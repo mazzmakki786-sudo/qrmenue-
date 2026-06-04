@@ -255,7 +255,7 @@ export default function SuperAdminClient({
   // Polling fallback (30s) for when real-time is not enabled in Supabase
   useEffect(() => {
     if (!user || user.email.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) return
-    const interval = setInterval(() => scheduleRefetch(), 30000)
+    const interval = setInterval(() => scheduleRefetch(), 15000)
     return () => clearInterval(interval)
   }, [user, scheduleRefetch])
 
