@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useRef } from "react"
 import { useForm } from "react-hook-form"
@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Camera, X } from "lucide-react"
+import { Camera, X, Flame, ChefHat, AlertTriangle } from "lucide-react"
 import type { Category } from "@/types"
 
 const dishSchema = z.object({
@@ -22,14 +22,23 @@ type DishFormData = z.infer<typeof dishSchema>
 
 interface Props {
   categories: Category[]
-  onSubmit: (data: DishFormData & { imageFile?: File | null }) => void
+  onSubmit: (data: DishFormData & { imageFile?: File | null; tags?: string[] }) => void
   onCancel: () => void
-  initialData?: Partial<DishFormData> & { image_url?: string | null }
+  initialData?: Partial<DishFormData> & { image_url?: string | null; tags?: string[] }
+  submitting?: boolean
+  imageUploadAllowed?: boolean
 }
 
-export function AddDishForm({ categories, onSubmit, onCancel, initialData }: Props) {
+const badgeOptions = [
+  { id: "popular", label: "Popular", icon: Flame, color: "text-[#FF6B35]" },
+  { id: "chef_special", label: "Chef's Special", icon: ChefHat, color: "text-black" },
+  { id: "spicy", label: "Spicy", icon: AlertTriangle, color: "text-[#DC2626]" },
+]
+
+export function AddDishForm({ categories, onSubmit, onCancel, initialData, submitting, imageUploadAllowed = true }: Props) {
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(initialData?.image_url || null)
+  const [selectedTags, setSelectedTags] = useState<string[]>(initialData?.tags || [])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const {
@@ -54,8 +63,14 @@ export function AddDishForm({ categories, onSubmit, onCancel, initialData }: Pro
     if (fileInputRef.current) fileInputRef.current.value = ""
   }
 
+  const toggleTag = (tagId: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tagId) ? prev.filter((t) => t !== tagId) : [...prev, tagId]
+    )
+  }
+
   const onFormSubmit = (data: DishFormData) => {
-    onSubmit({ ...data, imageFile })
+    onSubmit({ ...data, imageFile, tags: selectedTags })
   }
 
   return (
@@ -74,7 +89,7 @@ export function AddDishForm({ categories, onSubmit, onCancel, initialData }: Pro
               <X className="w-3 h-3" />
             </button>
           </div>
-        ) : (
+        ) : imageUploadAllowed ? (
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
@@ -83,6 +98,11 @@ export function AddDishForm({ categories, onSubmit, onCancel, initialData }: Pro
             <Camera className="w-4 h-4" />
             Upload photo
           </button>
+        ) : (
+          <div className="flex items-center gap-2 px-4 py-3 rounded-[10px] border border-dashed border-[#E8E8E8] text-sm text-[#999] bg-[#FAFAFA]">
+            <Camera className="w-4 h-4" />
+            Image upload not available on your plan
+          </div>
         )}
         <input
           ref={fileInputRef}
@@ -91,6 +111,32 @@ export function AddDishForm({ categories, onSubmit, onCancel, initialData }: Pro
           className="hidden"
           onChange={handleImageSelect}
         />
+      </div>
+
+      {/* Badges */}
+      <div>
+        <label className="block text-sm font-medium text-[#111] mb-2">Tags</label>
+        <div className="flex flex-wrap gap-2">
+          {badgeOptions.map((badge) => {
+            const isSelected = selectedTags.includes(badge.id)
+            const Icon = badge.icon
+            return (
+              <button
+                key={badge.id}
+                type="button"
+                onClick={() => toggleTag(badge.id)}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                  isSelected
+                    ? "bg-black text-white shadow-sm"
+                    : `bg-[#F8F8F8] ${badge.color} hover:bg-[#F0F0F0]`
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                {badge.label}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       <Input label="Name (English) *" id="name_en" {...register("name_en")} error={errors.name_en?.message} />
@@ -115,9 +161,9 @@ export function AddDishForm({ categories, onSubmit, onCancel, initialData }: Pro
         {errors.category_id && <p className="text-xs text-[#DC2626]">{errors.category_id.message}</p>}
       </div>
       <div className="flex gap-3 pt-2">
-        <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : "Save Dish"}
+        <Button type="button" variant="ghost" onClick={onCancel} disabled={submitting}>Cancel</Button>
+        <Button type="submit" disabled={isSubmitting || submitting}>
+          {submitting ? "Saving..." : isSubmitting ? "Saving..." : "Save Dish"}
         </Button>
       </div>
     </form>

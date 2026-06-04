@@ -34,7 +34,11 @@ export default async function MenuPage({ params }: Props) {
         city={restaurant.city}
         cuisineType={restaurant.cuisine_type}
       />
-      <MenuContent categories={categories} />
+      <MenuContent
+        categories={categories}
+        restaurantId={restaurant.id}
+        restaurantName={restaurant.name}
+      />
     </div>
   )
 }

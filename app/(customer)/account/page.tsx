@@ -1,106 +1,208 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { User, LogOut } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { formatPrice } from "@/lib/utils"
+import { LogOut, Package, Store } from "lucide-react"
 import type { Order } from "@/types"
 
+const statusColors: Record<string, "available" | "unavailable" | "trial" | "starter" | "growth" | "premium"> = {
+  received: "growth", preparing: "premium", ready: "available",
+  completed: "available", cancelled: "unavailable",
+}
+
+const statusLabels: Record<string, string> = {
+  received: "Pending", preparing: "Preparing", ready: "Ready",
+  completed: "Delivered", cancelled: "Cancelled",
+}
+
 export default function AccountPage() {
+  const router = useRouter()
   const [user, setUser] = useState<any>(null)
-  const [orders, setOrders] = useState<Order[]>([])
+  const [orders, setOrders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const init = async () => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
+  const fetchOrders = useCallback(async () => {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { setLoading(false); return }
 
-      if (user) {
-        const { data } = await supabase
-          .from("orders")
-          .select("*")
-          .eq("customer_id", user.id)
-          .order("created_at", { ascending: false })
-          .limit(20)
-        setOrders(data || [])
-      }
-      setLoading(false)
-    }
-    init()
+    setUser(user)
+
+    const { data } = await supabase
+      .from("orders")
+      .select("*, restaurants(name)")
+      .eq("customer_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(50)
+
+    setOrders(data || [])
+    setLoading(false)
   }, [])
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 8000)
+    fetchOrders()
+    return () => clearTimeout(timer)
+  }, [fetchOrders])
+
+  useEffect(() => {
+    if (!user) return
+    const supabase = createClient()
+    const channel = supabase
+      .channel(`customer-orders-${user.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "orders",
+          filter: `customer_id=eq.${user.id}`,
+        },
+        (payload) => {
+          setOrders((prev) => [payload.new as Order, ...prev.slice(0, 49)])
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "orders",
+          filter: `customer_id=eq.${user.id}`,
+        },
+        (payload) => {
+          setOrders((prev) =>
+            prev.map((o) => (o.id === payload.new.id ? (payload.new as Order) : o))
+          )
+        }
+      )
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [user])
 
   const handleLogout = async () => {
     const supabase = createClient()
     await supabase.auth.signOut()
-    setUser(null)
-    setOrders([])
+    router.push("/restaurants")
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-[#999]">Loading...</p>
+      <div className="min-h-screen bg-white">
+        <div className="h-14 border-b border-[#F0F0F0]" />
+        <div className="p-4 space-y-3">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-20 bg-[#F8F8F8] rounded-[10px] animate-pulse" />
+          ))}
+        </div>
       </div>
     )
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-4">
-        <User className="w-12 h-12 text-[#999] mb-4" />
-        <p className="text-lg font-medium mb-2">Not logged in</p>
-        <p className="text-sm text-[#555] mb-6">Login to view your orders</p>
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-white">
+        <Package className="w-12 h-12 text-[#999] mb-4" />
+        <h1 className="text-xl font-bold mb-2">My Orders</h1>
+        <p className="text-sm text-[#555] mb-6 text-center">Sign in to view your orders</p>
         <Link href="/login?redirect=/account">
           <Button variant="primary">Sign In</Button>
-        </Link>
-        <Link href="/restaurants" className="mt-4">
-          <Button variant="ghost">Browse Restaurants</Button>
         </Link>
       </div>
     )
   }
 
+  const activeOrders = orders.filter((o) => o.order_status !== "completed" && o.order_status !== "cancelled")
+  const pastOrders = orders.filter((o) => o.order_status === "completed" || o.order_status === "cancelled")
+
   return (
     <div className="min-h-screen bg-white">
-      <div className="px-4 py-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-xl font-bold">My Account</h1>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 text-sm text-[#DC2626] hover:text-red-700"
-          >
-            <LogOut className="w-4 h-4" />
-            Sign Out
-          </button>
-        </div>
+      <div className="flex items-center justify-between px-4 h-14 border-b border-[#F0F0F0]">
+        <h1 className="text-lg font-semibold">My Orders</h1>
+        <button onClick={handleLogout} className="text-sm text-[#DC2626] flex items-center gap-1">
+          <LogOut className="w-4 h-4" /> Sign Out
+        </button>
+      </div>
 
-        <div className="bg-[#F8F8F8] rounded-[12px] p-4 mb-6">
-          <p className="text-sm font-medium">{user.email}</p>
-          <p className="text-xs text-[#555] mt-1">Member since {new Date(user.created_at).toLocaleDateString()}</p>
-        </div>
+      <div className="p-4 space-y-8">
+        {/* Active Orders */}
+        {activeOrders.length > 0 && (
+          <div>
+            <h2 className="text-xs font-semibold text-[#999] uppercase tracking-wider mb-3">Active Orders</h2>
+            <div className="space-y-2">
+              {activeOrders.map((order) => (
+                <Link
+                  key={order.id}
+                  href={`/order-confirm/${order.id}`}
+                  className="block p-4 rounded-xl border border-[#F0F0F0] hover:border-[#DDD] hover:shadow-sm transition-all active:scale-[0.99]"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <p className="text-sm font-semibold">{order.order_number}</p>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <Store className="w-3 h-3 text-[#999]" />
+                        <span className="text-xs text-[#555]">{order.restaurants?.name || "Restaurant"}</span>
+                      </div>
+                    </div>
+                    <Badge variant={statusColors[order.order_status] || "starter"} className="capitalize">
+                      {statusLabels[order.order_status] || order.order_status}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-[#999]">
+                    <span>{order.items?.length || 0} items • {formatPrice(order.total_price)}</span>
+                    <span>{new Date(order.created_at).toLocaleDateString("en-PK")}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
-        <h2 className="text-sm font-semibold mb-3">Order History</h2>
-        {orders.length === 0 ? (
-          <p className="text-sm text-[#999]">No orders yet</p>
-        ) : (
-          <div className="space-y-2">
-            {orders.map((order) => (
-              <div
-                key={order.id}
-                className="p-4 rounded-[10px] border border-[#E8E8E8]"
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm font-medium">{order.order_number}</p>
-                  <span className="text-xs text-[#555] capitalize">{order.order_status}</span>
-                </div>
-                <p className="text-xs text-[#555]">
-                  {new Date(order.created_at).toLocaleDateString()} • Rs {order.total_price}
-                </p>
-              </div>
-            ))}
+        {/* Past Orders */}
+        {pastOrders.length > 0 && (
+          <div>
+            <h2 className="text-xs font-semibold text-[#999] uppercase tracking-wider mb-3">Past Orders</h2>
+            <div className="space-y-2">
+              {pastOrders.map((order) => (
+                <Link
+                  key={order.id}
+                  href={`/order-confirm/${order.id}`}
+                  className="block p-4 rounded-xl border border-[#F0F0F0] hover:border-[#DDD] hover:shadow-sm transition-all active:scale-[0.99]"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <p className="text-sm font-semibold">{order.order_number}</p>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <Store className="w-3 h-3 text-[#999]" />
+                        <span className="text-xs text-[#555]">{order.restaurants?.name || "Restaurant"}</span>
+                      </div>
+                    </div>
+                    <Badge variant={order.order_status === "completed" ? "available" : "unavailable"}>
+                      {statusLabels[order.order_status] || order.order_status}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-[#999]">
+                    <span className="font-medium text-[#555]">{formatPrice(order.total_price)}</span>
+                    <span>{new Date(order.created_at).toLocaleDateString("en-PK")}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {orders.length === 0 && (
+          <div className="text-center py-12">
+            <Package className="w-10 h-10 text-[#999] mx-auto mb-3" />
+            <p className="text-[#555]">No orders yet</p>
+            <Link href="/restaurants" className="block mt-4">
+              <Button variant="primary">Browse Restaurants</Button>
+            </Link>
           </div>
         )}
       </div>

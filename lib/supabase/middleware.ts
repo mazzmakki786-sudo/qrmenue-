@@ -39,18 +39,19 @@ export async function updateSession(request: NextRequest) {
       .from("restaurants")
       .select("id")
       .eq("owner_id", user.id)
-      .single()
+      .maybeSingle()
     if (!restaurant) {
-      return NextResponse.redirect(new URL("/login", request.url))
+      return NextResponse.redirect(new URL("/", request.url))
     }
   }
 
   if (pathname.startsWith("/superadmin")) {
     if (!user) {
-      return NextResponse.redirect(new URL("/login", request.url))
-    }
-    if (user.email !== process.env.SUPER_ADMIN_EMAIL) {
-      return NextResponse.redirect(new URL("/", request.url))
+      if (pathname !== "/superadmin") {
+        return NextResponse.redirect(new URL("/superadmin", request.url))
+      }
+    } else if (user.email !== process.env.SUPER_ADMIN_EMAIL && pathname !== "/superadmin") {
+      return NextResponse.redirect(new URL("/superadmin", request.url))
     }
   }
 

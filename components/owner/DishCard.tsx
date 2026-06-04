@@ -1,7 +1,10 @@
-"use client"
+﻿"use client"
 
+import { useState } from "react"
+import Image from "next/image"
 import type { Dish } from "@/types"
-import { Pencil, Trash2 } from "lucide-react"
+import { Pencil, Trash2, ImageOff } from "lucide-react"
+import { DishBadges } from "@/components/customer/DishBadges"
 import { formatPrice } from "@/lib/utils"
 
 interface Props {
@@ -12,16 +15,28 @@ interface Props {
 }
 
 export function DishCard({ dish, onEdit, onDelete, onToggleAvailability }: Props) {
+  const [imgError, setImgError] = useState(false)
+
   return (
     <div className="flex items-center gap-4 py-3 border-b border-[#F0F0F0] last:border-b-0">
-      {dish.image_url && (
-        <div className="w-12 h-12 rounded-[10px] overflow-hidden flex-shrink-0">
-          <img
+      {dish.image_url && !imgError ? (
+        <div className="w-14 h-14 rounded-[10px] overflow-hidden flex-shrink-0 relative">
+          <Image
             src={dish.image_url}
             alt={dish.name_en}
-            className="w-full h-full object-cover"
-            loading="lazy"
+            fill
+            className="object-cover"
+            sizes="56px"
+            onError={() => setImgError(true)}
           />
+        </div>
+      ) : dish.image_url && imgError ? (
+        <div className="w-14 h-14 rounded-[10px] bg-[#F8F8F8] flex items-center justify-center flex-shrink-0">
+          <ImageOff className="w-5 h-5 text-[#999]" />
+        </div>
+      ) : (
+        <div className="w-14 h-14 rounded-[10px] bg-[#F8F8F8] flex items-center justify-center flex-shrink-0">
+          <ImageOff className="w-5 h-5 text-[#999]" />
         </div>
       )}
       <div className="flex-1 min-w-0">
@@ -34,6 +49,7 @@ export function DishCard({ dish, onEdit, onDelete, onToggleAvailability }: Props
           )}
         </div>
         <p className="text-sm text-[#555]">{formatPrice(dish.price)}</p>
+        <DishBadges tags={dish.tags || []} />
       </div>
       <div className="flex items-center gap-1">
         <button

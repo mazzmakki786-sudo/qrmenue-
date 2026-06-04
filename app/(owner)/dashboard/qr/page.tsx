@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Download, Copy, Check, Printer } from "lucide-react"
 import type { Restaurant } from "@/types"
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://qrmenu.vercel.app"
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://qr-menue-one.vercel.app"
 
 export default function QRPage() {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null)

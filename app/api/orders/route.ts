@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { generateOrderNumber } from "@/lib/utils"
 import { z } from "zod"
 
@@ -44,8 +44,18 @@ export async function POST(request: Request) {
   }
 
   const orderNumber = generateOrderNumber()
+  const adminSupabase = createAdminClient()
 
-  const { data, error } = await supabase
+  let finalCustomerId = parsed.data.customer_id || null
+  if (finalCustomerId) {
+    await adminSupabase.from("customers").upsert({
+      id: finalCustomerId,
+      name: parsed.data.customer_name,
+      email: parsed.data.customer_name,
+    }, { onConflict: "id", ignoreDuplicates: false })
+  }
+
+  const { data, error } = await adminSupabase
     .from("orders")
     .insert({
       restaurant_id: parsed.data.restaurant_id,
@@ -81,7 +91,7 @@ export async function POST(request: Request) {
     restaurantPhone: restaurant?.phone || "",
   })
 
-  await supabase.from("notification_logs").insert({
+  await adminSupabase.from("notification_logs").insert({
     restaurant_id: parsed.data.restaurant_id,
     order_id: data.id,
     type: "order_email",

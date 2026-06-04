@@ -1,4 +1,4 @@
-export interface Restaurant {
+﻿export interface Restaurant {
   id: string
   owner_id: string | null
   name: string
@@ -42,6 +42,7 @@ export interface Dish {
   image_url: string | null
   is_available: boolean
   sort_order: number
+  tags: string[]
   created_at: string
   updated_at: string
 }

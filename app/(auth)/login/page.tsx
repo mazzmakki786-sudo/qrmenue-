@@ -10,7 +10,7 @@ import Link from "next/link"
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirect = searchParams.get("redirect") || "/"
+  const redirectParam = searchParams.get("redirect")
   const supabase = createClient()
 
   const [email, setEmail] = useState("")
@@ -19,9 +19,12 @@ function LoginForm() {
   const [loading, setLoading] = useState(false)
 
   const handleGoogleLogin = async () => {
+    const cb = redirectParam
+      ? `${location.origin}/auth/callback?redirect=${redirectParam}`
+      : `${location.origin}/auth/callback`
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${location.origin}/auth/callback?redirect=${redirect}` },
+      options: { redirectTo: cb },
     })
   }
 
@@ -29,19 +32,35 @@ function LoginForm() {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { error, data } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
       setError(error.message)
-    } else {
-      router.push(redirect)
+    } else if (data.user) {
+      if (redirectParam) {
+        router.push(redirectParam)
+      } else {
+        const { data: restaurant } = await supabase
+          .from("restaurants")
+          .select("id")
+          .eq("owner_id", data.user.id)
+          .maybeSingle()
+        router.push(restaurant ? "/dashboard" : "/restaurants")
+      }
     }
     setLoading(false)
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-1">Almost there!</h1>
-      <p className="text-sm text-[#555] mb-8">Login to complete your order</p>
+    <div className="w-full">
+      <div className="text-center mb-8">
+        <div className="w-12 h-12 rounded-xl bg-black text-white flex items-center justify-center mx-auto mb-4">
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+          </svg>
+        </div>
+        <h1 className="text-2xl font-bold">Welcome back</h1>
+        <p className="text-sm text-[#555] mt-1">Sign in to your account</p>
+      </div>
 
       <Button variant="google" onClick={handleGoogleLogin} className="mb-6">
         <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
@@ -70,7 +89,7 @@ function LoginForm() {
 
       <p className="text-sm text-[#555] text-center mt-6">
         Don't have an account?{" "}
-        <Link href="/signup" className="text-black font-medium underline">Sign up</Link>
+        <Link href="/signup" className="text-[#FF6B35] font-semibold hover:underline">Sign up</Link>
       </p>
     </div>
   )

@@ -109,7 +109,7 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6 max-w-lg">
-      <h1 className="text-xl font-bold">Profile & Settings</h1>
+      <h1 className="text-xl font-bold">Profile</h1>
 
       {/* Restaurant Info */}
       <div className="bg-white rounded-[14px] border border-[#E8E8E8] p-5 space-y-4">

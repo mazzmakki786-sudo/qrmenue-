@@ -1,5 +1,7 @@
+﻿-- Migration: add_dish_tags (2026-05-31)
+ALTER TABLE dishes ADD COLUMN IF NOT EXISTS tags JSONB DEFAULT '[]'::jsonb;
 -- ============================================
--- QRMenu.pk — Complete Database Schema
+-- QRMenu.pk â€” Complete Database Schema
 -- Run this in Supabase SQL Editor
 -- ============================================
 
@@ -200,11 +202,18 @@ GROUP BY restaurant_id, DATE(created_at AT TIME ZONE 'Asia/Karachi');
 CREATE UNIQUE INDEX ON daily_order_stats(restaurant_id, order_date);
 
 CREATE OR REPLACE FUNCTION refresh_daily_stats()
-RETURNS void AS $$
+RETURNS trigger
+LANGUAGE plpgsql
+AS $func$
 BEGIN
   REFRESH MATERIALIZED VIEW CONCURRENTLY daily_order_stats;
+  RETURN NULL;
 END;
-$$ LANGUAGE plpgsql;
+$func$;
+
+CREATE TRIGGER refresh_daily_stats_trigger
+  AFTER INSERT OR UPDATE OF order_status ON orders
+  FOR EACH STATEMENT EXECUTE FUNCTION refresh_daily_stats();
 
 -- ============================================
 -- TRIGGERS: auto updated_at
@@ -228,6 +237,24 @@ CREATE TRIGGER dishes_updated_at
 CREATE TRIGGER orders_updated_at
   BEFORE UPDATE ON orders
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- ============================================
+-- STORAGE: dish-images bucket
+-- ============================================
+INSERT INTO storage.buckets (id, name, public) VALUES ('dish-images', 'dish-images', true)
+ON CONFLICT (id) DO UPDATE SET public = true;
+
+CREATE POLICY "Public can view dish-images"
+  ON storage.objects FOR SELECT
+  USING (bucket_id = 'dish-images');
+
+CREATE POLICY "Authenticated users can upload to dish-images"
+  ON storage.objects FOR INSERT
+  WITH CHECK (bucket_id = 'dish-images' AND auth.role() = 'authenticated');
+
+CREATE POLICY "Owners can update/delete own dish-images"
+  ON storage.objects FOR ALL
+  USING (bucket_id = 'dish-images' AND auth.role() = 'authenticated');
 
 -- ============================================
 -- ROW LEVEL SECURITY
@@ -273,7 +300,11 @@ CREATE POLICY "Owner manages own dishes"
     )
   );
 
--- Orders: owner reads own, anyone can create
+-- Orders: anyone can view (by order ID UUID), owner reads own, anyone can create
+CREATE POLICY "Anyone can view orders"
+  ON orders FOR SELECT
+  USING (true);
+
 CREATE POLICY "Owner can read own restaurant orders"
   ON orders FOR SELECT
   USING (
@@ -297,5 +328,21 @@ CREATE POLICY "Owner can update own restaurant orders"
 
 -- Customers: can see own profile
 CREATE POLICY "Customer can see own profile"
-  ON customers FOR ALL
+  ON customers FOR SELECT
   USING (id = auth.uid());
+
+-- Customers: can insert own profile
+CREATE POLICY "Customer can insert own profile"
+  ON customers FOR INSERT
+  WITH CHECK (id = auth.uid());
+
+-- Customers: can update own profile
+CREATE POLICY "Customer can update own profile"
+  ON customers FOR UPDATE
+  USING (id = auth.uid());
+
+-- ============================================
+-- REALTIME: enable for orders table
+-- ============================================
+ALTER PUBLICATION supabase_realtime ADD TABLE orders;
+

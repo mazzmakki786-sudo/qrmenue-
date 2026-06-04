@@ -1,11 +1,11 @@
-"use client"
+﻿"use client"
 
 import { useCartStore } from "@/stores/cartStore"
 import { ShoppingCart } from "lucide-react"
 import Link from "next/link"
 
 export function CartBar() {
-  const { items, getTotalItems, getTotalPrice } = useCartStore()
+  const { items, getTotalItems, getTotalPrice, restaurantName } = useCartStore()
   const totalItems = getTotalItems()
 
   if (totalItems === 0) return null
@@ -13,21 +13,34 @@ export function CartBar() {
   return (
     <Link
       href="/cart"
-      className="fixed bottom-[60px] left-0 right-0 z-40 mx-4 mb-3"
+      className="fixed bottom-[60px] left-0 right-0 z-40 mx-4 mb-3 animate-slide-up"
     >
-      <div className="bg-black text-white rounded-[12px] px-5 py-3.5 flex items-center justify-between shadow-lg">
-        <div className="flex items-center gap-3">
+      <div className="bg-black text-white rounded-2xl px-5 py-4 flex items-center justify-between shadow-xl shadow-black/20">
+        <div className="flex items-center gap-3 min-w-0">
           <div className="relative">
-            <ShoppingCart className="w-5 h-5" />
-            <span className="absolute -top-1.5 -right-1.5 bg-[#FF6B35] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+              <ShoppingCart className="w-5 h-5" />
+            </div>
+            <span className="absolute -top-1 -right-1 bg-[#FF6B35] text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
               {totalItems}
             </span>
           </div>
-          <span className="text-sm">{totalItems} item{totalItems > 1 ? "s" : ""}</span>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold leading-tight">
+              {totalItems} item{totalItems > 1 ? "s" : ""}
+            </p>
+            {restaurantName && (
+              <p className="text-[11px] text-white/60 truncate">{restaurantName}</p>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="font-semibold">Rs {getTotalPrice().toLocaleString("en-PK")}</span>
-          <span className="text-sm opacity-70">View →</span>
+        <div className="flex items-center gap-3 shrink-0">
+          <span className="font-bold text-lg">Rs {getTotalPrice().toLocaleString("en-PK")}</span>
+          <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
         </div>
       </div>
     </Link>
