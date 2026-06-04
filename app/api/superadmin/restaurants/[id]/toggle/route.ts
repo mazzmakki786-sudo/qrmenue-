@@ -10,7 +10,7 @@ export async function PATCH(
   const body = await request.json()
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.email !== process.env.SUPER_ADMIN_EMAIL) {
+  if (!user || user.email?.toLowerCase() !== process.env.SUPER_ADMIN_EMAIL?.toLowerCase()) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
   }
 

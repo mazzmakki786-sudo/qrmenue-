@@ -222,7 +222,7 @@ export default function SuperAdminClient({
     }
   }, [user])
 
-  // Debounced 500ms real-time subscription on restaurants + company_settings
+  // Debounced 500ms refetch (used by real-time + polling fallback)
   const scheduleRefetch = useCallback(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
@@ -230,6 +230,7 @@ export default function SuperAdminClient({
     }, 500)
   }, [fetchRestaurants])
 
+  // Real-time subscription on restaurants + company_settings
   useEffect(() => {
     if (!user || user.email.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) return
     const channel = supabase
@@ -249,6 +250,13 @@ export default function SuperAdminClient({
       if (debounceRef.current) clearTimeout(debounceRef.current)
       supabase.removeChannel(channel)
     }
+  }, [user, scheduleRefetch, supabase])
+
+  // Polling fallback (30s) for when real-time is not enabled in Supabase
+  useEffect(() => {
+    if (!user || user.email.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) return
+    const interval = setInterval(() => scheduleRefetch(), 30000)
+    return () => clearInterval(interval)
   }, [user, scheduleRefetch])
 
   const handleLogout = async () => {

@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import {
   getSubscriptionStatus,
+  PLAN_LIMITS,
   type Plan,
   type PlanLimits,
   type SubscriptionStatus,
@@ -156,9 +157,7 @@ export function useSubscription(): UseSubscriptionReturn {
   const status = restaurant
     ? getSubscriptionStatus(restaurant, { dishCount, imageCount, orderCount })
     : null
-  const planLimits = status
-    ? (status as any).planLimits
-    : EMPTY_LIMITS
+  const planLimits = PLAN_LIMITS[plan] || EMPTY_LIMITS
 
   return {
     restaurant,

@@ -50,7 +50,7 @@ export async function updateSession(request: NextRequest) {
       if (pathname !== "/superadmin") {
         return NextResponse.redirect(new URL("/superadmin", request.url))
       }
-    } else if (user.email !== process.env.SUPER_ADMIN_EMAIL && pathname !== "/superadmin") {
+    } else if (user.email?.toLowerCase() !== process.env.SUPER_ADMIN_EMAIL?.toLowerCase() && pathname !== "/superadmin") {
       return NextResponse.redirect(new URL("/superadmin", request.url))
     }
   }
