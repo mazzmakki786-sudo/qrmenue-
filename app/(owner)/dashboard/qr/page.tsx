@@ -94,14 +94,15 @@ export default function QRPage() {
       <h1 className="text-xl font-bold">QR Code</h1>
 
       {/* QR Code Display */}
-      <div className="bg-white rounded-[14px] border border-[#E8E8E8] p-6 flex flex-col items-center gap-4">
-        <div ref={qrRef}>
+      <div className="bg-white rounded-[14px] border border-[#E8E8E8] p-6 flex flex-col items-center gap-4 overflow-hidden">
+        <div ref={qrRef} className="max-w-full">
           <QRCodeSVG
             id="restaurant-qr"
             value={menuUrl}
             size={size}
             level="H"
             includeMargin
+            className="max-w-full h-auto"
           />
         </div>
         <p className="text-sm font-medium">{restaurant.name}</p>

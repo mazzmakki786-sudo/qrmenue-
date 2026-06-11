@@ -152,11 +152,11 @@ export function OrderReceipt({ order, restaurant }: Props) {
         </div>
       </div>
 
-      <div className="flex gap-3 mt-4 max-w-sm mx-auto">
-        <Button variant="primary" fullWidth onClick={handlePrint}>
+      <div className="grid grid-cols-2 gap-3 mt-4 max-w-sm mx-auto">
+        <Button variant="primary" onClick={handlePrint}>
           <Printer className="w-4 h-4 mr-2" /> Print
         </Button>
-        <Button variant="primary" fullWidth onClick={handleDownload}>
+        <Button variant="primary" onClick={handleDownload}>
           <Download className="w-4 h-4 mr-2" /> Save
         </Button>
       </div>

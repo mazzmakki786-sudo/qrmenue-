@@ -41,7 +41,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="max-w-lg mx-auto space-y-6 md:space-y-8 py-6 md:py-8 px-2">
+    <div className="max-w-lg mx-auto space-y-6 md:space-y-8 py-6 md:py-8 px-4">
       <div className="text-center">
         <div className="w-14 h-14 md:w-16 md:h-16 bg-black text-white rounded-full flex items-center justify-center mx-auto mb-4">
           <Check className="w-7 h-7 md:w-8 md:h-8" />

@@ -139,7 +139,7 @@ export default function PricingPage() {
               key={plan.key}
               className={`rounded-2xl border p-5 md:p-6 flex flex-col relative transition-all duration-200 ${
                 plan.highlight
-                  ? "border-black bg-gradient-to-br from-white to-[#FAFAFA] shadow-xl scale-[1.02] md:scale-105"
+                  ? "border-black bg-gradient-to-br from-white to-[#FAFAFA] shadow-xl sm:scale-[1.02] lg:scale-105"
                   : "border-[#E8E8E8] bg-white hover:border-[#999] hover:shadow-md"
               }`}
             >

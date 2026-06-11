@@ -113,9 +113,9 @@ export default function AnalyticsPage() {
           <h3 className="text-sm font-semibold mb-3">All Time Popular Dishes</h3>
           <div className="space-y-2">
             {topDishes.map((d, i) => (
-              <div key={d.name} className="flex items-center justify-between text-sm">
-                <span>{i + 1}. {d.name}</span>
-                <span className="text-[#555]">{d.count} orders</span>
+              <div key={d.name} className="flex items-center justify-between text-sm gap-2">
+                <span className="truncate min-w-0">{i + 1}. {d.name}</span>
+                <span className="text-[#555] shrink-0">{d.count} orders</span>
               </div>
             ))}
           </div>
