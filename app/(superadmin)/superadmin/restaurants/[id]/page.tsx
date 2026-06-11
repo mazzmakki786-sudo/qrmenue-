@@ -7,10 +7,10 @@ import { PlanEditor } from "@/components/superadmin/PlanEditor"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { formatPrice } from "@/lib/utils"
-import { ArrowLeft, Phone, MapPin, Mail, Calendar, ExternalLink, ShoppingBag, Utensils, ToggleLeft, ToggleRight, BarChart3, Users, TrendingUp, XCircle, Clock, Image as ImageIcon, Crown, Loader2, RotateCcw } from "lucide-react"
+import { ArrowLeft, Phone, MapPin, Mail, Calendar, ExternalLink, ShoppingBag, Utensils, ToggleLeft, ToggleRight, BarChart3, Users, TrendingUp, XCircle, Clock, Image as ImageIcon, Crown, Loader2, RotateCcw, PauseCircle, Settings2 } from "lucide-react"
 import Link from "next/link"
 import type { Restaurant } from "@/types"
-import { PLAN_PRICES } from "@/lib/subscription"
+import { PLAN_PRICES, DEFAULT_TRIAL_LIMITS, type PlanLimitsPartial } from "@/lib/subscription"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from "recharts"
 
 export default function RestaurantDetailPage() {
@@ -36,22 +36,21 @@ export default function RestaurantDetailPage() {
   const debounceRef = useRef<NodeJS.Timeout | null>(null)
 
   const fetchData = async () => {
-    const [r, dishesRes, ordersRes, ownerRes, customersRes] = await Promise.all([
-      supabase.from("restaurants").select("*").eq("id", id).single(),
-      supabase.from("dishes").select("*").eq("restaurant_id", id).order("created_at", { ascending: false }),
+    const [rRes, ordersRes, ownerRes, customersRes] = await Promise.all([
+      fetch(`/api/superadmin/restaurants/${id}`).then((r) => r.json()).catch(() => null),
       supabase.from("orders").select("*").eq("restaurant_id", id).order("created_at", { ascending: false }).limit(500),
       fetch("/api/superadmin/users").then((res) => res.json()).catch(() => null),
       fetch(`/api/superadmin/restaurants/${id}/customers`).then((res) => res.json()).catch(() => null),
     ])
 
-    if (r.data) {
-      setRestaurant(r.data)
+    if (rRes?.restaurant) {
+      setRestaurant(rRes.restaurant)
+      setDishes(rRes.restaurant.dishes || [])
       const users = ownerRes?.users || []
-      const owner = users.find((u: any) => u.id === r.data.owner_id)
+      const owner = users.find((u: any) => u.id === rRes.restaurant.owner_id)
       setOwnerEmail(owner?.email || null)
     }
 
-    setDishes(dishesRes.data || [])
     const allOrders = ordersRes.data || []
     setOrders(allOrders)
     setCustomers(customersRes?.customers || [])
@@ -126,6 +125,37 @@ export default function RestaurantDetailPage() {
       if (!res.ok) { setRestaurant({ ...restaurant, is_active: !next }) }
       else { await fetchData() }
     } catch { setRestaurant({ ...restaurant, is_active: !next }) }
+  }
+
+  const handleToggleSuspended = async () => {
+    if (!restaurant) return
+    const next = !restaurant.is_suspended
+    setRestaurant({ ...restaurant, is_suspended: next })
+    try {
+      const res = await fetch(`/api/superadmin/restaurants/${id}/toggle`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_suspended: next }),
+      })
+      if (!res.ok) { setRestaurant({ ...restaurant, is_suspended: !next }) }
+      else { await fetchData() }
+    } catch { setRestaurant({ ...restaurant, is_suspended: !next }) }
+  }
+
+  const handleSaveOverrides = async (overrides: PlanLimitsPartial | null) => {
+    if (!restaurant) return
+    setSaving(true)
+    try {
+      const res = await fetch(`/api/superadmin/restaurants/${id}/toggle`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan_limits_override: overrides }),
+      })
+      if (!res.ok) throw new Error("Failed to save overrides")
+      await fetchData()
+    } catch (e: any) {
+      console.error(e)
+    } finally { setSaving(false) }
   }
 
   const handleToggleImages = async () => {
@@ -207,7 +237,7 @@ export default function RestaurantDetailPage() {
       </div>
 
       {/* Quick toggles */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <button onClick={handleToggleActive}
           className="bg-white rounded-[14px] border border-[#E8E8E8] p-4 flex items-center justify-between hover:bg-[#FAFAFA] transition-colors text-left">
           <div>
@@ -215,6 +245,16 @@ export default function RestaurantDetailPage() {
             <p className="text-xs text-[#999]">Show on /restaurants list</p>
           </div>
           {restaurant.is_active ? <ToggleRight className="w-10 h-10 text-[#16A34A]" /> : <ToggleLeft className="w-10 h-10 text-[#999]" />}
+        </button>
+        <button onClick={handleToggleSuspended}
+          className="bg-white rounded-[14px] border border-[#E8E8E8] p-4 flex items-center justify-between hover:bg-[#FAFAFA] transition-colors text-left">
+          <div>
+            <p className="text-sm font-semibold flex items-center gap-1.5">
+              <PauseCircle className="w-3.5 h-3.5" /> Account Suspended
+            </p>
+            <p className="text-xs text-[#999]">Temporarily hold this account</p>
+          </div>
+          {restaurant.is_suspended ? <ToggleRight className="w-10 h-10 text-[#D97706]" /> : <ToggleLeft className="w-10 h-10 text-[#999]" />}
         </button>
         <button onClick={handleToggleImages}
           className="bg-white rounded-[14px] border border-[#E8E8E8] p-4 flex items-center justify-between hover:bg-[#FAFAFA] transition-colors text-left">
@@ -369,7 +409,13 @@ export default function RestaurantDetailPage() {
 
       <div className="bg-white rounded-[14px] border border-[#E8E8E8] p-5">
         <h3 className="text-sm font-semibold mb-4 flex items-center gap-2"><Crown className="w-4 h-4" /> Change Plan</h3>
-        <PlanEditor currentPlan={restaurant.plan} currentTrialEnd={restaurant.trial_end} onSave={handlePlanUpdate} />
+        <PlanEditor
+          currentPlan={restaurant.plan}
+          currentTrialEnd={restaurant.trial_end}
+          currentOverrides={restaurant.plan_limits_override as PlanLimitsPartial | null}
+          onSave={handlePlanUpdate}
+          onSaveOverrides={handleSaveOverrides}
+        />
         {saving && <p className="text-xs text-[#999] mt-2">Saving...</p>}
       </div>
 

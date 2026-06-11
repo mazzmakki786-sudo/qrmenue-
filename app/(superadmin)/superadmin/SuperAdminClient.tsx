@@ -9,6 +9,7 @@ import { RestaurantTable } from "@/components/superadmin/RestaurantTable"
 import { CustomerTable } from "@/components/superadmin/CustomerTable"
 import { AnalyticsView } from "@/components/superadmin/AnalyticsView"
 import { CompanySettingsForm } from "@/components/superadmin/CompanySettingsForm"
+import { TrialLimitsEditor } from "@/components/superadmin/TrialLimitsEditor"
 
 const SUPER_ADMIN_EMAIL = "mazzmakki786@gmail.com"
 
@@ -333,7 +334,12 @@ export default function SuperAdminClient({
           )}
           {activeTab === "customers" && <CustomerTable />}
           {activeTab === "analytics" && <AnalyticsView />}
-          {activeTab === "settings" && <CompanySettingsForm />}
+          {activeTab === "settings" && (
+            <div className="space-y-6">
+              <TrialLimitsEditor />
+              <CompanySettingsForm />
+            </div>
+          )}
         </>
       )}
     </div>

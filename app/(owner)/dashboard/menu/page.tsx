@@ -14,7 +14,7 @@ import Link from "next/link"
 
 export default function MenuManagementPage() {
   const sub = useSubscription()
-  const { restaurant, dishCount, imageCount, canAddDish, canUploadImage, planLimits, status, refresh } = sub
+  const { restaurant, dishCount, imageCount, canAddDish, canAddCategory, canUploadImage, planLimits, status, refresh, isSuspended } = sub
   const [categories, setCategories] = useState<Category[]>([])
   const [dishes, setDishes] = useState<Dish[]>([])
   const [editingDish, setEditingDish] = useState<Dish | null>(null)
@@ -215,6 +215,16 @@ export default function MenuManagementPage() {
   }
 
   const handleAddCategory = () => {
+    if (suspended) {
+      setLimitError("Account is suspended. Cannot add categories.")
+      return
+    }
+    if (!canAddCategory) {
+      setLimitError(
+        `You've reached your plan's limit of ${planLimits.maxCategories} categories.`
+      )
+      return
+    }
     setCategoryNameEn("")
     setCategoryNameUr("")
     setCategoryError(null)
@@ -276,6 +286,7 @@ export default function MenuManagementPage() {
 
   const trialExpired = status?.isExpired === true
   const graceActive = status?.isInGracePeriod === true
+  const suspended = isSuspended === true
 
   if (loading) {
     return (
@@ -323,6 +334,16 @@ export default function MenuManagementPage() {
         </div>
       </div>
 
+      {suspended && (
+        <div className="mb-4 rounded-[14px] p-4 flex items-start gap-3 bg-[#FEF3C7] border border-[#D97706]/30">
+          <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5 text-[#D97706]" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-[#92400E]">Account Suspended</p>
+            <p className="text-xs text-[#555] mt-0.5">Your account has been suspended. Contact support for details.</p>
+          </div>
+        </div>
+      )}
+
       {(trialExpired || graceActive) && (
         <div className={`mb-4 rounded-[14px] p-4 flex items-start gap-3 ${
           trialExpired
@@ -347,7 +368,7 @@ export default function MenuManagementPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-3 mb-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
         <div className="bg-white rounded-[14px] border border-[#E8E8E8] p-3 md:p-4">
           <div className="flex items-center gap-1.5 text-xs text-[#999] mb-1">
             <UtensilsCrossed className="w-3.5 h-3.5" />

@@ -4,10 +4,28 @@ export interface PlanLimits {
   maxDishes: number
   maxImages: number
   maxOrders: number
+  maxCategories: number
   analytics: boolean
   customBranding: boolean
   canHaveQR: boolean
   canHaveWhatsapp: boolean
+}
+
+export interface TrialLimitConfig {
+  maxDishes: number
+  maxCategories: number
+  maxOrders: number
+  trialDurationDays: number
+  gracePeriodDays: number
+}
+
+export interface ExpiredTrialLimitConfig {
+  maxDishes: number
+  maxCategories: number
+  maxOrders: number
+  maxImages: number
+  blockMenu: boolean
+  blockOrders: boolean
 }
 
 export interface SubscriptionStatus {
@@ -15,21 +33,44 @@ export interface SubscriptionStatus {
   daysRemaining: number
   isExpired: boolean
   isInGracePeriod: boolean
+  isSuspended: boolean
+  blockMenu: boolean
+  blockOrders: boolean
   canUploadImages: boolean
   canAddDish: boolean
+  canAddCategory: boolean
   canAcceptOrder: boolean
   shouldBlurOrderDetails: boolean
   orderCount: number
   dishCount: number
+  categoryCount: number
   imageCount: number
   trialDaysRemaining: number
 }
 
+export const DEFAULT_TRIAL_LIMITS: TrialLimitConfig = {
+  maxDishes: 20,
+  maxCategories: 20,
+  maxOrders: 10,
+  trialDurationDays: 7,
+  gracePeriodDays: 3,
+}
+
+export const DEFAULT_EXPIRED_TRIAL_LIMITS: ExpiredTrialLimitConfig = {
+  maxDishes: 0,
+  maxCategories: 0,
+  maxOrders: 0,
+  maxImages: 0,
+  blockMenu: true,
+  blockOrders: true,
+}
+
 export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
   trial: {
-    maxDishes: 5,
-    maxImages: 5,
-    maxOrders: 10,
+    maxDishes: DEFAULT_TRIAL_LIMITS.maxDishes,
+    maxImages: 20,
+    maxOrders: DEFAULT_TRIAL_LIMITS.maxOrders,
+    maxCategories: DEFAULT_TRIAL_LIMITS.maxCategories,
     analytics: true,
     customBranding: false,
     canHaveQR: true,
@@ -39,6 +80,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     maxDishes: 30,
     maxImages: 10,
     maxOrders: Infinity,
+    maxCategories: Infinity,
     analytics: true,
     customBranding: false,
     canHaveQR: true,
@@ -48,6 +90,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     maxDishes: 50,
     maxImages: 20,
     maxOrders: Infinity,
+    maxCategories: Infinity,
     analytics: true,
     customBranding: true,
     canHaveQR: true,
@@ -57,6 +100,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     maxDishes: 100,
     maxImages: 100,
     maxOrders: Infinity,
+    maxCategories: Infinity,
     analytics: true,
     customBranding: true,
     canHaveQR: true,
@@ -89,12 +133,36 @@ export interface RestaurantLike {
   trial_end: string
   image_upload_allowed?: boolean
   is_active?: boolean
+  is_suspended?: boolean
+  plan_limits_override?: PlanLimitsPartial | null
+}
+
+export interface PlanLimitsPartial {
+  maxDishes?: number
+  maxImages?: number
+  maxOrders?: number
+  maxCategories?: number
 }
 
 export interface StatusCounts {
   dishCount?: number
   imageCount?: number
   orderCount?: number
+  categoryCount?: number
+}
+
+export function getEffectiveLimits(
+  plan: Plan,
+  override?: PlanLimitsPartial | null
+): PlanLimits {
+  const base = { ...PLAN_LIMITS[plan] }
+  if (override) {
+    if (override.maxDishes !== undefined) base.maxDishes = override.maxDishes
+    if (override.maxImages !== undefined) base.maxImages = override.maxImages
+    if (override.maxOrders !== undefined) base.maxOrders = override.maxOrders
+    if (override.maxCategories !== undefined) base.maxCategories = override.maxCategories
+  }
+  return base
 }
 
 export function getSubscriptionStatus(
@@ -110,16 +178,22 @@ export function getSubscriptionStatus(
   const orderCount = counts.orderCount ?? 0
   const dishCount = counts.dishCount ?? 0
   const imageCount = counts.imageCount ?? 0
+  const categoryCount = counts.categoryCount ?? 0
 
-  const limits = PLAN_LIMITS[restaurant.plan]
+  const isActive = restaurant.is_active !== false
+  const isSuspended = restaurant.is_suspended === true
+
+  const limits = getEffectiveLimits(restaurant.plan, restaurant.plan_limits_override)
 
   const dishLimit = limits.maxDishes
   const imageLimit = limits.maxImages
   const orderLimit = limits.maxOrders
+  const categoryLimit = limits.maxCategories
 
-  const canAddDish = dishCount < dishLimit
-  const canUploadImages = imageCount < imageLimit
-  const canAcceptOrder = orderCount < orderLimit
+  const canAddDish = dishCount < dishLimit && isActive && !isSuspended
+  const canUploadImages = imageCount < imageLimit && isActive && !isSuspended
+  const canAddCategory = categoryCount < categoryLimit && isActive && !isSuspended
+  const canAcceptOrder = orderCount < orderLimit && isActive && !isSuspended
 
   const shouldBlurOrderDetails =
     restaurant.plan === "trial" && orderCount >= orderLimit
@@ -136,18 +210,45 @@ export function getSubscriptionStatus(
     const isInGracePeriod = now > trialEnd && now < graceEnd
     const isExpired = now > graceEnd
 
+    if (isExpired) {
+      return {
+        plan: "trial",
+        daysRemaining: 0,
+        trialDaysRemaining: 0,
+        isExpired: true,
+        isInGracePeriod: false,
+        isSuspended,
+        blockMenu: true,
+        blockOrders: true,
+        canUploadImages: false,
+        canAddDish: false,
+        canAddCategory: false,
+        canAcceptOrder: false,
+        shouldBlurOrderDetails: true,
+        orderCount,
+        dishCount,
+        categoryCount,
+        imageCount,
+      }
+    }
+
     return {
       plan: "trial",
       daysRemaining: trialDaysRemaining,
       trialDaysRemaining,
-      isExpired,
+      isExpired: false,
       isInGracePeriod,
+      isSuspended,
+      blockMenu: false,
+      blockOrders: false,
       canUploadImages,
       canAddDish,
+      canAddCategory,
       canAcceptOrder,
       shouldBlurOrderDetails,
       orderCount,
       dishCount,
+      categoryCount,
       imageCount,
     }
   }
@@ -165,12 +266,17 @@ export function getSubscriptionStatus(
     trialDaysRemaining: 0,
     isExpired: planEnd ? now > planEnd : false,
     isInGracePeriod: false,
+    isSuspended,
+    blockMenu: false,
+    blockOrders: false,
     canUploadImages,
     canAddDish,
-    canAcceptOrder: true,
+    canAddCategory,
+    canAcceptOrder,
     shouldBlurOrderDetails: false,
     orderCount,
     dishCount,
+    categoryCount,
     imageCount,
   }
 }
@@ -185,6 +291,10 @@ export function getPlanFeatures(plan: Plan): string[] {
 
   features.push(
     `${formatLimit(limits.maxDishes)} dish${limits.maxDishes === 1 ? "" : "es"}`
+  )
+
+  features.push(
+    `${formatLimit(limits.maxCategories)} categor${limits.maxCategories === 1 ? "y" : "ies"}`
   )
 
   if (limits.maxImages === 0) {

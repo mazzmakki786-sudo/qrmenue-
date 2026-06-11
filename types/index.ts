@@ -17,6 +17,8 @@
   trial_end: string
   image_upload_allowed: boolean
   is_active: boolean
+  is_suspended: boolean
+  plan_limits_override: Record<string, number> | null
   created_at: string
   updated_at: string
 }

@@ -1,8 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { PLAN_LIMITS, type Plan } from "@/lib/subscription"
-import { AlertTriangle, Sparkles, TrendingUp, XCircle, ArrowRight, Lock, Eye, ShoppingBag } from "lucide-react"
+import { PLAN_LIMITS, type Plan, getEffectiveLimits } from "@/lib/subscription"
+import { AlertTriangle, Sparkles, TrendingUp, XCircle, ArrowRight, Lock, Eye, ShoppingBag, PauseCircle } from "lucide-react"
 
 interface Props {
   restaurant: any
@@ -20,6 +20,34 @@ export function SubscriptionBanner({ restaurant, orderCount = 0 }: Props) {
   const now = new Date()
   const msPerDay = 1000 * 60 * 60 * 24
 
+  const isSuspended = restaurant.is_suspended === true
+
+  if (isSuspended) {
+    return (
+      <div className="bg-[#FEF3C7] border border-[#D97706]/30 rounded-[14px] p-4">
+        <div className="flex items-start gap-3">
+          <div className="w-9 h-9 rounded-full bg-[#D97706] text-white flex items-center justify-center flex-shrink-0">
+            <PauseCircle className="w-5 h-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-[#92400E]">
+              Account Suspended
+            </p>
+            <p className="text-xs text-[#555] mt-1">
+              Your account has been temporarily suspended. Contact support for details.
+            </p>
+            <Link
+              href="/dashboard/subscription"
+              className="inline-flex items-center gap-1.5 mt-3 px-4 py-2 bg-[#D97706] text-white text-xs font-semibold rounded-lg hover:opacity-90 transition-opacity"
+            >
+              Contact Support <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   const trialDaysRemaining = Math.max(
     0,
     Math.ceil((trialEnd.getTime() - now.getTime()) / msPerDay)
@@ -28,7 +56,7 @@ export function SubscriptionBanner({ restaurant, orderCount = 0 }: Props) {
   const isInGracePeriod =
     plan === "trial" && now > trialEnd && now < graceEnd
   const isExpired = plan === "trial" ? now > graceEnd : planEnd ? now > planEnd : false
-  const limits = PLAN_LIMITS[plan]
+  const limits = getEffectiveLimits(plan, restaurant.plan_limits_override)
 
   const orderLimit = limits.maxOrders
   const orderLimitPercent =

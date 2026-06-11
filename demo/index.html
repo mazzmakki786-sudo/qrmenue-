@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QRMenu.pk — Clean UI Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9pt,400;0,9pt,500;0,9pt,600;0,9pt,700;1,9pt,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── Design System ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F8F6F3;
+  --surface:#FFFFFF;
+  --surface-hover:#F5F3F0;
+  --text:#1A1A1A;
+  --text-secondary:#6B6B6B;
+  --text-muted:#A0A0A0;
+  --primary:#1A1A1A;
+  --accent:#E8632E;
+  --accent-light:#FDF0EA;
+  --accent-hover:#D45322;
+  --border:#EDE9E5;
+  --border-strong:#D4CFC9;
+  --success:#1A9D5C;
+  --error:#DC2626;
+  --warning:#D97706;
+  --font-display:'DM Sans',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,sans-serif;
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:16px;
+  --radius-xl:24px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.04);
+  --shadow-md:0 4px 14px rgba(0,0,0,0.06);
+  --shadow-lg:0 8px 30px rgba(0,0,0,0.08);
+  --transition:0.25s cubic-bezier(0.16,1,0.3,1);
+}
+body{
+  font-family:var(--font-body);
+  background:var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  line-height:1.6;
+}
+h1,h2,h3,h4,h5,h6{font-family:var(--font-display);font-weight:600;line-height:1.3;letter-spacing:-0.02em}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+
+/* ── Reusable Components ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  font-family:var(--font-display);font-weight:600;font-size:14px;
+  padding:10px 20px;border-radius:var(--radius-md);border:none;
+  cursor:pointer;transition:all var(--transition);
+  white-space:nowrap;
+}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:#333}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-accent:hover{background:var(--accent-hover)}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text-secondary)}
+.btn-outline:hover{border-color:var(--text);color:var(--text)}
+.btn-ghost{background:transparent;color:var(--text-secondary)}
+.btn-ghost:hover{background:var(--surface-hover);color:var(--text)}
+.btn-sm{padding:7px 14px;font-size:13px}
+.btn-lg{padding:14px 28px;font-size:16px}
+.btn-full{width:100%}
+
+.card{
+  background:var(--surface);border-radius:var(--radius-lg);
+  border:1px solid var(--border);padding:24px;
+  transition:all var(--transition);
+}
+.card-hover:hover{box-shadow:var(--shadow-md);border-color:var(--border-strong)}
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:12px;font-weight:600;padding:3px 10px;
+  border-radius:100px;font-family:var(--font-display);
+}
+.badge-accent{background:var(--accent-light);color:var(--accent)}
+.badge-success{background:#E8F5EC;color:var(--success)}
+.badge-muted{background:var(--surface-hover);color:var(--text-secondary)}
+.tag{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:12px;font-weight:500;padding:4px 10px;
+  border-radius:100px;background:var(--surface-hover);color:var(--text-secondary);
+  cursor:pointer;transition:all var(--transition);
+  border:1px solid transparent;
+}
+.tag.active,.tag:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+.input-group{display:flex;flex-direction:column;gap:4px}
+.input-group label{font-size:13px;font-weight:600;color:var(--text-secondary);font-family:var(--font-display)}
+.input-group input,.input-group select,.input-group textarea{
+  font-family:var(--font-body);font-size:14px;padding:10px 14px;
+  border:1.5px solid var(--border);border-radius:var(--radius-md);
+  background:var(--surface);color:var(--text);transition:border-color var(--transition);
+  outline:none;width:100%;
+}
+.input-group input:focus,.input-group select:focus,.input-group textarea:focus{border-color:var(--text)}
+.input-group .error{font-size:12px;color:var(--error)}
+.separator{height:1px;background:var(--border);margin:16px 0}
+.avatar{width:40px;height:40px;border-radius:50%;background:var(--surface-hover);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:16px;font-family:var(--font-display);flex-shrink:0}
+.avatar-sm{width:32px;height:32px;font-size:13px}
+
+/* ── Screen System ── */
+.screen{display:none;animation:fadeIn 0.35s ease}
+.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
+
+.screen-content{max-width:1200px;margin:0 auto;padding:24px}
+.screen-header{margin-bottom:32px}
+.screen-header h1{font-size:28px;margin-bottom:4px}
+.screen-header p{color:var(--text-secondary);font-size:15px}
+
+/* ── Demo Navigation ── */
+.demo-nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(255,255,255,0.9);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;height:56px;
+  display:flex;align-items:center;gap:24px;
+  font-family:var(--font-display);
+}
+.demo-nav-brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;flex-shrink:0}
+.demo-nav-brand .logo{width:28px;height:28px;border-radius:var(--radius-sm);background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px}
+.demo-nav-links{display:flex;align-items:center;gap:2px;overflow-x:auto;scrollbar-width:none;flex:1}
+.demo-nav-links::-webkit-scrollbar{display:none}
+.demo-nav-links a{
+  font-size:12px;font-weight:500;padding:5px 10px;border-radius:var(--radius-sm);
+  color:var(--text-secondary);white-space:nowrap;transition:all var(--transition);
+  flex-shrink:0;
+}
+.demo-nav-links a:hover{color:var(--text);background:var(--surface-hover)}
+.demo-nav-links a.active{color:var(--text);background:var(--surface-hover)}
+.demo-nav-category{
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;
+  color:var(--text-muted);padding:0 4px;user-select:none;flex-shrink:0;
+}
+
+/* ── Landing ── */
+.landing-hero{text-align:center;padding:80px 24px 60px;max-width:720px;margin:0 auto}
+.landing-hero .pill{display:inline-flex;align-items:center;gap:6px;background:var(--accent-light);color:var(--accent);font-size:12px;font-weight:600;padding:4px 12px;border-radius:100px;font-family:var(--font-display);margin-bottom:20px}
+.landing-hero .pill .dot{width:6px;height:6px;border-radius:50%;background:var(--success)}
+.landing-hero h1{font-size:clamp(36px,6vw,60px);margin-bottom:16px}
+.landing-hero h1 span{color:var(--accent)}
+.landing-hero p{font-size:16px;color:var(--text-secondary);max-width:500px;margin:0 auto 32px}
+.landing-hero .btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;max-width:900px;margin:0 auto;padding:60px 24px}
+.step-card{text-align:center;padding:32px 24px}
+.step-card .num{width:44px;height:44px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:16px;margin:0 auto 16px}
+.step-card h3{font-size:16px;margin-bottom:6px}
+.step-card p{font-size:14px;color:var(--text-secondary);line-height:1.5}
+.section-title{text-align:center;margin-bottom:40px}
+.section-title h2{font-size:clamp(24px,3.5vw,32px);margin-bottom:8px}
+.section-title p{font-size:14px;color:var(--text-secondary)}
+
+/* ── Pricing ── */
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;max-width:1000px;margin:0 auto}
+.pricing-card{padding:28px;display:flex;flex-direction:column}
+.pricing-card.popular{border-color:var(--primary);box-shadow:var(--shadow-md);position:relative}
+.pricing-card.popular::before{content:'Most Popular';position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;font-size:11px;font-weight:600;font-family:var(--font-display);padding:3px 14px;border-radius:100px;white-space:nowrap}
+.pricing-card h3{font-size:18px;margin-bottom:4px}
+.pricing-card .price{font-size:36px;font-weight:700;font-family:var(--font-display);margin:12px 0 4px}
+.pricing-card .price span{font-size:14px;font-weight:400;color:var(--text-muted)}
+.pricing-card .features{flex:1;margin:20px 0;display:flex;flex-direction:column;gap:10px}
+.pricing-card .features li{list-style:none;display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text-secondary)}
+.pricing-card .features li .icon{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.pricing-card .features li .icon.check{background:#E8F5EC;color:var(--success)}
+.pricing-card .features li .icon.x{background:var(--surface-hover);color:var(--text-muted)}
+
+/* ── Auth ── */
+.auth-page{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 56px);padding:24px}
+.auth-card{width:100%;max-width:400px;padding:32px}
+.auth-card h2{font-size:22px;margin-bottom:4px;text-align:center}
+.auth-card .sub{text-align:center;color:var(--text-secondary);font-size:14px;margin-bottom:24px}
+.auth-card .divider{display:flex;align-items:center;gap:12px;margin:16px 0;font-size:12px;color:var(--text-muted)}
+.auth-card .divider::before,.auth-card .divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.role-card{text-align:center;padding:24px 16px;cursor:pointer;transition:all var(--transition)}
+.role-card:hover,.role-card.selected{border-color:var(--primary);background:var(--accent-light)}
+.role-card .icon{width:48px;height:48px;margin:0 auto 12px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:24px}
+.role-card h3{font-size:15px;margin-bottom:2px}
+.role-card p{font-size:12px;color:var(--text-secondary)}
+
+/* ── Restaurants ── */
+.search-bar{display:flex;gap:12px;margin-bottom:24px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:4px 4px 4px 16px;align-items:center;max-width:500px}
+.search-bar input{flex:1;border:none;outline:none;font-size:14px;font-family:var(--font-body);background:transparent;padding:8px 0}
+.search-bar .btn{padding:8px 16px;font-size:13px}
+.restaurant-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.restaurant-card{overflow:hidden;padding:0}
+.restaurant-card .cover{height:140px;background:var(--surface-hover);display:flex;align-items:center;justify-content:center;font-size:36px;position:relative}
+.restaurant-card .cover .status{position:absolute;top:12px;left:12px}
+.restaurant-card .info{padding:16px}
+.restaurant-card .info h3{font-size:16px;margin-bottom:2px}
+.restaurant-card .info .meta{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);margin-bottom:8px}
+
+/* ── Menu ── */
+.menu-header{display:flex;align-items:center;gap:16px;padding:16px 0 24px;flex-wrap:wrap}
+.menu-header .rest-logo{width:56px;height:56px;border-radius:var(--radius-md);background:var(--surface-hover);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.menu-header h1{font-size:22px}
+.menu-header .rest-meta{display:flex;gap:8px;font-size:13px;color:var(--text-secondary);flex-wrap:wrap;margin-top:2px}
+.category-pills{display:flex;gap:8px;overflow-x:auto;padding-bottom:12px;scrollbar-width:none;margin-bottom:8px}
+.category-pills::-webkit-scrollbar{display:none}
+.dish-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.dish-card{display:flex;gap:14px;padding:16px;cursor:pointer}
+.dish-card .thumb{width:72px;height:72px;border-radius:var(--radius-md);background:var(--surface-hover);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:28px}
+.dish-card .details{flex:1;min-width:0}
+.dish-card .details h4{font-size:15px;margin-bottom:2px}
+.dish-card .details p{font-size:13px;color:var(--text-secondary);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.dish-card .details .price{font-weight:700;font-size:15px;margin-top:4px;font-family:var(--font-display)}
+.dish-card .details .badges{display:flex;gap:4px;margin-bottom:4px;flex-wrap:wrap}
+.cart-bar{position:fixed;bottom:0;left:0;right:0;background:var(--primary);color:#fff;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;z-index:50;max-width:1200px;margin:0 auto;border-radius:var(--radius-lg) var(--radius-lg) 0 0}
+.cart-bar .info{display:flex;align-items:center;gap:12px}
+.cart-bar .info strong{font-size:16px;font-family:var(--font-display)}
+.cart-bar .info span{font-size:13px;opacity:0.7}
+
+/* ── Cart ── */
+.cart-list{display:flex;flex-direction:column;gap:12px;max-width:600px}
+.cart-item{display:flex;align-items:center;gap:14px;padding:16px}
+.cart-item .thumb{width:56px;height:56px;border-radius:var(--radius-md);background:var(--surface-hover);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:24px}
+.cart-item .info{flex:1}
+.cart-item .info h4{font-size:14px;margin-bottom:1px}
+.cart-item .info .price{font-size:14px;font-weight:700;font-family:var(--font-display)}
+.cart-item .qty{display:flex;align-items:center;gap:8px}
+.cart-item .qty button{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;transition:all var(--transition)}
+.cart-item .qty button:hover{border-color:var(--text)}
+.cart-item .qty span{font-size:14px;font-weight:600;width:20px;text-align:center}
+
+/* ── Checkout ── */
+.checkout-grid{display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start}
+@media(max-width:768px){.checkout-grid{grid-template-columns:1fr}}
+.order-type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px}
+.order-type-card{text-align:center;padding:16px 12px;cursor:pointer;border:1.5px solid var(--border);border-radius:var(--radius-md);transition:all var(--transition);font-size:12px;color:var(--text-secondary)}
+.order-type-card:hover,.order-type-card.active{border-color:var(--primary);background:var(--accent-light);color:var(--text)}
+.order-type-card .icon{font-size:24px;margin-bottom:6px}
+.order-type-card .label{font-weight:600;font-size:13px;font-family:var(--font-display)}
+
+/* ── Confirm ── */
+.confirm-page{text-align:center;padding:60px 24px;max-width:500px;margin:0 auto}
+.confirm-page .check{width:64px;height:64px;border-radius:50%;background:#E8F5EC;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px;color:var(--success)}
+.confirm-page h1{font-size:28px;margin-bottom:6px}
+.confirm-page .order-detail{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;text-align:left;margin:24px 0}
+.confirm-page .order-detail .row{display:flex;justify-content:space-between;padding:6px 0;font-size:14px}
+.confirm-page .order-detail .row span:last-child{font-weight:600;text-align:right}
+
+/* ── Dashboard ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:24px}
+.stat-card{padding:20px}
+.stat-card .label{font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;font-family:var(--font-display);margin-bottom:4px}
+.stat-card .value{font-size:28px;font-weight:700;font-family:var(--font-display)}
+.stat-card .change{font-size:12px;margin-top:2px;display:flex;align-items:center;gap:4px}
+.stat-card .change.up{color:var(--success)}
+.stat-card .change.down{color:var(--error)}
+.dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:768px){.dashboard-grid{grid-template-columns:1fr}}
+.chart-placeholder{height:200px;background:var(--surface-hover);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--text-muted);margin-top:12px}
+
+/* ── Orders ── */
+.order-filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.order-list{display:flex;flex-direction:column;gap:8px}
+.order-card{display:flex;align-items:center;gap:16px;padding:16px}
+.order-card .order-info{flex:1}
+.order-card .order-info h4{font-size:14px;margin-bottom:1px}
+.order-card .order-info .meta{display:flex;gap:8px;font-size:12px;color:var(--text-secondary)}
+.order-card .amount{font-weight:700;font-family:var(--font-display);font-size:16px;text-align:right}
+
+/* ── Menu Mgmt ── */
+.menu-mgmt-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.menu-mgmt-header .left h2{font-size:20px}
+.menu-mgmt-header .left p{font-size:13px;color:var(--text-secondary)}
+.dish-mgmt-list{display:flex;flex-direction:column;gap:6px}
+.dish-mgmt-row{display:flex;align-items:center;gap:14px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);transition:all var(--transition)}
+.dish-mgmt-row:hover{border-color:var(--border-strong)}
+.dish-mgmt-row .thumb{width:44px;height:44px;border-radius:var(--radius-sm);background:var(--surface-hover);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px}
+.dish-mgmt-row .info{flex:1;min-width:0}
+.dish-mgmt-row .info h4{font-size:14px}
+.dish-mgmt-row .info .meta{font-size:12px;color:var(--text-secondary)}
+.dish-mgmt-row .actions{display:flex;gap:4px}
+
+/* ── QR ── */
+.qr-page{text-align:center;max-width:400px;margin:0 auto}
+.qr-display{width:200px;height:200px;background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-lg);margin:0 auto 20px;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:12px;color:var(--text-muted);gap:4px}
+.qr-page .url{font-size:13px;color:var(--text-secondary);word-break:break-all;margin-bottom:12px;padding:8px 12px;background:var(--surface-hover);border-radius:var(--radius-sm)}
+
+/* ── Subscription ── */
+.sub-plan{text-align:center;padding:24px;margin-bottom:24px}
+.sub-plan .plan-name{font-size:14px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;font-weight:600}
+.sub-plan .plan-price{font-size:36px;font-weight:700;font-family:var(--font-display)}
+.sub-plan .plan-price span{font-size:14px;font-weight:400;color:var(--text-muted)}
+.sub-plan .usage-bar{height:6px;background:var(--surface-hover);border-radius:100px;margin:16px 0;overflow:hidden}
+.sub-plan .usage-bar .fill{height:100%;background:var(--accent);border-radius:100px;transition:width 0.6s ease}
+.sub-plan .usage-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary)}
+
+/* ── Super Admin ── */
+.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:24px}
+.admin-table{width:100%;border-collapse:collapse}
+.admin-table th{text-align:left;padding:10px 12px;font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid var(--border);font-family:var(--font-display)}
+.admin-table td{padding:12px;font-size:14px;border-bottom:1px solid var(--border)}
+.admin-table tr:last-child td{border-bottom:none}
+
+/* ── Settings ── */
+.settings-form{max-width:500px;display:flex;flex-direction:column;gap:16px}
+
+/* ── Onboarding ── */
+.onboarding-steps{max-width:500px;margin:0 auto}
+.onboarding-step{display:flex;gap:16px;padding:16px 0;align-items:flex-start}
+.onboarding-step .step-num{width:32px;height:32px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;font-family:var(--font-display);flex-shrink:0}
+.onboarding-step.done .step-num{background:var(--success);color:#fff}
+
+/* ── Notif Bell ── */
+.notif-bell{position:relative;width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--transition);flex-shrink:0}
+.notif-bell:hover{border-color:var(--text)}
+.notif-bell .dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--accent);border:2px solid var(--surface)}
+
+/* ── Compare Table ── */
+.compare-table{width:100%;border-collapse:collapse;font-size:14px}
+.compare-table th{text-align:left;padding:10px 12px;font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid var(--border);background:var(--surface);font-family:var(--font-display)}
+.compare-table td{padding:10px 12px;border-bottom:1px solid var(--border)}
+.compare-table tr:nth-child(even) td{background:var(--surface-hover)}
+
+/* ── Responsive ── */
+@media(max-width:640px){
+  .screen-content{padding:16px}
+  .demo-nav{padding:0 12px;gap:12px}
+  .demo-nav-links a{font-size:11px;padding:4px 8px}
+  .demo-nav-category{font-size:9px;padding:0 2px}
+  .landing-hero{padding:48px 16px 40px}
+  .landing-hero h1{font-size:28px}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .pricing-grid{grid-template-columns:1fr}
+  .dish-grid{grid-template-columns:1fr}
+  .restaurant-grid{grid-template-columns:1fr}
+  .order-type-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:480px){
+  .pricing-card .price{font-size:28px}
+  .stat-card .value{font-size:22px}
+  .menu-header .rest-logo{width:44px;height:44px;font-size:22px}
+  .menu-header h1{font-size:18px}
+  .dish-card .thumb{width:60px;height:60px;font-size:22px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════ NAV ═══════ -->
+<nav class="demo-nav">
+  <div class="demo-nav-brand"><div class="logo">Q</div>QRMenu.pk</div>
+  <div class="demo-nav-links" id="navLinks">
+    <span class="demo-nav-category">Public</span>
+    <a href="#" data-screen="landing" class="active">Home</a>
+    <a href="#" data-screen="pricing">Pricing</a>
+    <a href="#" data-screen="login">Login</a>
+    <a href="#" data-screen="signup">Sign Up</a>
+    <span class="demo-nav-category">Customer</span>
+    <a href="#" data-screen="restaurants">Restaurants</a>
+    <a href="#" data-screen="menu">Menu</a>
+    <a href="#" data-screen="cart">Cart</a>
+    <a href="#" data-screen="checkout">Checkout</a>
+    <a href="#" data-screen="confirm">Confirmed</a>
+    <a href="#" data-screen="orders">My Orders</a>
+    <span class="demo-nav-category">Owner</span>
+    <a href="#" data-screen="dashboard">Dashboard</a>
+    <a href="#" data-screen="menu-mgmt">Menu Mgmt</a>
+    <a href="#" data-screen="orders-list">Orders</a>
+    <a href="#" data-screen="order-detail">Order #</a>
+    <a href="#" data-screen="analytics">Analytics</a>
+    <a href="#" data-screen="settings">Settings</a>
+    <a href="#" data-screen="qr">QR Code</a>
+    <a href="#" data-screen="subscription">Plan</a>
+    <a href="#" data-screen="onboarding">Setup</a>
+    <span class="demo-nav-category">Admin</span>
+    <a href="#" data-screen="admin">Super Admin</a>
+  </div>
+</nav>
+
+<!-- ═══════ LANDING ═══════ -->
+<section id="screen-landing" class="screen active">
+  <div class="landing-hero">
+    <div class="pill"><span class="dot"></span>Live in Pakistan</div>
+    <h1>Digital Menu for<br><span>Every Restaurant</span></h1>
+    <p>No app. No commission. Just a QR code — customers scan, browse your menu, and order directly on WhatsApp.</p>
+    <div class="btns">
+      <button class="btn btn-primary btn-lg">Start Free Trial</button>
+      <button class="btn btn-outline btn-lg">Browse Restaurants</button>
+    </div>
+  </div>
+  <div class="section-title" style="margin-top:40px"><h2>How It Works</h2><p>Get your restaurant online in under 5 minutes</p></div>
+  <div class="steps-grid">
+    <div class="step-card card"><div class="num">01</div><h3>Create Menu</h3><p>Add your dishes, prices, and photos through our simple dashboard.</p></div>
+    <div class="step-card card"><div class="num">02</div><h3>Print QR Code</h3><p>We generate a unique QR code for your restaurant. Print and place on tables.</p></div>
+    <div class="step-card card"><div class="num">03</div><h3>Get Orders</h3><p>Customers scan, browse, and order via WhatsApp. No app download needed.</p></div>
+  </div>
+  <div class="section-title" style="margin-top:60px"><h2>Simple, Transparent Pricing</h2><p>No hidden fees. No commission on orders. Cancel anytime.</p></div>
+  <div class="pricing-grid screen-content">
+    <div class="pricing-card card"><h3>Free Trial</h3><div class="price">PKR 0<span>/7 days</span></div><ul class="features"><li><span class="icon check">✓</span> 5 dishes</li><li><span class="icon check">✓</span> 5 dish images</li><li><span class="icon check">✓</span> 10 orders</li><li><span class="icon check">✓</span> QR code generation</li><li><span class="icon check">✓</span> WhatsApp orders</li><li><span class="icon check">✓</span> Analytics dashboard</li></ul><button class="btn btn-outline btn-full">Start Free Trial</button></div>
+    <div class="pricing-card card"><h3>Starter</h3><div class="price">PKR 1,200<span>/month</span></div><ul class="features"><li><span class="icon check">✓</span> 30 dishes</li><li><span class="icon check">✓</span> 10 dish images</li><li><span class="icon check">✓</span> Unlimited orders</li><li><span class="icon check">✓</span> QR code generation</li><li><span class="icon check">✓</span> WhatsApp orders</li><li><span class="icon check">✓</span> Analytics dashboard</li></ul><button class="btn btn-outline btn-full">Choose Plan</button></div>
+    <div class="pricing-card card popular"><h3>Growth</h3><div class="price">PKR 2,500<span>/month</span></div><ul class="features"><li><span class="icon check">✓</span> 50 dishes</li><li><span class="icon check">✓</span> 20 dish images</li><li><span class="icon check">✓</span> Unlimited orders</li><li><span class="icon check">✓</span> Custom branding</li><li><span class="icon check">✓</span> Priority support</li><li><span class="icon check">✓</span> Everything in Starter</li></ul><button class="btn btn-primary btn-full">Choose Plan</button></div>
+    <div class="pricing-card card"><h3>Premium</h3><div class="price">PKR 4,500<span>/month</span></div><ul class="features"><li><span class="icon check">✓</span> 100 dishes</li><li><span class="icon check">✓</span> 100 dish images</li><li><span class="icon check">✓</span> Unlimited orders</li><li><span class="icon check">✓</span> Custom branding</li><li><span class="icon check">✓</span> Priority support</li><li><span class="icon check">✓</span> Everything in Growth</li></ul><button class="btn btn-outline btn-full">Choose Plan</button></div>
+  </div>
+  <div class="screen-content" style="max-width:900px">
+    <div style="overflow-x:auto;margin-top:40px">
+      <table class="compare-table"><thead><tr><th>Feature</th><th style="text-align:center">Free</th><th style="text-align:center">Starter</th><th style="text-align:center">Growth</th><th style="text-align:center">Premium</th></tr></thead><tbody>
+        <tr><td>Unlimited dishes</td><td style="text-align:center;font-weight:600">5</td><td style="text-align:center;font-weight:600">30</td><td style="text-align:center;font-weight:600">50</td><td style="text-align:center;font-weight:600">100</td></tr>
+        <tr><td>QR code generation</td><td style="text-align:center;color:var(--success)">✓</td><td style="text-align:center;color:var(--success)">✓</td><td style="text-align:center;color:var(--success)">✓</td><td style="text-align:center;color:var(--success)">✓</td></tr>
+        <tr><td>WhatsApp notifications</td><td style="text-align:center;color:var(--success)">✓</td><td style="text-align:center;color:var(--success)">✓</td><td style="text-align:center;color:var(--success)">✓</td><td style="text-align:center;color:var(--success)">✓</td></tr>
+        <tr><td>Dish images</td><td style="text-align:center;font-weight:600">5</td><td style="text-align:center;font-weight:600">10</td><td style="text-align:center;font-weight:600">20</td><td style="text-align:center;font-weight:600">100</td></tr>
+        <tr><td>Custom branding</td><td style="text-align:center;color:var(--text-muted)">—</td><td style="text-align:center;color:var(--text-muted)">—</td><td style="text-align:center;color:var(--success)">✓</td><td style="text-align:center;color:var(--success)">✓</td></tr>
+        <tr><td>Priority support</td><td style="text-align:center;color:var(--text-muted)">—</td><td style="text-align:center;color:var(--text-muted)">—</td><td style="text-align:center;color:var(--success)">✓</td><td style="text-align:center;color:var(--success)">✓</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+  <div style="text-align:center;padding:60px 24px;margin-top:40px">
+    <h2 style="font-size:clamp(24px,3vw,32px);margin-bottom:8px">Ready to go digital?</h2>
+    <p style="color:var(--text-secondary);font-size:14px;margin-bottom:24px;max-width:400px;margin-left:auto;margin-right:auto">Join hundreds of restaurants in Pakistan using QRMenu.pk</p>
+    <button class="btn btn-primary btn-lg">Start Free Trial — No Credit Card</button>
+  </div>
+  <footer style="text-align:center;padding:24px;border-top:1px solid var(--border);font-size:13px;color:var(--text-muted)">Made in Pakistan</footer>
+</section>
+
+<!-- ═══════ PRICING ═══════ -->
+<section id="screen-pricing" class="screen">
+  <div class="screen-content">
+    <div class="section-title"><h2>Pricing Plans</h2><p>Choose the plan that fits your restaurant</p></div>
+    <div class="pricing-grid">
+      <div class="pricing-card card"><h3>Free Trial</h3><div class="price">PKR 0<span>/7 days</span></div><ul class="features"><li><span class="icon check">✓</span> 5 dishes</li><li><span class="icon check">✓</span> 5 images</li><li><span class="icon check">✓</span> 10 orders</li><li><span class="icon check">✓</span> QR code</li><li><span class="icon check">✓</span> WhatsApp</li><li><span class="icon check">✓</span> Analytics</li></ul><button class="btn btn-outline btn-full">Start Free Trial</button></div>
+      <div class="pricing-card card"><h3>Starter</h3><div class="price">PKR 1,200<span>/month</span></div><ul class="features"><li><span class="icon check">✓</span> 30 dishes</li><li><span class="icon check">✓</span> 10 images</li><li><span class="icon check">✓</span> Unlimited orders</li><li><span class="icon check">✓</span> QR code</li><li><span class="icon check">✓</span> WhatsApp</li><li><span class="icon check">✓</span> Analytics</li></ul><button class="btn btn-outline btn-full">Choose Plan</button></div>
+      <div class="pricing-card card popular"><h3>Growth</h3><div class="price">PKR 2,500<span>/month</span></div><ul class="features"><li><span class="icon check">✓</span> 50 dishes</li><li><span class="icon check">✓</span> 20 images</li><li><span class="icon check">✓</span> Unlimited orders</li><li><span class="icon check">✓</span> Custom branding</li><li><span class="icon check">✓</span> Priority support</li><li><span class="icon check">✓</span> Everything in Starter</li></ul><button class="btn btn-primary btn-full">Choose Plan</button></div>
+      <div class="pricing-card card"><h3>Premium</h3><div class="price">PKR 4,500<span>/month</span></div><ul class="features"><li><span class="icon check">✓</span> 100 dishes</li><li><span class="icon check">✓</span> 100 images</li><li><span class="icon check">✓</span> Unlimited orders</li><li><span class="icon check">✓</span> Custom branding</li><li><span class="icon check">✓</span> Priority support</li><li><span class="icon check">✓</span> Everything in Growth</li></ul><button class="btn btn-outline btn-full">Choose Plan</button></div>
+    </div>
+    <div style="text-align:center;margin-top:32px;font-size:13px;color:var(--text-secondary)">All plans include free setup. <a href="#" style="text-decoration:underline">Contact us</a> for enterprise.</div>
+  </div>
+</section>
+
+<!-- ═══════ LOGIN ═══════ -->
+<section id="screen-login" class="screen">
+  <div class="auth-page">
+    <div class="auth-card card"><h2>Welcome back</h2><p class="sub">Sign in to your account</p>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="input-group"><label>Email</label><input type="email" placeholder="you@restaurant.com"></div>
+        <div class="input-group"><label>Password</label><input type="password" placeholder="••••••••"></div>
+        <button class="btn btn-primary btn-full" style="margin-top:4px">Sign In</button>
+        <div class="divider">or continue with</div>
+        <button class="btn btn-outline btn-full">Google</button>
+        <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:8px">Don't have an account? <a href="#" style="font-weight:600;text-decoration:underline">Sign up</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ SIGNUP ═══════ -->
+<section id="screen-signup" class="screen">
+  <div class="auth-page">
+    <div class="auth-card card"><h2>Join QRMenu.pk</h2><p class="sub">Choose how you want to use the platform</p>
+      <div class="role-grid">
+        <div class="role-card card card-hover"><div class="icon" style="background:var(--accent-light)">🍽️</div><h3>Restaurant Owner</h3><p>List your menu and receive orders</p></div>
+        <div class="role-card card card-hover"><div class="icon" style="background:var(--surface-hover)">👤</div><h3>Customer</h3><p>Browse menus and place orders</p></div>
+      </div>
+      <div class="separator"></div>
+      <p style="text-align:center;font-size:13px;color:var(--text-secondary)">Already have an account? <a href="#" style="font-weight:600;text-decoration:underline">Sign in</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ RESTAURANTS ═══════ -->
+<section id="screen-restaurants" class="screen">
+  <div class="screen-content">
+    <div class="screen-header"><h1>Restaurants</h1><p>Find your next meal</p></div>
+    <div class="search-bar"><span style="color:var(--text-muted);flex-shrink:0">🔍</span><input type="text" placeholder="Search restaurants or cuisines..."><button class="btn btn-primary btn-sm">Search</button></div>
+    <div style="display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap">
+      <span class="tag active">All</span><span class="tag">Karachi</span><span class="tag">Lahore</span><span class="tag">Islamabad</span><span class="tag">BBQ</span><span class="tag">Desi</span><span class="tag">Fast Food</span>
+    </div>
+    <div class="restaurant-grid">
+      <div class="restaurant-card card card-hover"><div class="cover"><span class="badge badge-success status">Open</span>🍖</div><div class="info"><h3>Bar.B.Q Tonight</h3><div class="meta">🔥 BBQ · Karachi</div><p style="font-size:13px;color:var(--text-secondary);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">Authentic Pakistani BBQ and traditional cuisine.</p></div></div>
+      <div class="restaurant-card card card-hover"><div class="cover"><span class="badge badge-success status">Open</span>🍛</div><div class="info"><h3>Lal Qila</h3><div class="meta">🍛 Desi · Lahore</div><p style="font-size:13px;color:var(--text-secondary);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">Fine dining with authentic Mughlai cuisine.</p></div></div>
+      <div class="restaurant-card card card-hover"><div class="cover"><span class="badge badge-success status">Open</span>🍔</div><div class="info"><h3>Burger Lab</h3><div class="meta">🍔 Fast Food · Karachi</div><p style="font-size:13px;color:var(--text-secondary);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">Gourmet burgers crafted with premium ingredients.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ MENU ═══════ -->
+<section id="screen-menu" class="screen">
+  <div class="screen-content">
+    <div class="menu-header"><div class="rest-logo">🍖</div><div><h1>Bar.B.Q Tonight</h1><div class="rest-meta"><span>🔥 BBQ · Karachi</span><span class="badge badge-success">Open</span><span class="badge badge-muted">★ 4.5</span></div></div></div>
+    <div class="category-pills"><span class="tag active">All</span><span class="tag">Starters</span><span class="tag">BBQ Platters</span><span class="tag">Karhai</span><span class="tag">Biryani</span><span class="tag">Breads</span><span class="tag">Drinks</span></div>
+    <div class="dish-grid">
+      <div class="dish-card card card-hover"><div class="thumb">🍗</div><div class="details"><div class="badges"><span class="badge badge-accent">Popular</span></div><h4>Chicken Tikka</h4><p>Char-grilled chicken legs marinated in traditional spices</p><div class="price">PKR 450</div></div><button class="btn btn-primary btn-sm" style="align-self:center;flex-shrink:0">+ Add</button></div>
+      <div class="dish-card card card-hover"><div class="thumb">🥩</div><div class="details"><div class="badges"><span class="badge badge-accent">Chef&rsquo;s Special</span></div><h4>Beef Seekh Kebab</h4><p>Minced beef with herbs and grilled to perfection</p><div class="price">PKR 380</div></div><button class="btn btn-primary btn-sm" style="align-self:center;flex-shrink:0">+ Add</button></div>
+      <div class="dish-card card card-hover"><div class="thumb">🍚</div><div class="details"><h4>Chicken Biryani</h4><p>Fragrant basmati rice layered with spiced chicken</p><div class="price">PKR 320</div></div><button class="btn btn-primary btn-sm" style="align-self:center;flex-shrink:0">+ Add</button></div>
+      <div class="dish-card card card-hover"><div class="thumb">🥘</div><div class="details"><div class="badges"><span class="badge badge-accent">Popular</span></div><h4>Chicken Karhai</h4><p>Traditional wok-cooked chicken with tomatoes and ginger</p><div class="price">PKR 650</div></div><button class="btn btn-primary btn-sm" style="align-self:center;flex-shrink:0">+ Add</button></div>
+    </div>
+    <div style="height:80px"></div>
+    <div class="cart-bar"><div class="info"><strong>2 items</strong><span>| PKR 830</span></div><button class="btn btn-sm" style="background:#fff;color:var(--primary);font-weight:700">View Cart →</button></div>
+  </div>
+</section>
+
+<!-- ═══════ CART ═══════ -->
+<section id="screen-cart" class="screen">
+  <div class="screen-content" style="max-width:600px">
+    <div class="screen-header"><h1>Your Cart</h1><p>Bar.B.Q Tonight</p></div>
+    <div class="cart-list">
+      <div class="cart-item card"><div class="thumb">🍗</div><div class="info"><h4>Chicken Tikka</h4><div class="price">PKR 450</div></div><div class="qty"><button>−</button><span>2</span><button>+</button></div></div>
+      <div class="cart-item card"><div class="thumb">🥩</div><div class="info"><h4>Beef Seekh Kebab</h4><div class="price">PKR 380</div></div><div class="qty"><button>−</button><span>1</span><button>+</button></div></div>
+    </div>
+    <div class="separator"></div>
+    <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:700;font-family:var(--font-display);margin-bottom:20px"><span>Total</span><span>PKR 1,280</span></div>
+    <button class="btn btn-primary btn-full btn-lg">Proceed to Checkout</button>
+  </div>
+</section>
+
+<!-- ═══════ CHECKOUT ═══════ -->
+<section id="screen-checkout" class="screen">
+  <div class="screen-content">
+    <div class="screen-header"><h1>Checkout</h1><p>Bar.B.Q Tonight</p></div>
+    <div class="checkout-grid">
+      <div>
+        <h3 style="font-size:16px;margin-bottom:12px">Order Type</h3>
+        <div class="order-type-grid"><div class="order-type-card active"><div class="icon">🍽️</div><div class="label">Dine In</div></div><div class="order-type-card"><div class="icon">🛍️</div><div class="label">Takeaway</div></div><div class="order-type-card"><div class="icon">🚚</div><div class="label">Delivery</div></div></div>
+        <h3 style="font-size:16px;margin-bottom:12px">Contact Details</h3>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="input-group"><label>Full Name</label><input type="text" placeholder="John"></div>
+          <div class="input-group"><label>Phone</label><input type="tel" placeholder="03XX-XXXXXXX"></div>
+          <div class="input-group"><label>Table #</label><input type="text" placeholder="e.g. 5"></div>
+        </div>
+        <h3 style="font-size:16px;margin:20px 0 12px">Payment</h3>
+        <div class="order-type-grid" style="grid-template-columns:1fr 1fr"><div class="order-type-card active"><div class="icon">💵</div><div class="label">Cash</div></div><div class="order-type-card"><div class="icon">🏦</div><div class="label">Bank Transfer</div></div></div>
+      </div>
+      <div class="card" style="position:sticky;top:80px">
+        <h3 style="font-size:16px;margin-bottom:12px">Order Summary</h3>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:14px"><div class="flex items-center justify-between"><span style="color:var(--text-secondary)">Chicken Tikka × 2</span><span style="font-weight:600">PKR 900</span></div><div class="flex items-center justify-between"><span style="color:var(--text-secondary)">Beef Seekh Kebab × 1</span><span style="font-weight:600">PKR 380</span></div></div>
+        <div class="separator"></div>
+        <div class="flex items-center justify-between" style="font-size:18px;font-weight:700;font-family:var(--font-display)"><span>Total</span><span>PKR 1,280</span></div>
+        <button class="btn btn-primary btn-full btn-lg" style="margin-top:16px">Place Order</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ CONFIRM ═══════ -->
+<section id="screen-confirm" class="screen">
+  <div class="confirm-page">
+    <div class="check">✓</div><h1>Order Placed!</h1>
+    <p style="color:var(--text-secondary);font-size:15px">Your order has been sent to the restaurant</p>
+    <div class="order-detail">
+      <div class="row"><span>Order #</span><span>QRM-2847</span></div>
+      <div class="row"><span>Restaurant</span><span>Bar.B.Q Tonight</span></div>
+      <div class="row"><span>Items</span><span>2 items</span></div>
+      <div class="row"><span>Total</span><span style="color:var(--accent)">PKR 1,280</span></div>
+      <div class="row"><span>Status</span><span class="badge badge-success">Confirmed</span></div>
+    </div>
+    <button class="btn btn-accent btn-lg btn-full"><span>📱</span> Send via WhatsApp</button>
+    <p style="margin-top:12px;font-size:13px;color:var(--text-secondary)"><a href="#" style="text-decoration:underline">Back to restaurants</a></p>
+  </div>
+</section>
+
+<!-- ═══════ MY ORDERS ═══════ -->
+<section id="screen-orders" class="screen">
+  <div class="screen-content" style="max-width:600px">
+    <div class="screen-header"><h1>My Orders</h1><p>Your order history</p></div>
+    <div class="order-list">
+      <div class="order-card card card-hover"><div style="width:44px;height:44px;border-radius:var(--radius-sm);background:var(--surface-hover);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🍖</div><div class="order-info"><h4>Bar.B.Q Tonight</h4><div class="meta"><span>QRM-2847</span><span>•</span><span>Today, 2:30 PM</span></div></div><div style="text-align:right"><div class="amount">PKR 1,280</div><span class="badge badge-success">Delivered</span></div></div>
+      <div class="order-card card card-hover"><div style="width:44px;height:44px;border-radius:var(--radius-sm);background:var(--surface-hover);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🍛</div><div class="order-info"><h4>Lal Qila</h4><div class="meta"><span>QRM-2812</span><span>•</span><span>Yesterday, 8:15 PM</span></div></div><div style="text-align:right"><div class="amount">PKR 2,450</div><span class="badge badge-accent">Preparing</span></div></div>
+      <div class="order-card card card-hover"><div style="width:44px;height:44px;border-radius:var(--radius-sm);background:var(--surface-hover);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🍔</div><div class="order-info"><h4>Burger Lab</h4><div class="meta"><span>QRM-2789</span><span>•</span><span>Jun 3, 7:00 PM</span></div></div><div style="text-align:right"><div class="amount">PKR 890</div><span class="badge badge-success">Delivered</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ DASHBOARD ═══════ -->
+<section id="screen-dashboard" class="screen">
+  <div class="screen-content">
+    <div class="flex items-center justify-between" style="margin-bottom:24px"><div><h1 style="font-size:24px">Welcome back, Ali 👋</h1><p style="color:var(--text-secondary);font-size:14px">Here's what's happening at your restaurant today</p></div><div class="notif-bell"><span>🔔</span><span class="dot"></span></div></div>
+    <div class="stats-grid">
+      <div class="stat-card card"><div class="label">Orders Today</div><div class="value">24</div><div class="change up">↑ 12% from yesterday</div></div>
+      <div class="stat-card card"><div class="label">Revenue Today</div><div class="value">PKR 28,450</div><div class="change up">↑ 8% from yesterday</div></div>
+      <div class="stat-card card"><div class="label">Active Dishes</div><div class="value">32</div><div class="change" style="color:var(--text-muted)">of 50 limit</div></div>
+      <div class="stat-card card"><div class="label">Avg. Rating</div><div class="value">4.5</div><div class="change up">↑ 0.3 this week</div></div>
+    </div>
+    <div class="dashboard-grid">
+      <div class="card"><div class="flex items-center justify-between" style="margin-bottom:12px"><h3 style="font-size:16px">Orders Overview</h3><div style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm">7d</button><button class="btn btn-ghost btn-sm" style="background:var(--surface-hover)">30d</button></div></div><div class="chart-placeholder">📊 Order trend chart</div></div>
+      <div class="card"><div class="flex items-center justify-between" style="margin-bottom:12px"><h3 style="font-size:16px">Popular Dishes</h3></div><div style="display:flex;flex-direction:column;gap:8px;font-size:14px"><div class="flex items-center justify-between"><span>Chicken Tikka</span><span style="font-weight:600;font-family:var(--font-display)">45 orders</span></div><div class="flex items-center justify-between"><span>Chicken Biryani</span><span style="font-weight:600;font-family:var(--font-display)">38 orders</span></div><div class="flex items-center justify-between"><span>Beef Seekh Kebab</span><span style="font-weight:600;font-family:var(--font-display)">31 orders</span></div></div></div>
+    </div>
+    <div style="margin-top:16px"><div class="card"><div class="flex items-center justify-between" style="margin-bottom:12px"><h3 style="font-size:16px">Recent Orders</h3><a href="#" style="font-size:13px;font-weight:600;font-family:var(--font-display)">View all →</a></div><div class="order-list"><div class="order-card" style="border:none;padding:8px 0;border-radius:0;background:transparent"><div class="order-info"><h4>QRM-2847</h4><div class="meta"><span>Ahmed</span><span>•</span><span>Dine In · Table 5</span><span>•</span><span>PKR 1,280</span></div></div><span class="badge badge-accent">New</span></div><div class="order-card" style="border:none;padding:8px 0;border-radius:0;background:transparent"><div class="order-info"><h4>QRM-2846</h4><div class="meta"><span>Sara</span><span>•</span><span>Takeaway</span><span>•</span><span>PKR 950</span></div></div><span class="badge badge-success">Ready</span></div><div class="order-card" style="border:none;padding:8px 0;border-radius:0;background:transparent"><div class="order-info"><h4>QRM-2845</h4><div class="meta"><span>Usman</span><span>•</span><span>Delivery</span><span>•</span><span>PKR 2,100</span></div></div><span class="badge badge-muted">Preparing</span></div></div></div></div>
+  </div>
+</section>
+
+<!-- ═══════ MENU MANAGEMENT ═══════ -->
+<section id="screen-menu-mgmt" class="screen">
+  <div class="screen-content">
+    <div class="menu-mgmt-header"><div class="left"><h2>Menu Management</h2><p>32 of 50 dishes used · 12 of 20 images used</p></div><button class="btn btn-primary">+ Add Dish</button></div>
+    <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">
+      <span class="tag active">All</span><span class="tag">Starters</span><span class="tag">BBQ</span><span class="tag">Karhai</span><span class="tag">Biryani</span>
+    </div>
+    <div class="dish-mgmt-list">
+      <div class="dish-mgmt-row"><div class="thumb">🍗</div><div class="info"><h4>Chicken Tikka</h4><div class="meta">PKR 450 · BBQ · Available</div></div><div class="actions"><button class="btn btn-ghost btn-sm">✏️</button><button class="btn btn-ghost btn-sm" style="color:var(--error)">🗑️</button></div></div>
+      <div class="dish-mgmt-row"><div class="thumb">🥩</div><div class="info"><h4>Beef Seekh Kebab</h4><div class="meta">PKR 380 · BBQ · Available</div></div><div class="actions"><button class="btn btn-ghost btn-sm">✏️</button><button class="btn btn-ghost btn-sm" style="color:var(--error)">🗑️</button></div></div>
+      <div class="dish-mgmt-row"><div class="thumb">🍚</div><div class="info"><h4>Chicken Biryani</h4><div class="meta">PKR 320 · Biryani · Available</div></div><div class="actions"><button class="btn btn-ghost btn-sm">✏️</button><button class="btn btn-ghost btn-sm" style="color:var(--error)">🗑️</button></div></div>
+      <div class="dish-mgmt-row" style="opacity:0.6"><div class="thumb">🥘</div><div class="info"><h4>Mutton Karhai</h4><div class="meta">PKR 850 · Karhai · Unavailable</div></div><div class="actions"><button class="btn btn-ghost btn-sm">✏️</button><button class="btn btn-ghost btn-sm" style="color:var(--error)">🗑️</button></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ ORDERS LIST ═══════ -->
+<section id="screen-orders-list" class="screen">
+  <div class="screen-content">
+    <div class="flex items-center justify-between" style="margin-bottom:24px"><div><h1 style="font-size:24px">Orders</h1><p style="color:var(--text-secondary);font-size:14px">24 orders today</p></div><button class="btn btn-outline btn-sm">📥 Export</button></div>
+    <div class="order-filters"><span class="tag active">Today</span><span class="tag">This Week</span><span class="tag">All Time</span><span class="tag">Pending</span></div>
+    <div class="order-list">
+      <div class="order-card card card-hover"><div class="order-info"><h4>QRM-2847 · Table 5</h4><div class="meta"><span>Ahmed</span><span>•</span><span>Dine In</span><span>•</span><span>2 items</span></div></div><div style="text-align:right"><div class="amount">PKR 1,280</div><span class="badge badge-accent">New</span></div></div>
+      <div class="order-card card card-hover"><div class="order-info"><h4>QRM-2846 · Takeaway</h4><div class="meta"><span>Sara</span><span>•</span><span>Takeaway</span><span>•</span><span>1 item</span></div></div><div style="text-align:right"><div class="amount">PKR 950</div><span class="badge badge-success">Ready</span></div></div>
+      <div class="order-card card card-hover"><div class="order-info"><h4>QRM-2845 · Delivery</h4><div class="meta"><span>Usman</span><span>•</span><span>Delivery</span><span>•</span><span>3 items</span></div></div><div style="text-align:right"><div class="amount">PKR 2,100</div><span class="badge badge-muted">Preparing</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ ORDER DETAIL ═══════ -->
+<section id="screen-order-detail" class="screen">
+  <div class="screen-content" style="max-width:600px">
+    <div style="margin-bottom:24px"><a href="#" style="font-size:13px;color:var(--text-secondary);text-decoration:underline">← Back to orders</a></div>
+    <div class="flex items-center justify-between" style="margin-bottom:20px"><div><h1 style="font-size:22px">Order QRM-2847</h1><p style="color:var(--text-secondary);font-size:14px">Today, 2:30 PM</p></div><span class="badge badge-accent" style="font-size:14px;padding:6px 16px">New</span></div>
+    <div class="card" style="margin-bottom:16px"><h3 style="font-size:15px;margin-bottom:8px">Customer Details</h3><div style="display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--text-secondary)"><span><strong style="color:var(--text)">Name:</strong> Ahmed Khan</span><span><strong style="color:var(--text)">Phone:</strong> 0300-1234567</span><span><strong style="color:var(--text)">Type:</strong> Dine In · Table 5</span></div></div>
+    <div class="card" style="margin-bottom:16px"><h3 style="font-size:15px;margin-bottom:8px">Items</h3><div style="display:flex;flex-direction:column;gap:6px;font-size:14px"><div class="flex items-center justify-between"><span>Chicken Tikka × 2</span><span style="font-weight:600">PKR 900</span></div><div class="flex items-center justify-between"><span>Beef Seekh Kebab × 1</span><span style="font-weight:600">PKR 380</span></div><div class="separator"></div><div class="flex items-center justify-between" style="font-size:16px;font-weight:700;font-family:var(--font-display)"><span>Total</span><span style="color:var(--accent)">PKR 1,280</span></div></div></div>
+    <h3 style="font-size:15px;margin-bottom:8px">Update Status</h3>
+    <div class="order-type-grid" style="grid-template-columns:repeat(4,1fr)"><div class="order-type-card active" style="font-size:11px"><div class="label">Pending</div></div><div class="order-type-card" style="font-size:11px"><div class="label">Preparing</div></div><div class="order-type-card" style="font-size:11px"><div class="label">Ready</div></div><div class="order-type-card" style="font-size:11px"><div class="label">Delivered</div></div></div>
+    <div style="display:flex;gap:8px;margin-top:16px"><button class="btn btn-primary btn-full">Mark as Preparing</button><button class="btn btn-outline">📄 Receipt</button></div>
+  </div>
+</section>
+
+<!-- ═══════ ANALYTICS ═══════ -->
+<section id="screen-analytics" class="screen">
+  <div class="screen-content">
+    <div class="flex items-center justify-between" style="margin-bottom:24px"><div><h1 style="font-size:24px">Analytics</h1><p style="color:var(--text-secondary);font-size:14px">Track your restaurant's performance</p></div><div style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm">7d</button><button class="btn btn-ghost btn-sm" style="background:var(--surface-hover)">30d</button><button class="btn btn-ghost btn-sm">90d</button></div></div>
+    <div class="stats-grid">
+      <div class="stat-card card"><div class="label">Total Orders</div><div class="value">284</div><div class="change up">↑ 15%</div></div>
+      <div class="stat-card card"><div class="label">Revenue</div><div class="value">PKR 342K</div><div class="change up">↑ 22%</div></div>
+      <div class="stat-card card"><div class="label">Avg. Order Value</div><div class="value">PKR 1,205</div><div class="change up">↑ 5%</div></div>
+      <div class="stat-card card"><div class="label">Conversion Rate</div><div class="value">68%</div><div class="change up">↑ 3%</div></div>
+    </div>
+    <div class="card" style="margin-bottom:16px"><h3 style="font-size:16px;margin-bottom:12px">Revenue Trend</h3><div class="chart-placeholder" style="height:250px">📈 Revenue chart (last 30 days)</div></div>
+    <div class="dashboard-grid"><div class="card"><h3 style="font-size:16px;margin-bottom:12px">Orders by Day</h3><div class="chart-placeholder" style="height:180px">📊 Bar chart</div></div><div class="card"><h3 style="font-size:16px;margin-bottom:12px">Top Dishes</h3><div style="display:flex;flex-direction:column;gap:8px;font-size:14px"><div class="flex items-center justify-between"><span>🥇 Chicken Tikka</span><span style="font-weight:600">142 orders</span></div><div class="flex items-center justify-between"><span>🥈 Chicken Biryani</span><span style="font-weight:600">118 orders</span></div><div class="flex items-center justify-between"><span>🥉 Beef Seekh Kebab</span><span style="font-weight:600">97 orders</span></div></div></div></div>
+  </div>
+</section>
+
+<!-- ═══════ SETTINGS ═══════ -->
+<section id="screen-settings" class="screen">
+  <div class="screen-content">
+    <div class="screen-header"><h1>Settings</h1><p>Manage your restaurant profile</p></div>
+    <div class="settings-form">
+      <div class="input-group"><label>Restaurant Name</label><input type="text" value="Bar.B.Q Tonight"></div>
+      <div class="input-group"><label>City</label><input type="text" value="Karachi"></div>
+      <div class="input-group"><label>Cuisine Type</label><input type="text" value="BBQ, Pakistani"></div>
+      <div class="input-group"><label>Phone Number</label><input type="tel" value="0300-1234567"></div>
+      <div class="input-group"><label>WhatsApp Number</label><input type="tel" value="0300-1234567"></div>
+      <div class="input-group"><label>Description</label><textarea rows="3" placeholder="Tell customers about your restaurant...">Authentic Pakistani BBQ since 2015.</textarea></div>
+      <button class="btn btn-primary btn-lg">Save Changes</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ QR CODE ═══════ -->
+<section id="screen-qr" class="screen">
+  <div class="screen-content" style="max-width:500px">
+    <div class="screen-header"><h1>QR Code</h1><p>Place on tables for customers to scan</p></div>
+    <div class="qr-page">
+      <div class="qr-display">[ QR Code ]<br>qrmenu.pk/barbq-tonight</div>
+      <div class="url">https://qrmenu.pk/menu/barbq-tonight</div>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="btn btn-primary">⬇ Download PNG</button><button class="btn btn-outline">🖨️ Print</button><button class="btn btn-outline">📋 Copy URL</button></div>
+      <div style="margin-top:20px"><label style="font-size:13px;color:var(--text-secondary);font-weight:600;font-family:var(--font-display)">QR Size</label><div style="display:flex;gap:6px;margin-top:6px"><span class="tag">150px</span><span class="tag active">200px</span><span class="tag">250px</span><span class="tag">300px</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ SUBSCRIPTION ═══════ -->
+<section id="screen-subscription" class="screen">
+  <div class="screen-content">
+    <div class="screen-header"><h1>Subscription</h1><p>Manage your plan and usage</p></div>
+    <div class="card sub-plan"><div class="plan-name">Current Plan</div><div class="plan-price">Growth<span>/month</span></div><div class="usage-bar"><div class="fill" style="width:64%"></div></div><div class="usage-labels"><span>Dishes: 32/50</span><span>Images: 12/20</span><span>Orders: Unlimited</span></div><button class="btn btn-outline btn-sm" style="margin-top:12px">Upgrade Plan</button></div>
+    <h3 style="font-size:16px;margin-bottom:12px">Available Plans</h3>
+    <div class="pricing-grid">
+      <div class="pricing-card card"><h3>Starter</h3><div class="price">PKR 1,200<span>/month</span></div><ul class="features"><li><span class="icon check">✓</span> 30 dishes</li><li><span class="icon check">✓</span> 10 images</li><li><span class="icon check">✓</span> Unlimited orders</li></ul><button class="btn btn-outline btn-full">Downgrade</button></div>
+      <div class="pricing-card card popular"><h3>Growth</h3><div class="price">PKR 2,500<span>/month</span></div><ul class="features"><li><span class="icon check">✓</span> 50 dishes</li><li><span class="icon check">✓</span> 20 images</li><li><span class="icon check">✓</span> Unlimited orders</li></ul><button class="btn btn-primary btn-full">Current Plan</button></div>
+      <div class="pricing-card card"><h3>Premium</h3><div class="price">PKR 4,500<span>/month</span></div><ul class="features"><li><span class="icon check">✓</span> 100 dishes</li><li><span class="icon check">✓</span> 100 images</li><li><span class="icon check">✓</span> Unlimited orders</li></ul><button class="btn btn-outline btn-full">Upgrade</button></div>
+    </div>
+    <div style="margin-top:20px;padding:16px 20px;background:var(--accent-light);border-radius:var(--radius-md);font-size:13px;color:var(--text-secondary)">Need a custom plan? <a href="#" style="font-weight:600;color:var(--text);text-decoration:underline">Contact us on WhatsApp</a> for enterprise pricing.</div>
+  </div>
+</section>
+
+<!-- ═══════ ONBOARDING ═══════ -->
+<section id="screen-onboarding" class="screen">
+  <div class="screen-content" style="max-width:600px">
+    <div class="screen-header"><h1>Welcome to QRMenu.pk 🎉</h1><p>Let's get your restaurant set up in minutes</p></div>
+    <div class="onboarding-steps">
+      <div class="onboarding-step done"><div class="step-num">✓</div><div><h4 style="font-size:15px">Create your account</h4><p style="font-size:13px;color:var(--text-secondary)">You're all signed up!</p></div></div>
+      <div class="onboarding-step"><div class="step-num">2</div><div><h4 style="font-size:15px">Set up your profile</h4><p style="font-size:13px;color:var(--text-secondary)">Add name, cuisine, location, and contact details</p><button class="btn btn-primary btn-sm" style="margin-top:8px">Set Up Profile</button></div></div>
+      <div class="onboarding-step"><div class="step-num">3</div><div><h4 style="font-size:15px">Add your menu items</h4><p style="font-size:13px;color:var(--text-secondary)">Start with 5 dishes to go live. Add more anytime!</p><button class="btn btn-outline btn-sm" style="margin-top:8px">Add Dishes</button></div></div>
+      <div class="onboarding-step"><div class="step-num">4</div><div><h4 style="font-size:15px">Print your QR code</h4><p style="font-size:13px;color:var(--text-secondary)">Download and place on tables for customers to scan</p></div></div>
+      <div class="onboarding-step"><div class="step-num">5</div><div><h4 style="font-size:15px">Go live & get orders</h4><p style="font-size:13px;color:var(--text-secondary)">Share your menu link and start receiving orders!</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ SUPER ADMIN ═══════ -->
+<section id="screen-admin" class="screen">
+  <div class="screen-content">
+    <div class="flex items-center justify-between" style="margin-bottom:24px"><div><h1 style="font-size:24px">Super Admin</h1><p style="color:var(--text-secondary);font-size:14px">Manage all restaurants on the platform</p></div><div style="display:flex;gap:6px"><span class="tag active">All</span><span class="tag">Active</span><span class="tag">Trial</span><span class="tag">Expired</span></div></div>
+    <div class="admin-grid">
+      <div class="stat-card card"><div class="label">Total Restaurants</div><div class="value">142</div><div class="change up">↑ 12 this week</div></div>
+      <div class="stat-card card"><div class="label">Active</div><div class="value">98</div><div class="change up">↑ 8</div></div>
+      <div class="stat-card card"><div class="label">On Trial</div><div class="value">28</div><div class="change" style="color:var(--warning)">⚠️ 5 expiring soon</div></div>
+      <div class="stat-card card"><div class="label">Revenue</div><div class="value">PKR 2.4M</div><div class="change up">↑ 18%</div></div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="overflow-x:auto">
+        <table class="admin-table"><thead><tr><th>Restaurant</th><th>Owner</th><th>Plan</th><th>Orders</th><th>Status</th><th></th></tr></thead><tbody>
+          <tr><td><strong>Bar.B.Q Tonight</strong><br><span style="font-size:12px;color:var(--text-muted)">Karachi</span></td><td>Ali Khan</td><td><span class="badge badge-accent">Growth</span></td><td style="font-weight:600">284</td><td><span class="badge badge-success">Active</span></td><td><button class="btn btn-ghost btn-sm">Manage</button></td></tr>
+          <tr><td><strong>Lal Qila</strong><br><span style="font-size:12px;color:var(--text-muted)">Lahore</span></td><td>Fatima Ahmed</td><td><span class="badge badge-accent">Premium</span></td><td style="font-weight:600">512</td><td><span class="badge badge-success">Active</span></td><td><button class="btn btn-ghost btn-sm">Manage</button></td></tr>
+          <tr><td><strong>Burger Lab</strong><br><span style="font-size:12px;color:var(--text-muted)">Karachi</span></td><td>Usman R.</td><td><span class="badge badge-muted">Trial</span></td><td style="font-weight:600">45</td><td><span class="badge badge-muted">Trial</span></td><td><button class="btn btn-ghost btn-sm">Manage</button></td></tr>
+          <tr><td><strong>Pizza Planet</strong><br><span style="font-size:12px;color:var(--text-muted)">Islamabad</span></td><td>Zara Malik</td><td><span class="badge badge-accent">Starter</span></td><td style="font-weight:600">142</td><td><span class="badge badge-success">Active</span></td><td><button class="btn btn-ghost btn-sm">Manage</button></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ SCREEN INDICATOR ═══════ -->
+<div id="screenIndicator" style="position:fixed;bottom:20px;right:20px;z-index:200;font-size:11px;color:var(--text-muted);background:var(--surface);padding:5px 12px;border-radius:100px;border:1px solid var(--border);font-family:var(--font-display);opacity:0.7;pointer-events:none">Home</div>
+
+<script>
+const navLinks = document.querySelectorAll('[data-screen]');
+const screens = document.querySelectorAll('.screen');
+const indicator = document.getElementById('screenIndicator');
+
+function navigateTo(screenId) {
+  screens.forEach(s => s.classList.remove('active'));
+  navLinks.forEach(a => a.classList.remove('active'));
+  const target = document.getElementById('screen-' + screenId);
+  if (target) target.classList.add('active');
+  const link = document.querySelector(`[data-screen="${screenId}"]`);
+  if (link) { link.classList.add('active'); indicator.textContent = link.textContent.trim(); }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+navLinks.forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    navigateTo(link.getAttribute('data-screen'));
+  });
+});
+
+navigateTo('landing');
+</script>
+</body>
+</html>

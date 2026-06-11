@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Admin — Wireframes</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #f5f5f5; color: #111; padding: 24px; }
+  .nav-back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #888; text-decoration: none; margin-bottom: 24px; }
+  .nav-back:hover { color: #111; }
+  h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 32px; }
+  .device-row { display: flex; gap: 24px; margin-bottom: 48px; flex-wrap: wrap; }
+  .device-col { flex: 1; min-width: 240px; }
+  .device-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #888; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .device-label .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .dot.phone { background: #3b82f6; }
+  .dot.tablet { background: #8b5cf6; }
+  .dot.desktop { background: #111; }
+  .frame { border: 2px solid #ddd; border-radius: 12px; background: #fff; overflow: hidden; }
+  .frame.phone { max-width: 320px; border-radius: 20px; }
+  .frame.tablet { max-width: 600px; }
+  .frame.desktop { width: 100%; }
+  .wf { width: 100%; }
+
+  .wf-hdr { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid #eee; }
+  .wf-hdr .brand { width: 60px; height: 12px; background: #111; border-radius: 2px; }
+  .wf-hdr .logout { width: 50px; height: 20px; border-radius: 6px; background: #f0f0f0; }
+
+  .wf-tabs { display: flex; gap: 2px; padding: 0 14px; background: #f8f8f8; border-bottom: 1px solid #eee; overflow-x: auto; }
+  .wf-tabs .tab { padding: 8px 12px; font-size: 10px; white-space: nowrap; border-bottom: 2px solid transparent; }
+  .wf-tabs .tab.active { border-bottom-color: #111; font-weight: 600; }
+
+  .wf-content { padding: 12px 14px; }
+
+  /* Search & filter */
+  .wf-sa-search { display: flex; gap: 8px; margin-bottom: 12px; }
+  .wf-sa-search .input { flex: 1; height: 32px; background: #f0f0f0; border-radius: 8px; }
+  .wf-sa-search .btn { width: 50px; height: 32px; background: #111; border-radius: 8px; }
+
+  /* Table */
+  .wf-table { border: 1px solid #eee; border-radius: 10px; overflow: hidden; }
+  .wf-table .tr { display: flex; border-bottom: 1px solid #eee; align-items: center; }
+  .wf-table .tr:last-child { border-bottom: none; }
+  .wf-table .tr.hdr { background: #f8f8f8; font-size: 9px; font-weight: 600; color: #555; }
+  .wf-table .td { flex: 1; padding: 8px 10px; font-size: 10px; }
+  .wf-table .td:first-child { flex: 1.5; }
+  .wf-table .td .n { width: 50px; height: 7px; background: #e0e0e0; border-radius: 2px; }
+  .wf-table .td .s { width: 30px; height: 6px; background: #e8e8e8; border-radius: 2px; }
+  .wf-table .td .badge { width: 30px; height: 12px; border-radius: 20px; background: #f0f0f0; }
+  .wf-table .td .badge.green { background: #22c55e; }
+  .wf-table .td .badge.yellow { background: #fbbf24; }
+
+  /* Analytics in superadmin */
+  .wf-sa-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .wf-sa-stat { background: #f8f8f8; border: 1px solid #eee; border-radius: 10px; padding: 12px; }
+  .wf-sa-stat .l { width: 50px; height: 7px; background: #e0e0e0; border-radius: 2px; margin-bottom: 4px; }
+  .wf-sa-stat .v { width: 50px; height: 16px; background: #111; border-radius: 3px; }
+  .wf-sa-chart { border: 1px solid #eee; border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+  .wf-sa-chart .hdr { width: 60px; height: 8px; background: #e0e0e0; border-radius: 2px; margin-bottom: 8px; }
+  .wf-sa-chart .graph { height: 60px; display: flex; align-items: flex-end; gap: 4px; }
+  .wf-sa-chart .graph .bar { flex: 1; background: #e0e0e0; border-radius: 2px 2px 0 0; }
+
+  /* Settings form */
+  .wf-sa-form { max-width: 400px; }
+  .wf-sa-form .field { margin-bottom: 10px; }
+  .wf-sa-form .field .l { width: 80px; height: 7px; background: #e0e0e0; border-radius: 2px; margin-bottom: 4px; }
+  .wf-sa-form .field .input { height: 32px; background: #f8f8f8; border: 1px solid #eee; border-radius: 6px; }
+
+  .screen-label { font-size: 10px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 8px; background: #f0f0f0; display: inline-block; border-radius: 4px; margin-bottom: 6px; }
+  .screen-spacer { height: 24px; }
+</style>
+</head>
+<body>
+<a href="index.html" class="nav-back">← Back to all wireframes</a>
+<h1>Super Admin Panel</h1>
+<p class="subtitle">Central management for all restaurants, customers, analytics &amp; settings</p>
+
+<!-- SCREEN 1: Restaurants Tab -->
+<div class="device-row">
+  <div class="device-col">
+    <div class="screen-label">① Restaurants Tab (Main)</div>
+    <div class="device-label"><span class="dot phone"></span> Mobile</div>
+    <div class="frame phone">
+      <div class="wf">
+        <div class="wf-hdr"><div class="brand"></div><div class="logout"></div></div>
+        <div class="wf-tabs"><div class="tab active">Restaurants</div><div class="tab">Customers</div><div class="tab">Analytics</div><div class="tab">Settings</div></div>
+        <div class="wf-content">
+          <div class="wf-sa-search"><div class="input"></div><div class="btn"></div></div>
+          <div class="wf-table">
+            <div class="tr hdr"><div class="td">Name</div><div class="td">Plan</div><div class="td">Status</div><div class="td"></div></div>
+            <div class="tr"><div class="td"><div class="n"></div><div class="s"></div></div><div class="td"><div class="badge green"></div></div><div class="td"><div class="badge"></div></div><div class="td" style="flex:0.5">⋯</div></div>
+            <div class="tr"><div class="td"><div class="n"></div><div class="s"></div></div><div class="td"><div class="badge yellow"></div></div><div class="td"><div class="badge"></div></div><div class="td" style="flex:0.5">⋯</div></div>
+            <div class="tr"><div class="td"><div class="n"></div><div class="s"></div></div><div class="td"><div class="badge"></div></div><div class="td"><div class="badge"></div></div><div class="td" style="flex:0.5">⋯</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="device-col">
+    <div class="screen-label" style="visibility:hidden">① Restaurants Tab</div>
+    <div class="device-label"><span class="dot tablet"></span> Tablet</div>
+    <div class="frame tablet">
+      <div class="wf">
+        <div class="wf-hdr"><div class="brand"></div><div class="logout"></div></div>
+        <div class="wf-tabs"><div class="tab active">Restaurants</div><div class="tab">Customers</div><div class="tab">Analytics</div><div class="tab">Settings</div></div>
+        <div class="wf-content">
+          <div class="wf-sa-search" style="max-width:400px"><div class="input"></div><div class="btn"></div></div>
+          <div class="wf-table">
+            <div class="tr hdr"><div class="td">Restaurant</div><div class="td">City</div><div class="td">Plan</div><div class="td">Orders</div><div class="td">Status</div><div class="td" style="flex:0.5"></div></div>
+            <div class="tr"><div class="td"><div class="n"></div><div class="s"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="badge green"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="badge"></div></div><div class="td" style="flex:0.5">⋯</div></div>
+            <div class="tr"><div class="td"><div class="n"></div><div class="s"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="badge yellow"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="badge"></div></div><div class="td" style="flex:0.5">⋯</div></div>
+            <div class="tr"><div class="td"><div class="n"></div><div class="s"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="badge"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="badge"></div></div><div class="td" style="flex:0.5">⋯</div></div>
+            <div class="tr"><div class="td"><div class="n"></div><div class="s"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="badge"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="badge"></div></div><div class="td" style="flex:0.5">⋯</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="device-col">
+    <div class="screen-label" style="visibility:hidden">① Restaurants Tab</div>
+    <div class="device-label"><span class="dot desktop"></span> Desktop</div>
+    <div class="frame desktop">
+      <div class="wf">
+        <div class="wf-hdr"><div class="brand"></div><div class="logout"></div></div>
+        <div class="wf-tabs"><div class="tab active">Restaurants</div><div class="tab">Customers</div><div class="tab">Analytics</div><div class="tab">Settings</div></div>
+        <div class="wf-content">
+          <div class="wf-sa-search" style="max-width:400px"><div class="input"></div><div class="btn"></div></div>
+          <div class="wf-table">
+            <div class="tr hdr"><div class="td">Restaurant</div><div class="td">Owner</div><div class="td">City</div><div class="td">Plan</div><div class="td">Orders</div><div class="td">Joined</div><div class="td">Status</div><div class="td" style="flex:0.5"></div></div>
+            <div class="tr"><div class="td"><div class="n"></div><div class="s"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="badge green"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="badge"></div></div><div class="td" style="flex:0.5">⋯</div></div>
+            <div class="tr"><div class="td"><div class="n"></div><div class="s"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="badge yellow"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="badge"></div></div><div class="td" style="flex:0.5">⋯</div></div>
+            <div class="tr"><div class="td"><div class="n"></div><div class="s"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="badge"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="badge"></div></div><div class="td" style="flex:0.5">⋯</div></div>
+            <div class="tr"><div class="td"><div class="n"></div><div class="s"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="badge"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="s"></div></div><div class="td"><div class="badge"></div></div><div class="td" style="flex:0.5">⋯</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2: Analytics Tab -->
+<div class="device-spacer"></div>
+<div class="device-row">
+  <div class="device-col">
+    <div class="screen-label">② Analytics Tab</div>
+    <div class="device-label"><span class="dot phone"></span> Mobile</div>
+    <div class="frame phone">
+      <div class="wf">
+        <div class="wf-hdr"><div class="brand"></div><div class="logout"></div></div>
+        <div class="wf-tabs"><div class="tab">Restaurants</div><div class="tab">Customers</div><div class="tab active">Analytics</div><div class="tab">Settings</div></div>
+        <div class="wf-content">
+          <div class="wf-chdr"><div class="t" style="width:60px"></div></div>
+          <div class="wf-sa-stats"><div class="wf-sa-stat"><div class="l"></div><div class="v"></div></div><div class="wf-sa-stat"><div class="l"></div><div class="v"></div></div></div>
+          <div class="wf-sa-chart"><div class="hdr"></div><div class="graph"><div class="bar" style="height:40%"></div><div class="bar" style="height:65%"></div><div class="bar" style="height:50%"></div><div class="bar" style="height:80%"></div><div class="bar" style="height:60%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:55%"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="device-col">
+    <div class="screen-label" style="visibility:hidden">② Analytics Tab</div>
+    <div class="device-label"><span class="dot desktop"></span> Desktop</div>
+    <div class="frame desktop">
+      <div class="wf">
+        <div class="wf-hdr"><div class="brand"></div><div class="logout"></div></div>
+        <div class="wf-tabs"><div class="tab">Restaurants</div><div class="tab">Customers</div><div class="tab active">Analytics</div><div class="tab">Settings</div></div>
+        <div class="wf-content">
+          <div class="wf-sa-stats" style="grid-template-columns:repeat(4,1fr);max-width:600px"><div class="wf-sa-stat"><div class="l"></div><div class="v"></div></div><div class="wf-sa-stat"><div class="l"></div><div class="v"></div></div><div class="wf-sa-stat"><div class="l"></div><div class="v"></div></div><div class="wf-sa-stat"><div class="l"></div><div class="v"></div></div></div>
+          <div style="display:flex;gap:12px">
+            <div class="wf-sa-chart" style="flex:1"><div class="hdr"></div><div class="graph" style="height:100px"><div class="bar" style="height:40%"></div><div class="bar" style="height:65%"></div><div class="bar" style="height:50%"></div><div class="bar" style="height:80%"></div><div class="bar" style="height:60%"></div></div></div>
+            <div class="wf-sa-chart" style="flex:1"><div class="hdr"></div><div class="graph" style="height:100px"><div class="bar" style="height:55%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:45%"></div><div class="bar" style="height:60%"></div><div class="bar" style="height:75%"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3: Settings Tab -->
+<div class="device-spacer"></div>
+<div class="device-row">
+  <div class="device-col">
+    <div class="screen-label">③ Company Settings Tab</div>
+    <div class="device-label"><span class="dot phone"></span> Mobile</div>
+    <div class="frame phone">
+      <div class="wf">
+        <div class="wf-hdr"><div class="brand"></div><div class="logout"></div></div>
+        <div class="wf-tabs"><div class="tab">Restaurants</div><div class="tab">Customers</div><div class="tab">Analytics</div><div class="tab active">Settings</div></div>
+        <div class="wf-content">
+          <div class="wf-chdr"><div class="t" style="width:80px"></div></div>
+          <div class="wf-sa-form">
+            <div class="field"><div class="l"></div><div class="input"></div></div>
+            <div class="field"><div class="l"></div><div class="input"></div></div>
+            <div class="field"><div class="l"></div><div class="input"></div></div>
+            <div class="field"><div class="l"></div><div class="input"></div></div>
+            <div class="field"><div class="l"></div><div class="input"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top:32px">
+  <div style="font-size:10px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:1px;padding:4px 10px;background:#f0f0f0;display:inline-block;border-radius:4px;margin-bottom:12px">Key Patterns</div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:#888">
+    <span>■ Tabbed interface (4 main tabs)</span>
+    <span>■ Searchable data tables</span>
+    <span>■ Restaurant table with status/suspend actions</span>
+    <span>■ Customer table list</span>
+    <span>■ Recharts graphs on analytics tab</span>
+    <span>■ Plan editor &amp; trial limits form</span>
+    <span>■ Company settings (JazzCash, Easypaisa, bank, WhatsApp)</span>
+    <span>■ 15s polling fallback for real-time-like updates</span>
+  </div>
+</div>
+</body>
+</html>

@@ -127,7 +127,7 @@ export function BellNotification({ restaurantId }: Props) {
 
       {/* Toast notifications */}
       {alerts.length > 0 && (
-        <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none">
+        <div className="fixed bottom-4 left-4 right-4 z-50 flex flex-col gap-2 max-w-sm mx-auto pointer-events-none">
           {alerts.map((alert) => (
             <Link
               key={alert.id}

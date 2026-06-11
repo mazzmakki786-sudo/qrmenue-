@@ -69,18 +69,18 @@ export function DishItem({ dish, lang = "en", unavailable = false, compact = fal
   return (
     <div className={`group flex gap-4 py-4 border-b border-[#F0F0F0] last:border-b-0 ${unavailable ? "opacity-50" : ""}`}>
       {dish.image_url && !imgError ? (
-        <div className="w-[100px] h-[100px] rounded-xl overflow-hidden flex-shrink-0 relative">
+        <div className="w-20 sm:w-[100px] h-20 sm:h-[100px] rounded-xl overflow-hidden flex-shrink-0 relative">
           <Image
             src={dish.image_url}
             alt={dish.name_en}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
-            sizes="100px"
+            sizes="(max-width: 640px) 80px, 100px"
             onError={() => setImgError(true)}
           />
         </div>
       ) : (
-        <div className="w-[100px] h-[100px] rounded-xl bg-gradient-to-br from-[#F8F8F8] to-[#EEE] flex items-center justify-center flex-shrink-0 border border-[#E8E8E8]">
+        <div className="w-20 sm:w-[100px] h-20 sm:h-[100px] rounded-xl bg-gradient-to-br from-[#F8F8F8] to-[#EEE] flex items-center justify-center flex-shrink-0 border border-[#E8E8E8]">
           <ImageOff className="w-6 h-6 text-[#BBB]" />
         </div>
       )}

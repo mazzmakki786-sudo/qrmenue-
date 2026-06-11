@@ -153,7 +153,7 @@ export default function OrderDetailPage() {
             {shouldBlurOrderDetails ? (
               <span className="blur-sm select-none font-mono text-right">{blur(order.delivery_address)}</span>
             ) : (
-              <span className="text-right max-w-[200px]">{order.delivery_address}</span>
+              <span className="text-right">{order.delivery_address}</span>
             )}
           </div>
         )}

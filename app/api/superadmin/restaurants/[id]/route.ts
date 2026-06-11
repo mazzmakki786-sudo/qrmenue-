@@ -1,5 +1,13 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { createClient, createAdminClient } from "@/lib/supabase/server"
+
+async function checkAuth(supabase: Awaited<ReturnType<typeof createClient>>) {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user || user.email?.toLowerCase() !== process.env.SUPER_ADMIN_EMAIL?.toLowerCase()) {
+    return false
+  }
+  return true
+}
 
 export async function GET(
   _request: Request,
@@ -8,12 +16,12 @@ export async function GET(
   const { id } = await params
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.email?.toLowerCase() !== process.env.SUPER_ADMIN_EMAIL?.toLowerCase()) {
+  if (!(await checkAuth(supabase))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
   }
 
-  const { data, error } = await supabase
+  const admin = createAdminClient()
+  const { data, error } = await admin
     .from("restaurants")
     .select("*, dishes(*), categories(*)")
     .eq("id", id)
@@ -32,14 +40,14 @@ export async function PATCH(
 ) {
   const { id } = await params
   const supabase = await createClient()
-  const body = await request.json()
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.email?.toLowerCase() !== process.env.SUPER_ADMIN_EMAIL?.toLowerCase()) {
+  if (!(await checkAuth(supabase))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
   }
 
-  const { data, error } = await supabase
+  const admin = createAdminClient()
+  const body = await request.json()
+  const { data, error } = await admin
     .from("restaurants")
     .update(body)
     .eq("id", id)

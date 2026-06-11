@@ -164,7 +164,7 @@ export default function DashboardPage() {
         <SubscriptionBanner restaurant={restaurant} orderCount={orderCount} />
       )}
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Link
           href="/dashboard/menu"
           className="flex items-center gap-3 p-4 rounded-[14px] bg-black text-white hover:bg-[#1A1A1A] transition-colors"

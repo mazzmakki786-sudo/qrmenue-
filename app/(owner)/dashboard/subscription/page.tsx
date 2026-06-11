@@ -8,7 +8,7 @@ import { SubscriptionBanner } from "@/components/shared/SubscriptionBanner"
 import { useCompanySettings } from "@/lib/hooks/useCompanySettings"
 import { useSubscription } from "@/lib/hooks/useSubscription"
 import { PLAN_LIMITS, PLAN_NAMES, PLAN_PRICES, type Plan, formatLimit } from "@/lib/subscription"
-import { Check, X, Sparkles, ArrowRight, Clock, ShoppingBag, Image as ImageIcon, Utensils, MessageCircle, Star } from "lucide-react"
+import { Check, X, Sparkles, ArrowRight, Clock, ShoppingBag, Image as ImageIcon, Utensils, MessageCircle, Star, XCircle } from "lucide-react"
 
 const planOrder: Plan[] = ["trial", "starter", "growth", "premium"]
 
@@ -40,6 +40,8 @@ export default function SubscriptionPage() {
     )
   }
 
+  const isSuspended = "is_suspended" in restaurant ? (restaurant as any).is_suspended : false
+
   const jazzcash = settings.jazzcash_number || "03001234567"
   const easypaisa = settings.easypaisa_number || "03001234567"
   const bankName = settings.bank_name || "Meezan Bank"
@@ -63,6 +65,20 @@ export default function SubscriptionPage() {
         </p>
       </div>
 
+      {isSuspended && (
+        <div className="bg-[#FEF3C7] border border-[#D97706]/30 rounded-[14px] p-4 flex items-start gap-3">
+          <div className="w-9 h-9 rounded-full bg-[#D97706] text-white flex items-center justify-center flex-shrink-0">
+            <XCircle className="w-5 h-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-[#92400E]">Account Suspended</p>
+            <p className="text-xs text-[#555] mt-1">
+              Your account has been temporarily suspended. Contact support for more information.
+            </p>
+          </div>
+        </div>
+      )}
+
       <SubscriptionBanner restaurant={restaurant} orderCount={orderCount} />
 
       <div className="bg-white rounded-[14px] border border-[#E8E8E8] p-5">
@@ -80,7 +96,7 @@ export default function SubscriptionPage() {
               : "Active"}
         </p>
 
-        <div className="grid grid-cols-3 gap-2 pt-3 border-t border-[#F0F0F0]">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 border-t border-[#F0F0F0]">
           <UsageStat
             icon={<Utensils className="w-3.5 h-3.5" />}
             label="Dishes"
@@ -98,6 +114,12 @@ export default function SubscriptionPage() {
             label="Orders"
             used={orderCount}
             limit={planLimits.maxOrders}
+          />
+          <UsageStat
+            icon={<Utensils className="w-3.5 h-3.5" />}
+            label="Categories"
+            used={sub.categoryCount}
+            limit={planLimits.maxCategories}
           />
         </div>
       </div>
@@ -134,7 +156,7 @@ export default function SubscriptionPage() {
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2 mb-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
                     <UsageStat
                       icon={<Utensils className="w-3 h-3" />}
                       label="Dishes"
@@ -154,6 +176,13 @@ export default function SubscriptionPage() {
                       label="Orders"
                       used={orderCount}
                       limit={limits.maxOrders}
+                      compact
+                    />
+                    <UsageStat
+                      icon={<Utensils className="w-3 h-3" />}
+                      label="Categories"
+                      used={sub.categoryCount}
+                      limit={limits.maxCategories}
                       compact
                     />
                   </div>

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owner Dashboard — Wireframes</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #f5f5f5; color: #111; padding: 24px; }
+  .nav-back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #888; text-decoration: none; margin-bottom: 24px; }
+  .nav-back:hover { color: #111; }
+  h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 32px; }
+  .device-row { display: flex; gap: 24px; margin-bottom: 48px; flex-wrap: wrap; }
+  .device-col { flex: 1; min-width: 240px; }
+  .device-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #888; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .device-label .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .dot.phone { background: #3b82f6; }
+  .dot.tablet { background: #8b5cf6; }
+  .dot.desktop { background: #111; }
+  .frame { border: 2px solid #ddd; border-radius: 12px; background: #fff; overflow: hidden; }
+  .frame.phone { max-width: 320px; border-radius: 20px; }
+  .frame.tablet { max-width: 600px; }
+  .frame.desktop { width: 100%; }
+  .wf { width: 100%; }
+
+  /* Owner header */
+  .wf-ohdr { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid #eee; background: #fff; }
+  .wf-ohdr .hamburger { width: 20px; height: 14px; display: flex; flex-direction: column; justify-content: space-between; }
+  .wf-ohdr .hamburger span { height: 2px; background: #111; border-radius: 1px; }
+  .wf-ohdr .brand { font-size: 12px; font-weight: 600; }
+  .wf-ohdr .action { width: 20px; height: 20px; border-radius: 50%; background: #e0e0e0; }
+
+  /* Desktop header */
+  .wf-dhdr { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #eee; background: #fff; }
+  .wf-dhdr .left { display: flex; align-items: center; gap: 16px; }
+  .wf-dhdr .brand { font-size: 14px; font-weight: 700; }
+  .wf-dhdr .nav { display: flex; gap: 4px; }
+  .wf-dhdr .nav .ni { width: 50px; height: 28px; border-radius: 6px; background: #f0f0f0; }
+  .wf-dhdr .nav .ni.active { background: #111; }
+  .wf-dhdr .logout { width: 40px; height: 20px; background: #f0f0f0; border-radius: 4px; }
+
+  /* Drawer */
+  .wf-drawer { position: absolute; left: 0; top: 0; bottom: 0; width: 200px; background: #fff; border-right: 1px solid #eee; padding: 16px; z-index: 10; }
+  .wf-drawer .brand { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .wf-drawer .sub { font-size: 10px; color: #888; margin-bottom: 16px; }
+  .wf-drawer .items { display: flex; flex-direction: column; gap: 2px; }
+  .wf-drawer .items .di { height: 32px; border-radius: 6px; background: #f0f0f0; }
+  .wf-drawer .items .di.active { background: #111; }
+  .wf-drawer-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); z-index: 5; }
+
+  /* Content */
+  .wf-content { padding: 12px 14px; }
+  .wf-chdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .wf-chdr .t { width: 80px; height: 12px; background: #e0e0e0; border-radius: 3px; }
+  .wf-chdr .btn { width: 70px; height: 28px; background: #111; border-radius: 20px; }
+
+  /* Stats grid */
+  .wf-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .wf-stat-card { background: #f8f8f8; border: 1px solid #eee; border-radius: 10px; padding: 12px; }
+  .wf-stat-card .l { width: 50px; height: 8px; background: #e0e0e0; border-radius: 2px; margin-bottom: 6px; }
+  .wf-stat-card .v { width: 40px; height: 16px; background: #111; border-radius: 3px; }
+
+  /* Quick links */
+  .wf-quick-links { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .wf-quick-link { display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 12px; border-radius: 10px; }
+  .wf-quick-link.dark { background: #111; }
+  .wf-quick-link.light { border: 1px solid #eee; }
+  .wf-quick-link .icon { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.2); }
+  .wf-quick-link .text { flex: 1; }
+  .wf-quick-link .text .n { width: 60px; height: 8px; background: rgba(255,255,255,0.4); border-radius: 2px; margin-bottom: 3px; }
+  .wf-quick-link .text .s { width: 40px; height: 6px; background: rgba(255,255,255,0.3); border-radius: 2px; }
+  .wf-quick-link.light .text .n { background: #e0e0e0; }
+  .wf-quick-link.light .text .s { background: #e8e8e8; }
+
+  /* Progress cards */
+  .wf-progress { border: 1px solid #eee; border-radius: 10px; padding: 14px; margin-bottom: 10px; background: #fff; }
+  .wf-progress .hdr { display: flex; justify-content: space-between; margin-bottom: 8px; }
+  .wf-progress .hdr .l { width: 80px; height: 10px; background: #e0e0e0; border-radius: 2px; }
+  .wf-progress .hdr .pct { width: 24px; height: 10px; background: #e0e0e0; border-radius: 2px; }
+  .wf-progress .bar { height: 6px; background: #f0f0f0; border-radius: 3px; margin-bottom: 8px; overflow: hidden; }
+  .wf-progress .bar .fill { height: 100%; width: 60%; background: #111; border-radius: 3px; }
+  .wf-progress .items { display: flex; flex-wrap: wrap; gap: 6px; }
+  .wf-progress .items .chk { display: flex; align-items: center; gap: 4px; }
+  .wf-progress .items .chk .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .wf-progress .items .chk .dot.g { background: #22c55e; }
+  .wf-progress .items .chk .dot.x { background: #eee; }
+  .wf-progress .items .chk .l { width: 50px; height: 6px; background: #e8e8e8; border-radius: 2px; }
+
+  /* Chart */
+  .wf-chart { border: 1px solid #eee; border-radius: 10px; padding: 14px; margin-bottom: 10px; background: #fff; }
+  .wf-chart .hdr { width: 80px; height: 10px; background: #e0e0e0; border-radius: 2px; margin-bottom: 10px; }
+  .wf-chart .graph { height: 80px; display: flex; align-items: flex-end; gap: 4px; }
+  .wf-chart .graph .bar { flex: 1; background: #e0e0e0; border-radius: 2px 2px 0 0; }
+  .wf-chart .graph .bar:nth-child(4) { background: #111; }
+
+  /* Subscription banner */
+  .wf-sub-banner { border: 1px solid #fef3c7; background: #fffbeb; border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; gap: 8px; align-items: flex-start; }
+  .wf-sub-banner .icon { width: 24px; height: 24px; border-radius: 50%; background: #fbbf24; flex-shrink: 0; }
+  .wf-sub-banner .text { flex: 1; }
+  .wf-sub-banner .text .l1 { width: 100px; height: 8px; background: #d97706; border-radius: 2px; margin-bottom: 4px; }
+  .wf-sub-banner .text .l2 { width: 140px; height: 6px; background: #fde68a; border-radius: 2px; }
+
+  /* Popular dishes */
+  .wf-popular { border: 1px solid #eee; border-radius: 10px; padding: 14px; background: #fff; }
+  .wf-popular .hdr { width: 80px; height: 10px; background: #e0e0e0; border-radius: 2px; margin-bottom: 8px; }
+  .wf-popular .row { display: flex; justify-content: space-between; padding: 4px 0; }
+  .wf-popular .row .n { width: 80px; height: 6px; background: #e8e8e8; border-radius: 2px; }
+  .wf-popular .row .c { width: 40px; height: 6px; background: #e8e8e8; border-radius: 2px; }
+
+  /* Menu management */
+  .wf-menu-hdr { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .wf-menu-hdr .logo { width: 40px; height: 40px; border-radius: 50%; background: #f0f0f0; flex-shrink: 0; }
+  .wf-menu-hdr .text { flex: 1; }
+  .wf-menu-hdr .text .n { width: 100px; height: 10px; background: #111; border-radius: 2px; margin-bottom: 3px; }
+  .wf-menu-hdr .text .s { width: 80px; height: 6px; background: #e0e0e0; border-radius: 2px; }
+
+  .wf-menu-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 10px; }
+  .wf-menu-stat { border: 1px solid #eee; border-radius: 10px; padding: 10px; }
+  .wf-menu-stat .l { width: 40px; height: 6px; background: #e8e8e8; border-radius: 2px; margin-bottom: 4px; }
+  .wf-menu-stat .v { width: 30px; height: 14px; background: #e0e0e0; border-radius: 3px; }
+
+  .wf-search-row { display: flex; gap: 6px; margin-bottom: 10px; }
+  .wf-search-row .search { flex: 1; height: 32px; background: #f0f0f0; border-radius: 8px; }
+  .wf-search-row .btn-sm { width: 60px; height: 32px; border-radius: 8px; }
+  .wf-search-row .btn-sm.dark { background: #111; }
+  .wf-search-row .btn-sm.light { border: 1px solid #eee; }
+
+  .wf-cat-pills { display: flex; gap: 4px; margin-bottom: 10px; overflow-x: auto; }
+  .wf-cat-pills .pill { height: 24px; border-radius: 20px; flex-shrink: 0; }
+  .wf-cat-pills .pill.active { width: 36px; background: #111; }
+  .wf-cat-pills .pill.inactive { width: 44px; background: #f0f0f0; border: 1px solid #eee; }
+
+  .wf-dish-list { display: flex; flex-direction: column; gap: 6px; }
+  .wf-dish-row { display: flex; align-items: center; gap: 8px; border: 1px solid #eee; border-radius: 8px; padding: 8px; }
+  .wf-dish-row .img { width: 36px; height: 36px; border-radius: 6px; background: #e0e0e0; flex-shrink: 0; }
+  .wf-dish-row .info { flex: 1; }
+  .wf-dish-row .info .n { width: 70px; height: 8px; background: #111; border-radius: 2px; margin-bottom: 3px; }
+  .wf-dish-row .info .p { width: 40px; height: 6px; background: #e0e0e0; border-radius: 2px; }
+  .wf-dish-row .actions { display: flex; gap: 4px; }
+  .wf-dish-row .actions .act { width: 24px; height: 24px; border-radius: 6px; background: #f0f0f0; }
+
+  /* Orders */
+  .wf-filter-pills { display: flex; gap: 6px; margin-bottom: 10px; }
+  .wf-filter-pills .pill { flex: 1; height: 28px; border-radius: 20px; text-align: center; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+  .wf-filter-pills .pill.active { background: #111; color: #fff; }
+  .wf-filter-pills .pill.inactive { background: #f0f0f0; color: #888; }
+
+  .wf-order-list { display: flex; flex-direction: column; gap: 6px; }
+  .wf-order-row { display: flex; align-items: center; justify-content: space-between; border: 1px solid #eee; border-radius: 8px; padding: 10px; }
+  .wf-order-row .left .n { width: 60px; height: 8px; background: #111; border-radius: 2px; margin-bottom: 4px; }
+  .wf-order-row .left .s { width: 80px; height: 6px; background: #e0e0e0; border-radius: 2px; }
+  .wf-order-row .right { text-align: right; }
+  .wf-order-row .right .v { width: 40px; height: 10px; background: #111; border-radius: 2px; margin-bottom: 4px; margin-left: auto; }
+  .wf-order-row .right .badge { width: 40px; height: 14px; border-radius: 20px; background: #f0f0f0; margin-left: auto; }
+
+  /* Settings */
+  .wf-settings-form { max-width: 400px; }
+  .wf-field-row { margin-bottom: 10px; }
+  .wf-field-row .l { width: 80px; height: 8px; background: #e0e0e0; border-radius: 2px; margin-bottom: 4px; }
+  .wf-field-row .input { height: 36px; background: #f8f8f8; border: 1px solid #eee; border-radius: 8px; }
+  .wf-avatar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .wf-avatar .pic { width: 48px; height: 48px; border-radius: 50%; background: #f0f0f0; }
+  .wf-avatar .text .n { width: 80px; height: 8px; background: #111; border-radius: 2px; margin-bottom: 3px; }
+  .wf-avatar .text .s { width: 60px; height: 6px; background: #e0e0e0; border-radius: 2px; }
+
+  /* Subscription */
+  .wf-plan-card { border: 1px solid #eee; border-radius: 12px; padding: 16px; margin-bottom: 10px; background: #fff; }
+  .wf-plan-card .hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .wf-plan-card .hdr .n { width: 60px; height: 10px; background: #e0e0e0; border-radius: 2px; }
+  .wf-plan-card .hdr .badge { width: 50px; height: 16px; border-radius: 20px; background: #f0f0f0; }
+  .wf-plan-card .usage-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; margin-bottom: 10px; }
+  .wf-plan-card .usage-item { background: #f8f8f8; border-radius: 6px; padding: 6px; }
+  .wf-plan-card .usage-item .l { width: 30px; height: 6px; background: #e0e0e0; border-radius: 2px; margin-bottom: 3px; }
+  .wf-plan-card .usage-item .v { width: 20px; height: 8px; background: #111; border-radius: 2px; }
+  .wf-plan-card .btn { width: 100%; height: 32px; border-radius: 8px; background: #111; }
+
+  /* QR page */
+  .wf-qr-display { display: flex; flex-direction: column; align-items: center; padding: 20px; }
+  .wf-qr-display .qr { width: 120px; height: 120px; background: #f0f0f0; border: 2px solid #eee; border-radius: 8px; margin-bottom: 10px; }
+  .wf-qr-display .n { width: 80px; height: 8px; background: #111; border-radius: 2px; margin-bottom: 4px; }
+  .wf-qr-display .s { width: 60px; height: 6px; background: #e0e0e0; border-radius: 2px; margin-bottom: 10px; }
+  .wf-qr-size { display: flex; gap: 6px; justify-content: center; }
+  .wf-qr-size .s-btn { width: 36px; height: 22px; border-radius: 20px; background: #f0f0f0; }
+  .wf-qr-size .s-btn.active { background: #111; }
+
+  .screen-label { font-size: 10px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 8px; background: #f0f0f0; display: inline-block; border-radius: 4px; margin-bottom: 6px; }
+  .screen-spacer { height: 24px; }
+</style>
+</head>
+<body>
+<a href="index.html" class="nav-back">← Back to all wireframes</a>
+<h1>Owner Dashboard</h1>
+<p class="subtitle">Restaurant owner management panel — responsive sidebar + hamburger drawer</p>
+
+<!-- SCREEN 1: Dashboard Home -->
+<div class="device-row">
+  <div class="device-col">
+    <div class="screen-label">① Dashboard Home</div>
+    <div class="device-label"><span class="dot phone"></span> Mobile</div>
+    <div class="frame phone">
+      <div class="wf" style="position:relative;min-height:500px">
+        <div class="wf-ohdr"><div class="hamburger"><span></span><span></span><span></span></div><div class="brand">QRMenu.pk</div><div class="action"></div></div>
+        <div class="wf-content">
+          <div class="wf-chdr"><div class="t"></div><div class="btn"></div></div>
+          <div class="wf-sub-banner"><div class="icon"></div><div class="text"><div class="l1"></div><div class="l2"></div></div></div>
+          <div class="wf-quick-links">
+            <div class="wf-quick-link dark"><div class="icon"></div><div class="text"><div class="n"></div><div class="s"></div></div></div>
+            <div class="wf-quick-link light"><div class="icon"></div><div class="text"><div class="n"></div><div class="s"></div></div></div>
+          </div>
+          <div class="wf-progress"><div class="hdr"><div class="l"></div><div class="pct"></div></div><div class="bar"><div class="fill" style="width:60%"></div></div></div>
+          <div class="wf-stats-grid">
+            <div class="wf-stat-card"><div class="l"></div><div class="v"></div></div>
+            <div class="wf-stat-card"><div class="l"></div><div class="v"></div></div>
+          </div>
+          <div class="wf-chart"><div class="hdr"></div><div class="graph"><div class="bar" style="height:40%"></div><div class="bar" style="height:60%"></div><div class="bar" style="height:45%"></div><div class="bar" style="height:80%"></div><div class="bar" style="height:55%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:65%"></div></div></div>
+          <div class="wf-popular"><div class="hdr"></div><div class="row"><div class="n"></div><div class="c"></div></div><div class="row"><div class="n"></div><div class="c"></div></div><div class="row"><div class="n"></div><div class="c"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="device-col">
+    <div class="screen-label" style="visibility:hidden">① Dashboard Home</div>
+    <div class="device-label"><span class="dot tablet"></span> Tablet</div>
+    <div class="frame tablet">
+      <div class="wf" style="min-height:400px">
+        <div class="wf-dhdr"><div class="left"><div class="brand">QRMenu.pk</div><div class="nav"><div class="ni active"></div><div class="ni"></div><div class="ni"></div><div class="ni"></div></div></div><div class="logout"></div></div>
+        <div style="display:flex;min-height:360px">
+          <div style="width:160px;border-right:1px solid #eee;padding:12px"><div class="wf-drawer" style="position:static;border:none;padding:0;width:auto"><div class="brand">QRMenu.pk</div><div class="sub">Owner dashboard</div><div class="items"><div class="di active"></div><div class="di"></div><div class="di"></div><div class="di"></div><div class="di"></div></div></div></div>
+          <div class="wf-content" style="flex:1;padding:12px">
+            <div class="wf-chdr"><div class="t"></div></div>
+            <div class="wf-stats-grid" style="grid-template-columns:repeat(4,1fr)">
+              <div class="wf-stat-card"><div class="l"></div><div class="v"></div></div>
+              <div class="wf-stat-card"><div class="l"></div><div class="v"></div></div>
+              <div class="wf-stat-card"><div class="l"></div><div class="v"></div></div>
+              <div class="wf-stat-card"><div class="l"></div><div class="v"></div></div>
+            </div>
+            <div class="wf-chart"><div class="hdr"></div><div class="graph" style="height:100px"><div class="bar" style="height:40%"></div><div class="bar" style="height:60%"></div><div class="bar" style="height:45%"></div><div class="bar" style="height:80%"></div><div class="bar" style="height:55%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:65%"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="device-col">
+    <div class="screen-label" style="visibility:hidden">① Dashboard Home</div>
+    <div class="device-label"><span class="dot desktop"></span> Desktop</div>
+    <div class="frame desktop">
+      <div class="wf" style="min-height:400px">
+        <div class="wf-dhdr"><div class="left"><div class="nav"><div class="ni active"></div><div class="ni"></div><div class="ni"></div><div class="ni"></div><div class="ni"></div><div class="ni"></div><div class="ni"></div></div></div><div class="logout"></div></div>
+        <div style="display:flex;min-height:360px">
+          <div style="width:180px;border-right:1px solid #eee;padding:16px"><div class="wf-drawer" style="position:static;border:none;padding:0;width:auto"><div class="brand">QRMenu.pk</div><div class="sub">Owner dashboard</div><div class="items"><div class="di active"></div><div class="di"></div><div class="di"></div><div class="di"></div><div class="di"></div><div class="di"></div><div class="di"></div></div></div></div>
+          <div class="wf-content" style="flex:1;padding:16px">
+            <div class="wf-chdr"><div class="t"></div><div class="btn"></div></div>
+            <div class="wf-stats-grid" style="grid-template-columns:repeat(4,1fr)">
+              <div class="wf-stat-card"><div class="l"></div><div class="v"></div></div>
+              <div class="wf-stat-card"><div class="l"></div><div class="v"></div></div>
+              <div class="wf-stat-card"><div class="l"></div><div class="v"></div></div>
+              <div class="wf-stat-card"><div class="l"></div><div class="v"></div></div>
+            </div>
+            <div class="wf-chart"><div class="hdr"></div><div class="graph" style="height:120px"><div class="bar" style="height:40%"></div><div class="bar" style="height:60%"></div><div class="bar" style="height:45%"></div><div class="bar" style="height:80%"></div><div class="bar" style="height:55%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:65%"></div></div></div>
+            <div class="wf-popular"><div class="hdr"></div><div class="row"><div class="n"></div><div class="c"></div></div><div class="row"><div class="n"></div><div class="c"></div></div><div class="row"><div class="n"></div><div class="c"></div></div><div class="row"><div class="n"></div><div class="c"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2: Menu Management -->
+<div class="device-row">
+  <div class="device-col">
+    <div class="screen-label">② Menu Management</div>
+    <div class="device-label"><span class="dot phone"></span> Mobile</div>
+    <div class="frame phone">
+      <div class="wf">
+        <div class="wf-ohdr"><div class="hamburger"><span></span><span></span><span></span></div><div class="brand">QRMenu.pk</div><div class="action"></div></div>
+        <div class="wf-content">
+          <div class="wf-menu-hdr"><div class="logo"></div><div class="text"><div class="n"></div><div class="s"></div></div></div>
+          <div class="wf-menu-stats"><div class="wf-menu-stat"><div class="l"></div><div class="v"></div></div><div class="wf-menu-stat"><div class="l"></div><div class="v"></div></div><div class="wf-menu-stat"><div class="l"></div><div class="v"></div></div></div>
+          <div class="wf-search-row"><div class="search"></div><div class="btn-sm light"></div><div class="btn-sm dark"></div></div>
+          <div class="wf-cat-pills"><div class="pill active"></div><div class="pill inactive"></div><div class="pill inactive"></div><div class="pill inactive"></div></div>
+          <div class="wf-dish-list">
+            <div class="wf-dish-row"><div class="img"></div><div class="info"><div class="n"></div><div class="p"></div></div><div class="actions"><div class="act"></div><div class="act"></div></div></div>
+            <div class="wf-dish-row"><div class="img"></div><div class="info"><div class="n"></div><div class="p"></div></div><div class="actions"><div class="act"></div><div class="act"></div></div></div>
+            <div class="wf-dish-row"><div class="img"></div><div class="info"><div class="n"></div><div class="p"></div></div><div class="actions"><div class="act"></div><div class="act"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="device-col">
+    <div class="screen-label" style="visibility:hidden">② Menu Management</div>
+    <div class="device-label"><span class="dot desktop"></span> Desktop</div>
+    <div class="frame desktop">
+      <div class="wf">
+        <div class="wf-dhdr"><div class="left"><div class="nav"><div class="ni"></div><div class="ni active"></div><div class="ni"></div><div class="ni"></div></div></div><div class="logout"></div></div>
+        <div style="display:flex;min-height:400px">
+          <div style="width:180px;border-right:1px solid #eee;padding:16px"><div class="wf-drawer" style="position:static;border:none;padding:0;width:auto"><div class="brand">QRMenu.pk</div><div class="items" style="margin-top:16px"><div class="di"></div><div class="di active"></div><div class="di"></div><div class="di"></div><div class="di"></div></div></div></div>
+          <div class="wf-content" style="flex:1;padding:16px">
+            <div class="wf-menu-hdr"><div class="logo"></div><div class="text"><div class="n"></div><div class="s"></div></div></div>
+            <div class="wf-menu-stats" style="grid-template-columns:repeat(3,1fr);max-width:400px"><div class="wf-menu-stat"><div class="l"></div><div class="v"></div></div><div class="wf-menu-stat"><div class="l"></div><div class="v"></div></div><div class="wf-menu-stat"><div class="l"></div><div class="v"></div></div></div>
+            <div class="wf-search-row" style="max-width:500px"><div class="search"></div><div class="btn-sm light"></div><div class="btn-sm dark"></div></div>
+            <div class="wf-dish-list"><div class="wf-dish-row"><div class="img"></div><div class="info"><div class="n"></div><div class="p"></div></div><div class="actions"><div class="act"></div><div class="act"></div></div></div><div class="wf-dish-row"><div class="img"></div><div class="info"><div class="n"></div><div class="p"></div></div><div class="actions"><div class="act"></div><div class="act"></div></div></div><div class="wf-dish-row"><div class="img"></div><div class="info"><div class="n"></div><div class="p"></div></div><div class="actions"><div class="act"></div><div class="act"></div></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3: Orders -->
+<div class="screen-spacer"></div>
+<div class="device-row">
+  <div class="device-col">
+    <div class="screen-label">③ Orders</div>
+    <div class="device-label"><span class="dot phone"></span> Mobile</div>
+    <div class="frame phone">
+      <div class="wf">
+        <div class="wf-ohdr"><div class="hamburger"><span></span><span></span><span></span></div><div class="brand">QRMenu.pk</div><div class="action"></div></div>
+        <div class="wf-content">
+          <div class="wf-chdr"><div class="t"></div></div>
+          <div class="wf-sub-banner"><div class="icon"></div><div class="text"><div class="l1"></div><div class="l2"></div></div></div>
+          <div class="wf-filter-pills"><div class="pill active">Today</div><div class="pill inactive">Week</div><div class="pill inactive">All</div></div>
+          <div class="wf-order-list">
+            <div class="wf-order-row"><div class="left"><div class="n"></div><div class="s"></div></div><div class="right"><div class="v"></div><div class="badge"></div></div></div>
+            <div class="wf-order-row"><div class="left"><div class="n"></div><div class="s"></div></div><div class="right"><div class="v"></div><div class="badge"></div></div></div>
+            <div class="wf-order-row"><div class="left"><div class="n"></div><div class="s"></div></div><div class="right"><div class="v"></div><div class="badge"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="device-col">
+    <div class="screen-label" style="visibility:hidden">③ Orders</div>
+    <div class="device-label"><span class="dot desktop"></span> Desktop</div>
+    <div class="frame desktop">
+      <div class="wf">
+        <div class="wf-dhdr"><div class="left"><div class="nav"><div class="ni"></div><div class="ni"></div><div class="ni active"></div><div class="ni"></div></div></div><div class="logout"></div></div>
+        <div style="display:flex;min-height:400px">
+          <div style="width:180px;border-right:1px solid #eee;padding:16px"><div class="wf-drawer" style="position:static;border:none;padding:0;width:auto"><div class="brand">QRMenu.pk</div><div class="items" style="margin-top:16px"><div class="di"></div><div class="di"></div><div class="di active"></div><div class="di"></div><div class="di"></div></div></div></div>
+          <div class="wf-content" style="flex:1;padding:16px">
+            <div class="wf-chdr"><div class="t"></div></div>
+            <div class="wf-filter-pills" style="max-width:300px"><div class="pill active">Today</div><div class="pill inactive">Week</div><div class="pill inactive">All</div></div>
+            <div class="wf-order-list"><div class="wf-order-row"><div class="left"><div class="n"></div><div class="s"></div></div><div class="right"><div class="v"></div><div class="badge"></div></div></div><div class="wf-order-row"><div class="left"><div class="n"></div><div class="s"></div></div><div class="right"><div class="v"></div><div class="badge"></div></div></div><div class="wf-order-row"><div class="left"><div class="n"></div><div class="s"></div></div><div class="right"><div class="v"></div><div class="badge"></div></div></div><div class="wf-order-row"><div class="left"><div class="n"></div><div class="s"></div></div><div class="right"><div class="v"></div><div class="badge"></div></div></div><div class="wf-order-row"><div class="left"><div class="n"></div><div class="s"></div></div><div class="right"><div class="v"></div><div class="badge"></div></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 4: Analytics -->
+<div class="device-spacer"></div>
+<div class="device-row">
+  <div class="device-col">
+    <div class="screen-label">④ Analytics</div>
+    <div class="device-label"><span class="dot phone"></span> Mobile</div>
+    <div class="frame phone">
+      <div class="wf">
+        <div class="wf-ohdr"><div class="hamburger"><span></span><span></span><span></span></div><div class="brand">QRMenu.pk</div><div class="action"></div></div>
+        <div class="wf-content">
+          <div class="wf-chdr"><div class="t"></div></div>
+          <div class="wf-stats-grid">
+            <div class="wf-stat-card"><div class="l"></div><div class="v" style="width:50px;height:20px"></div></div>
+            <div class="wf-stat-card"><div class="l"></div><div class="v" style="width:60px;height:20px"></div></div>
+          </div>
+          <div class="wf-chart"><div class="hdr"></div><div class="graph" style="height:80px"><div class="bar" style="height:30%"></div><div class="bar" style="height:50%"></div><div class="bar" style="height:40%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:50%"></div><div class="bar" style="height:60%"></div><div class="bar" style="height:55%"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 5: Settings -->
+<div class="device-spacer"></div>
+<div class="device-row">
+  <div class="device-col">
+    <div class="screen-label">⑤ Settings / Profile</div>
+    <div class="device-label"><span class="dot phone"></span> Mobile</div>
+    <div class="frame phone">
+      <div class="wf">
+        <div class="wf-ohdr"><div class="hamburger"><span></span><span></span><span></span></div><div class="brand">QRMenu.pk</div><div class="action"></div></div>
+        <div class="wf-content">
+          <div class="wf-chdr"><div class="t" style="width:60px"></div></div>
+          <div class="wf-avatar"><div class="pic"></div><div class="text"><div class="n"></div><div class="s"></div></div></div>
+          <div class="wf-settings-form">
+            <div class="wf-field-row"><div class="l"></div><div class="input"></div></div>
+            <div class="wf-field-row"><div class="l"></div><div class="input"></div></div>
+            <div class="wf-field-row"><div class="l"></div><div class="input"></div></div>
+            <div class="wf-field-row"><div class="l"></div><div class="input"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 6: Subscription -->
+<div class="device-spacer"></div>
+<div class="device-row">
+  <div class="device-col">
+    <div class="screen-label">⑥ Subscription</div>
+    <div class="device-label"><span class="dot phone"></span> Mobile</div>
+    <div class="frame phone">
+      <div class="wf">
+        <div class="wf-ohdr"><div class="hamburger"><span></span><span></span><span></span></div><div class="brand">QRMenu.pk</div><div class="action"></div></div>
+        <div class="wf-content">
+          <div class="wf-chdr"><div class="t"></div></div>
+          <div class="wf-plan-card"><div class="hdr"><div class="n"></div><div class="badge"></div></div><div class="usage-grid"><div class="usage-item"><div class="l"></div><div class="v"></div></div><div class="usage-item"><div class="l"></div><div class="v"></div></div><div class="usage-item"><div class="l"></div><div class="v"></div></div><div class="usage-item"><div class="l"></div><div class="v"></div></div></div></div>
+          <div class="wf-plan-card" style="border-color:#111"><div class="hdr"><div class="n"></div><div class="badge" style="background:#111;color:#fff;font-size:8px;text-align:center;display:flex;align-items:center;justify-content:center">POPULAR</div></div><div class="usage-grid"><div class="usage-item"><div class="l"></div><div class="v"></div></div><div class="usage-item"><div class="l"></div><div class="v"></div></div><div class="usage-item"><div class="l"></div><div class="v"></div></div><div class="usage-item"><div class="l"></div><div class="v"></div></div></div><div class="btn"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 7: QR Code -->
+<div class="device-spacer"></div>
+<div class="device-row">
+  <div class="device-col">
+    <div class="screen-label">⑦ QR Code</div>
+    <div class="device-label"><span class="dot phone"></span> Mobile</div>
+    <div class="frame phone">
+      <div class="wf">
+        <div class="wf-ohdr"><div class="hamburger"><span></span><span></span><span></span></div><div class="brand">QRMenu.pk</div><div class="action"></div></div>
+        <div class="wf-content">
+          <div class="wf-chdr"><div class="t" style="width:60px"></div></div>
+          <div class="wf-qr-display"><div class="qr"></div><div class="n"></div><div class="s"></div><div class="wf-qr-size"><div class="s-btn active"></div><div class="s-btn"></div><div class="s-btn"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top:32px">
+  <div style="font-size:10px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:1px;padding:4px 10px;background:#f0f0f0;display:inline-block;border-radius:4px;margin-bottom:12px">Key Patterns</div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:#888">
+    <span>■ Mobile: sticky header + hamburger drawer (85vw, backdrop-blur)</span>
+    <span>■ Desktop: sidebar (hidden on mobile) + top nav with icons</span>
+    <span>■ Responsive stats grid: 2 cols (mobile) → 4 cols (desktop)</span>
+    <span>■ Skeleton loaders (pulsing gray bars) throughout</span>
+    <span>■ Real-time order notifications (bell icon + toast)</span>
+    <span>■ Subscription banner: 5 states (trial, grace, expired, suspended, paid)</span>
+    <span>■ Usage progress bars with color thresholds (black → yellow → red)</span>
+    <span>■ Profile completion &amp; menu setup progress</span>
+  </div>
+</div>
+</body>
+</html>

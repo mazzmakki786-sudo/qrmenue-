@@ -106,7 +106,7 @@ export default async function LandingPage() {
             <div className="w-7 h-7 rounded-lg bg-black text-white flex items-center justify-center text-xs">Q</div>
             QRMenu.pk
           </Link>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 max-md:hidden">
             <Link href="/pricing" className="text-sm text-[#555] font-medium px-3 py-1.5 hover:text-black transition-colors">
               Pricing
             </Link>
@@ -121,6 +121,17 @@ export default async function LandingPage() {
               className="text-sm font-medium px-4 py-1.5 rounded-full bg-black text-white hover:bg-[#1A1A1A] transition-colors"
             >
               Get Started
+            </Link>
+          </div>
+          <div className="flex md:hidden items-center gap-1.5">
+            <Link
+              href="/signup"
+              className="text-sm font-medium px-3 py-1.5 rounded-full bg-black text-white"
+            >
+              Get Started
+            </Link>
+            <Link href="/login" className="text-sm text-[#555] font-medium px-3 py-1.5">
+              Sign In
             </Link>
           </div>
         </div>

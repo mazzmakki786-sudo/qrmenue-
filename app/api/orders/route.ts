@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { generateOrderNumber } from "@/lib/utils"
 import { z } from "zod"
+import { loadTrialLimitsFromDB } from "@/lib/subscription-server"
+import { DEFAULT_TRIAL_LIMITS, GRACE_PERIOD_DAYS } from "@/lib/subscription"
 
 const orderItemSchema = z.object({
   id: z.string(),
@@ -35,12 +37,45 @@ export async function POST(request: Request) {
 
   const { data: restaurant } = await supabase
     .from("restaurants")
-    .select("id, phone, is_active")
+    .select("id, phone, is_active, is_suspended, plan, trial_end")
     .eq("id", parsed.data.restaurant_id)
     .single()
 
   if (!restaurant || !restaurant.is_active) {
     return NextResponse.json({ error: "Restaurant not found or inactive" }, { status: 404 })
+  }
+
+  if (restaurant.is_suspended) {
+    return NextResponse.json({ error: "Restaurant is suspended. Cannot accept orders." }, { status: 403 })
+  }
+
+  if (restaurant.plan === "trial" && restaurant.trial_end) {
+    const trialEnd = new Date(restaurant.trial_end)
+    const graceEnd = new Date(trialEnd.getTime() + GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000)
+    if (new Date() > graceEnd) {
+      return NextResponse.json({
+        error: "TRIAL_EXPIRED",
+        message: "This restaurant's trial has ended. Cannot accept orders.",
+      }, { status: 403 })
+    }
+  }
+
+  if (restaurant.plan === "trial") {
+    const trialLimits = await loadTrialLimitsFromDB()
+    const maxOrders = trialLimits.maxOrders ?? DEFAULT_TRIAL_LIMITS.maxOrders
+
+    const { count: orderCount } = await supabase
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .eq("restaurant_id", parsed.data.restaurant_id)
+      .neq("order_status", "cancelled")
+
+    if ((orderCount ?? 0) >= maxOrders) {
+      return NextResponse.json({
+        error: "ORDER_LIMIT_REACHED",
+        message: `Trial plan allows ${maxOrders} orders. Upgrade to accept more.`,
+      }, { status: 403 })
+    }
   }
 
   const orderNumber = generateOrderNumber()

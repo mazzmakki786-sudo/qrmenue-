@@ -5,81 +5,64 @@ import Link from "next/link"
 import { Check, X, Sparkles, Star, Shield, Zap, Heart } from "lucide-react"
 import { useCompanySettings } from "@/lib/hooks/useCompanySettings"
 import { useEffect, useState } from "react"
+import { PLAN_LIMITS, PLAN_PRICES, PLAN_NAMES, DEFAULT_TRIAL_LIMITS, formatLimit, type Plan, getPlanFeatures } from "@/lib/subscription"
 
-interface PlanData {
-  key: "trial" | "starter" | "growth" | "premium"
-  name: string
-  price: number
-  badge?: string
-  badgeColor?: string
-  features: { label: string; inc: boolean }[]
-  cta: string
-  highlight?: boolean
-}
+const planKeys: Plan[] = ["trial", "starter", "growth", "premium"]
 
-const plans: PlanData[] = [
-  {
-    key: "trial",
-    name: "Free Trial",
-    price: 0,
-    badge: "7 days",
-    badgeColor: "bg-[#FEF3C7] text-[#D97706]",
+function buildPlanData(key: Plan): {
+  key: Plan; name: string; price: number; badge?: string; badgeColor?: string; features: { label: string; inc: boolean }[]; cta: string; highlight?: boolean
+} {
+  const limits = PLAN_LIMITS[key]
+  const features = getPlanFeatures(key).map((f) => ({ label: f, inc: true }))
+
+  if (key === "trial") {
+    return {
+      key, name: PLAN_NAMES[key], price: 0,
+      badge: `${DEFAULT_TRIAL_LIMITS.trialDurationDays} days`,
+      badgeColor: "bg-[#FEF3C7] text-[#D97706]",
+      features: [
+        ...features,
+        { label: "Analytics dashboard", inc: true },
+      ],
+      cta: "Start Free Trial",
+    }
+  }
+  if (key === "starter") {
+    return {
+      key, name: PLAN_NAMES[key], price: PLAN_PRICES[key],
+      features: [
+        ...features,
+        { label: "Analytics dashboard", inc: true },
+      ],
+      cta: `Choose ${PLAN_NAMES[key]}`,
+    }
+  }
+  if (key === "growth") {
+    return {
+      key, name: PLAN_NAMES[key], price: PLAN_PRICES[key],
+      badge: "⭐ Most Popular",
+      badgeColor: "bg-black text-white",
+      features: [
+        ...features,
+        { label: "Priority support", inc: true },
+        { label: "Everything in Starter", inc: true },
+      ],
+      cta: `Choose ${PLAN_NAMES[key]}`,
+      highlight: true,
+    }
+  }
+  return {
+    key, name: PLAN_NAMES[key], price: PLAN_PRICES[key],
     features: [
-      { label: "5 dishes", inc: true },
-      { label: "5 dish images", inc: true },
-      { label: "10 orders", inc: true },
-      { label: "QR code generation", inc: true },
-      { label: "WhatsApp orders", inc: true },
-      { label: "Analytics dashboard", inc: true },
-    ],
-    cta: "Start Free Trial",
-  },
-  {
-    key: "starter",
-    name: "Starter",
-    price: 1200,
-    features: [
-      { label: "30 dishes", inc: true },
-      { label: "10 dish images", inc: true },
-      { label: "Unlimited orders", inc: true },
-      { label: "QR code generation", inc: true },
-      { label: "WhatsApp orders", inc: true },
-      { label: "Analytics dashboard", inc: true },
-    ],
-    cta: "Choose Starter",
-  },
-  {
-    key: "growth",
-    name: "Growth",
-    price: 2500,
-    badge: "⭐ Most Popular",
-    badgeColor: "bg-black text-white",
-    features: [
-      { label: "50 dishes", inc: true },
-      { label: "20 dish images", inc: true },
-      { label: "Unlimited orders", inc: true },
-      { label: "Custom branding", inc: true },
-      { label: "Priority support", inc: true },
-      { label: "Everything in Starter", inc: true },
-    ],
-    cta: "Choose Growth",
-    highlight: true,
-  },
-  {
-    key: "premium",
-    name: "Premium",
-    price: 4500,
-    features: [
-      { label: "100 dishes", inc: true },
-      { label: "100 dish images", inc: true },
-      { label: "Unlimited orders", inc: true },
-      { label: "Custom branding", inc: true },
+      ...features,
       { label: "Priority support", inc: true },
       { label: "Everything in Growth", inc: true },
     ],
-    cta: "Choose Premium",
-  },
-]
+    cta: `Choose ${PLAN_NAMES[key]}`,
+  }
+}
+
+const plans: ReturnType<typeof buildPlanData>[] = planKeys.map(buildPlanData)
 
 const faqs = [
   {

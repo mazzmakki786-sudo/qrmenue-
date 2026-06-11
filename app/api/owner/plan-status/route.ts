@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { PLAN_LIMITS, type Plan } from "@/lib/subscription"
+import { getEffectiveLimits, type Plan } from "@/lib/subscription"
 
 export async function GET() {
   const supabase = await createClient()
@@ -9,35 +9,37 @@ export async function GET() {
 
   const { data: restaurant } = await supabase
     .from("restaurants")
-    .select("id, plan")
+    .select("id, plan, plan_limits_override, is_active, is_suspended")
     .eq("owner_id", user.id)
     .single()
 
   if (!restaurant) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
 
   const plan = restaurant.plan as Plan
-  const limits = PLAN_LIMITS[plan]
+  const limits = getEffectiveLimits(plan, restaurant.plan_limits_override)
 
-  const { count: dishCount } = await supabase
-    .from("dishes")
-    .select("id", { count: "exact", head: true })
-    .eq("restaurant_id", restaurant.id)
+  const [dishRes, catRes] = await Promise.all([
+    supabase.from("dishes").select("id, image_url").eq("restaurant_id", restaurant.id),
+    supabase.from("categories").select("id", { count: "exact", head: true }).eq("restaurant_id", restaurant.id),
+  ])
 
-  const { data: dishes } = await supabase
-    .from("dishes")
-    .select("id, image_url")
-    .eq("restaurant_id", restaurant.id)
-
-  const imageCount = (dishes || []).filter((d: any) => !!d.image_url).length
+  const dishes = dishRes.data || []
+  const dishCount = dishes.length
+  const imageCount = dishes.filter((d: any) => !!d.image_url).length
+  const categoryCount = catRes.count ?? 0
 
   return NextResponse.json({
     plan,
     limits,
+    is_active: restaurant.is_active,
+    is_suspended: restaurant.is_suspended,
     usage: {
-      dishes: dishCount ?? 0,
+      dishes: dishCount,
       images: imageCount,
+      categories: categoryCount,
     },
-    canAddDish: (dishCount ?? 0) < limits.maxDishes,
+    canAddDish: dishCount < limits.maxDishes,
     canAddImage: imageCount < limits.maxImages,
+    canAddCategory: categoryCount < limits.maxCategories,
   })
 }

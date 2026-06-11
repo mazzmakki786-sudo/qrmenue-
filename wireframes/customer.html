@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Flow — Wireframes</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #f5f5f5; color: #111; padding: 24px; }
+  .nav-back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #888; text-decoration: none; margin-bottom: 24px; }
+  .nav-back:hover { color: #111; }
+  h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 32px; }
+  .device-row { display: flex; gap: 24px; margin-bottom: 48px; flex-wrap: wrap; }
+  .device-col { flex: 1; min-width: 240px; }
+  .device-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #888; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .device-label .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .dot.phone { background: #3b82f6; }
+  .dot.tablet { background: #8b5cf6; }
+  .dot.desktop { background: #111; }
+  .frame { border: 2px solid #ddd; border-radius: 12px; background: #fff; overflow: hidden; }
+  .frame.phone { max-width: 320px; border-radius: 20px; }
+  .frame.tablet { max-width: 600px; }
+  .frame.desktop { width: 100%; }
+  .wf { width: 100%; }
+
+  /* Shared elements */
+  .wf-hdr { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid #eee; }
+  .wf-hdr .back { width: 20px; height: 20px; border-radius: 50%; background: #e8e8e8; flex-shrink: 0; }
+  .wf-hdr .title { width: 80px; height: 12px; background: #e0e0e0; border-radius: 3px; }
+  .wf-restro-info { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid #eee; }
+  .wf-restro-info .logo { width: 40px; height: 40px; border-radius: 50%; background: #e0e0e0; flex-shrink: 0; }
+  .wf-restro-info .text { flex: 1; }
+  .wf-restro-info .text .l1 { width: 100px; height: 10px; background: #111; border-radius: 3px; margin-bottom: 4px; }
+  .wf-restro-info .text .l2 { width: 120px; height: 8px; background: #e0e0e0; border-radius: 3px; }
+  .wf-search { display: flex; gap: 8px; padding: 10px 14px; }
+  .wf-search .input { flex: 1; height: 32px; background: #f0f0f0; border-radius: 8px; }
+  .wf-search .toggle { width: 40px; height: 24px; background: #e0e0e0; border-radius: 20px; }
+  .wf-cat-pills { display: flex; gap: 6px; padding: 0 14px 10px; overflow-x: auto; }
+  .wf-cat-pills .pill { height: 24px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+  .wf-cat-pills .pill.active { width: 40px; background: #111; }
+  .wf-cat-pills .pill.inactive { width: 50px; background: #f0f0f0; }
+  .wf-cat-pills .pill.inactive.w { width: 60px; }
+  .wf-dish-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 8px 14px; }
+  .wf-dish-card { background: #f8f8f8; border: 1px solid #eee; border-radius: 10px; overflow: hidden; }
+  .wf-dish-card .img { width: 100%; height: 80px; background: #e0e0e0; }
+  .wf-dish-card .body { padding: 8px; }
+  .wf-dish-card .body .n { width: 50px; height: 8px; background: #e0e0e0; border-radius: 2px; margin-bottom: 4px; }
+  .wf-dish-card .body .p { width: 40px; height: 8px; background: #e8e8e8; border-radius: 2px; margin-bottom: 6px; }
+  .wf-dish-card .body .add { width: 100%; height: 24px; border-radius: 6px; background: #111; }
+  .wf-dish-card.unavail { opacity: 0.5; }
+  .wf-dish-card.unavail .body .add { background: #e0e0e0; }
+
+  /* Cart bar */
+  .wf-cart-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #111; color: #fff; }
+  .wf-cart-bar .left { display: flex; align-items: center; gap: 8px; }
+  .wf-cart-bar .left .icon { width: 18px; height: 18px; border-radius: 50%; background: #333; }
+  .wf-cart-bar .left .count { width: 30px; height: 8px; background: #333; border-radius: 2px; }
+  .wf-cart-bar .right { display: flex; align-items: center; gap: 8px; }
+  .wf-cart-bar .right .total { width: 50px; height: 8px; background: #fff; border-radius: 2px; }
+  .wf-cart-bar .right .arrow { width: 50px; height: 22px; background: #fff; border-radius: 8px; }
+
+  /* Bottom nav */
+  .wf-bottom-nav { display: flex; align-items: center; justify-content: space-around; height: 44px; border-top: 1px solid #eee; background: #fff; }
+  .wf-bottom-nav .item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .wf-bottom-nav .item .icon { width: 16px; height: 16px; border-radius: 50%; background: #e0e0e0; }
+  .wf-bottom-nav .item.active .icon { background: #111; }
+  .wf-bottom-nav .item .label { width: 24px; height: 6px; background: #e8e8e8; border-radius: 2px; }
+  .wf-bottom-nav .item.active .label { background: #111; }
+
+  /* Cart page */
+  .wf-cart-items { padding: 8px 14px; }
+  .wf-cart-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #eee; }
+  .wf-cart-row .info { flex: 1; }
+  .wf-cart-row .info .n { width: 70px; height: 8px; background: #e0e0e0; border-radius: 2px; margin-bottom: 4px; }
+  .wf-cart-row .info .p { width: 40px; height: 8px; background: #e8e8e8; border-radius: 2px; }
+  .wf-cart-row .qty { display: flex; align-items: center; gap: 6px; }
+  .wf-cart-row .qty .btn-m { width: 24px; height: 24px; border-radius: 50%; background: #f0f0f0; }
+  .wf-cart-row .qty .num { width: 16px; text-align: center; font-size: 11px; }
+  .wf-cart-row .qty .btn-p { width: 24px; height: 24px; border-radius: 50%; background: #111; }
+
+  /* Checkout */
+  .wf-checkout-form { padding: 12px 14px; }
+  .wf-order-type { display: flex; gap: 8px; margin-bottom: 16px; }
+  .wf-order-type .chip { flex: 1; height: 36px; border-radius: 8px; background: #f8f8f8; border: 1px solid #eee; }
+  .wf-order-type .chip.active { background: #111; border-color: #111; }
+  .wf-field { height: 40px; background: #f8f8f8; border: 1px solid #eee; border-radius: 8px; margin-bottom: 10px; }
+  .wf-pay-methods { display: flex; flex-direction: column; gap: 8px; }
+  .wf-pay-methods .method { display: flex; align-items: center; gap: 8px; height: 40px; border: 1px solid #eee; border-radius: 8px; padding: 0 12px; }
+  .wf-pay-methods .method .radio { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #ddd; }
+  .wf-pay-methods .method.active { background: #111; border-color: #111; color: #fff; }
+  .wf-pay-methods .method.active .radio { border-color: #fff; }
+  .wf-pay-methods .method .l { width: 80px; height: 8px; background: #e0e0e0; border-radius: 2px; }
+  .wf-pay-methods .method.active .l { background: #fff; }
+
+  /* Confirmation */
+  .wf-confirm { text-align: center; padding: 32px 14px; }
+  .wf-confirm .icon-lg { width: 48px; height: 48px; border-radius: 50%; background: #22c55e; margin: 0 auto 12px; }
+  .wf-confirm .l1 { width: 120px; height: 10px; background: #e0e0e0; border-radius: 3px; margin: 0 auto 6px; }
+  .wf-confirm .l2 { width: 180px; height: 8px; background: #e8e8e8; border-radius: 3px; margin: 0 auto; }
+
+  /* Restaurant directory */
+  .wf-city-pills { display: flex; gap: 6px; padding: 10px 14px; overflow-x: auto; }
+  .wf-city-pills .pill { height: 28px; border-radius: 20px; flex-shrink: 0; }
+  .wf-city-pills .pill.active { width: 50px; background: #111; }
+  .wf-city-pills .pill.inactive { width: 60px; background: #f0f0f0; }
+  .wf-restro-list { padding: 8px 14px; }
+  .wf-restro-item { display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid #eee; border-radius: 10px; margin-bottom: 8px; }
+  .wf-restro-item .logo { width: 36px; height: 36px; border-radius: 50%; background: #e0e0e0; flex-shrink: 0; }
+  .wf-restro-item .text { flex: 1; }
+  .wf-restro-item .text .n { width: 80px; height: 8px; background: #e0e0e0; border-radius: 2px; margin-bottom: 4px; }
+  .wf-restro-item .text .c { width: 60px; height: 6px; background: #e8e8e8; border-radius: 2px; }
+
+  .screen-label { font-size: 10px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 8px; background: #f0f0f0; display: inline-block; border-radius: 4px; margin-bottom: 6px; }
+  .screen-spacer { height: 16px; }
+</style>
+</head>
+<body>
+<a href="index.html" class="nav-back">← Back to all wireframes</a>
+<h1>Customer (Menu) Flow</h1>
+<p class="subtitle">Mobile-first app-like experience — menu browsing → cart → checkout → confirmation</p>
+
+<!-- SCREEN 1: Menu Browsing -->
+<div class="device-row">
+  <div class="device-col">
+    <div class="screen-label">① Menu Browsing (QR Destination)</div>
+    <div class="device-label"><span class="dot phone"></span> Mobile</div>
+    <div class="frame phone">
+      <div class="wf">
+        <div class="wf-restro-info"><div class="logo"></div><div class="text"><div class="l1"></div><div class="l2"></div></div></div>
+        <div class="wf-search"><div class="input"></div><div class="toggle"></div></div>
+        <div class="wf-cat-pills"><div class="pill active"></div><div class="pill inactive"></div><div class="pill inactive w"></div><div class="pill inactive"></div></div>
+        <div class="wf-dish-grid">
+          <div class="wf-dish-card"><div class="img"></div><div class="body"><div class="n"></div><div class="p"></div><div class="add"></div></div></div>
+          <div class="wf-dish-card"><div class="img"></div><div class="body"><div class="n"></div><div class="p"></div><div class="add"></div></div></div>
+          <div class="wf-dish-card"><div class="img"></div><div class="body"><div class="n"></div><div class="p"></div><div class="add"></div></div></div>
+          <div class="wf-dish-card unavail"><div class="img"></div><div class="body"><div class="n"></div><div class="p"></div><div class="add"></div></div></div>
+        </div>
+        <div class="wf-cart-bar"><div class="left"><div class="icon"></div><div class="count"></div></div><div class="right"><div class="total"></div><div class="arrow"></div></div></div>
+        <div class="wf-bottom-nav"><div class="item active"><div class="icon"></div><div class="label"></div></div><div class="item"><div class="icon"></div><div class="label"></div></div><div class="item"><div class="icon"></div><div class="label"></div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="device-col">
+    <div class="screen-label" style="visibility:hidden">① Menu Browsing</div>
+    <div class="device-label"><span class="dot tablet"></span> Tablet</div>
+    <div class="frame tablet">
+      <div class="wf">
+        <div class="wf-restro-info" style="justify-content:center"><div class="logo" style="width:48px;height:48px"></div><div class="text" style="text-align:center"><div class="l1" style="margin:0 auto 4px"></div><div class="l2" style="margin:0 auto"></div></div></div>
+        <div class="wf-search" style="max-width:400px;margin:0 auto"><div class="input"></div><div class="toggle"></div></div>
+        <div class="wf-cat-pills" style="justify-content:center"><div class="pill active"></div><div class="pill inactive"></div><div class="pill inactive w"></div><div class="pill inactive"></div><div class="pill inactive"></div></div>
+        <div class="wf-dish-grid" style="grid-template-columns:repeat(3,1fr);max-width:500px;margin:0 auto">
+          <div class="wf-dish-card"><div class="img" style="height:90px"></div><div class="body"><div class="n"></div><div class="p"></div><div class="add"></div></div></div>
+          <div class="wf-dish-card"><div class="img" style="height:90px"></div><div class="body"><div class="n"></div><div class="p"></div><div class="add"></div></div></div>
+          <div class="wf-dish-card"><div class="img" style="height:90px"></div><div class="body"><div class="n"></div><div class="p"></div><div class="add"></div></div></div>
+          <div class="wf-dish-card"><div class="img" style="height:90px"></div><div class="body"><div class="n"></div><div class="p"></div><div class="add"></div></div></div>
+          <div class="wf-dish-card unavail"><div class="img" style="height:90px"></div><div class="body"><div class="n"></div><div class="p"></div><div class="add"></div></div></div>
+          <div class="wf-dish-card"><div class="img" style="height:90px"></div><div class="body"><div class="n"></div><div class="p"></div><div class="add"></div></div></div>
+        </div>
+        <div class="wf-cart-bar" style="max-width:500px;margin:0 auto;border-radius:8px"><div class="left"><div class="icon"></div><div class="count"></div></div><div class="right"><div class="total"></div><div class="arrow"></div></div></div>
+        <div class="wf-bottom-nav" style="max-width:500px;margin:0 auto;border-radius:8px"></div>
+      </div>
+    </div>
+  </div>
+  <div class="device-col">
+    <div class="screen-label" style="visibility:hidden">① Menu Browsing</div>
+    <div class="device-label"><span class="dot desktop"></span> Desktop</div>
+    <div class="frame desktop">
+      <div class="wf">
+        <div class="wf-restro-info" style="justify-content:center"><div class="logo" style="width:52px;height:52px"></div><div class="text" style="text-align:center"><div class="l1" style="width:140px;margin:0 auto 4px;height:12px"></div><div class="l2" style="width:180px;margin:0 auto"></div></div></div>
+        <div class="wf-search" style="max-width:480px;margin:0 auto"><div class="input"></div><div class="toggle"></div></div>
+        <div class="wf-cat-pills" style="justify-content:center"><div class="pill active"></div><div class="pill inactive"></div><div class="pill inactive w"></div><div class="pill inactive"></div><div class="pill inactive"></div><div class="pill inactive"></div></div>
+        <div class="wf-dish-grid" style="grid-template-columns:repeat(4,1fr);max-width:600px;margin:0 auto">
+          <div class="wf-dish-card"><div class="img" style="height:100px"></div><div class="body"><div class="n"></div><div class="p"></div><div class="add"></div></div></div>
+          <div class="wf-dish-card"><div class="img" style="height:100px"></div><div class="body"><div class="n"></div><div class="p"></div><div class="add"></div></div></div>
+          <div class="wf-dish-card"><div class="img" style="height:100px"></div><div class="body"><div class="n"></div><div class="p"></div><div class="add"></div></div></div>
+          <div class="wf-dish-card"><div class="img" style="height:100px"></div><div class="body"><div class="n"></div><div class="p"></div><div class="add"></div></div></div>
+        </div>
+        <div class="wf-cart-bar" style="max-width:600px;margin:0 auto;border-radius:8px"><div class="left"><div class="icon"></div><div class="count"></div></div><div class="right"><div class="total"></div><div class="arrow"></div></div></div>
+        <div class="wf-bottom-nav" style="max-width:600px;margin:0 auto;border-radius:8px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2: Cart Page -->
+<div class="screen-spacer"></div>
+<div class="device-row">
+  <div class="device-col">
+    <div class="screen-label">② Cart Page</div>
+    <div class="device-label"><span class="dot phone"></span> Mobile</div>
+    <div class="frame phone">
+      <div class="wf">
+        <div class="wf-hdr"><div class="back"></div><div class="title"></div></div>
+        <div style="padding:8px 14px;background:#f8f8f8;border-bottom:1px solid #eee;display:flex;align-items:center;gap:6px"><div style="width:14px;height:14px;border-radius:50%;background:#e0e0e0"></div><div style="width:80px;height:8px;background:#e0e0e0;border-radius:2px"></div></div>
+        <div class="wf-cart-items">
+          <div class="wf-cart-row"><div class="info"><div class="n"></div><div class="p"></div></div><div class="qty"><div class="btn-m"></div><div class="num">1</div><div class="btn-p"></div></div></div>
+          <div class="wf-cart-row"><div class="info"><div class="n"></div><div class="p"></div></div><div class="qty"><div class="btn-m"></div><div class="num">2</div><div class="btn-p"></div></div></div>
+          <div class="wf-cart-row"><div class="info"><div class="n"></div><div class="p"></div></div><div class="qty"><div class="btn-m"></div><div class="num">1</div><div class="btn-p"></div></div></div>
+        </div>
+        <div class="wf-cart-bar" style="background:#fff;border-top:1px solid #eee;color:#111"><div class="left"><div class="count" style="background:#e0e0e0"></div></div><div class="right"><div class="total" style="background:#111"></div><div class="arrow" style="background:#111;color:#fff;display:flex;align-items:center;justify-content:center;font-size:8px">→</div></div></div>
+        <div class="wf-bottom-nav"><div class="item"><div class="icon"></div><div class="label"></div></div><div class="item active"><div class="icon"></div><div class="label"></div></div><div class="item"><div class="icon"></div><div class="label"></div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="device-col">
+    <div class="screen-label" style="visibility:hidden">② Cart Page</div>
+    <div class="device-label"><span class="dot tablet"></span> Tablet</div>
+    <div class="frame tablet">
+      <div class="wf">
+        <div class="wf-hdr" style="justify-content:center"><div class="back" style="position:absolute;left:14px"></div><div class="title"></div></div>
+        <div style="max-width:400px;margin:0 auto;padding:12px"><div class="wf-cart-items" style="padding:0"><div class="wf-cart-row"><div class="info"><div class="n" style="width:100px"></div><div class="p" style="width:60px"></div></div><div class="qty"><div class="btn-m"></div><div class="num">1</div><div class="btn-p"></div></div></div><div class="wf-cart-row"><div class="info"><div class="n" style="width:100px"></div><div class="p" style="width:60px"></div></div><div class="qty"><div class="btn-m"></div><div class="num">2</div><div class="btn-p"></div></div></div></div></div>
+        <div class="wf-cart-bar" style="max-width:400px;margin:0 auto;border-radius:8px;background:#fff;border:1px solid #eee;color:#111"><div class="left"><div class="count" style="background:#e0e0e0"></div></div><div class="right"><div class="total" style="background:#111"></div><div class="arrow" style="background:#111;color:#fff;display:flex;align-items:center;justify-content:center;font-size:8px">→</div></div></div>
+        <div class="wf-bottom-nav" style="max-width:400px;margin:0 auto"></div>
+      </div>
+    </div>
+  </div>
+  <div class="device-col">
+    <div class="screen-label" style="visibility:hidden">② Cart Page</div>
+    <div class="device-label"><span class="dot desktop"></span> Desktop</div>
+    <div class="frame desktop">
+      <div class="wf">
+        <div class="wf-hdr" style="justify-content:center"><div class="back" style="position:absolute;left:14px"></div><div class="title"></div></div>
+        <div style="max-width:480px;margin:0 auto;padding:16px"><div class="wf-cart-items" style="padding:0"><div class="wf-cart-row"><div class="info"><div class="n" style="width:120px"></div><div class="p" style="width:60px"></div></div><div class="qty"><div class="btn-m"></div><div class="num">1</div><div class="btn-p"></div></div></div><div class="wf-cart-row"><div class="info"><div class="n" style="width:120px"></div><div class="p" style="width:60px"></div></div><div class="qty"><div class="btn-m"></div><div class="num">2</div><div class="btn-p"></div></div></div><div class="wf-cart-row"><div class="info"><div class="n" style="width:120px"></div><div class="p" style="width:60px"></div></div><div class="qty"><div class="btn-m"></div><div class="num">1</div><div class="btn-p"></div></div></div></div></div>
+        <div class="wf-cart-bar" style="max-width:480px;margin:0 auto;border-radius:8px;background:#fff;border:1px solid #eee;color:#111"><div class="left"><div class="count" style="background:#e0e0e0"></div></div><div class="right"><div class="total" style="background:#111"></div><div class="arrow" style="background:#111;color:#fff;display:flex;align-items:center;justify-content:center;font-size:8px">→</div></div></div>
+        <div class="wf-bottom-nav" style="max-width:480px;margin:0 auto"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3: Checkout -->
+<div class="screen-spacer"></div>
+<div class="device-row">
+  <div class="device-col">
+    <div class="screen-label">③ Checkout</div>
+    <div class="device-label"><span class="dot phone"></span> Mobile</div>
+    <div class="frame phone">
+      <div class="wf">
+        <div class="wf-hdr"><div class="back"></div><div class="title"></div></div>
+        <div class="wf-checkout-form">
+          <div class="wf-order-type"><div class="chip active"></div><div class="chip"></div><div class="chip"></div></div>
+          <div class="wf-field"></div>
+          <div class="wf-field"></div>
+          <div style="margin:16px 0 8px"><div style="width:80px;height:8px;background:#e0e0e0;border-radius:2px;margin-bottom:8px"></div></div>
+          <div class="wf-pay-methods"><div class="method active"><div class="radio"></div><div class="l"></div></div><div class="method"><div class="radio"></div><div class="l"></div></div></div>
+        </div>
+        <div class="wf-cart-bar" style="background:#fff;border-top:1px solid #eee;color:#111"><div class="right" style="width:100%"><div style="width:100%;height:36px;background:#111;border-radius:8px"></div></div></div>
+        <div class="wf-bottom-nav"><div class="item"><div class="icon"></div><div class="label"></div></div><div class="item active"><div class="icon"></div><div class="label"></div></div><div class="item"><div class="icon"></div><div class="label"></div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="device-col">
+    <div class="screen-label" style="visibility:hidden">③ Checkout</div>
+    <div class="device-label"><span class="dot tablet"></span> Tablet</div>
+    <div class="frame tablet">
+      <div class="wf">
+        <div class="wf-hdr" style="justify-content:center"><div class="back" style="position:absolute;left:14px"></div><div class="title"></div></div>
+        <div class="wf-checkout-form" style="max-width:400px;margin:0 auto">
+          <div class="wf-order-type"><div class="chip active"></div><div class="chip"></div><div class="chip"></div></div>
+          <div class="wf-field"></div><div class="wf-field"></div>
+          <div class="wf-pay-methods"><div class="method active"><div class="radio"></div><div class="l"></div></div><div class="method"><div class="radio"></div><div class="l"></div></div></div>
+        </div>
+        <div class="wf-cart-bar" style="max-width:400px;margin:0 auto;border-radius:8px;background:#fff;border:1px solid #eee;color:#111"><div class="right" style="width:100%"><div style="width:100%;height:36px;background:#111;border-radius:8px"></div></div></div>
+        <div class="wf-bottom-nav" style="max-width:400px;margin:0 auto"></div>
+      </div>
+    </div>
+  </div>
+  <div class="device-col">
+    <div class="screen-label" style="visibility:hidden">③ Checkout</div>
+    <div class="device-label"><span class="dot desktop"></span> Desktop</div>
+    <div class="frame desktop">
+      <div class="wf">
+        <div class="wf-hdr" style="justify-content:center"><div class="back" style="position:absolute;left:14px"></div><div class="title"></div></div>
+        <div class="wf-checkout-form" style="max-width:480px;margin:0 auto">
+          <div class="wf-order-type"><div class="chip active"></div><div class="chip"></div><div class="chip"></div></div>
+          <div class="wf-field"></div><div class="wf-field"></div>
+          <div class="wf-pay-methods"><div class="method active"><div class="radio"></div><div class="l"></div></div><div class="method"><div class="radio"></div><div class="l"></div></div></div>
+        </div>
+        <div class="wf-cart-bar" style="max-width:480px;margin:0 auto;border-radius:8px;background:#fff;border:1px solid #eee;color:#111"><div class="right" style="width:100%"><div style="width:100%;height:36px;background:#111;border-radius:8px"></div></div></div>
+        <div class="wf-bottom-nav" style="max-width:480px;margin:0 auto"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 4: Order Confirmation -->
+<div class="screen-spacer"></div>
+<div class="device-row">
+  <div class="device-col">
+    <div class="screen-label">④ Order Confirmation</div>
+    <div class="device-label"><span class="dot phone"></span> Mobile</div>
+    <div class="frame phone">
+      <div class="wf">
+        <div class="wf-confirm">
+          <div class="icon-lg"></div>
+          <div class="l1"></div>
+          <div class="l2"></div>
+          <div style="margin-top:20px"><div style="width:160px;height:36px;background:#22c55e;border-radius:8px;margin:0 auto"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="device-col">
+    <div class="screen-label" style="visibility:hidden">④ Order Confirmation</div>
+    <div class="device-label"><span class="dot tablet"></span> Tablet</div>
+    <div class="frame tablet">
+      <div class="wf">
+        <div class="wf-confirm" style="max-width:400px;margin:0 auto">
+          <div class="icon-lg"></div>
+          <div class="l1"></div>
+          <div class="l2"></div>
+          <div style="margin-top:20px"><div style="width:180px;height:36px;background:#22c55e;border-radius:8px;margin:0 auto"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="device-col">
+    <div class="screen-label" style="visibility:hidden">④ Order Confirmation</div>
+    <div class="device-label"><span class="dot desktop"></span> Desktop</div>
+    <div class="frame desktop">
+      <div class="wf">
+        <div class="wf-confirm" style="max-width:480px;margin:0 auto">
+          <div class="icon-lg"></div>
+          <div class="l1"></div>
+          <div class="l2"></div>
+          <div style="margin-top:20px"><div style="width:200px;height:40px;background:#22c55e;border-radius:8px;margin:0 auto"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 5: Restaurant Directory -->
+<div class="screen-spacer"></div>
+<div class="device-row">
+  <div class="device-col">
+    <div class="screen-label">⑤ Restaurant Directory</div>
+    <div class="device-label"><span class="dot phone"></span> Mobile</div>
+    <div class="frame phone">
+      <div class="wf">
+        <div class="wf-hdr"><div class="back"></div><div class="title" style="width:100px"></div></div>
+        <div class="wf-city-pills"><div class="pill active"></div><div class="pill inactive"></div><div class="pill inactive"></div><div class="pill inactive"></div></div>
+        <div class="wf-restro-list">
+          <div class="wf-restro-item"><div class="logo"></div><div class="text"><div class="n"></div><div class="c"></div></div></div>
+          <div class="wf-restro-item"><div class="logo"></div><div class="text"><div class="n"></div><div class="c"></div></div></div>
+          <div class="wf-restro-item"><div class="logo"></div><div class="text"><div class="n"></div><div class="c"></div></div></div>
+        </div>
+        <div class="wf-bottom-nav"><div class="item active"><div class="icon"></div><div class="label"></div></div><div class="item"><div class="icon"></div><div class="label"></div></div><div class="item"><div class="icon"></div><div class="label"></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top:32px">
+  <div style="font-size:10px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:1px;padding:4px 10px;background:#f0f0f0;display:inline-block;border-radius:4px;margin-bottom:12px">Key Patterns</div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:#888">
+    <span>■ Phone-frame (max-w-app: 480px) centered on desktop</span>
+    <span>■ Fixed bottom nav (60px) with safe-area inset</span>
+    <span>■ Fixed sticky cart bar with slide-up animation</span>
+    <span>■ 2-col dish grid (photo-first cards)</span>
+    <span>■ Horizontally scrollable category pills</span>
+    <span>■ Search bar + EN/UR language toggle</span>
+    <span>■ Unavailable dishes shown with opacity</span>
+    <span>■ Checkout: order type selector (dine-in/takeaway/delivery)</span>
+    <span>■ WhatsApp redirect on order placement</span>
+  </div>
+</div>
+</body>
+</html>

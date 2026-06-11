@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Landing Page — Wireframes</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #f5f5f5; color: #111; padding: 24px; }
+  .nav-back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #888; text-decoration: none; margin-bottom: 24px; }
+  .nav-back:hover { color: #111; }
+  h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 32px; }
+
+  /* Device grid */
+  .device-row { display: flex; gap: 24px; margin-bottom: 48px; flex-wrap: wrap; }
+  .device-col { flex: 1; min-width: 240px; }
+  .device-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #888; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .device-label .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .dot.phone { background: #3b82f6; }
+  .dot.tablet { background: #8b5cf6; }
+  .dot.desktop { background: #111; }
+
+  /* Wireframe frame */
+  .frame { border: 2px solid #ddd; border-radius: 12px; background: #fff; overflow: hidden; }
+  .frame.phone { max-width: 320px; border-radius: 20px; border-width: 2px; }
+  .frame.tablet { max-width: 600px; }
+  .frame.desktop { width: 100%; }
+
+  /* Wireframe elements */
+  .wf { width: 100%; }
+  .wf-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #eee; }
+  .wf-logo { width: 80px; height: 20px; background: #e0e0e0; border-radius: 4px; }
+  .wf-nav { display: flex; gap: 8px; }
+  .wf-nav-item { width: 40px; height: 12px; background: #e0e0e0; border-radius: 3px; }
+  .wf-nav-btn { width: 60px; height: 24px; background: #111; border-radius: 20px; }
+  .wf-nav-btn.outline { background: transparent; border: 1px solid #ddd; }
+
+  .wf-hero { padding: 32px 16px; text-align: center; }
+  .wf-hero .badge { width: 100px; height: 22px; background: #eee; border-radius: 20px; margin: 0 auto 14px; }
+  .wf-hero h2 { width: 240px; height: 28px; background: #111; border-radius: 4px; margin: 0 auto 10px; }
+  .wf-hero h2.short { width: 180px; height: 28px; background: #111; border-radius: 4px; margin: 0 auto 10px; }
+  .wf-hero p { width: 280px; height: 14px; background: #e0e0e0; border-radius: 3px; margin: 0 auto; }
+  .wf-hero .btn-row { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+  .wf-hero .btn { width: 140px; height: 40px; border-radius: 10px; }
+  .wf-hero .btn.primary { background: #111; }
+  .wf-hero .btn.secondary { background: transparent; border: 1px solid #ddd; }
+
+  .wf-section { padding: 24px 16px; }
+  .wf-section-title { width: 180px; height: 22px; background: #e0e0e0; border-radius: 4px; margin: 0 auto 8px; }
+  .wf-section-sub { width: 240px; height: 12px; background: #e8e8e8; border-radius: 3px; margin: 0 auto 20px; }
+
+  .wf-cards { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .wf-card { flex: 1; min-width: 80px; height: 120px; background: #f8f8f8; border: 1px solid #eee; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .wf-card .circle { width: 32px; height: 32px; border-radius: 50%; background: #111; margin-bottom: 8px; }
+  .wf-card .line { width: 60px; height: 8px; background: #e0e0e0; border-radius: 3px; margin-bottom: 4px; }
+  .wf-card .line.s { width: 40px; }
+  .wf-card.tall { height: 180px; min-width: 90px; }
+  .wf-card .bar { width: 100%; height: 4px; background: #eee; border-radius: 3px; margin-top: 8px; }
+  .wf-card .bar .fill { height: 100%; width: 60%; background: #111; border-radius: 3px; }
+  .wf-card .check { width: 14px; height: 14px; border-radius: 50%; background: #22c55e; margin-bottom: 6px; }
+  .wf-card .cross { width: 14px; height: 14px; border-radius: 50%; background: #ddd; margin-bottom: 6px; }
+  .wf-card .text-s { width: 50px; height: 6px; background: #e0e0e0; border-radius: 2px; margin-bottom: 3px; }
+  .wf-card .price { font-size: 11px; font-weight: 700; color: #111; margin-bottom: 4px; }
+
+  .wf-table { width: 100%; border: 1px solid #eee; border-radius: 10px; overflow: hidden; }
+  .wf-table .tr { display: flex; border-bottom: 1px solid #eee; }
+  .wf-table .tr:last-child { border-bottom: none; }
+  .wf-table .td { flex: 1; padding: 10px 12px; text-align: center; }
+  .wf-table .td:first-child { text-align: left; flex: 1.5; }
+  .wf-table .th { font-size: 10px; font-weight: 600; color: #555; padding: 10px 12px; text-align: center; flex: 1; }
+  .wf-table .th:first-child { text-align: left; flex: 1.5; }
+  .wf-table .td .check { width: 12px; height: 12px; border-radius: 50%; background: #22c55e; margin: 0 auto; }
+  .wf-table .td .cross { width: 12px; height: 12px; border-radius: 50%; background: #ddd; margin: 0 auto; }
+  .wf-table .td .text { font-size: 9px; color: #555; }
+
+  .wf-contact { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .wf-contact-item { flex: 1; min-width: 120px; height: 70px; background: #f8f8f8; border: 1px solid #eee; border-radius: 12px; padding: 14px; display: flex; align-items: center; gap: 10px; }
+  .wf-contact-item .icon-box { width: 36px; height: 36px; border-radius: 8px; background: #eee; flex-shrink: 0; }
+  .wf-contact-item .text-block { flex: 1; }
+  .wf-contact-item .text-block .l1 { width: 70px; height: 8px; background: #e0e0e0; border-radius: 3px; margin-bottom: 4px; }
+  .wf-contact-item .text-block .l2 { width: 100px; height: 6px; background: #e8e8e8; border-radius: 3px; }
+
+  .wf-cta { background: #111; padding: 32px 16px; text-align: center; }
+  .wf-cta .l1 { width: 200px; height: 22px; background: #333; border-radius: 4px; margin: 0 auto 8px; }
+  .wf-cta .l2 { width: 260px; height: 12px; background: #333; border-radius: 3px; margin: 0 auto 16px; }
+  .wf-cta .btn { width: 180px; height: 40px; background: #fff; border-radius: 10px; margin: 0 auto; }
+
+  .wf-footer { display: flex; align-items: center; justify-content: space-between; padding: 16px; }
+  .wf-footer .logo { width: 80px; height: 16px; background: #e0e0e0; border-radius: 3px; }
+  .wf-footer .links { display: flex; gap: 12px; }
+  .wf-footer .links span { width: 40px; height: 8px; background: #e8e8e8; border-radius: 2px; }
+
+  /* Section label */
+  .section-marker { font-size: 10px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 1px; padding: 4px 10px; background: #f0f0f0; display: inline-block; border-radius: 4px; margin-bottom: 12px; }
+  .section-block { margin-bottom: 24px; }
+  .section-block:last-child { margin-bottom: 0; }
+</style>
+</head>
+<body>
+<a href="index.html" class="nav-back">← Back to all wireframes</a>
+<h1>Landing Page</h1>
+<p class="subtitle">Public website — responsive layout across all devices</p>
+
+<!-- MOBILE -->
+<div class="device-row">
+  <div class="device-col">
+    <div class="device-label"><span class="dot phone"></span> Mobile &lt;768px</div>
+    <div class="frame phone">
+      <div class="wf">
+        <div class="wf-header">
+          <div class="wf-logo"></div>
+          <div class="wf-nav">
+            <div class="wf-nav-btn outline"></div>
+            <div class="wf-nav-btn"></div>
+          </div>
+        </div>
+        <div class="wf-hero">
+          <div class="badge"></div>
+          <h2 class="short"></h2>
+          <p></p>
+          <div class="btn-row">
+            <div class="btn primary"></div>
+            <div class="btn secondary"></div>
+          </div>
+        </div>
+        <div class="wf-section">
+          <div class="wf-cards">
+            <div class="wf-card"><div class="circle"></div><div class="line"></div><div class="line s"></div></div>
+            <div class="wf-card"><div class="circle"></div><div class="line"></div><div class="line s"></div></div>
+          </div>
+          <div style="margin-top:12px">
+            <div class="wf-card" style="min-width:100%"><div class="circle"></div><div class="line"></div><div class="line s"></div></div>
+          </div>
+        </div>
+        <div class="wf-section">
+          <div class="wf-card tall" style="min-width:100%">
+            <div class="price">PKR 0</div>
+            <div class="line"></div>
+            <div class="check"></div><div class="text-s"></div>
+            <div class="check"></div><div class="text-s"></div>
+            <div class="check"></div><div class="text-s"></div>
+            <div class="bar"><div class="fill" style="width:80%"></div></div>
+          </div>
+        </div>
+        <div class="wf-section" style="padding:16px">
+          <div class="wf-table">
+            <div class="tr" style="background:#f8f8f8"><div class="th">Feature</div><div class="th">Trial</div><div class="th">Starter</div></div>
+            <div class="tr"><div class="td">Dishes</div><div class="td"><div class="text">5</div></div><div class="td"><div class="text">30</div></div></div>
+            <div class="tr"><div class="td">QR Code</div><div class="td"><div class="check"></div></div><div class="td"><div class="check"></div></div></div>
+            <div class="tr"><div class="td">Analytics</div><div class="td"><div class="check"></div></div><div class="td"><div class="check"></div></div></div>
+          </div>
+        </div>
+        <div class="wf-contact" style="padding:16px">
+          <div class="wf-contact-item"><div class="icon-box"></div><div class="text-block"><div class="l1"></div><div class="l2"></div></div></div>
+        </div>
+        <div class="wf-cta"><div class="l1"></div><div class="l2"></div><div class="btn"></div></div>
+        <div class="wf-footer"><div class="logo"></div><div class="links"><span></span><span></span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLET -->
+  <div class="device-col">
+    <div class="device-label"><span class="dot tablet"></span> Tablet 768–1024px</div>
+    <div class="frame tablet">
+      <div class="wf">
+        <div class="wf-header">
+          <div class="wf-logo"></div>
+          <div class="wf-nav">
+            <div class="wf-nav-item"></div>
+            <div class="wf-nav-item"></div>
+            <div class="wf-nav-btn outline"></div>
+            <div class="wf-nav-btn"></div>
+          </div>
+        </div>
+        <div class="wf-hero">
+          <div class="badge"></div>
+          <h2></h2>
+          <p></p>
+          <div class="btn-row">
+            <div class="btn primary"></div>
+            <div class="btn secondary"></div>
+          </div>
+        </div>
+        <div class="wf-section">
+          <div class="wf-cards">
+            <div class="wf-card"><div class="circle"></div><div class="line"></div><div class="line s"></div></div>
+            <div class="wf-card"><div class="circle"></div><div class="line"></div><div class="line s"></div></div>
+            <div class="wf-card"><div class="circle"></div><div class="line"></div><div class="line s"></div></div>
+          </div>
+        </div>
+        <div class="wf-section">
+          <div class="wf-cards">
+            <div class="wf-card tall"><div class="price">PKR 0</div><div class="line"></div><div class="check"></div><div class="text-s"></div><div class="check"></div><div class="text-s"></div><div class="check"></div><div class="text-s"></div></div>
+            <div class="wf-card tall"><div class="price">PKR 1,200</div><div class="line"></div><div class="check"></div><div class="text-s"></div><div class="check"></div><div class="text-s"></div><div class="cross"></div><div class="text-s"></div></div>
+            <div class="wf-card tall"><div class="price">PKR 2,500</div><div class="line"></div><div class="check"></div><div class="text-s"></div><div class="check"></div><div class="text-s"></div><div class="check"></div><div class="text-s"></div></div>
+          </div>
+        </div>
+        <div class="wf-cta"><div class="l1"></div><div class="l2"></div><div class="btn"></div></div>
+        <div class="wf-footer"><div class="logo"></div><div class="links"><span></span><span></span><span></span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESKTOP -->
+  <div class="device-col">
+    <div class="device-label"><span class="dot desktop"></span> Desktop &gt;1024px</div>
+    <div class="frame desktop">
+      <div class="wf">
+        <div class="wf-header">
+          <div class="wf-logo"></div>
+          <div class="wf-nav">
+            <div class="wf-nav-item"></div>
+            <div class="wf-nav-item"></div>
+            <div class="wf-nav-item"></div>
+            <div class="wf-nav-btn outline"></div>
+            <div class="wf-nav-btn"></div>
+          </div>
+        </div>
+        <div class="wf-hero">
+          <div class="badge"></div>
+          <h2 style="width:320px;height:36px"></h2>
+          <p style="width:400px"></p>
+          <div class="btn-row">
+            <div class="btn primary"></div>
+            <div class="btn secondary"></div>
+          </div>
+        </div>
+        <div class="wf-section">
+          <div class="wf-cards">
+            <div class="wf-card"><div class="circle"></div><div class="line"></div><div class="line s"></div></div>
+            <div class="wf-card"><div class="circle"></div><div class="line"></div><div class="line s"></div></div>
+            <div class="wf-card"><div class="circle"></div><div class="line"></div><div class="line s"></div></div>
+          </div>
+        </div>
+        <div class="wf-section">
+          <div class="wf-cards">
+            <div class="wf-card tall"><div class="price">PKR 0</div><div class="line"></div><div class="check"></div><div class="text-s"></div><div class="check"></div><div class="text-s"></div><div class="check"></div><div class="text-s"></div><div class="bar"><div class="fill" style="width:80%"></div></div></div>
+            <div class="wf-card tall"><div class="price">PKR 1,200</div><div class="line"></div><div class="check"></div><div class="text-s"></div><div class="check"></div><div class="text-s"></div><div class="cross"></div><div class="text-s"></div><div class="bar"><div class="fill" style="width:50%"></div></div></div>
+            <div class="wf-card tall"><div class="price">PKR 2,500</div><div class="line"></div><div class="check"></div><div class="text-s"></div><div class="check"></div><div class="text-s"></div><div class="check"></div><div class="text-s"></div><div class="bar"><div class="fill" style="width:70%"></div></div></div>
+            <div class="wf-card tall"><div class="price">PKR 4,500</div><div class="line"></div><div class="check"></div><div class="text-s"></div><div class="check"></div><div class="text-s"></div><div class="check"></div><div class="text-s"></div><div class="bar"><div class="fill" style="width:90%"></div></div></div>
+          </div>
+        </div>
+        <div class="wf-section">
+          <div class="wf-table">
+            <div class="tr" style="background:#f8f8f8"><div class="th">Feature</div><div class="th">Free Trial</div><div class="th">Starter</div><div class="th">Growth</div><div class="th">Premium</div></div>
+            <div class="tr"><div class="td">Max dishes</div><div class="td"><div class="text">5</div></div><div class="td"><div class="text">30</div></div><div class="td"><div class="text">50</div></div><div class="td"><div class="text">100</div></div></div>
+            <div class="tr"><div class="td">QR code</div><div class="td"><div class="check"></div></div><div class="td"><div class="check"></div></div><div class="td"><div class="check"></div></div><div class="td"><div class="check"></div></div></div>
+            <div class="tr"><div class="td">Analytics</div><div class="td"><div class="check"></div></div><div class="td"><div class="check"></div></div><div class="td"><div class="check"></div></div><div class="td"><div class="check"></div></div></div>
+            <div class="tr"><div class="td">Custom branding</div><div class="td"><div class="cross"></div></div><div class="td"><div class="cross"></div></div><div class="td"><div class="check"></div></div><div class="td"><div class="check"></div></div></div>
+            <div class="tr"><div class="td">Priority support</div><div class="td"><div class="cross"></div></div><div class="td"><div class="cross"></div></div><div class="td"><div class="check"></div></div><div class="td"><div class="check"></div></div></div>
+          </div>
+        </div>
+        <div class="wf-contact" style="padding:24px 16px">
+          <div class="wf-contact-item"><div class="icon-box"></div><div class="text-block"><div class="l1"></div><div class="l2"></div></div></div>
+          <div class="wf-contact-item"><div class="icon-box"></div><div class="text-block"><div class="l1"></div><div class="l2"></div></div></div>
+        </div>
+        <div class="wf-cta"><div class="l1"></div><div class="l2"></div><div class="btn"></div></div>
+        <div class="wf-footer"><div class="logo"></div><div class="links"><span></span><span></span><span></span><span></span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Labels -->
+<div style="margin-top:32px">
+  <div class="section-marker">Layout Legend</div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:#888">
+    <span>■ Header (sticky, backdrop-blur)</span>
+    <span>■ Hero section</span>
+    <span>■ How it Works (3-step)</span>
+    <span>■ Pricing grid (responsive cols)</span>
+    <span>■ Comparison table (scrollable)</span>
+    <span>■ Contact (WhatsApp + Email)</span>
+    <span>■ CTA (black section)</span>
+    <span>■ Footer</span>
+  </div>
+</div>
+</body>
+</html>

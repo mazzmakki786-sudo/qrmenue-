@@ -51,10 +51,10 @@ export function DishCard({ dish, onEdit, onDelete, onToggleAvailability }: Props
         <p className="text-sm text-[#555]">{formatPrice(dish.price)}</p>
         <DishBadges tags={dish.tags || []} />
       </div>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 flex-shrink-0">
         <button
           onClick={() => onToggleAvailability(dish.id, !dish.is_available)}
-          className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+          className={`px-2 py-1 rounded text-xs font-medium transition-colors whitespace-nowrap ${
             dish.is_available
               ? "bg-[#16A34A]/10 text-[#16A34A]"
               : "bg-[#DC2626]/10 text-[#DC2626]"
@@ -62,11 +62,11 @@ export function DishCard({ dish, onEdit, onDelete, onToggleAvailability }: Props
         >
           {dish.is_available ? "Available" : "Hidden"}
         </button>
-        <button onClick={() => onEdit(dish)} className="p-2 hover:bg-[#F8F8F8] rounded-lg">
-          <Pencil className="w-4 h-4 text-[#555]" />
+        <button onClick={() => onEdit(dish)} className="p-1.5 hover:bg-[#F8F8F8] rounded-lg">
+          <Pencil className="w-3.5 h-3.5 text-[#555]" />
         </button>
-        <button onClick={() => onDelete(dish.id)} className="p-2 hover:bg-red-50 rounded-lg">
-          <Trash2 className="w-4 h-4 text-[#DC2626]" />
+        <button onClick={() => onDelete(dish.id)} className="p-1.5 hover:bg-red-50 rounded-lg">
+          <Trash2 className="w-3.5 h-3.5 text-[#DC2626]" />
         </button>
       </div>
     </div>

@@ -21,12 +21,13 @@ export async function POST(request: Request) {
 
   const { data: restaurant } = await supabase
     .from("restaurants")
-    .select("id, plan, is_active")
+    .select("id, plan, is_active, is_suspended")
     .eq("owner_id", user.id)
     .single()
 
   if (!restaurant) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
   if (!restaurant.is_active) return NextResponse.json({ error: "Restaurant is not active" }, { status: 403 })
+  if (restaurant.is_suspended) return NextResponse.json({ error: "Restaurant is suspended" }, { status: 403 })
 
   const plan = restaurant.plan as Plan
   const limits = PLAN_LIMITS[plan]

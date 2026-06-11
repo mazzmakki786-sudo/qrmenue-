@@ -100,7 +100,7 @@ function Card({ dish, lang = "en", unavailable = false }: { dish: Dish; lang?: "
           <h3 className={`text-sm font-semibold text-[#111] leading-snug line-clamp-2 ${lang === "ur" ? "font-urdu" : ""}`}>
             {name}
           </h3>
-          <span className="text-sm font-bold text-[#111] whitespace-nowrap shrink-0">Rs {dish.price}</span>
+          <span className="text-sm font-bold text-[#111] whitespace-nowrap text-right">Rs {dish.price}</span>
         </div>
         {description && (
           <p className={`text-xs text-[#555] leading-relaxed line-clamp-2 mb-2 ${lang === "ur" ? "font-urdu" : ""}`}>

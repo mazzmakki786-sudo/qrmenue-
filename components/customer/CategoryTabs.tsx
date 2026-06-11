@@ -21,7 +21,7 @@ export function CategoryTabs({ categories, activeCategory, onSelect, lang = "en"
   }, [activeCategory])
 
   return (
-    <div ref={scrollRef} className="overflow-x-auto scrollbar-hide">
+    <div ref={scrollRef} className="overflow-x-auto scrollbar-hide [mask-image:linear-gradient(to_right,black_calc(100%-24px),transparent_100%)]">
       <div className="flex gap-1.5 px-4 pb-3">
         <button
           onClick={() => onSelect(null)}
