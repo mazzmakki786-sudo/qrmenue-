@@ -32,22 +32,24 @@ export default function AccountPage() {
     if (!user) { setLoading(false); return }
 
     setUser(user)
+    try {
+      const { data } = await supabase
+        .from("orders")
+        .select("*, restaurants(name)")
+        .eq("customer_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(50)
 
-    const { data } = await supabase
-      .from("orders")
-      .select("*, restaurants(name)")
-      .eq("customer_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(50)
-
-    setOrders(data || [])
-    setLoading(false)
+      setOrders(data || [])
+    } catch (err) {
+      console.error("Orders fetch error:", err)
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 8000)
     fetchOrders()
-    return () => clearTimeout(timer)
   }, [fetchOrders])
 
   useEffect(() => {

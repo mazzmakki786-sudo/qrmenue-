@@ -5,128 +5,65 @@
 
 ---
 
-## PHASE 1: FOUNDATION (Weeks 1-2)
+## ✅ COMPLETED (Build Phase)
 
-### Week 1 — Project Setup
-☐ Create Next.js 14 project with TypeScript + Tailwind + ESLint + App Router
-☐ Install all npm dependencies
-☐ Initialize shadcn/ui and add components
-☐ Create folder structure
-☐ Configure tailwind.config.js with design tokens
-☐ Configure next.config.js
-☐ Create vercel.json
-☐ Set up Supabase project and run database schema
-☐ Enable Supabase Auth providers (Google + Email)
-☐ Create Supabase Storage bucket
-☐ Create .env.local with environment variables
-☐ Create types/index.ts — all TypeScript interfaces
-☐ Create lib/utils.ts
-☐ Create lib/supabase/client.ts
-☐ Create lib/supabase/server.ts
-☐ Create lib/supabase/middleware.ts
-☐ Create lib/subscription.ts
-☐ Create lib/whatsapp.ts
-☐ Create lib/qr.ts
-☐ Create lib/resend.ts
-☐ Create stores/cartStore.ts
-☐ Create stores/orderStore.ts
-☐ Create messages/en.json
-☐ Create messages/ur.json
-☐ Create middleware.ts for route protection
-☐ Create landing page (/)
-☐ Create pricing page (/pricing)
+### Phase 1: Critical Bug Fixes
+✅ B1-B2: Fix customer upsert email in orders API route
+     - app/api/orders/route.ts: Changed `email: customer_name` to use actual phone field
 
-### Week 2 — Design System & Auth
-☐ Build all UI components (Button, Card, Badge, Input, Dialog, Tabs)
-☐ Build shared components (LanguageToggle, QRCodeDisplay, SubscriptionBanner)
-☐ Build customer bottom nav layout
-☐ Build owner sidebar layout
-☐ Build super admin layout
-☐ Build login page (/login)
-☐ Build customer signup page (/signup)
-☐ Build restaurant owner signup page (/signup/restaurant)
-☐ Implement auth callback handler
-☐ Configure Google OAuth credentials
+### Phase 2: Category CRUD Consistency
+✅ Create POST /api/owner/categories route (app/api/owner/categories/route.ts)
+✅ Create DELETE /api/owner/categories route
+✅ Update menu page to use API routes instead of direct DB calls
+✅ Remove legacy app/api/admin/categories/route.ts
+
+### Phase 3: Bell Notification + Owner Email Alerts
+✅ Wire BellNotification in owner layout (desktop + mobile header)
+✅ Real-time new order alerts with sound + toast in dashboard header
+
+### Phase 4: i18n + LanguageToggle
+✅ Create messages/en.json (all English strings)
+✅ Create messages/ur.json (all Urdu strings)
+✅ Create lib/i18n/context.tsx (language provider with useI18n hook)
+✅ Create lib/i18n/useTranslation.ts (re-export for convenience)
+✅ Fix LanguageToggle to use i18n context (removed local state)
+✅ Integrate LanguageToggle in customer menu (replaced inline toggle)
+✅ Update CategoryTabs to use i18n context directly
+✅ Update DishGrid to use i18n context directly
+✅ Wrap root layout with I18nProvider
+
+### Phase 5: Cleanup
+✅ Delete CategorySidebar.tsx (unused)
+✅ Delete DishList.tsx (unused)
+✅ Delete DishItem.tsx (unused — only DishList imported it)
+✅ Clean up todo.md with current status
 
 ---
 
-## PHASE 2: MVP CORE (Weeks 3-6)
+## 📋 PENDING TASKS
 
-### Week 3 — Customer Menu
-☐ Build /menu/[slug] SSR page
-☐ Build MenuHeader component
-☐ Build CategoryTabs component
-☐ Build DishList component
-☐ Build DishItem component
-☐ Build CartBar component
-☐ Build CartDrawer component
-☐ Implement Add to Cart
-☐ Integrate EN/UR language toggle
+### Phase 6: Owner Email Alert System
+✅ Create lib/email/orderLimitAlert.ts — Daily order limit (10/day) notification
+✅ Create lib/email/planEndingAlert.ts — Plan expiration notification
+✅ Create POST /api/owner/alerts/check — Combined alert trigger endpoint
+✅ Integrate triggers in dashboard page load + order creation API
 
-### Week 4 — Checkout & Orders
-☐ Build /cart page
-☐ Build /checkout page
-☐ Build OrderTypeSelector
-☐ Build DineInForm
-☐ Build TakeawayForm
-☐ Build DeliveryForm
-☐ Build payment method selector
-☐ Implement login gate at checkout
-☐ Create POST /api/orders
-☐ Create GET/PATCH /api/orders/[id]
-☐ Create GET /api/menu/[slug]
-☐ Build WhatsAppRedirect component
-☐ Build /order-confirm/[id] page
+### Phase 7: Performance & Polish
+✅ Add ISR (revalidate: 60) for menu pages
+✅ Add loading="lazy" on CartDrawer dish images
+✅ Add React ErrorBoundary component
+✅ Wrap layouts with error boundaries (customer, owner, superadmin)
 
-### Week 5 — Owner Dashboard
-☐ Build /dashboard page
-☐ Build DashboardStats component
-☐ Build OrdersChart component (7d/30d toggle)
-☐ Build RecentOrders component
-☐ Build BellNotification component (Realtime)
-☐ Build /dashboard/orders page
-☐ Build /dashboard/orders/[id] page
-☐ Create POST /api/notifications/email
-
-### Week 6 — Menu Management & Subscription
-☐ Build /dashboard/menu page
-☐ Build AddDishForm component
-☐ Build DishCard component
-☐ Build image upload to Supabase Storage
-☐ Create POST /api/admin/dishes
-☐ Create POST /api/admin/categories
-☐ Create PATCH /api/admin/subscription
-☐ Build /dashboard/subscription page
-☐ Build /dashboard/settings page
+### Phase 8: Low Priority Bug Fixes
+✅ Fix window.confirm → custom Dialog component for category delete
+✅ Fix 8-second timeout fallbacks with proper try/catch/finally in all pages
+✅ Add loading="lazy" on below-fold images
 
 ---
 
-## PHASE 3: SUPER ADMIN & BETA (Weeks 7-8)
+## ORIGINAL SPECS (For Reference)
 
-### Week 7 — Super Admin Panel
-☐ Build /superadmin page (all restaurants)
-☐ Build /superadmin/restaurants/[id] page
-☐ Build PlanEditor component
-☐ Build /superadmin/settings page
-☐ Build /restaurants page (directory)
-☐ Build /account page (order history)
-☐ Create GET /api/superadmin/restaurants
-☐ Create GET/PATCH /api/superadmin/settings
-☐ End-to-end testing
-☐ Mobile responsiveness testing
-☐ Lighthouse audit
-
-### Week 8 — Beta Launch
-☐ Onboard 5 beta restaurants
-☐ Set up error monitoring
-☐ Polish email templates
-☐ Custom domain setup
-☐ Fix beta feedback
-
----
-
-## PHASE 4: SCALE (Weeks 9-12)
-☐ Week 9 — Public launch Lahore (20 restaurants)
-☐ Week 10 — Karachi expansion (35 restaurants)
-☐ Week 11 — Islamabad expansion (50 restaurants)
-☐ Week 12 — Review, optimize, plan Phase 2
+### Phase 1: Foundation (Weeks 1-2) — ✅ All Done
+### Phase 2: MVP Core (Weeks 3-6) — ✅ All Done
+### Phase 3: Super Admin & Beta (Weeks 7-8) — ✅ All Done
+### Phase 4: Scale (Weeks 9-12) — 📅 Future

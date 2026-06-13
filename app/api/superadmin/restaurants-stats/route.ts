@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { createClient, createAdminClient } from "@/lib/supabase/server"
 
 export async function GET() {
   const supabase = await createClient()
@@ -9,13 +9,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
   }
 
-  const supabaseAdmin = (await import("@supabase/supabase-js")).createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      auth: { autoRefreshToken: false, persistSession: false },
-    }
-  )
+  const supabaseAdmin = createAdminClient()
 
   const now = new Date()
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
@@ -27,7 +21,9 @@ export async function GET() {
       .select("id, name, city, plan, plan_end_date, trial_end, is_active, image_upload_allowed, created_at"),
     supabaseAdmin
       .from("orders")
-      .select("id, restaurant_id, total_price, order_status, created_at"),
+      .select("id, restaurant_id, total_price, order_status, created_at")
+      .order("created_at", { ascending: false })
+      .limit(20000),
   ])
 
   const allRestaurants = allRestaurantsRes.data || []

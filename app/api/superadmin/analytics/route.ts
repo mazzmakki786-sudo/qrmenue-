@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { createClient, createAdminClient } from "@/lib/supabase/server"
 
 export async function GET() {
   const supabase = await createClient()
@@ -9,45 +9,41 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
   }
 
-  const supabaseAdmin = (await import("@supabase/supabase-js")).createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      auth: { autoRefreshToken: false, persistSession: false },
-    }
-  )
+  const supabaseAdmin = createAdminClient()
 
   const now = new Date()
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
 
-  const [allOrdersRes, last7Res, last30Res, allRestaurantsRes, allCustomersRes] = await Promise.all([
-    supabaseAdmin
-      .from("orders")
-      .select("id, total_price, order_status, order_type, payment_status, created_at, restaurant_id, customer_id, customer_name, customer_phone"),
-    supabaseAdmin
-      .from("orders")
+  const [allTotalRes, allCancelledRes, allCompletedRes, allMappingRes, last7Res, last30Res, allRestaurantsRes, allCustomersRes] = await Promise.all([
+    supabaseAdmin.from("orders").select("id", { count: "exact", head: true }),
+    supabaseAdmin.from("orders").select("id", { count: "exact", head: true }).eq("order_status", "cancelled"),
+    supabaseAdmin.from("orders").select("id", { count: "exact", head: true }).eq("order_status", "completed"),
+    supabaseAdmin.from("orders").select("total_price, order_status, customer_id, restaurant_id").limit(20000),
+    supabaseAdmin.from("orders")
       .select("id, total_price, order_status, order_type, payment_status, created_at, restaurant_id, customer_id, customer_name, customer_phone")
       .gte("created_at", sevenDaysAgo.toISOString())
       .order("created_at", { ascending: false }),
-    supabaseAdmin
-      .from("orders")
+    supabaseAdmin.from("orders")
       .select("id, total_price, order_status, order_type, payment_status, created_at, restaurant_id, customer_id, customer_name, customer_phone")
       .gte("created_at", thirtyDaysAgo.toISOString())
       .order("created_at", { ascending: false }),
-    supabaseAdmin
-      .from("restaurants")
-      .select("id, name, city, plan, plan_end_date, trial_end, is_active, image_upload_allowed, created_at"),
-    supabaseAdmin
-      .from("customers")
-      .select("id, created_at"),
+    supabaseAdmin.from("restaurants").select("id, name, city, plan, plan_end_date, trial_end, is_active, image_upload_allowed, created_at"),
+    supabaseAdmin.from("customers").select("id, created_at"),
   ])
 
-  const allOrders = allOrdersRes.data || []
+  const allOrders = allMappingRes.data || []
   const last7 = last7Res.data || []
   const last30 = last30Res.data || []
   const allRestaurants = allRestaurantsRes.data || []
   const allCustomers = allCustomersRes.data || []
+
+  const totalAllTime = allTotalRes.count ?? 0
+  const cancelledAllTime = allCancelledRes.count ?? 0
+  const completedAllTime = allCompletedRes.count ?? 0
+  const allTimeRevenue = allOrders
+    .filter((o: any) => o.order_status !== "cancelled")
+    .reduce((s: number, o: any) => s + o.total_price, 0)
 
   const sumRevenue = (orders: any[]) =>
     orders.filter((o) => o.order_status !== "cancelled").reduce((s, o) => s + o.total_price, 0)
@@ -75,12 +71,9 @@ export async function GET() {
     return map
   }
 
-  // === Customer flow ===
-  // Unique customers in 7d and 30d
   const uniqueCustomers7 = new Set(last7.map((o: any) => o.customer_id).filter(Boolean))
   const uniqueCustomers30 = new Set(last30.map((o: any) => o.customer_id).filter(Boolean))
 
-  // New customers (registered) in 7d and 30d
   const newCustomers7 = allCustomers.filter((c: any) =>
     new Date(c.created_at) >= sevenDaysAgo
   ).length
@@ -88,7 +81,6 @@ export async function GET() {
     new Date(c.created_at) >= thirtyDaysAgo
   ).length
 
-  // Repeat customers
   const customerOrderCount: Record<string, number> = {}
   allOrders.forEach((o: any) => {
     if (!o.customer_id) return
@@ -97,14 +89,12 @@ export async function GET() {
   const repeatCustomers = Object.values(customerOrderCount).filter((c) => c > 1).length
   const oneTimeCustomers = Object.values(customerOrderCount).filter((c) => c === 1).length
 
-  // Customer purchase funnel: how many customers made 1, 2, 3+ orders
   const purchaseFunnel = {
     one_order: oneTimeCustomers,
     two_orders: Object.values(customerOrderCount).filter((c) => c === 2).length,
     three_plus: Object.values(customerOrderCount).filter((c) => c >= 3).length,
   }
 
-  // === Registrations over time ===
   const groupRegistrationsByDay = (customers: any[]) => {
     const map: Record<string, number> = {}
     customers.forEach((c: any) => {
@@ -124,7 +114,6 @@ export async function GET() {
     new Date(c.created_at) >= sevenDaysAgo
   )
 
-  // === Restaurant trials & subscriptions ===
   const nowISO = now.toISOString()
   const threeDaysFromNow = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString()
 
@@ -142,13 +131,11 @@ export async function GET() {
   )
   const inactiveRestaurants = allRestaurants.filter((r: any) => !r.is_active)
 
-  // Plan distribution
   const planDistribution: Record<string, number> = {}
   allRestaurants.forEach((r: any) => {
     planDistribution[r.plan] = (planDistribution[r.plan] || 0) + 1
   })
 
-  // Trial order usage (orders per active trial restaurant)
   const orderCountByRestaurant: Record<string, number> = {}
   allOrders.forEach((o: any) => {
     if (o.order_status === "cancelled") return
@@ -163,7 +150,6 @@ export async function GET() {
     max_orders: 10,
   }))
 
-  // Restaurants group by registration day (last 30 days)
   const restaurantsByDay: Record<string, number> = {}
   allRestaurants.forEach((r: any) => {
     if (new Date(r.created_at) < thirtyDaysAgo) return
@@ -172,11 +158,7 @@ export async function GET() {
   })
   const registrationsByDay = groupRegistrationsByDay(recentCustomers30)
 
-  const restaurantsRes = await supabaseAdmin
-    .from("restaurants")
-    .select("id, name, city")
-
-  const restaurantMap = new Map((restaurantsRes.data || []).map((r: any) => [r.id, r]))
+  const restaurantMap = new Map(allRestaurants.map((r: any) => [r.id, r]))
 
   const ordersWithRestaurant = (orders: any[]) =>
     orders.map((o) => ({
@@ -186,10 +168,10 @@ export async function GET() {
 
   return NextResponse.json({
     allTime: {
-      total: allOrders.length,
-      revenue: sumRevenue(allOrders),
-      cancelled: allOrders.filter((o) => o.order_status === "cancelled").length,
-      completed: allOrders.filter((o) => o.order_status === "completed").length,
+      total: totalAllTime,
+      revenue: allTimeRevenue,
+      cancelled: cancelledAllTime,
+      completed: completedAllTime,
     },
     last7: {
       total: last7.length,

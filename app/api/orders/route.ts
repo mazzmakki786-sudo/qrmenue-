@@ -4,6 +4,7 @@ import { generateOrderNumber } from "@/lib/utils"
 import { z } from "zod"
 import { loadTrialLimitsFromDB } from "@/lib/subscription-server"
 import { DEFAULT_TRIAL_LIMITS, GRACE_PERIOD_DAYS } from "@/lib/subscription"
+import { checkAndSendOrderLimitAlert } from "@/lib/email/orderLimitAlert"
 
 const orderItemSchema = z.object({
   id: z.string(),
@@ -86,7 +87,7 @@ export async function POST(request: Request) {
     await adminSupabase.from("customers").upsert({
       id: finalCustomerId,
       name: parsed.data.customer_name,
-      email: parsed.data.customer_name,
+      phone: parsed.data.customer_phone || null,
     }, { onConflict: "id", ignoreDuplicates: false })
   }
 
@@ -132,6 +133,8 @@ export async function POST(request: Request) {
     type: "order_email",
     status: "sent",
   })
+
+  checkAndSendOrderLimitAlert(parsed.data.restaurant_id).catch(() => {})
 
   return NextResponse.json({
     order: data,

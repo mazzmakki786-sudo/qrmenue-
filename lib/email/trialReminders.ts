@@ -269,30 +269,37 @@ export async function checkAndSendReminders(
     remindersToSend.push("grace_period_2")
   }
 
-  for (const type of remindersToSend) {
-    const { data: existing } = await supabase
-      .from("trial_reminder_emails")
-      .select("id")
-      .eq("restaurant_id", restaurantId)
-      .eq("reminder_type", type)
-      .maybeSingle()
+  const { data: existingReminders } = await supabase
+    .from("trial_reminder_emails")
+    .select("reminder_type")
+    .eq("restaurant_id", restaurantId)
 
-    if (existing) continue
+  const existingTypes = new Set((existingReminders || []).map((r) => r.reminder_type))
+  const toSend = remindersToSend.filter((t) => !existingTypes.has(t))
 
-    const sent = await sendTrialReminder({
-      restaurantId,
-      ownerEmail,
-      restaurantName: restaurant.name,
-      type,
-      daysRemaining: Math.max(0, daysUntilEnd),
-    })
+  if (toSend.length === 0) return
 
-    if (sent) {
-      await supabase.from("trial_reminder_emails").insert({
-        restaurant_id: restaurantId,
-        reminder_type: type,
-        email: ownerEmail,
+  const emailResults = await Promise.allSettled(
+    toSend.map((type) =>
+      sendTrialReminder({
+        restaurantId,
+        ownerEmail,
+        restaurantName: restaurant.name,
+        type,
+        daysRemaining: Math.max(0, daysUntilEnd),
       })
-    }
+    )
+  )
+
+  const reminderInserts = toSend
+    .filter((_, i) => emailResults[i].status === "fulfilled" && emailResults[i].value)
+    .map((type) => ({
+      restaurant_id: restaurantId,
+      reminder_type: type,
+      email: ownerEmail,
+    }))
+
+  if (reminderInserts.length > 0) {
+    await supabase.from("trial_reminder_emails").insert(reminderInserts)
   }
 }

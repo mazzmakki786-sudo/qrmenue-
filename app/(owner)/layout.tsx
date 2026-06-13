@@ -3,8 +3,10 @@
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { LayoutDashboard, UtensilsCrossed, ClipboardList, BarChart3, User, CreditCard, QrCode, Menu, X, LogOut } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { BellNotification } from "@/components/owner/BellNotification"
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary"
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -20,6 +22,22 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname()
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [restaurantId, setRestaurantId] = useState<string | null>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return
+      supabase
+        .from("restaurants")
+        .select("id")
+        .eq("owner_id", user.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data) setRestaurantId(data.id)
+        })
+    })
+  }, [])
 
   const handleLogout = async () => {
     const supabase = createClient()
@@ -52,13 +70,16 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
             })}
           </nav>
         </div>
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-[#555] hover:bg-[#F0F0F0] transition-colors"
-        >
-          <LogOut className="w-4 h-4" />
-          <span className="hidden lg:inline">Sign Out</span>
-        </button>
+        <div className="flex items-center gap-2">
+          {restaurantId && <BellNotification restaurantId={restaurantId} />}
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-[#555] hover:bg-[#F0F0F0] transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+            <span className="hidden lg:inline">Sign Out</span>
+          </button>
+        </div>
       </header>
 
       <div
@@ -69,12 +90,15 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
           <Menu className="w-5 h-5" />
         </button>
         <Link href="/dashboard" className="font-semibold text-sm">QRMenu.pk</Link>
-        <button
-          onClick={handleLogout}
-          className="p-2 -mr-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
-        >
-          <LogOut className="w-5 h-5 text-[#555]" />
-        </button>
+        <div className="flex items-center gap-1">
+          {restaurantId && <BellNotification restaurantId={restaurantId} />}
+          <button
+            onClick={handleLogout}
+            className="p-2 -mr-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+          >
+            <LogOut className="w-5 h-5 text-[#555]" />
+          </button>
+        </div>
       </div>
 
       {mobileOpen && (
@@ -131,7 +155,9 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
         className="p-4 md:p-6 lg:p-8 max-w-6xl mx-auto"
         style={{ paddingBottom: "calc(16px + env(safe-area-inset-bottom))" }}
       >
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
       </main>
     </div>
   )

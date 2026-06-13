@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { createClient, createAdminClient } from "@/lib/supabase/server"
 
 export async function GET() {
   const supabase = await createClient()
@@ -9,40 +9,37 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
   }
 
-  const supabaseAdmin = (await import("@supabase/supabase-js")).createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    }
-  )
+  const supabaseAdmin = createAdminClient()
 
-  const { data: customers, error } = await supabaseAdmin
-    .from("customers")
-    .select("*")
-    .order("created_at", { ascending: false })
+  const [customersRes, ordersRes, restaurantsRes] = await Promise.all([
+    supabaseAdmin
+      .from("customers")
+      .select("id, name, phone, email, city, created_at")
+      .order("created_at", { ascending: false })
+      .limit(5000),
+    supabaseAdmin
+      .from("orders")
+      .select("id, customer_id, total_price, order_status, created_at, restaurant_id")
+      .order("created_at", { ascending: false })
+      .limit(20000),
+    supabaseAdmin
+      .from("restaurants")
+      .select("id, name"),
+  ])
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+  if (customersRes.error) {
+    return NextResponse.json({ error: customersRes.error.message }, { status: 400 })
   }
 
-  const { data: orders } = await supabaseAdmin
-    .from("orders")
-    .select("id, customer_id, total_price, order_status, created_at, restaurant_id")
-
-  const restaurantsRes = await supabaseAdmin
-    .from("restaurants")
-    .select("id, name")
+  const customers = customersRes.data || []
+  const orders = ordersRes.data || []
 
   const restaurantMap = new Map(
     (restaurantsRes.data || []).map((r: any) => [r.id, r.name])
   )
 
   const customerStats: Record<string, { total_orders: number; total_spent: number; last_order: string | null }> = {}
-  ;(orders || []).forEach((o) => {
+  orders.forEach((o) => {
     if (!o.customer_id) return
     if (!customerStats[o.customer_id]) {
       customerStats[o.customer_id] = { total_orders: 0, total_spent: 0, last_order: null }
@@ -53,7 +50,7 @@ export async function GET() {
     if (!stat.last_order || o.created_at > stat.last_order) stat.last_order = o.created_at
   })
 
-  const customersWithStats = (customers || []).map((c: any) => ({
+  const customersWithStats = customers.map((c: any) => ({
     ...c,
     ...(customerStats[c.id] || { total_orders: 0, total_spent: 0, last_order: null }),
   }))

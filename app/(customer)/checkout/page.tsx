@@ -104,17 +104,7 @@ export default function CheckoutPage() {
       })
       setCurrentOrder(data.order)
       useCartStore.getState().clearCart()
-
-      if (data.whatsapp_url) {
-        window.location.href = data.whatsapp_url
-        return
-      }
-
-      if (!user) {
-        router.push(`/login?redirect=/order-confirm/${data.order.id}`)
-      } else {
-        router.push(`/order-confirm/${data.order.id}`)
-      }
+      router.push(`/order-confirm/${data.order.id}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong")
     } finally {

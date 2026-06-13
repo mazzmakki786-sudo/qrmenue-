@@ -1,20 +1,18 @@
 "use client"
 
-import { useState } from "react"
+import { useI18n } from "@/lib/i18n/context"
 
-type Language = "en" | "ur"
+interface Props {
+  className?: string
+}
 
-export function LanguageToggle() {
-  const [lang, setLang] = useState<Language>("en")
-
-  const toggle = () => {
-    setLang((prev) => (prev === "en" ? "ur" : "en"))
-  }
+export function LanguageToggle({ className = "" }: Props) {
+  const { lang, setLang } = useI18n()
 
   return (
     <button
-      onClick={toggle}
-      className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#F8F8F8] text-xs font-medium text-[#555] hover:bg-[#F0F0F0] transition-colors"
+      onClick={() => setLang(lang === "en" ? "ur" : "en")}
+      className={`flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#F8F8F8] text-xs font-medium text-[#555] hover:bg-[#F0F0F0] transition-colors ${className}`}
     >
       <span className={lang === "en" ? "text-black font-semibold" : ""}>EN</span>
       <span className="text-[#CCC]">/</span>

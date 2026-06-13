@@ -1,16 +1,17 @@
 ﻿"use client"
 
 import { useRef, useEffect } from "react"
+import { useI18n } from "@/lib/i18n/context"
 import type { Category, Dish } from "@/types"
 
 interface Props {
   categories: (Category & { dishes: Dish[] })[]
   activeCategory: string | null
   onSelect: (categoryId: string | null) => void
-  lang?: "en" | "ur"
 }
 
-export function CategoryTabs({ categories, activeCategory, onSelect, lang = "en" }: Props) {
+export function CategoryTabs({ categories, activeCategory, onSelect }: Props) {
+  const { lang } = useI18n()
   const scrollRef = useRef<HTMLDivElement>(null)
   const activeRef = useRef<HTMLButtonElement>(null)
 

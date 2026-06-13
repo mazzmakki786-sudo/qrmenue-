@@ -1,16 +1,19 @@
+"use client"
+
 import type { Category, Dish } from "@/types"
 import { UtensilsCrossed, Plus, Minus, ImageOff } from "lucide-react"
 import { useState } from "react"
 import Image from "next/image"
 import { DishBadges } from "./DishBadges"
 import { useCartStore } from "@/stores/cartStore"
+import { useI18n } from "@/lib/i18n/context"
 
 interface Props {
   categories: (Category & { dishes: Dish[] })[]
-  lang?: "en" | "ur"
 }
 
-export function DishGrid({ categories, lang = "en" }: Props) {
+export function DishGrid({ categories }: Props) {
+  const { lang } = useI18n()
   if (categories.length === 0) {
     return (
       <div className="text-center py-12">
@@ -40,10 +43,10 @@ export function DishGrid({ categories, lang = "en" }: Props) {
             </div>
             <div className="grid grid-cols-2 gap-3">
               {availableDishes.map((dish) => (
-                <Card key={dish.id} dish={dish} lang={lang} />
+                <Card key={dish.id} dish={dish} />
               ))}
               {unavailableDishes.map((dish) => (
-                <Card key={dish.id} dish={dish} lang={lang} unavailable />
+                <Card key={dish.id} dish={dish} unavailable />
               ))}
             </div>
             {availableDishes.length === 0 && unavailableDishes.length === 0 && (
@@ -56,7 +59,8 @@ export function DishGrid({ categories, lang = "en" }: Props) {
   )
 }
 
-function Card({ dish, lang = "en", unavailable = false }: { dish: Dish; lang?: "en" | "ur"; unavailable?: boolean }) {
+function Card({ dish, unavailable = false }: { dish: Dish; unavailable?: boolean }) {
+  const { lang } = useI18n()
   const [imgError, setImgError] = useState(false)
   const { items, addItem, updateQuantity } = useCartStore()
   const cartItem = items.find((item) => item.dish.id === dish.id)

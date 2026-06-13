@@ -3,5 +3,25 @@
   "buildCommand": "next build",
   "devCommand": "next dev",
   "installCommand": "npm install",
-  "regions": ["sin1"]
+  "regions": ["sin1"],
+  "functions": {
+    "app/api/superadmin/analytics/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/superadmin/restaurants-stats/route.ts": {
+      "maxDuration": 30
+    },
+    "app/api/superadmin/customers/route.ts": {
+      "maxDuration": 30
+    },
+    "app/api/orders/route.ts": {
+      "maxDuration": 30
+    },
+    "app/api/trial/reminders/check/route.ts": {
+      "maxDuration": 30
+    },
+    "app/api/menu/[slug]/route.ts": {
+      "maxDuration": 30
+    }
+  }
 }

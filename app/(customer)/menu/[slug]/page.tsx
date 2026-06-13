@@ -9,7 +9,7 @@ interface Props {
   params: Promise<{ slug: string }>
 }
 
-export const dynamic = "force-dynamic"
+export const revalidate = 60
 
 export default async function MenuPage({ params }: Props) {
   const { slug } = await params

@@ -5,7 +5,8 @@ import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, ExternalLink, ClipboardList } from "lucide-react"
+import { ArrowLeft, ExternalLink, ClipboardList, LogIn, Store, Package } from "lucide-react"
+import { formatPrice } from "@/lib/utils"
 
 function buildWhatsAppUrl(order: any): string {
   const restaurant = order.restaurants
@@ -44,6 +45,7 @@ function buildWhatsAppUrl(order: any): string {
 export default function OrderConfirmPage({ params }: any) {
   const router = useRouter()
   const [order, setOrder] = useState<any>(null)
+  const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [countdown, setCountdown] = useState(5)
   const [redirected, setRedirected] = useState(false)
@@ -53,6 +55,7 @@ export default function OrderConfirmPage({ params }: any) {
     const fetchOrder = async () => {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
 
       const { data } = await supabase
         .from("orders")
@@ -66,12 +69,6 @@ export default function OrderConfirmPage({ params }: any) {
       }
 
       setOrder(data)
-
-      if (!user) {
-        router.replace(`/login?redirect=/order-confirm/${params.id}`)
-        return
-      }
-
       setLoading(false)
     }
     fetchOrder()
@@ -116,13 +113,14 @@ export default function OrderConfirmPage({ params }: any) {
   return (
     <div className="min-h-screen bg-[#F8F8F8]">
       <div className="flex items-center gap-3 px-4 h-14 bg-white border-b border-[#F0F0F0]">
-        <Link href="/account">
+        <Link href={user ? "/account" : "/restaurants"}>
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <h1 className="text-lg font-semibold">Order Placed</h1>
       </div>
 
       <div className="p-4 space-y-4">
+        {/* Success header */}
         <div className="bg-white rounded-[14px] p-6 text-center">
           <div className="w-14 h-14 rounded-full bg-[#DCFCE7] flex items-center justify-center mx-auto mb-3">
             <span className="text-2xl">✓</span>
@@ -134,6 +132,61 @@ export default function OrderConfirmPage({ params }: any) {
           </p>
         </div>
 
+        {/* Order summary */}
+        <div className="bg-white rounded-[14px] p-5 space-y-3">
+          <h3 className="text-sm font-semibold flex items-center gap-2">
+            <Package className="w-4 h-4 text-[#FF6B35]" />
+            Order Summary
+          </h3>
+          {(order.items || []).map((item: any, i: number) => (
+            <div key={i} className="flex items-center justify-between text-sm">
+              <span className="text-[#555]">
+                {item.name_en}{" "}
+                <span className="text-[#999]">x{item.quantity}</span>
+              </span>
+              <span className="font-medium">Rs {item.subtotal}</span>
+            </div>
+          ))}
+          <div className="border-t border-[#F0F0F0] pt-2 flex items-center justify-between font-semibold">
+            <span>Total</span>
+            <span className="text-lg">Rs {order.total_price}</span>
+          </div>
+          <div className="text-xs text-[#999] space-y-1 pt-1">
+            <p>Name: {order.customer_name}</p>
+            {order.customer_phone && <p>Phone: {order.customer_phone}</p>}
+            {order.table_number && <p>Table: {order.table_number}</p>}
+            {order.delivery_address && <p>Address: {order.delivery_address}</p>}
+            <p className="capitalize">
+              {order.order_type?.replace("_", " ")} •{" "}
+              {order.payment_method === "cod" ? "Cash on Delivery" : "Bank Transfer"}
+            </p>
+          </div>
+        </div>
+
+        {/* Optional sign in prompt */}
+        {!user && (
+          <div className="bg-white rounded-[14px] p-5 border border-[#E8E8E8]">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#F8F8F8] flex items-center justify-center shrink-0">
+                <LogIn className="w-5 h-5 text-[#555]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold">Track your order</p>
+                <p className="text-xs text-[#555] mt-0.5">
+                  Sign in to view order status and history anytime.
+                </p>
+                <Link
+                  href={`/login?redirect=/order-confirm/${order.id}`}
+                  className="inline-flex items-center gap-1 mt-2 text-sm font-semibold text-[#FF6B35] hover:underline"
+                >
+                  Sign in <ExternalLink className="w-3 h-3" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* WhatsApp redirect */}
         {whatsappUrl && (
           <div className="bg-white rounded-[14px] p-5">
             {redirected ? (
@@ -167,12 +220,23 @@ export default function OrderConfirmPage({ params }: any) {
           </div>
         )}
 
-        <Link href="/account">
-          <Button variant="ghost" fullWidth>
-            <ClipboardList className="w-4 h-4 mr-2" />
-            View my orders
-          </Button>
-        </Link>
+        {/* Bottom actions */}
+        <div className="space-y-2">
+          {user && (
+            <Link href="/account">
+              <Button variant="ghost" fullWidth>
+                <ClipboardList className="w-4 h-4 mr-2" />
+                View my orders
+              </Button>
+            </Link>
+          )}
+          <Link href="/restaurants">
+            <Button variant="ghost" fullWidth>
+              <Store className="w-4 h-4 mr-2" />
+              Browse more restaurants
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   )

@@ -46,6 +46,7 @@ export function CartDrawer({ open, onOpenChange }: Props) {
                       <img
                         src={item.dish.image_url}
                         alt={item.dish.name_en}
+                        loading="lazy"
                         className="w-full h-full object-cover"
                       />
                     </div>

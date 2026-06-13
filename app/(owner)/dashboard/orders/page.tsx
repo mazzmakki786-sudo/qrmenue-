@@ -56,15 +56,13 @@ export default function OrdersPage() {
       setOrders(data || [])
     } catch (err) {
       console.error("Orders fetch error:", err)
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }, [filter])
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 8000)
     fetchOrders()
-    return () => clearTimeout(timer)
   }, [fetchOrders])
 
   useEffect(() => {

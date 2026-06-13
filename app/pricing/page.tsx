@@ -133,11 +133,11 @@ export default function PricingPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-12">
+        <div className="grid grid-cols-4 gap-1 md:gap-5 mb-12">
           {plans.map((plan) => (
             <div
               key={plan.key}
-              className={`rounded-2xl border p-5 md:p-6 flex flex-col relative transition-all duration-200 ${
+              className={`rounded-xl md:rounded-2xl border p-2.5 md:p-6 flex flex-col relative transition-all duration-200 ${
                 plan.highlight
                   ? "border-black bg-gradient-to-br from-white to-[#FAFAFA] shadow-xl sm:scale-[1.02] lg:scale-105"
                   : "border-[#E8E8E8] bg-white hover:border-[#999] hover:shadow-md"
@@ -145,27 +145,27 @@ export default function PricingPage() {
             >
               {plan.badge && (
                 <span
-                  className={`text-[10px] md:text-xs font-semibold px-2.5 py-1 rounded-full self-start mb-3 ${plan.badgeColor}`}
+                  className={`text-[8px] md:text-xs font-semibold px-1.5 md:px-2.5 py-0.5 md:py-1 rounded-full self-start mb-1.5 md:mb-3 ${plan.badgeColor}`}
                 >
                   {plan.badge}
                 </span>
               )}
-              <h3 className="text-lg md:text-xl font-bold">{plan.name}</h3>
-              <div className="mt-2 mb-5">
-                <span className="text-3xl md:text-4xl font-bold tracking-tight">
+              <h3 className="text-[11px] md:text-xl font-bold">{plan.name}</h3>
+              <div className="mt-1 md:mt-2 mb-2 md:mb-5">
+                <span className="text-sm md:text-4xl font-bold tracking-tight">
                   PKR {plan.price.toLocaleString()}
                 </span>
                 {plan.price > 0 && (
-                  <span className="text-sm text-[#555] ml-1">/month</span>
+                  <span className="text-[9px] md:text-sm text-[#555] ml-0.5 md:ml-1">/mo</span>
                 )}
               </div>
-              <div className="space-y-2.5 flex-1 mb-5">
+              <div className="space-y-1 md:space-y-2.5 flex-1 mb-2 md:mb-5">
                 {plan.features.map((f, i) => (
-                  <div key={i} className="flex items-start gap-2.5 text-sm">
+                  <div key={i} className="flex items-start gap-1 md:gap-2.5 text-[9px] md:text-sm">
                     {f.inc ? (
-                      <Check className="w-4 h-4 text-[#16A34A] flex-shrink-0 mt-0.5" />
+                      <Check className="w-2.5 h-2.5 md:w-4 md:h-4 text-[#16A34A] flex-shrink-0 mt-0.5" />
                     ) : (
-                      <X className="w-4 h-4 text-[#CCC] flex-shrink-0 mt-0.5" />
+                      <X className="w-2.5 h-2.5 md:w-4 md:h-4 text-[#CCC] flex-shrink-0 mt-0.5" />
                     )}
                     <span className={f.inc ? "text-[#222]" : "text-[#999]"}>
                       {f.label}
@@ -177,7 +177,8 @@ export default function PricingPage() {
                 <Button
                   variant={plan.highlight ? "accent" : "primary"}
                   fullWidth
-                  size={plan.highlight ? "lg" : "default"}
+                  size={plan.highlight ? "default" : "sm"}
+                  className="!text-[9px] md:!text-sm !h-7 md:!h-12 !px-2 md:!px-6 !rounded-lg md:!rounded-xl"
                 >
                   {plan.cta}
                 </Button>

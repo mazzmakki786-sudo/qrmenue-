@@ -28,9 +28,13 @@ export default function MenuManagementPage() {
   const [submitting, setSubmitting] = useState(false)
   const [search, setSearch] = useState("")
   const [limitError, setLimitError] = useState<string | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
 
   const fetchData = useCallback(async () => {
-    if (!restaurant?.id) return
+    if (!restaurant?.id) {
+      setLoading(false)
+      return
+    }
     const supabase = createClient()
     try {
       const [catsRes, dishesRes] = await Promise.all([
@@ -41,14 +45,13 @@ export default function MenuManagementPage() {
       setDishes(dishesRes.data || [])
     } catch (err) {
       console.error("Menu fetch error:", err)
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }, [restaurant?.id])
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 8000)
     fetchData()
-    return () => clearTimeout(timer)
   }, [fetchData])
 
   const compressImage = (file: File, maxW = 600): Promise<Blob> =>
@@ -240,14 +243,24 @@ export default function MenuManagementPage() {
     }
     if (!restaurant?.id) return
     setSubmitting(true)
+    setCategoryError(null)
     try {
-      const supabase = createClient()
-      await supabase.from("categories").insert({
-        restaurant_id: restaurant.id,
-        name_en: name,
-        name_ur: categoryNameUr.trim() || null,
-        sort_order: categories.length,
+      const res = await fetch("/api/owner/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name_en: name,
+          name_ur: categoryNameUr.trim() || null,
+        }),
       })
+      const json = await res.json()
+      if (!res.ok) {
+        if (json.error === "CATEGORY_LIMIT_REACHED") {
+          setLimitError(json.message)
+          return
+        }
+        throw new Error(json.error || "Failed to add category")
+      }
       setShowAddCategoryModal(false)
       fetchData()
     } catch (err) {
@@ -258,10 +271,27 @@ export default function MenuManagementPage() {
   }
 
   const handleDeleteCategory = async (id: string) => {
-    if (!confirm("Delete this category and all its dishes?")) return
-    const supabase = createClient()
-    await supabase.from("categories").delete().eq("id", id)
-    fetchData()
+    setDeleteConfirm(id)
+  }
+
+  const confirmDeleteCategory = async () => {
+    const id = deleteConfirm
+    if (!id) return
+    setDeleteConfirm(null)
+    try {
+      const res = await fetch("/api/owner/categories", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      })
+      if (!res.ok) {
+        const json = await res.json()
+        console.error("Delete category error:", json.error)
+      }
+      fetchData()
+    } catch (err) {
+      console.error("Delete category error:", err)
+    }
   }
 
   const closeModal = () => {
@@ -619,6 +649,32 @@ export default function MenuManagementPage() {
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!deleteConfirm} onOpenChange={(open) => { if (!open) setDeleteConfirm(null) }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-[#DC2626]">
+              <AlertTriangle className="w-4 h-4" /> Delete Category
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-[#555]">
+              Are you sure you want to delete this category and all its dishes? This action cannot be undone.
+            </p>
+            <div className="flex gap-3 pt-2">
+              <Button type="button" variant="ghost" onClick={() => setDeleteConfirm(null)}>
+                Cancel
+              </Button>
+              <button
+                onClick={confirmDeleteCategory}
+                className="flex-1 px-4 py-3 rounded-[10px] bg-[#DC2626] text-white text-sm font-semibold hover:bg-red-700 transition-colors"
+              >
+                Delete Category
+              </button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

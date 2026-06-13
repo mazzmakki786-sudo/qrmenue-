@@ -5,7 +5,9 @@ import { CategoryTabs } from "./CategoryTabs"
 import { DishGrid } from "./DishGrid"
 import { CartBar } from "./CartBar"
 import { useCartStore } from "@/stores/cartStore"
-import { Search, Languages } from "lucide-react"
+import { Search } from "lucide-react"
+import { LanguageToggle } from "@/components/shared/LanguageToggle"
+import { useI18n } from "@/lib/i18n/context"
 import type { Category, Dish } from "@/types"
 
 interface Props {
@@ -16,8 +18,8 @@ interface Props {
 
 export function MenuContent({ categories, restaurantId, restaurantName }: Props) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
-  const [lang, setLang] = useState<"en" | "ur">("en")
   const [search, setSearch] = useState("")
+  const { lang, t } = useI18n()
   const setRestaurant = useCartStore((s) => s.setRestaurant)
   const clearCart = useCartStore((s) => s.clearCart)
   const currentRestaurantId = useCartStore((s) => s.restaurantId)
@@ -60,25 +62,16 @@ export function MenuContent({ categories, restaurantId, restaurantName }: Props)
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder={lang === "ur" ? "ڈش تلاش کریں..." : "Search dishes..."}
+              placeholder={t("customer.searchDishes")}
               className="w-full h-10 pl-9 pr-4 rounded-xl bg-[#F8F8F8] text-sm placeholder:text-[#999] focus:outline-none focus:bg-[#F0F0F0] transition-colors"
             />
           </div>
-          <button
-            onClick={() => setLang((prev) => (prev === "en" ? "ur" : "en"))}
-            className="flex items-center gap-1 px-3 py-2 rounded-xl bg-[#F8F8F8] text-xs font-medium text-[#555] hover:bg-[#F0F0F0] transition-colors shrink-0"
-          >
-            <Languages className="w-3.5 h-3.5" />
-            <span className={lang === "en" ? "text-black font-semibold" : ""}>EN</span>
-            <span className="text-[#CCC]">/</span>
-            <span className={`${lang === "ur" ? "text-black font-semibold font-urdu" : ""}`}>UR</span>
-          </button>
+          <LanguageToggle />
         </div>
         <CategoryTabs
           categories={categories}
           activeCategory={activeCategory}
           onSelect={(id) => setActiveCategory(id === activeCategory ? null : id)}
-          lang={lang}
         />
       </div>
 
@@ -88,14 +81,14 @@ export function MenuContent({ categories, restaurantId, restaurantName }: Props)
           <div className="py-16 text-center">
             <Search className="w-8 h-8 text-[#DDD] mx-auto mb-3" />
             <p className="text-sm text-[#999]">
-              {lang === "ur" ? "کوئی ڈش نہیں ملی" : "No dishes found"}
+              {t("customer.noDishes")}
             </p>
             <button onClick={() => setSearch("")} className="text-sm text-[#FF6B35] font-medium mt-2 hover:underline">
-              {lang === "ur" ? "صاف کریں" : "Clear search"}
+              {t("customer.clearSearch")}
             </button>
           </div>
         ) : (
-          <DishGrid categories={searched} lang={lang} />
+          <DishGrid categories={searched} />
         )}
       </div>
 

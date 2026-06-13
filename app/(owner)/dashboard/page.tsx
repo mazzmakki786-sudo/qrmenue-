@@ -28,7 +28,10 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
 
   const fetchData = useCallback(async () => {
-    if (!restaurant?.id) return
+    if (!restaurant?.id) {
+      setLoading(false)
+      return
+    }
     const supabase = createClient()
     const today = new Date().toISOString().split("T")[0]
 
@@ -93,22 +96,22 @@ export default function DashboardPage() {
       setDishCount(dishRes.count ?? 0)
     } catch (err) {
       console.error("Dashboard data fetch error:", err)
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }, [restaurant?.id])
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 8000)
     fetchData()
-    return () => clearTimeout(timer)
   }, [fetchData])
 
   useEffect(() => {
-    if (restaurant?.plan === "trial") {
+    if (!restaurant?.id) return
+    if (restaurant.plan === "trial") {
       fetch("/api/trial/reminders/check", { method: "POST" }).catch(() => {})
     }
-  }, [restaurant?.plan])
+    fetch("/api/owner/alerts/check", { method: "POST" }).catch(() => {})
+  }, [restaurant?.id, restaurant?.plan])
 
   const handleLogout = async () => {
     const supabase = createClient()
