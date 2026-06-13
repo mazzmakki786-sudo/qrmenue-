@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { uid } from "@/lib/realtime"
 import { Badge } from "@/components/ui/badge"
 import { formatPrice } from "@/lib/utils"
 import { Search, Phone, Mail, ShoppingBag, Calendar, MapPin, ExternalLink } from "lucide-react"
@@ -29,7 +30,7 @@ export function CustomerTable() {
   // Real-time subscription on customers
   useEffect(() => {
     const channel = supabase
-      .channel("customers-changes")
+      .channel(uid("customers-changes"))
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "customers" },
@@ -44,7 +45,7 @@ export function CustomerTable() {
   // Real-time subscription on orders
   useEffect(() => {
     const channel = supabase
-      .channel("orders-customer-stats")
+      .channel(uid("orders-customer-stats"))
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "orders" },

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { uid } from "@/lib/realtime"
 import { Check } from "lucide-react"
 
 const settingKeys = [
@@ -39,7 +40,7 @@ export function CompanySettingsForm() {
   // Real-time subscription on company_settings
   useEffect(() => {
     const channel = supabase
-      .channel("settings-changes")
+      .channel(uid("settings-changes"))
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "company_settings" },

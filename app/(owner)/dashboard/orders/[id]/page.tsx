@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { uid } from "@/lib/realtime"
 import { useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -46,7 +47,7 @@ export default function OrderDetailPage() {
   useEffect(() => {
     const supabase = createClient()
     const channel = supabase
-      .channel(`order-detail-${id}`)
+      .channel(uid(`order-detail-${id}`))
       .on(
         "postgres_changes",
         {

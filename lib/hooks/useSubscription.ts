@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { uid } from "@/lib/realtime"
 import {
   getSubscriptionStatus,
   PLAN_LIMITS,
@@ -127,7 +128,7 @@ export function useSubscription(): UseSubscriptionReturn {
     }
 
     const channel = supabase
-      .channel(`subscription-${restaurantId}`)
+      .channel(uid(`subscription-${restaurantId}`))
       .on(
         "postgres_changes",
         {

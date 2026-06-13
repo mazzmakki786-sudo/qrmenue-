@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { uid } from "@/lib/realtime"
 import { useParams } from "next/navigation"
 import { PlanEditor } from "@/components/superadmin/PlanEditor"
 import { Button } from "@/components/ui/button"
@@ -94,7 +95,7 @@ export default function RestaurantDetailPage() {
   useEffect(() => {
     if (!id) return
     const channel = supabase
-      .channel(`restaurant-${id}-changes`)
+      .channel(uid(`restaurant-${id}-changes`))
       .on("postgres_changes", { event: "*", schema: "public", table: "restaurants", filter: `id=eq.${id}` }, () => scheduleRefetch())
       .on("postgres_changes", { event: "*", schema: "public", table: "orders", filter: `restaurant_id=eq.${id}` }, () => scheduleRefetch())
       .on("postgres_changes", { event: "*", schema: "public", table: "dishes", filter: `restaurant_id=eq.${id}` }, () => scheduleRefetch())

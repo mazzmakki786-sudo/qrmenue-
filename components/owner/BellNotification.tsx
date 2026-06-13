@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { uid } from "@/lib/realtime"
 import { Bell, X } from "lucide-react"
 import Link from "next/link"
 import { formatPrice } from "@/lib/utils"
@@ -74,7 +75,7 @@ export function BellNotification({ restaurantId }: Props) {
     fetchInitial()
 
     const channel = supabase
-      .channel(`orders-${restaurantId}`)
+      .channel(uid(`orders-${restaurantId}`))
       .on(
         "postgres_changes",
         {

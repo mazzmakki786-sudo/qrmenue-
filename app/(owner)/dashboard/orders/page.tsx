@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { uid } from "@/lib/realtime"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { formatPrice } from "@/lib/utils"
@@ -76,7 +77,7 @@ export default function OrdersPage() {
     }
 
     const channel = supabase
-      .channel(`orders-page-${restaurantId}`)
+      .channel(uid(`orders-page-${restaurantId}`))
       .on(
         "postgres_changes",
         {

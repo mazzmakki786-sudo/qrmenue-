@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { uid } from "@/lib/realtime"
 
 export function useCompanySettings() {
   const [settings, setSettings] = useState<Record<string, string>>({})
@@ -25,7 +26,7 @@ export function useCompanySettings() {
 
     const supabase = createClient()
     const channel = supabase
-      .channel("public-company-settings")
+      .channel(uid("public-company-settings"))
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "company_settings" },

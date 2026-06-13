@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { uid } from "@/lib/realtime"
 import { formatPrice } from "@/lib/utils"
 import { TrendingUp, ShoppingBag, DollarSign, XCircle, BarChart3, Calendar, UserPlus, Users, Clock, AlertTriangle, Zap, Crown, ShoppingCart, ExternalLink } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, CartesianGrid } from "recharts"
@@ -55,7 +56,7 @@ export function AnalyticsView() {
 
   useEffect(() => {
     const channel = supabase
-      .channel("analytics-orders")
+      .channel(uid("analytics-orders"))
       .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, () => scheduleRefetch())
       .on("postgres_changes", { event: "*", schema: "public", table: "restaurants" }, () => scheduleRefetch())
       .on("postgres_changes", { event: "*", schema: "public", table: "customers" }, () => scheduleRefetch())

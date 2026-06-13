@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
+import { uid } from "@/lib/realtime"
 import { formatPrice } from "@/lib/utils"
 import { Shield, LogOut, Eye, EyeOff, Search, ChevronRight, X, Users, Building2, BarChart3, Settings as SettingsIcon } from "lucide-react"
 import { RestaurantTable } from "@/components/superadmin/RestaurantTable"
@@ -235,7 +236,7 @@ export default function SuperAdminClient({
   useEffect(() => {
     if (!user || user.email.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) return
     const channel = supabase
-      .channel("restaurants-changes")
+      .channel(uid("restaurants-changes"))
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "restaurants" },
