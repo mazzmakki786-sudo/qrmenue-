@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { MapPin, Timer } from "lucide-react"
+import { MapPin, UtensilsCrossed, ArrowLeft } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface Props {
   name: string
@@ -16,14 +17,22 @@ interface Props {
 }
 
 export function MenuHeader({ name, nameUr, logoUrl, coverUrl, city, cuisineType, description, lang = "en" }: Props) {
+  const router = useRouter()
   const [logoError, setLogoError] = useState(false)
   const [coverError, setCoverError] = useState(false)
   const displayName = lang === "ur" && nameUr ? nameUr : name
 
   return (
-    <div className="pt-16 pb-4 px-4">
+    <div className="pb-4 px-4">
       {/* Cover Image */}
       <div className="relative w-full h-48 rounded-3xl overflow-hidden mb-6 group">
+        <button
+          onClick={() => router.back()}
+          className="absolute top-3 left-3 z-30 w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
+          aria-label="Go back"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10" />
         <div className="absolute inset-0 bg-gradient-to-br from-[#25D366]/20 to-transparent z-10" />
         {coverUrl && !coverError ? (
@@ -66,7 +75,7 @@ export function MenuHeader({ name, nameUr, logoUrl, coverUrl, city, cuisineType,
               </span>
               {cuisineType && (
                 <span className="flex items-center gap-1">
-                  <Timer className="w-3.5 h-3.5" /> {cuisineType}
+                  <UtensilsCrossed className="w-3.5 h-3.5" /> {cuisineType}
                 </span>
               )}
             </div>

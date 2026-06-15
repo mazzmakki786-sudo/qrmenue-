@@ -70,6 +70,67 @@
 
 ---
 
+## 🔧 UI/UX FIXES APPLIED (Latest Session)
+
+### Design System Foundation
+| Fix | File |
+|-----|------|
+| Semantic color tokens (surface, border, text-*) | `tailwind.config.js` |
+| Keyframe animations (scale-up, slide-down, fade-in, shimmer, fadeInUp) | `tailwind.config.js`, `app/globals.css` |
+| Removed `maximumScale:1` accessibility violation | `app/layout.tsx` |
+| Button focus-visible rings for keyboard navigation | `components/ui/button.tsx` |
+| Input aria-describedby + role="alert" on errors | `components/ui/input.tsx` |
+| CardFooter + CardDescription components added | `components/ui/card.tsx` |
+| Shared `timeAgo` utility (removed 3 duplicate implementations) | `lib/utils.ts` |
+| Fixed `.font-urdu` CSS variable reference | `app/globals.css` |
+| Standardized border color to `#E8E8E8` | `tailwind.config.js` |
+
+### Customer Mobile UI
+| Fix | File |
+|-----|------|
+| 2-column dish grid with image-top cards + badges | `components/customer/DishGrid.tsx` |
+| Back button + removed pt-16 padding waste | `components/customer/MenuHeader.tsx` |
+| Active underline + gradient edge fades on category tabs | `components/customer/CategoryTabs.tsx` |
+| Search debounce (300ms) + X clear button | `components/customer/MenuContent.tsx` |
+| Cart: thumbnails, line totals, breakdown, Clear All, Continue Browsing | `app/(customer)/cart/page.tsx` |
+| Checkout: phone validation, inline errors, step indicators, order summary | `app/(customer)/checkout/page.tsx` |
+| Bottom nav: cart badge, active dot, aria-labels, safe-area-inset | `app/(customer)/layout.tsx` |
+| Restaurant search + staggered fadeInUp animation | `app/(customer)/restaurants/RestaurantsClient.tsx` |
+| Order status timeline, manual WhatsApp, Reorder, Call Restaurant | `app/(customer)/order-confirm/[id]/page.tsx` |
+| Zustand individual selectors to prevent re-render cascades | `components/customer/DishGrid.tsx`, `CartBar.tsx`, `CartDrawer.tsx` |
+
+### Owner Dashboard UI
+| Fix | File |
+|-----|------|
+| Period selector (Today/7d/30d), real trend %, error state with retry | `app/(owner)/dashboard/page.tsx` |
+| Status filter pills, pagination (25/page), improved empty state | `app/(owner)/dashboard/orders/page.tsx` |
+| Fixed `suspended` → `isSuspended` bug, batch select + toggle, undo toast | `app/(owner)/dashboard/menu/page.tsx` |
+| Date range selector, revenue LineChart, order type breakdown | `app/(owner)/dashboard/analytics/page.tsx` |
+| QR size selector wired correctly, Share button (Web Share API) | `app/(owner)/dashboard/qr/page.tsx` |
+| Drawer slide animation, role="dialog", Escape key, scroll lock | `app/(owner)/layout.tsx` |
+| DishCard: checkbox for batch selection, toggle switch | `components/owner/DishCard.tsx` |
+| Shared DashboardFooter component extracted | `components/shared/DashboardFooter.tsx` (new) |
+
+### SuperAdmin UI
+| Fix | File |
+|-----|------|
+| Client-side pagination (25/page) on all tables | `RestaurantTable.tsx`, `CustomerTable.tsx` |
+| Tab deep-linking via URL search params | `SuperAdminClient.tsx` |
+| Confirmation dialog before toggling restaurant status | `RestaurantTable.tsx` |
+
+### Bug Fixes
+| Bug | Severity | Fix |
+|-----|----------|-----|
+| `animate-scale-up` CSS class undefined in BellNotification | 🔴 | Added keyframe to tailwind.config.js |
+| `suspended` variable undefined in menu/page.tsx line 223 | 🔴 | Changed to `isSuspended` |
+| QR size selector doesn't change actual QR render size | 🟡 | Wired `qrSize` state to QRCodeSVG `size` prop |
+| 3 duplicate `timeAgo` implementations with different formats | 🟡 | Consolidated into `lib/utils.ts` |
+| `.font-urdu` referenced wrong font (Noto Naskh vs Nastaliq) | 🟡 | Fixed to use `var(--font-urdu)` CSS variable |
+| `CartDrawer.tsx` orphaned (never imported) | 🟢 | Identified — can be deleted or integrated later |
+| `WhatsAppRedirect.tsx` orphaned (never imported) | 🟢 | Identified — can be deleted or integrated later |
+
+---
+
 ## 🔴 UNRESOLVED (Requires External Action)
 
 | # | Issue | Action Needed |
@@ -78,3 +139,4 @@
 | 2 | Leaked password protection disabled | Enable in Supabase Auth dashboard: Authentication → Settings → Security → Leaked password protection |
 | 3 | `pg_trgm` in public schema | Move to separate schema (minor) |
 | 4 | `rls_auto_enable` SECURITY DEFINER function | Revoke EXECUTE from anon role or change to SECURITY INVOKER |
+| 5 | Security RLS migration needs to be run on Supabase | Execute `supabase_migrations/security_rls_fix.sql` on the database |

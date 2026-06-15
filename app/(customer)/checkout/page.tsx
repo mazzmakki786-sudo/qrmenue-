@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useCallback, useEffect } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { useCartStore } from "@/stores/cartStore"
@@ -10,8 +10,10 @@ import { DineInForm } from "@/components/checkout/DineInForm"
 import { TakeawayForm } from "@/components/checkout/TakeawayForm"
 import { DeliveryForm } from "@/components/checkout/DeliveryForm"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, ChevronDown, ChevronUp, ShoppingBag } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
+import { formatPrice } from "@/lib/utils"
 import type { OrderType, PaymentMethod } from "@/types"
 
 const CUSTOMER_INFO_KEY = "qrmenu-customer-info"
@@ -29,9 +31,14 @@ function saveInfo(info: Record<string, string>) {
   } catch {}
 }
 
+const PHONE_REGEX = /^03\d{2}-?\d{7}$/
+
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items, getTotalPrice, restaurantId, clearCart } = useCartStore()
+  const items = useCartStore((s) => s.items)
+  const getTotalPrice = useCartStore((s) => s.getTotalPrice)
+  const restaurantId = useCartStore((s) => s.restaurantId)
+  const clearCart = useCartStore((s) => s.clearCart)
   const {
     orderType, customerName, customerPhone, tableNumber,
     deliveryAddress, paymentMethod,
@@ -41,6 +48,8 @@ export default function CheckoutPage() {
   } = useOrderStore()
 
   const [localLoading, setLocalLoading] = React.useState(false)
+  const [showSummary, setShowSummary] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   useEffect(() => {
     const saved = loadSavedInfo()
@@ -63,8 +72,32 @@ export default function CheckoutPage() {
       .catch(() => {})
   }, [restaurantId, clearCart, router])
 
+  const validatePhone = useCallback((phone: string): string => {
+    if (!phone) return ""
+    if (!PHONE_REGEX.test(phone)) return "Enter a valid phone (e.g. 0300-1234567)"
+    return ""
+  }, [])
+
+  const validateForm = useCallback((): boolean => {
+    const errors: Record<string, string> = {}
+    if (!customerName.trim()) errors.name = "Name is required"
+    if (customerPhone && !PHONE_REGEX.test(customerPhone)) {
+      errors.phone = "Enter a valid phone (e.g. 0300-1234567)"
+    }
+    if (orderType === "dine_in" && !tableNumber.trim()) {
+      errors.table = "Table number is required"
+    }
+    if (orderType === "delivery" && !deliveryAddress.trim()) {
+      errors.address = "Delivery address is required"
+    }
+    setFieldErrors(errors)
+    return Object.keys(errors).length === 0
+  }, [customerName, customerPhone, orderType, tableNumber, deliveryAddress])
+
   const handlePlaceOrder = useCallback(async () => {
     if (!orderType || !customerName) return
+    if (!validateForm()) return
+
     setLocalLoading(true)
     setError(null)
 
@@ -110,7 +143,7 @@ export default function CheckoutPage() {
     } finally {
       setLocalLoading(false)
     }
-  }, [orderType, customerName, customerPhone, tableNumber, deliveryAddress, paymentMethod, items, restaurantId, getTotalPrice, router, setCurrentOrder, setError])
+  }, [orderType, customerName, customerPhone, tableNumber, deliveryAddress, paymentMethod, items, restaurantId, getTotalPrice, router, setCurrentOrder, setError, validateForm])
 
   if (items.length === 0 || !restaurantId) {
     return (
@@ -123,8 +156,16 @@ export default function CheckoutPage() {
     )
   }
 
+  const totalItems = items.reduce((s, i) => s + i.quantity, 0)
+
+  const steps = [
+    { label: "Order Type", done: !!orderType },
+    { label: "Details", done: !!customerName.trim() },
+    { label: "Payment", done: !!paymentMethod },
+  ]
+
   return (
-    <div className="min-h-screen bg-white pb-[180px]">
+    <div className="min-h-screen bg-white pb-40">
       <div className="flex items-center gap-3 px-4 h-14 border-b border-[#F0F0F0]">
         <Link href="/cart">
           <ArrowLeft className="w-5 h-5" />
@@ -132,38 +173,107 @@ export default function CheckoutPage() {
         <h1 className="text-lg font-semibold">Your Order</h1>
       </div>
 
+      {/* Step Indicators */}
+      <div className="flex items-center justify-center gap-2 px-4 py-3 border-b border-[#F0F0F0] bg-[#FAFAFA]">
+        {steps.map((step, i) => (
+          <React.Fragment key={step.label}>
+            <div className="flex items-center gap-1.5">
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold ${
+                step.done ? "bg-black text-white" : "bg-[#E8E8E8] text-[#999]"
+              }`}>
+                {i + 1}
+              </div>
+              <span className={`text-xs font-medium ${step.done ? "text-black" : "text-[#999]"}`}>
+                {step.label}
+              </span>
+            </div>
+            {i < steps.length - 1 && (
+              <div className={`w-6 h-px ${step.done ? "bg-black" : "bg-[#E8E8E8]"}`} />
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+
+      {/* Order Summary Collapsible */}
+      <button
+        onClick={() => setShowSummary(!showSummary)}
+        className="w-full flex items-center justify-between px-4 py-3 border-b border-[#F0F0F0] bg-[#F9FAFB]"
+      >
+        <div className="flex items-center gap-2">
+          <ShoppingBag className="w-4 h-4 text-[#555]" />
+          <span className="text-sm font-medium">{totalItems} items — {formatPrice(getTotalPrice())}</span>
+        </div>
+        {showSummary ? <ChevronUp className="w-4 h-4 text-[#999]" /> : <ChevronDown className="w-4 h-4 text-[#999]" />}
+      </button>
+      {showSummary && (
+        <div className="px-4 py-3 border-b border-[#F0F0F0] space-y-2 bg-white">
+          {items.map((item) => (
+            <div key={item.dish.id} className="flex items-center gap-3">
+              <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-[#F5F5F5]">
+                {item.dish.image_url ? (
+                  <Image src={item.dish.image_url} alt={item.dish.name_en} fill className="object-cover" sizes="40px" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <ShoppingBag className="w-4 h-4 text-[#CCC]" />
+                  </div>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium truncate">{item.dish.name_en}</p>
+                <p className="text-[11px] text-[#999]">{item.quantity}x {formatPrice(item.dish.price)}</p>
+              </div>
+              <span className="text-xs font-semibold">{formatPrice(item.dish.price * item.quantity)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="px-4 py-6 space-y-8">
         <OrderTypeSelector selected={orderType} onSelect={setOrderType} />
 
         {orderType && (
           <div>
             {orderType === "dine_in" && (
-              <DineInForm
-                name={customerName}
-                phone={customerPhone}
-                tableNumber={tableNumber}
-                onNameChange={setCustomerName}
-                onPhoneChange={setCustomerPhone}
-                onTableChange={setTableNumber}
-              />
+              <div className="space-y-1">
+                <DineInForm
+                  name={customerName}
+                  phone={customerPhone}
+                  tableNumber={tableNumber}
+                  onNameChange={setCustomerName}
+                  onPhoneChange={setCustomerPhone}
+                  onTableChange={setTableNumber}
+                />
+                {fieldErrors.name && <p className="text-xs text-[#DC2626] mt-1">{fieldErrors.name}</p>}
+                {fieldErrors.phone && <p className="text-xs text-[#DC2626] mt-1">{fieldErrors.phone}</p>}
+                {fieldErrors.table && <p className="text-xs text-[#DC2626] mt-1">{fieldErrors.table}</p>}
+              </div>
             )}
             {orderType === "takeaway" && (
-              <TakeawayForm
-                name={customerName}
-                phone={customerPhone}
-                onNameChange={setCustomerName}
-                onPhoneChange={setCustomerPhone}
-              />
+              <div className="space-y-1">
+                <TakeawayForm
+                  name={customerName}
+                  phone={customerPhone}
+                  onNameChange={setCustomerName}
+                  onPhoneChange={setCustomerPhone}
+                />
+                {fieldErrors.name && <p className="text-xs text-[#DC2626] mt-1">{fieldErrors.name}</p>}
+                {fieldErrors.phone && <p className="text-xs text-[#DC2626] mt-1">{fieldErrors.phone}</p>}
+              </div>
             )}
             {orderType === "delivery" && (
-              <DeliveryForm
-                name={customerName}
-                phone={customerPhone}
-                address={deliveryAddress}
-                onNameChange={setCustomerName}
-                onPhoneChange={setCustomerPhone}
-                onAddressChange={setDeliveryAddress}
-              />
+              <div className="space-y-1">
+                <DeliveryForm
+                  name={customerName}
+                  phone={customerPhone}
+                  address={deliveryAddress}
+                  onNameChange={setCustomerName}
+                  onPhoneChange={setCustomerPhone}
+                  onAddressChange={setDeliveryAddress}
+                />
+                {fieldErrors.name && <p className="text-xs text-[#DC2626] mt-1">{fieldErrors.name}</p>}
+                {fieldErrors.phone && <p className="text-xs text-[#DC2626] mt-1">{fieldErrors.phone}</p>}
+                {fieldErrors.address && <p className="text-xs text-[#DC2626] mt-1">{fieldErrors.address}</p>}
+              </div>
             )}
           </div>
         )}
@@ -201,7 +311,7 @@ export default function CheckoutPage() {
         )}
       </div>
 
-      <div className="fixed bottom-[60px] left-0 right-0 bg-white border-t border-[#F0F0F0] p-4 z-40 md:max-w-app md:mx-auto md:left-[calc(50%-240px)]">
+      <div className="fixed bottom-[60px] left-0 right-0 bg-white border-t border-[#F0F0F0] p-4 z-40">
         <Button
           variant="primary"
           fullWidth

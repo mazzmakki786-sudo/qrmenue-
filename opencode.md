@@ -959,5 +959,47 @@ npx tsc --noEmit
 
 ---
 
-*Last updated: $(date)*
+## 11. Latest Session Changes (UI/UX + Security + Performance)
+
+### Security Fixes Applied
+- RLS policies for `subscriptions`, `company_settings`, `notification_logs` tables
+- IDOR fix on owner notifications route
+- Input whitelisting on superadmin PATCH (no raw body passthrough)
+- Plan validation (trial/starter/growth/premium only)
+- Test email endpoint now requires super admin auth
+- Super admin email leak removed from `/api/superadmin/check`
+- Rate limiting added to orders, dishes, categories, notifications, menu endpoints
+- Rate limiter IP spoofing fix + fail-closed pattern
+- XSS sanitization in all email templates + QR print window
+
+### Performance Fixes Applied
+- Paginated superadmin APIs (max 100/page instead of 20,000 rows)
+- Cache-Control headers on public endpoints (menu, settings)
+- `next/image` replacing raw `<img>` tags in 6 files
+- Dynamic import for OrdersChart (~400KB bundle reduction)
+- Zustand `subscribeWithSelector` + individual selectors (less re-renders)
+- 5 skeleton `loading.tsx` files for streaming/Suspense
+- `optimizePackageImports` for lucide-react and recharts
+
+### UI/UX Fixes Applied
+- 2-column dish grid layout (mobile-first)
+- Search debounce + clear button on menu
+- Cart: images, line totals, breakdown, Clear All
+- Checkout: phone validation, step indicators, order summary
+- Bottom nav: cart badge, active dot, safe-area
+- Order status timeline + ETA
+- Dashboard: period selector, real trends, error states
+- Owner orders: status filters, pagination
+- Menu management: batch toggle, undo toast, bug fix
+- Analytics: date range, revenue chart, order type breakdown
+- QR: fixed size selector, Share button
+- SuperAdmin: pagination, tab deep-linking, confirmation dialogs
+- Design system: color tokens, animations, accessibility fixes
+
+### Database Migration Required
+Run `supabase_migrations/security_rls_fix.sql` on the Supabase database to apply RLS policy fixes.
+
+---
+
+*Last updated: June 2026*
 *Created by: Senior SEO Implementation Plan*

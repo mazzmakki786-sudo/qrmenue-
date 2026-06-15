@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import { Bell, X, ChevronRight, Clock, Megaphone } from "lucide-react"
 import Link from "next/link"
-import { formatPrice } from "@/lib/utils"
+import { formatPrice, timeAgo } from "@/lib/utils"
 
 interface Props {
   restaurantId: string
@@ -216,16 +216,6 @@ export function BellNotification({ restaurantId }: Props) {
 
   const dismissAlert = (id: string) => {
     setAlerts((prev) => prev.filter((a) => a.id !== id))
-  }
-
-  function timeAgo(dateStr: string) {
-    const diff = Date.now() - new Date(dateStr).getTime()
-    const mins = Math.floor(diff / 60000)
-    if (mins < 1) return "Just now"
-    if (mins < 60) return `${mins} min ago`
-    const hours = Math.floor(mins / 60)
-    if (hours < 24) return `${hours} hour ago`
-    return `${Math.floor(hours / 24)} day ago`
   }
 
   return (

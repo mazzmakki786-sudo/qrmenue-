@@ -11,11 +11,11 @@ export const metadata: Metadata = {
     description:
       "Simple, transparent pricing. Start with a free trial. No commission on orders.",
     type: "website",
-    url: "https://qrmenu.pk/pricing",
+    url: "https://qr-menue-one.vercel.app/pricing",
     siteName: "QRMenu.pk",
   },
   alternates: {
-    canonical: "https://qrmenu.pk/pricing",
+    canonical: "https://qr-menue-one.vercel.app/pricing",
   },
 }
 

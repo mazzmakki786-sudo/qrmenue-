@@ -12,11 +12,11 @@ export const metadata: Metadata = {
     description:
       "Find and browse restaurants across Pakistan. View menus, prices, and order via WhatsApp.",
     type: "website",
-    url: "https://qrmenu.pk/restaurants",
+    url: "https://qr-menue-one.vercel.app/restaurants",
     siteName: "QRMenu.pk",
   },
   alternates: {
-    canonical: "https://qrmenu.pk/restaurants",
+    canonical: "https://qr-menue-one.vercel.app/restaurants",
   },
 }
 
@@ -32,7 +32,7 @@ export default async function RestaurantsPage() {
   const items =
     restaurants?.map((r) => ({
       name: r.name,
-      url: `https://qrmenu.pk/menu/${r.slug}`,
+      url: `https://qr-menue-one.vercel.app/menu/${r.slug}`,
       description: r.description || undefined,
     })) ?? []
 

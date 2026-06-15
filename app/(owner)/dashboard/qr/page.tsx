@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { QRCodeSVG } from "qrcode.react"
-import { Download, Printer, Copy, Check, ExternalLink, Info } from "lucide-react"
+import { Download, Printer, Copy, Check, ExternalLink, Info, Share2 } from "lucide-react"
 import type { Restaurant } from "@/types"
 import { escapeHtml } from "@/lib/utils"
 
@@ -109,6 +109,7 @@ export default function QRPage() {
           <button
             onClick={() => downloadQR(`${restaurant.slug}-qr-code.png`)}
             className="bg-black text-white px-6 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all"
+            aria-label="Download QR code as PNG"
           >
             <Download className="w-4 h-4" />
             Download PNG
@@ -116,9 +117,22 @@ export default function QRPage() {
           <button
             onClick={handlePrint}
             className="border border-[#F0F0F0] text-black px-6 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-[#F3F4F5] active:scale-[0.98] transition-all"
+            aria-label="Print QR code"
           >
             <Printer className="w-4 h-4" />
             Print
+          </button>
+          <button
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({ title: restaurant.name, url: menuUrl }).catch(() => {})
+              }
+            }}
+            className="border border-[#F0F0F0] text-black px-6 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-[#F3F4F5] active:scale-[0.98] transition-all"
+            aria-label="Share menu link"
+          >
+            <Share2 className="w-4 h-4" />
+            Share
           </button>
         </div>
       </div>
@@ -128,14 +142,14 @@ export default function QRPage() {
         {/* Left: QR Display */}
         <div className="lg:col-span-5 flex justify-center">
           <div className="bg-white p-8 rounded-[14px] border border-[#F0F0F0] w-full max-w-sm flex flex-col items-center transition-transform hover:scale-[1.01] duration-300">
-            <div ref={qrRef} className="w-56 h-56 flex items-center justify-center mb-6">
+            <div ref={qrRef} className="flex items-center justify-center mb-6" style={{ width: size, height: size }}>
               {!qrLoaded ? (
                 <div className="w-full h-full skeleton rounded-lg" />
               ) : (
                 <QRCodeSVG
                   id="restaurant-qr"
                   value={menuUrl}
-                  size={224}
+                  size={size}
                   level="H"
                   includeMargin
                   className="w-full h-full"

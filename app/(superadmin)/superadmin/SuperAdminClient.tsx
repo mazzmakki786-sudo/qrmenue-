@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback, useRef } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import { formatPrice } from "@/lib/utils"
@@ -135,7 +135,9 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
   const [checking, setChecking] = useState(!currentUserEmail)
   const [isSuperAdmin, setIsSuperAdmin] = useState(false)
   const [isLocked, setIsLocked] = useState(false)
-  const [activeTab, setActiveTab] = useState<Tab>("restaurants")
+  const searchParams = useSearchParams()
+  const initialTab = (searchParams.get("tab") as Tab) || "restaurants"
+  const [activeTab, setActiveTab] = useState<Tab>(TABS.find((t) => t.id === initialTab) ? initialTab : "restaurants")
   const [restaurants, setRestaurants] = useState<any[]>([])
   const [users, setUsers] = useState<Record<string, { email: string; last_sign_in_at: string | null }>>({})
   const [loading, setLoading] = useState(true)
@@ -319,7 +321,10 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
             return (
               <button
                 key={t.id}
-                onClick={() => setActiveTab(t.id)}
+                onClick={() => {
+                  setActiveTab(t.id)
+                  router.replace(`/superadmin?tab=${t.id}`, { scroll: false })
+                }}
                 className={`flex items-center gap-2 py-4 text-xs font-semibold transition-all whitespace-nowrap border-b-2 ${
                   isActive ? "text-black border-black" : "text-[#555] border-transparent hover:text-black"
                 }`}

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { formatPrice } from "@/lib/utils"
 import { useState, useMemo } from "react"
 import { Search, ExternalLink, Utensils, ShoppingBag, Calendar, Clock, ToggleLeft, ToggleRight, Loader2 } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 interface Props {
   restaurants: (Restaurant & {
@@ -27,9 +28,13 @@ const planBadgeVariant: Record<string, "trial" | "starter" | "growth" | "premium
   premium: "premium",
 }
 
+const PAGE_SIZE = 25
+
 export function RestaurantTable({ restaurants, users, setRestaurants }: Props) {
   const [search, setSearch] = useState("")
   const [togglingId, setTogglingId] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [confirmToggle, setConfirmToggle] = useState<{ id: string; name: string; currentActive: boolean } | null>(null)
 
   const filtered = useMemo(() => {
     return restaurants.filter((r) => {
@@ -42,15 +47,16 @@ export function RestaurantTable({ restaurants, users, setRestaurants }: Props) {
     })
   }, [restaurants, users, search])
 
-  const handleToggle = async (id: string, currentActive: boolean, e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
+  const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+
+  const handleToggle = async (id: string, currentActive: boolean) => {
     if (togglingId) return
     setTogglingId(id)
+    setConfirmToggle(null)
 
     const next = !currentActive
 
-    // Optimistic update
     if (setRestaurants) {
       setRestaurants((prev) =>
         prev.map((r) => (r.id === id ? { ...r, is_active: next } : r))
@@ -64,7 +70,6 @@ export function RestaurantTable({ restaurants, users, setRestaurants }: Props) {
         body: JSON.stringify({ is_active: next }),
       })
       if (!res.ok) {
-        // Revert on error
         if (setRestaurants) {
           setRestaurants((prev) =>
             prev.map((r) => (r.id === id ? { ...r, is_active: currentActive } : r))
@@ -72,7 +77,6 @@ export function RestaurantTable({ restaurants, users, setRestaurants }: Props) {
         }
       }
     } catch (err) {
-      // Revert on network error
       if (setRestaurants) {
         setRestaurants((prev) =>
           prev.map((r) => (r.id === id ? { ...r, is_active: currentActive } : r))
@@ -90,7 +94,7 @@ export function RestaurantTable({ restaurants, users, setRestaurants }: Props) {
         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
         <input
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => { setSearch(e.target.value); setCurrentPage(1) }}
           placeholder="Search by name, city, or owner email..."
           className="w-full h-12 pl-10 pr-4 rounded-[10px] bg-[#F8F8F8] border border-[#E8E8E8] text-base placeholder:text-[#999] focus:outline-none focus:border-black transition-colors"
         />
@@ -119,7 +123,7 @@ export function RestaurantTable({ restaurants, users, setRestaurants }: Props) {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((r) => {
+                {paginated.map((r) => {
                   const owner = r.owner_id ? users[r.owner_id] : undefined
                   const trialDaysLeft = r.plan === "trial" && r.trial_end
                     ? Math.max(0, Math.ceil((new Date(r.trial_end).getTime() - Date.now()) / (24 * 60 * 60 * 1000)))
@@ -148,7 +152,11 @@ export function RestaurantTable({ restaurants, users, setRestaurants }: Props) {
                       </td>
                       <td className="px-4 py-3">
                         <button
-                          onClick={(e) => handleToggle(r.id, r.is_active, e)}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            setConfirmToggle({ id: r.id, name: r.name, currentActive: r.is_active })
+                          }}
                           disabled={togglingId === r.id}
                           className="flex items-center gap-1.5 disabled:opacity-50 hover:opacity-80 transition-opacity"
                         >
@@ -182,7 +190,7 @@ export function RestaurantTable({ restaurants, users, setRestaurants }: Props) {
           </div>
 
           <div className="md:hidden divide-y divide-[#F0F0F0]">
-            {filtered.map((r) => {
+            {paginated.map((r) => {
               const owner = r.owner_id ? users[r.owner_id] : undefined
               const trialDaysLeft = r.plan === "trial" && r.trial_end
                 ? Math.max(0, Math.ceil((new Date(r.trial_end).getTime() - Date.now()) / (24 * 60 * 60 * 1000)))
@@ -195,7 +203,11 @@ export function RestaurantTable({ restaurants, users, setRestaurants }: Props) {
                       <p className="text-xs text-[#999] truncate">/{r.slug}</p>
                     </Link>
                     <button
-                      onClick={(e) => handleToggle(r.id, r.is_active, e)}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        setConfirmToggle({ id: r.id, name: r.name, currentActive: r.is_active })
+                      }}
                       disabled={togglingId === r.id}
                       className="flex-shrink-0 hover:opacity-80 transition-opacity"
                     >
@@ -238,8 +250,70 @@ export function RestaurantTable({ restaurants, users, setRestaurants }: Props) {
               )
             })}
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-4 py-3 border-t border-[#F0F0F0]">
+              <span className="text-xs text-[#999]">
+                Showing {(currentPage - 1) * PAGE_SIZE + 1}-{Math.min(currentPage * PAGE_SIZE, filtered.length)} of {filtered.length}
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 rounded-full text-xs font-semibold border border-[#E8E8E8] text-[#555] hover:bg-[#F0F0F0] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  Prev
+                </button>
+                <span className="text-xs text-[#555] font-medium">{currentPage} / {totalPages}</span>
+                <button
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 rounded-full text-xs font-semibold border border-[#E8E8E8] text-[#555] hover:bg-[#F0F0F0] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
+
+      {/* Confirmation Dialog */}
+      <Dialog open={!!confirmToggle} onOpenChange={(open) => { if (!open) setConfirmToggle(null) }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {confirmToggle?.currentActive ? "Suspend Restaurant" : "Activate Restaurant"}
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-[#555]">
+            {confirmToggle?.currentActive
+              ? `Are you sure you want to suspend "${confirmToggle?.name}"? The restaurant will stop receiving new orders.`
+              : `Are you sure you want to activate "${confirmToggle?.name}"? The restaurant will be able to receive orders again.`}
+          </p>
+          <div className="flex gap-3 pt-4">
+            <button
+              onClick={() => setConfirmToggle(null)}
+              className="flex-1 px-4 py-3 rounded-xl border border-[#F0F0F0] text-sm font-semibold hover:bg-[#F9FAFB] transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                if (confirmToggle) {
+                  handleToggle(confirmToggle.id, confirmToggle.currentActive)
+                }
+              }}
+              className={`flex-1 px-4 py-3 rounded-xl text-sm font-semibold text-white transition-colors ${
+                confirmToggle?.currentActive ? "bg-[#DC2626] hover:bg-red-700" : "bg-[#16A34A] hover:bg-green-700"
+              }`}
+            >
+              {confirmToggle?.currentActive ? "Suspend" : "Activate"}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

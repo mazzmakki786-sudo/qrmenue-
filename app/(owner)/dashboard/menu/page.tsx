@@ -7,7 +7,7 @@ import { AddDishForm } from "@/components/owner/AddDishForm"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Plus, Store, UtensilsCrossed, Eye, EyeOff, Pencil, Search, FolderPlus, Image as ImageIcon, AlertTriangle, ArrowRight, X } from "lucide-react"
+import { Plus, Store, UtensilsCrossed, Eye, EyeOff, Pencil, Search, FolderPlus, Image as ImageIcon, AlertTriangle, ArrowRight, X, Undo2 } from "lucide-react"
 import type { Category, Dish } from "@/types"
 import { useSubscription } from "@/lib/hooks/useSubscription"
 import Link from "next/link"
@@ -31,6 +31,8 @@ export default function MenuManagementPage() {
   const [limitError, setLimitError] = useState<string | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [logoError, setLogoError] = useState(false)
+  const [selectedDishes, setSelectedDishes] = useState<Set<string>>(new Set())
+  const [undoToast, setUndoToast] = useState<{ message: string; undo: () => void } | null>(null)
 
   const fetchData = useCallback(async () => {
     if (!restaurant?.id) {
@@ -207,10 +209,39 @@ export default function MenuManagementPage() {
   }
 
   const handleDeleteDish = async (dishId: string) => {
+    const dishToDelete = dishes.find((d) => d.id === dishId)
     const supabase = createClient()
     await supabase.from("dishes").delete().eq("id", dishId)
     await refresh()
     fetchData()
+
+    setUndoToast({
+      message: `"${dishToDelete?.name_en || ""}" deleted`,
+      undo: async () => {
+        if (dishToDelete) {
+          const res = await fetch("/api/owner/dishes", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name_en: dishToDelete.name_en,
+              name_ur: dishToDelete.name_ur,
+              description_en: dishToDelete.description_en,
+              description_ur: dishToDelete.description_ur,
+              price: dishToDelete.price,
+              category_id: dishToDelete.category_id,
+              image_url: dishToDelete.image_url,
+              tags: dishToDelete.tags || [],
+            }),
+          })
+          if (res.ok) {
+            await refresh()
+            fetchData()
+          }
+        }
+        setUndoToast(null)
+      },
+    })
+    setTimeout(() => setUndoToast(null), 5000)
   }
 
   const handleToggleAvailability = async (dishId: string, is_available: boolean) => {
@@ -219,8 +250,35 @@ export default function MenuManagementPage() {
     fetchData()
   }
 
+  const handleBatchToggle = async () => {
+    const supabase = createClient()
+    const selectedArray = Array.from(selectedDishes)
+    const allAvailable = selectedArray.every((id) => dishes.find((d) => d.id === id)?.is_available)
+    await supabase.from("dishes").update({ is_available: !allAvailable }).in("id", selectedArray)
+    setSelectedDishes(new Set())
+    fetchData()
+  }
+
+  const toggleSelectDish = (dishId: string) => {
+    setSelectedDishes((prev) => {
+      const next = new Set(prev)
+      if (next.has(dishId)) next.delete(dishId)
+      else next.add(dishId)
+      return next
+    })
+  }
+
+  const toggleSelectAll = () => {
+    const filteredIds = filteredDishes.map((d) => d.id)
+    if (selectedDishes.size === filteredIds.length) {
+      setSelectedDishes(new Set())
+    } else {
+      setSelectedDishes(new Set(filteredIds))
+    }
+  }
+
   const handleAddCategory = () => {
-    if (suspended) {
+    if (isSuspended) {
       setLimitError("Account is suspended. Cannot add categories.")
       return
     }
@@ -280,6 +338,10 @@ export default function MenuManagementPage() {
     const id = deleteConfirm
     if (!id) return
     setDeleteConfirm(null)
+
+    const catToDelete = categories.find((c) => c.id === id)
+    const dishesToDelete = dishes.filter((d) => d.category_id === id)
+
     try {
       const res = await fetch("/api/owner/categories", {
         method: "DELETE",
@@ -289,8 +351,27 @@ export default function MenuManagementPage() {
       if (!res.ok) {
         const json = await res.json()
         console.error("Delete category error:", json.error)
+        return
       }
       fetchData()
+
+      setUndoToast({
+        message: `Category "${catToDelete?.name_en || ""}" deleted`,
+        undo: async () => {
+          await fetch("/api/owner/categories", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name_en: catToDelete?.name_en,
+              name_ur: catToDelete?.name_ur,
+              id,
+            }),
+          })
+          fetchData()
+          setUndoToast(null)
+        },
+      })
+      setTimeout(() => setUndoToast(null), 5000)
     } catch (err) {
       console.error("Delete category error:", err)
     }
@@ -481,6 +562,26 @@ export default function MenuManagementPage() {
         </div>
       )}
 
+      {selectedDishes.size > 0 && (
+        <div className="bg-black text-white rounded-xl p-3 mb-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              checked={selectedDishes.size === filteredDishes.length && filteredDishes.length > 0}
+              onChange={toggleSelectAll}
+              className="w-4 h-4 rounded accent-white"
+            />
+            <span className="text-sm font-medium">{selectedDishes.size} selected</span>
+          </div>
+          <button
+            onClick={handleBatchToggle}
+            className="px-4 py-1.5 bg-white text-black text-xs font-semibold rounded-full hover:bg-[#F0F0F0] transition-colors"
+          >
+            Toggle Availability
+          </button>
+        </div>
+      )}
+
       {categories.length > 0 && (
         <div className="flex gap-1.5 mb-4 overflow-x-auto scrollbar-hide pb-1">
           <button
@@ -556,6 +657,8 @@ export default function MenuManagementPage() {
                         onEdit={(d) => setEditingDish(d)}
                         onDelete={handleDeleteDish}
                         onToggleAvailability={handleToggleAvailability}
+                        selected={selectedDishes.has(dish.id)}
+                        onSelect={toggleSelectDish}
                       />
                     ))}
                   </div>
@@ -673,6 +776,19 @@ export default function MenuManagementPage() {
           </div>
         </DialogContent>
       </Dialog>
+      {/* Undo Toast */}
+      {undoToast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-black text-white rounded-xl px-4 py-3 flex items-center gap-3 shadow-2xl animate-slide-up max-w-sm w-[calc(100%-2rem)]">
+          <span className="text-sm flex-1 min-w-0 truncate">{undoToast.message}</span>
+          <button
+            onClick={() => { undoToast.undo(); setUndoToast(null) }}
+            className="text-xs font-semibold text-[#25D366] hover:underline flex items-center gap-1 shrink-0"
+          >
+            <Undo2 className="w-3.5 h-3.5" />
+            Undo
+          </button>
+        </div>
+      )}
     </div>
   )
 }

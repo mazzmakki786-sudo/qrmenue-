@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import Image from "next/image"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
+import { Search, X } from "lucide-react"
 
 interface RestaurantSummary {
   id: string
@@ -17,6 +18,7 @@ interface RestaurantSummary {
 export function RestaurantsClient() {
   const [restaurants, setRestaurants] = useState<RestaurantSummary[]>([])
   const [selectedCity, setSelectedCity] = useState<string>("")
+  const [searchQuery, setSearchQuery] = useState("")
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -46,13 +48,47 @@ export function RestaurantsClient() {
     return acc
   }, {})
 
+  const filteredGrouped = searchQuery.trim()
+    ? cities.reduce<Record<string, RestaurantSummary[]>>((acc, city) => {
+        const q = searchQuery.toLowerCase()
+        const items = (grouped[city] || []).filter(
+          (r) => r.name.toLowerCase().includes(q) || (r.cuisine_type || "").toLowerCase().includes(q)
+        )
+        if (items.length) acc[city] = items
+        return acc
+      }, {})
+    : grouped
+
+  const filteredCount = Object.values(filteredGrouped).reduce((s, arr) => s + arr.length, 0)
+
   return (
     <div className="min-h-screen bg-white">
-      <main className="pt-24 pb-8 px-4 max-w-[600px] mx-auto">
+      <main className="pt-24 pb-8 px-4 max-w-app mx-auto">
         <header className="mb-6">
           <h1 className="text-2xl font-bold tracking-tight">Restaurants</h1>
           <p className="text-sm text-[#999] mt-1">Order from your favorite spots</p>
         </header>
+
+        {/* Search Bar */}
+        <div className="relative mb-4 group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#999] group-focus-within:text-black transition-colors" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search restaurants..."
+            className="w-full bg-[#F9FAFB] border border-[#F0F0F0] rounded-xl py-3 pl-11 pr-10 text-sm focus:outline-none focus:border-black transition-all placeholder:text-[#999]"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#DDD] flex items-center justify-center hover:bg-[#CCC] transition-colors"
+              aria-label="Clear search"
+            >
+              <X className="w-3 h-3 text-[#555]" />
+            </button>
+          )}
+        </div>
 
         <div className="flex overflow-x-auto no-scrollbar gap-2 mb-6 -mx-4 px-4">
           <button
@@ -82,20 +118,21 @@ export function RestaurantsClient() {
               <div key={i} className="h-24 bg-[#F5F5F5] rounded-xl animate-pulse" />
             ))}
           </div>
-        ) : restaurants.length === 0 ? (
+        ) : filteredCount === 0 ? (
           <div className="py-24 text-center">
-            <p className="text-[#999]">No restaurants found</p>
+            <p className="text-[#999]">{searchQuery ? "No restaurants match your search" : "No restaurants found"}</p>
           </div>
         ) : (
           <div className="space-y-6">
-            {Object.entries(grouped).map(([city, items]) => (
+            {Object.entries(filteredGrouped).map(([city, items]) => (
               <section key={city} className="space-y-3">
                 <h2 className="text-[12px] font-semibold text-[#999] uppercase tracking-wider">{city}</h2>
-                {items.map((r) => (
+                {items.map((r, index) => (
                   <Link
                     key={r.id}
                     href={`/menu/${r.slug}`}
-                    className="flex items-center gap-4 p-4 rounded-xl border border-[#F0F0F0] hover:border-[#DDD] hover:shadow-sm transition-all active:scale-[0.99] group"
+                    className="flex items-center gap-4 p-4 rounded-xl border border-[#F0F0F0] hover:border-[#DDD] hover:shadow-sm transition-all active:scale-[0.99] group animate-fadeInUp"
+                    style={{ animationDelay: `${index * 50}ms` }}
                   >
                     {r.logo_url ? (
                       <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 relative bg-black">

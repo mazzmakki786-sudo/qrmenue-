@@ -17,6 +17,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         )}
         <input
           id={id}
+          aria-describedby={error ? `${id}-error` : undefined}
           className={cn(
             "flex h-12 w-full rounded-[10px] bg-[#F8F8F8] border border-[#E8E8E8] px-4 py-3 text-base",
             "placeholder:text-[#999]",
@@ -27,7 +28,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           {...props}
         />
-        {error && <p className="text-xs text-[#DC2626]">{error}</p>}
+        {error && <p id={`${id}-error`} role="alert" className="text-xs text-[#DC2626]">{error}</p>}
       </div>
     )
   }

@@ -42,11 +42,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: `${restaurant.name} Menu — ${cuisine} in ${cityName} | QRMenu.pk`,
       description,
       type: "website",
-      url: `https://qrmenu.pk/menu/${slug}`,
+      url: `https://qr-menue-one.vercel.app/menu/${slug}`,
       siteName: "QRMenu.pk",
       images: [
         {
-          url: restaurant.logo_url || "https://qrmenu.pk/og-image.svg",
+          url: restaurant.logo_url || "https://qr-menue-one.vercel.app/og-image.svg",
           width: 1200,
           height: 630,
           alt: `${restaurant.name} menu on QRMenu.pk`,
@@ -57,10 +57,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: "summary_large_image",
       title: `${restaurant.name} Menu — ${cuisine} in ${cityName} | QRMenu.pk`,
       description,
-      images: [restaurant.logo_url || "https://qrmenu.pk/og-image.svg"],
+      images: [restaurant.logo_url || "https://qr-menue-one.vercel.app/og-image.svg"],
     },
     alternates: {
-      canonical: `https://qrmenu.pk/menu/${slug}`,
+      canonical: `https://qr-menue-one.vercel.app/menu/${slug}`,
     },
   }
 }

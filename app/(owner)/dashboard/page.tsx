@@ -2,25 +2,30 @@
 
 import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { formatPrice } from "@/lib/utils"
-import { ChevronRight, ClipboardList, UtensilsCrossed, User, Check, TrendingUp, ShoppingBag, LogOut } from "lucide-react"
+import { formatPrice, timeAgo } from "@/lib/utils"
+import { ChevronRight, ClipboardList, UtensilsCrossed, User, Check, TrendingUp, TrendingDown, AlertCircle, RefreshCw } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import type { DailyStats, Order } from "@/types"
 import { useSubscription } from "@/lib/hooks/useSubscription"
 import { Badge } from "@/components/ui/badge"
+import { DashboardFooter } from "@/components/shared/DashboardFooter"
 import dynamic from "next/dynamic"
 
 const OrdersChart = dynamic(() => import("@/components/owner/OrdersChart").then((m) => ({ default: m.OrdersChart })), {
   loading: () => <div className="h-64 bg-[#F0F0F0] animate-pulse rounded-[14px]" />,
 })
 
+type Period = "today" | "7d" | "30d"
+
 export default function DashboardPage() {
   const router = useRouter()
   const sub = useSubscription()
   const { restaurant, orderCount, loading: subLoading } = sub
   const [todayOrders, setTodayOrders] = useState(0)
+  const [yesterdayOrders, setYesterdayOrders] = useState(0)
   const [todayRevenue, setTodayRevenue] = useState(0)
+  const [yesterdayRevenue, setYesterdayRevenue] = useState(0)
   const [graph7d, setGraph7d] = useState<DailyStats[]>([])
   const [graph30d, setGraph30d] = useState<DailyStats[]>([])
   const [recentOrders, setRecentOrders] = useState<Order[]>([])
@@ -28,7 +33,9 @@ export default function DashboardPage() {
   const [categoryCount, setCategoryCount] = useState(0)
   const [dishCount, setDishCount] = useState(0)
   const [loading, setLoading] = useState(true)
-  const [chartView, setChartView] = useState<"7d" | "30d">("7d")
+  const [error, setError] = useState<string | null>(null)
+  const [period, setPeriod] = useState<Period>("today")
+
   const fetchData = useCallback(async () => {
     if (!restaurant?.id) {
       setLoading(false)
@@ -36,14 +43,22 @@ export default function DashboardPage() {
     }
     const supabase = createClient()
     const today = new Date().toISOString().split("T")[0]
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0]
 
     try {
-      const [todayRes, statsRes, ordersRes, catRes, dishRes] = await Promise.all([
+      const [todayRes, yesterdayRes, statsRes, ordersRes, catRes, dishRes] = await Promise.all([
         supabase
           .from("orders")
           .select("total_price")
           .eq("restaurant_id", restaurant.id)
           .gte("created_at", today)
+          .neq("order_status", "cancelled"),
+        supabase
+          .from("orders")
+          .select("total_price")
+          .eq("restaurant_id", restaurant.id)
+          .gte("created_at", yesterday)
+          .lt("created_at", today)
           .neq("order_status", "cancelled"),
         supabase
           .from("daily_order_stats")
@@ -67,9 +82,16 @@ export default function DashboardPage() {
           .eq("restaurant_id", restaurant.id),
       ])
 
+      if (todayRes.error) throw new Error(todayRes.error.message)
+
       if (todayRes.data) {
         setTodayOrders(todayRes.data.length)
         setTodayRevenue(todayRes.data.reduce((sum, o) => sum + o.total_price, 0))
+      }
+
+      if (yesterdayRes.data) {
+        setYesterdayOrders(yesterdayRes.data.length)
+        setYesterdayRevenue(yesterdayRes.data.reduce((sum, o) => sum + o.total_price, 0))
       }
 
       if (statsRes.data) {
@@ -96,8 +118,10 @@ export default function DashboardPage() {
 
       setCategoryCount(catRes.count ?? 0)
       setDishCount(dishRes.count ?? 0)
+      setError(null)
     } catch (err) {
       console.error("Dashboard data fetch error:", err)
+      setError("Failed to load dashboard data. Please try again.")
     } finally {
       setLoading(false)
     }
@@ -114,12 +138,6 @@ export default function DashboardPage() {
     }
     fetch("/api/owner/alerts/check", { method: "POST" }).catch(() => {})
   }, [restaurant?.id, restaurant?.plan])
-
-  const handleLogout = async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push("/")
-  }
 
   const profileFields = [
     { label: "Phone number", done: !!restaurant?.phone },
@@ -142,10 +160,14 @@ export default function DashboardPage() {
     ? Math.max(0, Math.ceil((new Date(restaurant.trial_end).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : 0
 
-  const chartData = chartView === "7d" ? graph7d : graph30d
-  const maxOrders = Math.max(...chartData.map((d) => d.total_orders), 1)
-
   const onboardingComplete = profilePercent === 100 && menuDone === 2
+
+  const ordersTrend = yesterdayOrders > 0
+    ? Math.round(((todayOrders - yesterdayOrders) / yesterdayOrders) * 100)
+    : todayOrders > 0 ? 100 : 0
+  const revenueTrend = yesterdayRevenue > 0
+    ? Math.round(((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100)
+    : todayRevenue > 0 ? 100 : 0
 
   if (loading || subLoading) {
     return (
@@ -160,9 +182,24 @@ export default function DashboardPage() {
     )
   }
 
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-4">
+        <AlertCircle className="w-10 h-10 text-[#DC2626]" />
+        <p className="text-sm text-[#555] text-center">{error}</p>
+        <button
+          onClick={() => { setError(null); setLoading(true); fetchData() }}
+          className="flex items-center gap-2 px-5 py-2.5 bg-black text-white text-sm font-semibold rounded-full hover:opacity-90 transition-all active:scale-95"
+        >
+          <RefreshCw className="w-4 h-4" />
+          Retry
+        </button>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
-
 
       {/* Top Row */}
       <div className="flex items-center justify-between">
@@ -212,6 +249,23 @@ export default function DashboardPage() {
           </div>
         </section>
       )}
+
+      {/* Period Selector */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1">
+        {(["today", "7d", "30d"] as const).map((p) => (
+          <button
+            key={p}
+            onClick={() => setPeriod(p)}
+            className={`px-5 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${
+              period === p
+                ? "bg-black text-white"
+                : "bg-[#F0F0F0] text-[#555] hover:bg-[#E2E2E2]"
+            }`}
+          >
+            {p === "today" ? "Today" : p === "7d" ? "7 Days" : "30 Days"}
+          </button>
+        ))}
+      </div>
 
       {/* Quick Action Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -302,23 +356,23 @@ export default function DashboardPage() {
             <div className="bg-white border border-[#F0F0F0] p-6 rounded-[14px] flex flex-col justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-[#555]">Today Orders</span>
               <span className="text-[28px] font-bold text-black mt-2">{todayOrders}</span>
-              <span className="text-xs text-[#25D366] font-medium mt-4 flex items-center gap-1">
-                <TrendingUp className="w-4 h-4" />
-                from today
+              <span className={`text-xs font-medium mt-4 flex items-center gap-1 ${ordersTrend >= 0 ? "text-[#25D366]" : "text-[#DC2626]"}`}>
+                {ordersTrend >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                {ordersTrend === 0 && todayOrders === 0 ? "No data yet" : `${Math.abs(ordersTrend)}% vs yesterday`}
               </span>
             </div>
             <div className="bg-white border border-[#F0F0F0] p-6 rounded-[14px] flex flex-col justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-[#555]">Today Revenue</span>
               <span className="text-[28px] font-bold text-black mt-2">{formatPrice(todayRevenue)}</span>
-              <span className="text-xs text-[#25D366] font-medium mt-4 flex items-center gap-1">
-                <TrendingUp className="w-4 h-4" />
-                from today
+              <span className={`text-xs font-medium mt-4 flex items-center gap-1 ${revenueTrend >= 0 ? "text-[#25D366]" : "text-[#DC2626]"}`}>
+                {revenueTrend >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                {revenueTrend === 0 && todayRevenue === 0 ? "No data yet" : `${Math.abs(revenueTrend)}% vs yesterday`}
               </span>
             </div>
           </div>
 
           {/* Orders Chart */}
-          {chartData.length > 0 ? (
+          {graph7d.length > 0 || graph30d.length > 0 ? (
             <OrdersChart data7d={graph7d} data30d={graph30d} />
           ) : (
             <div className="bg-white border border-[#F0F0F0] rounded-[14px] p-6">
@@ -332,7 +386,12 @@ export default function DashboardPage() {
           {/* Popular Dishes */}
           {topDishes.length > 0 && (
             <div className="bg-white border border-[#F0F0F0] rounded-[14px] p-6">
-              <h3 className="text-lg font-semibold text-black mb-6">Popular Dishes</h3>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-black">Popular Dishes</h3>
+                <Link href="/dashboard/analytics" className="text-sm text-[#25D366] font-semibold hover:underline flex items-center gap-1">
+                  View All <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
               <div className="space-y-3">
                 {topDishes.map((d, i) => (
                   <div
@@ -357,8 +416,8 @@ export default function DashboardPage() {
         <div className="bg-white border border-[#F0F0F0] rounded-[14px] overflow-hidden">
           <div className="p-6 border-b border-[#F0F0F0] flex items-center justify-between">
             <h3 className="text-lg font-semibold text-black">Recent Orders</h3>
-            <Link href="/dashboard/orders" className="text-sm text-[#25D366] font-semibold hover:underline">
-              View All
+            <Link href="/dashboard/orders" className="text-sm text-[#25D366] font-semibold hover:underline flex items-center gap-1">
+              View All <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
           {recentOrders.length > 0 ? (
@@ -371,6 +430,7 @@ export default function DashboardPage() {
                     <th className="px-6 py-4">Type</th>
                     <th className="px-6 py-4">Price</th>
                     <th className="px-6 py-4">Status</th>
+                    <th className="px-6 py-4">Time</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#F0F0F0]">
@@ -405,6 +465,9 @@ export default function DashboardPage() {
                           {order.order_status}
                         </Badge>
                       </td>
+                      <td className="px-6 py-4 text-xs text-[#999]">
+                        {timeAgo(order.created_at)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -418,26 +481,7 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4 border-t border-[#F0F0F0]">
-        <div className="flex flex-col md:flex-row items-center gap-4">
-          <span className="text-sm font-bold text-black">QRMenu.pk</span>
-          <div className="flex gap-4 text-xs text-[#555]">
-            <span>Terms of Service</span>
-            <span>Privacy Policy</span>
-          </div>
-        </div>
-        <div className="flex items-center gap-6">
-          <span className="text-xs text-[#555]">&copy; 2024 QRMenu.pk. All rights reserved.</span>
-          <button
-            onClick={handleLogout}
-            className="text-xs text-[#BA1A1A] font-semibold flex items-center gap-1 hover:underline opacity-80 hover:opacity-100 transition-opacity"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            Sign Out
-          </button>
-        </div>
-      </footer>
+      <DashboardFooter />
     </div>
   )
 }

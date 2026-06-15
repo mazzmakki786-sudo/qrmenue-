@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { CategoryTabs } from "./CategoryTabs"
 import { DishGrid } from "./DishGrid"
 import { CartBar } from "./CartBar"
 import { useCartStore } from "@/stores/cartStore"
-import { Search } from "lucide-react"
+import { Search, X } from "lucide-react"
 import { useI18n } from "@/lib/i18n/context"
 import type { Category, Dish } from "@/types"
 
@@ -17,7 +17,8 @@ interface Props {
 
 export function MenuContent({ categories, restaurantId, restaurantName }: Props) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
-  const [search, setSearch] = useState("")
+  const [searchInput, setSearchInput] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
   const { lang, setLang, t } = useI18n()
   const setRestaurant = useCartStore((s) => s.setRestaurant)
   const clearCart = useCartStore((s) => s.clearCart)
@@ -31,25 +32,38 @@ export function MenuContent({ categories, restaurantId, restaurantName }: Props)
     setRestaurant(restaurantId, restaurantName)
   }, [restaurantId, restaurantName])
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchInput)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchInput])
+
+  const handleClearSearch = useCallback(() => {
+    setSearchInput("")
+    setDebouncedSearch("")
+    searchRef.current?.focus()
+  }, [])
+
   const filtered = activeCategory
     ? categories.filter((c) => c.id === activeCategory)
     : categories
 
-  const searched = search.trim()
+  const searched = debouncedSearch.trim()
     ? filtered
         .map((cat) => ({
           ...cat,
           dishes: cat.dishes.filter((d) => {
             const name = lang === "ur" && d.name_ur ? d.name_ur : d.name_en
             const desc = lang === "ur" && d.description_ur ? d.description_ur : d.description_en
-            const q = search.toLowerCase()
+            const q = debouncedSearch.toLowerCase()
             return name.toLowerCase().includes(q) || (desc || "").toLowerCase().includes(q)
           }),
         }))
         .filter((cat) => cat.dishes.length > 0)
     : filtered
 
-  const noResults = search && searched.length === 0
+  const noResults = debouncedSearch && searched.length === 0
 
   return (
     <div>
@@ -62,11 +76,20 @@ export function MenuContent({ categories, restaurantId, restaurantName }: Props)
               <input
                 ref={searchRef}
                 type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
                 placeholder={t("customer.searchDishes")}
-                className="w-full bg-[#F9FAFB] border border-[#F0F0F0] rounded-xl py-3 pl-11 pr-4 text-sm focus:outline-none focus:border-black transition-all placeholder:text-[#999]"
+                className="w-full bg-[#F9FAFB] border border-[#F0F0F0] rounded-xl py-3 pl-11 pr-10 text-sm focus:outline-none focus:border-black transition-all placeholder:text-[#999]"
               />
+              {searchInput && (
+                <button
+                  onClick={handleClearSearch}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#DDD] flex items-center justify-center hover:bg-[#CCC] transition-colors"
+                  aria-label="Clear search"
+                >
+                  <X className="w-3 h-3 text-[#555]" />
+                </button>
+              )}
             </div>
             <button
               onClick={() => setLang(lang === "en" ? "ur" : "en")}

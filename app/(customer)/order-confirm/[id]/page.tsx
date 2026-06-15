@@ -1,10 +1,11 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Check, ArrowLeft, ClipboardList, Store, ExternalLink } from "lucide-react"
+import { Check, ArrowLeft, ClipboardList, Store, ExternalLink, Phone, RotateCcw } from "lucide-react"
+import { useCartStore } from "@/stores/cartStore"
 
 function buildWhatsAppUrl(order: any): string {
   const restaurant = order.restaurants
@@ -40,14 +41,54 @@ function buildWhatsAppUrl(order: any): string {
   return `https://wa.me/92${phone.slice(1)}?text=${encodeURIComponent(message)}`
 }
 
+const STATUS_STEPS = ["placed", "received", "preparing", "ready"] as const
+
+function StatusTimeline({ currentStatus }: { currentStatus: string }) {
+  const currentIndex = STATUS_STEPS.indexOf(currentStatus as any)
+  const activeIndex = currentIndex >= 0 ? currentIndex : 0
+
+  return (
+    <div className="flex items-center justify-between px-2">
+      {STATUS_STEPS.map((step, i) => {
+        const isCompleted = i <= activeIndex
+        const isCurrent = i === activeIndex
+        return (
+          <div key={step} className="flex items-center flex-1 last:flex-none">
+            <div className="flex flex-col items-center">
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                isCompleted
+                  ? "bg-[#25D366] text-white"
+                  : "border-2 border-[#DDD] text-[#999]"
+              }`}>
+                {isCompleted ? <Check className="w-3.5 h-3.5" style={{ strokeWidth: 3 }} /> : i + 1}
+              </div>
+              <span className={`text-[10px] mt-1 font-medium capitalize ${
+                isCurrent ? "text-black" : isCompleted ? "text-[#25D366]" : "text-[#999]"
+              }`}>
+                {step}
+              </span>
+            </div>
+            {i < STATUS_STEPS.length - 1 && (
+              <div className={`flex-1 h-0.5 mx-1 mb-4 ${
+                i < activeIndex ? "bg-[#25D366]" : "bg-[#E8E8E8]"
+              }`} />
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 export default function OrderConfirmPage({ params }: any) {
   const router = useRouter()
   const [order, setOrder] = useState<any>(null)
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [countdown, setCountdown] = useState(5)
   const [whatsappSuccess, setWhatsappSuccess] = useState(false)
-  const openedRef = useRef(false)
+  const addItem = useCartStore((s) => s.addItem)
+  const clearCart = useCartStore((s) => s.clearCart)
+  const setRestaurant = useCartStore((s) => s.setRestaurant)
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -72,29 +113,28 @@ export default function OrderConfirmPage({ params }: any) {
     fetchOrder()
   }, [params.id, router])
 
-  useEffect(() => {
-    if (!order || loading) return
-    if (openedRef.current) return
-    const url = buildWhatsAppUrl(order)
-    if (!url) return
-
-    const tick = setInterval(() => {
-      setCountdown((c) => {
-        if (c <= 0) {
-          clearInterval(tick)
-          if (!openedRef.current) {
-            openedRef.current = true
-            setWhatsappSuccess(true)
-            window.open(url, "_blank")
-          }
-          return 0
-        }
-        return c - 1
-      })
-    }, 1000)
-
-    return () => clearInterval(tick)
-  }, [order, loading])
+  const handleReorder = () => {
+    if (!order) return
+    clearCart()
+    const restaurant = order.restaurants
+    if (restaurant) {
+      setRestaurant(restaurant.id, restaurant.name)
+    }
+    order.items?.forEach((item: any) => {
+      const dish = {
+        id: item.id,
+        name_en: item.name_en,
+        price: item.price,
+        image_url: null,
+        is_available: true,
+        tags: [],
+      }
+      for (let i = 0; i < item.quantity; i++) {
+        addItem(dish as any)
+      }
+    })
+    router.push("/cart")
+  }
 
   if (loading) {
     return (
@@ -108,6 +148,7 @@ export default function OrderConfirmPage({ params }: any) {
 
   const whatsappUrl = buildWhatsAppUrl(order)
   const restaurant = order.restaurants
+  const restaurantPhone = restaurant?.phone?.replace(/[^0-9+]/g, "")
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-20">
@@ -134,49 +175,41 @@ export default function OrderConfirmPage({ params }: any) {
           <h2 className="text-lg font-bold text-black mb-1">Order Placed!</h2>
           <p className="text-sm font-semibold text-[#25D366] mb-3">#{order.order_number}</p>
           <p className="text-sm text-[#555] px-4">
-            Your order has been sent to <span className="font-semibold text-black">{restaurant?.name || "the restaurant"}</span> on WhatsApp
+            Your order has been sent to <span className="font-semibold text-black">{restaurant?.name || "the restaurant"}</span>
           </p>
         </section>
 
-        {/* WhatsApp Automation Status */}
+        {/* Status Timeline */}
         <section className="bg-white border border-[#F0F0F0] rounded-[14px] p-5 shadow-sm">
-          {whatsappSuccess ? (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Check className="w-5 h-5 text-[#25D366]" style={{ strokeWidth: 3 }} />
-                <span className="text-sm font-semibold text-black">WhatsApp opened!</span>
-              </div>
-              <button
-                onClick={() => { window.open(whatsappUrl, "_blank") }}
-                className="text-sm font-semibold text-[#25D366] hover:underline"
-              >
-                Resend
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-[#25D366]" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                  <span className="text-sm font-semibold text-black">Opening WhatsApp...</span>
-                </div>
-                <span className="text-sm text-[#555]">{countdown}s</span>
-              </div>
-              <div className="w-full h-1.5 bg-[#EDEEEF] rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[#25D366] rounded-full transition-all duration-1000 ease-linear"
-                  style={{ width: `${((5 - countdown) / 5) * 100}%` }}
-                />
-              </div>
-            </div>
-          )}
-          <button
-            onClick={() => { window.open(whatsappUrl, "_blank") }}
-            className="w-full mt-4 bg-[#25D366] text-white text-sm font-bold py-3.5 rounded-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
-          >
-            Send on WhatsApp now
-          </button>
+          <h3 className="text-sm font-semibold mb-4 text-black">Order Status</h3>
+          <StatusTimeline currentStatus={order.status || "placed"} />
         </section>
+
+        {/* WhatsApp Button */}
+        {whatsappUrl && (
+          <section className="bg-white border border-[#F0F0F0] rounded-[14px] p-5 shadow-sm">
+            {whatsappSuccess && (
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <Check className="w-5 h-5 text-[#25D366]" style={{ strokeWidth: 3 }} />
+                  <span className="text-sm font-semibold text-black">WhatsApp opened!</span>
+                </div>
+                <button
+                  onClick={() => { window.open(whatsappUrl, "_blank") }}
+                  className="text-sm font-semibold text-[#25D366] hover:underline"
+                >
+                  Resend
+                </button>
+              </div>
+            )}
+            <button
+              onClick={() => { window.open(whatsappUrl, "_blank"); setWhatsappSuccess(true) }}
+              className="w-full bg-[#25D366] text-white text-sm font-bold py-3.5 rounded-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+            >
+              Send on WhatsApp
+            </button>
+          </section>
+        )}
 
         {/* Order Summary */}
         <section className="bg-white border border-[#F0F0F0] rounded-[14px] p-5 shadow-sm">
@@ -252,6 +285,22 @@ export default function OrderConfirmPage({ params }: any) {
 
         {/* Bottom Actions */}
         <div className="space-y-3 pt-4">
+          <button
+            onClick={handleReorder}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-lg text-sm text-white font-semibold bg-black active:scale-[0.98] transition-all"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Reorder
+          </button>
+          {restaurantPhone && (
+            <a
+              href={`tel:${restaurantPhone}`}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-lg text-sm text-[#555] font-semibold border border-[#F0F0F0] hover:bg-[#EDEEEF] transition-colors"
+            >
+              <Phone className="w-4 h-4" />
+              Call Restaurant
+            </a>
+          )}
           {user && (
             <Link
               href="/account"

@@ -18,7 +18,7 @@ const notoUrdu = Noto_Nastaliq_Urdu({
 })
 
 const APP_NAME = "QRMenu.pk"
-const SITE_URL = "https://qrmenu.pk"
+const SITE_URL = "https://qr-menue-one.vercel.app"
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -101,7 +101,6 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
   viewportFit: "cover",
   themeColor: "#FFFFFF",
 }

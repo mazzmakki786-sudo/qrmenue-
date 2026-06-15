@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
 import Image from "next/image"
@@ -12,13 +12,23 @@ interface Props {
   onEdit: (dish: Dish) => void
   onDelete: (id: string) => void
   onToggleAvailability: (id: string, available: boolean) => void
+  selected?: boolean
+  onSelect?: (id: string) => void
 }
 
-export function DishCard({ dish, onEdit, onDelete, onToggleAvailability }: Props) {
+export function DishCard({ dish, onEdit, onDelete, onToggleAvailability, selected, onSelect }: Props) {
   const [imgError, setImgError] = useState(false)
 
   return (
     <div className="flex items-center gap-4 py-3 border-b border-[#F0F0F0] last:border-b-0">
+      {onSelect && (
+        <input
+          type="checkbox"
+          checked={selected || false}
+          onChange={() => onSelect(dish.id)}
+          className="w-4 h-4 rounded flex-shrink-0 accent-black"
+        />
+      )}
       {dish.image_url && !imgError ? (
         <div className="w-14 h-14 rounded-[10px] overflow-hidden flex-shrink-0 relative">
           <Image
@@ -54,13 +64,16 @@ export function DishCard({ dish, onEdit, onDelete, onToggleAvailability }: Props
       <div className="flex items-center gap-1 flex-shrink-0">
         <button
           onClick={() => onToggleAvailability(dish.id, !dish.is_available)}
-          className={`px-2 py-1 rounded text-xs font-medium transition-colors whitespace-nowrap ${
-            dish.is_available
-              ? "bg-[#16A34A]/10 text-[#16A34A]"
-              : "bg-[#DC2626]/10 text-[#DC2626]"
+          className={`relative w-11 h-6 rounded-full transition-colors ${
+            dish.is_available ? "bg-[#16A34A]" : "bg-[#E5E7EB]"
           }`}
+          aria-label={dish.is_available ? "Mark as unavailable" : "Mark as available"}
         >
-          {dish.is_available ? "Available" : "Hidden"}
+          <span
+            className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${
+              dish.is_available ? "translate-x-5" : "translate-x-0"
+            }`}
+          />
         </button>
         <button onClick={() => onEdit(dish)} className="p-1.5 hover:bg-[#F8F8F8] rounded-lg">
           <Pencil className="w-3.5 h-3.5 text-[#555]" />

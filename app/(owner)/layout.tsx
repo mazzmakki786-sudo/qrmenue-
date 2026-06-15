@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { LayoutDashboard, UtensilsCrossed, ClipboardList, BarChart3, User, CreditCard, QrCode, Menu, X, LogOut } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { BellNotification } from "@/components/owner/BellNotification"
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary"
@@ -39,6 +39,28 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
         })
     })
   }, [])
+
+  // Body scroll lock when drawer is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = ""
+    }
+    return () => { document.body.style.overflow = "" }
+  }, [mobileOpen])
+
+  // Escape key to close drawer
+  const handleEscape = useCallback((e: KeyboardEvent) => {
+    if (e.key === "Escape" && mobileOpen) {
+      setMobileOpen(false)
+    }
+  }, [mobileOpen])
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleEscape)
+    return () => document.removeEventListener("keydown", handleEscape)
+  }, [handleEscape])
 
   const handleLogout = async () => {
     const supabase = createClient()
@@ -105,17 +127,29 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
         </div>
       </div>
 
+      {/* Mobile Drawer with Animation */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
           <div
-            className="absolute left-0 top-0 bottom-0 w-72 max-w-[85vw] bg-white p-4 flex flex-col"
-            style={{ paddingTop: "calc(16px + env(safe-area-inset-top))" }}
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300"
+            onClick={() => setMobileOpen(false)}
+            aria-label="Close menu"
+          />
+          <div
+            role="dialog"
+            aria-label="Navigation menu"
+            className="absolute left-0 top-0 bottom-0 w-72 max-w-[85vw] bg-white p-4 flex flex-col transition-transform duration-300 ease-out"
+            style={{
+              transform: "translateX(0)",
+              paddingTop: "calc(16px + env(safe-area-inset-top))",
+              animation: "slideInLeft 0.3s ease-out",
+            }}
           >
             <div className="flex justify-end mb-4">
               <button
                 onClick={() => setMobileOpen(false)}
                 className="p-2 -mr-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-[#F0F0F0]"
+                aria-label="Close menu"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -163,6 +197,13 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
           {children}
         </ErrorBoundary>
       </main>
+
+      <style jsx global>{`
+        @keyframes slideInLeft {
+          from { transform: translateX(-100%); }
+          to { transform: translateX(0); }
+        }
+      `}</style>
     </div>
   )
 }
