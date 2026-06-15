@@ -56,7 +56,7 @@ export default function CustomerSignupPage() {
   return (
     <div className="w-full">
       <div className="mb-6">
-        <Link href="/signup" className="text-sm text-[#555] hover:text-black inline-flex items-center gap-1">
+        <Link href="/signup" className="text-sm text-[#555555] hover:text-black inline-flex items-center gap-1">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
           Back
         </Link>
@@ -68,7 +68,7 @@ export default function CustomerSignupPage() {
           </svg>
         </div>
         <h1 className="text-2xl font-bold">Create Account</h1>
-        <p className="text-sm text-[#555] mt-1">Join as a customer to browse and order</p>
+        <p className="text-sm text-[#555555] mt-1">Join as a customer to browse and order</p>
       </div>
 
       <form onSubmit={handleSignup} className="space-y-4">
@@ -81,9 +81,9 @@ export default function CustomerSignupPage() {
         </Button>
       </form>
 
-      <p className="text-sm text-[#555] text-center mt-6">
+      <p className="text-sm text-[#555555] text-center mt-6">
         Already have an account?{" "}
-        <Link href="/login" className="text-[#FF6B35] font-semibold hover:underline">
+        <Link href="/login" className="text-[#25D366] font-semibold hover:underline">
           Sign in
         </Link>
       </p>

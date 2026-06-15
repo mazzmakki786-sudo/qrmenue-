@@ -26,7 +26,7 @@ export function OrderTypeSelector({ selected, onSelect }: Props) {
             className={`flex flex-col items-center gap-1.5 p-3 sm:p-4 rounded-[12px] border transition-all ${
               selected === type
                 ? "border-black bg-black text-white"
-                : "border-[#E8E8E8] bg-white text-[#555] hover:border-[#CCC]"
+                : "border-[#F0F0F0] bg-white text-[#555] hover:border-[#CCC]"
             }`}
           >
             <Icon className="w-6 h-6" />

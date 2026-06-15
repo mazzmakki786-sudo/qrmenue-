@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Orders | QRMenu.pk Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary": "#93492e",
+                        "background": "#f8f9fa",
+                        "secondary-container": "#e2e2e2",
+                        "deep-black": "#000000",
+                        "border-light": "#F0F0F0",
+                        "on-tertiary-container": "#78351b",
+                        "on-background": "#191c1d",
+                        "inverse-surface": "#2e3132",
+                        "surface-container-highest": "#e1e3e4",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#763319",
+                        "on-secondary-container": "#646464",
+                        "pure-white": "#FFFFFF",
+                        "surface-variant": "#e1e3e4",
+                        "on-tertiary": "#ffffff",
+                        "primary": "#006d2f",
+                        "whatsapp-green": "#25D366",
+                        "on-tertiary-fixed": "#380d00",
+                        "text-muted": "#555555",
+                        "tertiary-container": "#ffa07e",
+                        "on-surface-variant": "#3c4a3d",
+                        "on-surface": "#191c1d",
+                        "on-secondary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a",
+                        "outline": "#6c7b6b",
+                        "primary-container": "#25d366",
+                        "surface-container-low": "#f3f4f5",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "surface-gray": "#F9FAFB",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#3de273",
+                        "surface-container": "#edeeef",
+                        "tertiary-fixed-dim": "#ffb59b",
+                        "on-secondary-fixed-variant": "#474747",
+                        "primary-fixed-dim": "#3de273",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed-dim": "#c6c6c6",
+                        "secondary": "#5e5e5e",
+                        "inverse-on-surface": "#f0f1f2",
+                        "surface-dim": "#d9dadb",
+                        "secondary-fixed": "#e2e2e2",
+                        "on-primary-container": "#005523",
+                        "on-error-container": "#93000a",
+                        "surface-bright": "#f8f9fa",
+                        "primary-fixed": "#66ff8e",
+                        "on-primary-fixed": "#002109",
+                        "surface-container-high": "#e7e8e9",
+                        "outline-variant": "#bbcbb9",
+                        "tertiary-fixed": "#ffdbcf",
+                        "surface": "#f8f9fa",
+                        "surface-tint": "#006d2f",
+                        "on-primary-fixed-variant": "#005322"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "container-max": "1280px",
+                        "stack-sm": "8px",
+                        "stack-md": "16px",
+                        "stack-lg": "32px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "unit": "4px"
+                    },
+                    fontFamily: {
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    fontSize: {
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            background-color: #F8F8F8;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .blur-mask {
+            filter: blur(4px);
+            user-select: none;
+        }
+        .order-card {
+            background-color: #FFFFFF;
+            border: 1px solid #E8E8E8;
+            border-radius: 10px;
+            transition: all 0.2s ease-in-out;
+        }
+        .order-card:hover {
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
+        }
+        .order-container {
+            max-width: 896px; /* max-w-4xl */
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body class="text-on-background min-h-screen pb-24 md:pb-0">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-pure-white/80 dark:bg-deep-black/80 backdrop-blur-md border-b border-border-light dark:border-secondary-container h-16 flex items-center justify-between px-margin-mobile md:px-margin-desktop">
+<div class="flex items-center gap-stack-md">
+<span class="font-headline-md text-headline-md font-bold text-deep-black dark:text-pure-white">QRMenu.pk</span>
+</div>
+<div class="flex items-center gap-stack-md">
+<span class="material-symbols-outlined text-text-muted hover:bg-surface-gray p-2 rounded-lg cursor-pointer transition-colors" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined text-text-muted hover:bg-surface-gray p-2 rounded-lg cursor-pointer transition-colors" data-icon="help">help</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-border-light">
+<img alt="Restaurant Owner Profile" data-alt="A professional headshot of a restaurant manager in a modern, well-lit hospitality setting. The lighting is soft and natural, reflecting a clean, high-contrast aesthetic consistent with a SaaS management platform. The individual has a friendly but authoritative expression, representing reliability and efficiency." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmVEessncaQKFqv9aByphLcs07gWaShOSTNTWcR-BZ4RyjTS2ndg1_J0zU5vgYjtyhHajuVuNzqpfRbO6ZlNvO7CIkK_5xb2o3EuaMP31aj47kVFlIOECSRsSHiPHbN0JbZXrsyqAzGXyS9kcgBE7CN1Ygsr3x53yadBiMOwr7rRQMX6NLwo80tUgKwoQ5Ed5nhL8BWeZd_TYjm4SfmWFTL2J91C_qfeb7yWA1L56Y7Md5z4P5SnxVhR-fhhRle2DgmW82Xiwqb75b"/>
+</div>
+</div>
+</header>
+<!-- Side Navigation (Desktop Only) -->
+<nav class="h-screen w-64 fixed left-0 top-0 hidden md:flex flex-col bg-surface-gray dark:bg-inverse-surface border-r border-border-light dark:border-secondary-container p-stack-md gap-stack-sm pt-20">
+<div class="mb-stack-lg px-2">
+<h2 class="font-headline-md text-headline-md font-bold text-deep-black">Restaurant Admin</h2>
+<p class="text-label-sm text-text-muted">Management Portal</p>
+</div>
+<a class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-deep-black hover:bg-border-light transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-deep-black hover:bg-border-light transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="restaurant_menu">restaurant_menu</span>
+<span class="font-label-md text-label-md">Menu Management</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-deep-black text-pure-white rounded-lg translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-label-md text-label-md">Orders</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-deep-black hover:bg-border-light transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-md text-label-md">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-deep-black hover:bg-border-light transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="qr_code_2">qr_code_2</span>
+<span class="font-label-md text-label-md">QR Codes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-deep-black hover:bg-border-light transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+<div class="mt-auto pt-stack-lg">
+<button class="w-full bg-deep-black text-pure-white py-3 rounded-lg font-bold hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                Add New Item
+            </button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-24 px-margin-mobile md:px-margin-desktop pb-12">
+<div class="order-container flex flex-col gap-stack-lg">
+<!-- Trial Lock Banner -->
+<section class="bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl p-stack-md flex flex-col md:flex-row items-center justify-between gap-stack-md shadow-lg">
+<div class="flex items-center gap-4 text-pure-white">
+<div class="bg-white/20 p-2 rounded-lg">
+<span class="material-symbols-outlined" data-icon="lock" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<div>
+<p class="font-bold text-body-md">Order details locked - You have reached your trial limit</p>
+<p class="text-sm opacity-90">Upgrade your plan to see customer info and order details.</p>
+</div>
+</div>
+<button class="bg-amber-100 text-amber-900 px-6 py-2.5 rounded-lg font-bold hover:bg-white transition-colors flex items-center gap-2 whitespace-nowrap">
+                    Upgrade to Unlock
+                    <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</section>
+<!-- Heading & Filters -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-stack-md">
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-deep-black">Orders</h1>
+<div class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
+<button class="px-5 py-1.5 rounded-full bg-deep-black text-pure-white text-label-md font-bold whitespace-nowrap">Today</button>
+<button class="px-5 py-1.5 rounded-full bg-surface-container-low text-secondary text-label-md font-medium hover:bg-secondary-container transition-colors whitespace-nowrap">Week</button>
+<button class="px-5 py-1.5 rounded-full bg-surface-container-low text-secondary text-label-md font-medium hover:bg-secondary-container transition-colors whitespace-nowrap">All</button>
+</div>
+</div>
+<!-- Orders List -->
+<div class="flex flex-col gap-3">
+<!-- Unlocked Order Example -->
+<div class="order-card p-4 md:p-stack-md flex flex-col md:flex-row items-start md:items-center justify-between gap-stack-md">
+<div class="flex items-center gap-stack-md flex-1">
+<div class="w-12 h-12 bg-surface-gray flex items-center justify-center rounded-lg border border-border-light text-text-muted">
+<span class="material-symbols-outlined" data-icon="receipt">receipt</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-bold text-deep-black">#1024</span>
+<span class="text-sm text-text-muted">•</span>
+<span class="text-sm text-text-muted">2 mins ago</span>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="font-medium text-on-background">Ahmed Khan</span>
+<span class="text-xs px-2 py-0.5 bg-surface-container rounded-full text-secondary">Dine-in</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between w-full md:w-auto md:gap-stack-lg">
+<div class="flex flex-col md:items-end">
+<span class="font-bold text-body-md text-deep-black">PKR 1,250</span>
+<span class="text-xs text-text-muted">3 items</span>
+</div>
+<div class="flex items-center gap-stack-md">
+<span class="bg-primary/10 text-primary text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">Received</span>
+<button class="p-2 hover:bg-surface-gray rounded-full transition-colors text-text-muted">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Locked Order Example -->
+<div class="order-card p-4 md:p-stack-md flex flex-col md:flex-row items-start md:items-center justify-between gap-stack-md">
+<div class="flex items-center gap-stack-md flex-1">
+<div class="w-12 h-12 bg-surface-gray flex items-center justify-center rounded-lg border border-border-light text-text-muted opacity-50">
+<span class="material-symbols-outlined" data-icon="lock_clock">lock_clock</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-bold text-deep-black">#1025</span>
+<span class="text-sm text-text-muted">•</span>
+<span class="text-sm text-text-muted">5 mins ago</span>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="font-mono text-sm tracking-tighter opacity-20 select-none">████████</span>
+<span class="text-xs px-2 py-0.5 bg-surface-container/50 rounded-full text-transparent select-none blur-[2px]">████</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between w-full md:w-auto md:gap-stack-lg">
+<div class="flex flex-col md:items-end">
+<span class="font-bold text-body-md text-deep-black">PKR 850</span>
+<span class="text-xs text-text-muted">1 item</span>
+</div>
+<div class="flex items-center gap-stack-md">
+<span class="bg-primary/10 text-primary text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">Received</span>
+<button class="p-2 hover:bg-surface-gray rounded-full transition-colors text-text-muted cursor-not-allowed">
+<span class="material-symbols-outlined" data-icon="lock" style="font-size: 18px;">lock</span>
+</button>
+</div>
+</div>
+</div>
+<!-- More Statuses Examples -->
+<div class="order-card p-4 md:p-stack-md flex flex-col md:flex-row items-start md:items-center justify-between gap-stack-md">
+<div class="flex items-center gap-stack-md flex-1">
+<div class="w-12 h-12 bg-surface-gray flex items-center justify-center rounded-lg border border-border-light text-text-muted">
+<span class="material-symbols-outlined" data-icon="receipt">receipt</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-bold text-deep-black">#1023</span>
+<span class="text-sm text-text-muted">•</span>
+<span class="text-sm text-text-muted">15 mins ago</span>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="font-medium text-on-background">Sara J.</span>
+<span class="text-xs px-2 py-0.5 bg-surface-container rounded-full text-secondary">Takeaway</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between w-full md:w-auto md:gap-stack-lg">
+<div class="flex flex-col md:items-end">
+<span class="font-bold text-body-md text-deep-black">PKR 4,200</span>
+<span class="text-xs text-text-muted">5 items</span>
+</div>
+<div class="flex items-center gap-stack-md">
+<span class="bg-blue-100 text-blue-600 text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">Preparing</span>
+<button class="p-2 hover:bg-surface-gray rounded-full transition-colors text-text-muted">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<div class="order-card p-4 md:p-stack-md flex flex-col md:flex-row items-start md:items-center justify-between gap-stack-md">
+<div class="flex items-center gap-stack-md flex-1">
+<div class="w-12 h-12 bg-surface-gray flex items-center justify-center rounded-lg border border-border-light text-text-muted">
+<span class="material-symbols-outlined" data-icon="receipt">receipt</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-bold text-deep-black">#1022</span>
+<span class="text-sm text-text-muted">•</span>
+<span class="text-sm text-text-muted">32 mins ago</span>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="font-medium text-on-background">Zain Ali</span>
+<span class="text-xs px-2 py-0.5 bg-surface-container rounded-full text-secondary">Dine-in</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between w-full md:w-auto md:gap-stack-lg">
+<div class="flex flex-col md:items-end">
+<span class="font-bold text-body-md text-deep-black">PKR 980</span>
+<span class="text-xs text-text-muted">2 items</span>
+</div>
+<div class="flex items-center gap-stack-md">
+<span class="bg-purple-100 text-purple-600 text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">Ready</span>
+<button class="p-2 hover:bg-surface-gray rounded-full transition-colors text-text-muted">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<div class="order-card p-4 md:p-stack-md flex flex-col md:flex-row items-start md:items-center justify-between gap-stack-md">
+<div class="flex items-center gap-stack-md flex-1">
+<div class="w-12 h-12 bg-surface-gray flex items-center justify-center rounded-lg border border-border-light text-text-muted">
+<span class="material-symbols-outlined" data-icon="receipt">receipt</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-bold text-deep-black">#1021</span>
+<span class="text-sm text-text-muted">•</span>
+<span class="text-sm text-text-muted">1 hour ago</span>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="font-medium text-on-background">Fatima B.</span>
+<span class="text-xs px-2 py-0.5 bg-surface-container rounded-full text-secondary">Delivery</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between w-full md:w-auto md:gap-stack-lg">
+<div class="flex flex-col md:items-end">
+<span class="font-bold text-body-md text-deep-black">PKR 2,550</span>
+<span class="text-xs text-text-muted">4 items</span>
+</div>
+<div class="flex items-center gap-stack-md">
+<span class="bg-emerald-100 text-emerald-600 text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">Completed</span>
+<button class="p-2 hover:bg-surface-gray rounded-full transition-colors text-text-muted">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<div class="order-card p-4 md:p-stack-md flex flex-col md:flex-row items-start md:items-center justify-between gap-stack-md opacity-60">
+<div class="flex items-center gap-stack-md flex-1">
+<div class="w-12 h-12 bg-surface-gray flex items-center justify-center rounded-lg border border-border-light text-text-muted">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-bold text-deep-black">#1020</span>
+<span class="text-sm text-text-muted">•</span>
+<span class="text-sm text-text-muted">2 hours ago</span>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="font-medium text-on-background">Omer K.</span>
+<span class="text-xs px-2 py-0.5 bg-surface-container rounded-full text-secondary">Takeaway</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between w-full md:w-auto md:gap-stack-lg">
+<div class="flex flex-col md:items-end">
+<span class="font-bold text-body-md text-deep-black">PKR 1,100</span>
+<span class="text-xs text-text-muted">2 items</span>
+</div>
+<div class="flex items-center gap-stack-md">
+<span class="bg-gray-100 text-gray-500 text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">Cancelled</span>
+<button class="p-2 hover:bg-surface-gray rounded-full transition-colors text-text-muted">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer / Logout -->
+<footer class="mt-stack-lg border-t border-border-light pt-stack-lg flex flex-col items-center gap-stack-md">
+<a class="text-error font-medium hover:underline flex items-center gap-2 transition-all" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="logout">logout</span>
+                    Sign Out
+                </a>
+<p class="text-label-sm text-text-muted">© 2024 QRMenu.pk - Fast SaaS for Smart Restaurants</p>
+</footer>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Mobile) -->
+<nav class="fixed bottom-0 w-full md:hidden z-50 bg-pure-white/80 dark:bg-deep-black/80 backdrop-blur-md border-t border-border-light dark:border-secondary-container shadow-lg h-16 pb-safe flex justify-around items-center">
+<a class="text-text-muted flex flex-col items-center justify-center py-2 transition-transform scale-90 active:bg-surface-container-low" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="text-deep-black flex flex-col items-center justify-center py-2 transition-transform scale-100 active:bg-surface-container-low" href="#">
+<span class="material-symbols-outlined" data-icon="list_alt">list_alt</span>
+<span class="font-label-sm text-label-sm font-bold">Orders</span>
+</a>
+<a class="text-text-muted flex flex-col items-center justify-center py-2 transition-transform scale-90 active:bg-surface-container-low" href="#">
+<span class="material-symbols-outlined" data-icon="restaurant">restaurant</span>
+<span class="font-label-sm text-label-sm">Menu</span>
+</a>
+<a class="text-text-muted flex flex-col items-center justify-center py-2 transition-transform scale-90 active:bg-surface-container-low" href="#">
+<span class="material-symbols-outlined" data-icon="menu_open">menu_open</span>
+<span class="font-label-sm text-label-sm">More</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions for order cards
+        document.querySelectorAll('.order-card').forEach(card => {
+            card.addEventListener('mousedown', () => {
+                card.style.transform = 'scale(0.995)';
+            });
+            card.addEventListener('mouseup', () => {
+                card.style.transform = 'scale(1)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
+
+        // Real-time insertion simulation (visual only)
+        function simulateNewOrder() {
+            console.log("Listening for real-time order updates...");
+        }
+        simulateNewOrder();
+    </script>
+</body></html>

@@ -1,5 +1,6 @@
 import { Resend } from "resend"
 import { createClient } from "@/lib/supabase/server"
+import { escapeHtml } from "@/lib/utils"
 
 let _r: Resend | null = null
 function get() {
@@ -55,7 +56,7 @@ export async function checkAndSendPlanEndingAlert(restaurantId: string): Promise
       subject: `Your ${planLabel} plan ends in ${daysUntilEnd} days — QRMenu.pk`,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #111;">
-          <h1 style="font-size: 22px; margin-bottom: 8px;">Your ${planLabel} plan ends soon, ${restaurant.name}</h1>
+          <h1 style="font-size: 22px; margin-bottom: 8px;">Your ${planLabel} plan ends soon, ${escapeHtml(restaurant.name)}</h1>
           <p style="color: #555; font-size: 15px; line-height: 1.6;">
             Your current plan expires in <strong>${daysUntilEnd} day${daysUntilEnd > 1 ? "s" : ""}</strong>.
             After that, your account will be downgraded and some features may become unavailable.
@@ -65,7 +66,7 @@ export async function checkAndSendPlanEndingAlert(restaurantId: string): Promise
           </p>
           <div style="margin: 32px 0; text-align: center;">
             <a href="${process.env.NEXT_PUBLIC_APP_URL || ""}/dashboard/subscription" 
-               style="display: inline-block; background: #FF6B35; color: white; padding: 14px 32px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 15px;">
+               style="display: inline-block; background: #25D366; color: white; padding: 14px 32px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 15px;">
               Renew My Plan →
             </a>
           </div>

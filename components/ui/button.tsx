@@ -15,7 +15,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           "inline-flex items-center justify-center font-semibold rounded-[10px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none",
           fullWidth && "w-full",
           variant === "primary" && "bg-black text-white hover:bg-[#1A1A1A]",
-          variant === "accent" && "bg-[#FF6B35] text-white hover:bg-[#E55A25]",
+          variant === "accent" && "bg-[#25D366] text-white hover:bg-[#1ba94a]",
           variant === "ghost" && "bg-transparent border border-[#E8E8E8] text-[#111] hover:bg-[#F8F8F8]",
           variant === "google" && "bg-white border border-[#E8E8E8] text-[#111] hover:bg-[#F8F8F8] w-full",
           size === "sm" && "h-9 px-4 text-sm",

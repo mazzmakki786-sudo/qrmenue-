@@ -178,7 +178,7 @@ export default function CheckoutPage() {
                 className={`flex items-center gap-3 w-full p-4 rounded-[10px] border transition-colors ${
                   paymentMethod === method
                     ? "border-black bg-black text-white"
-                    : "border-[#E8E8E8] text-[#555]"
+                    : "border-[#F0F0F0] text-[#555]"
                 }`}
               >
                 <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${

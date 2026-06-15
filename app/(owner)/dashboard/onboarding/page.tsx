@@ -6,6 +6,7 @@ import { QRCodeDisplay } from "@/components/shared/QRCodeDisplay"
 import { Button } from "@/components/ui/button"
 import { Check, Copy, ArrowRight } from "lucide-react"
 import { useSubscription } from "@/lib/hooks/useSubscription"
+import Image from "next/image"
 
 export default function OnboardingPage() {
   const router = useRouter()
@@ -32,7 +33,7 @@ export default function OnboardingPage() {
     )
   }
 
-  const menuUrl = `${process.env.NEXT_PUBLIC_APP_URL || "https://qr-menue-one.vercel.app"}/menu/${restaurant.slug}`
+  const menuUrl = `${process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "")}/menu/${restaurant.slug}`
 
   const handleCopyUrl = () => {
     navigator.clipboard.writeText(menuUrl)
@@ -56,7 +57,7 @@ export default function OnboardingPage() {
         <h2 className="font-semibold">Your Restaurant</h2>
         <div className="flex items-center gap-3">
           {restaurant.logo_url ? (
-            <img src={restaurant.logo_url} alt="" className="w-12 h-12 rounded-full object-cover" />
+            <Image src={restaurant.logo_url} alt={`${restaurant.name} logo`} width={48} height={48} className="w-12 h-12 rounded-full object-cover" />
           ) : (
             <div className="w-12 h-12 rounded-full bg-[#F8F8F8] flex items-center justify-center">
               <span className="text-lg font-bold text-[#555]">{restaurant.name[0]}</span>

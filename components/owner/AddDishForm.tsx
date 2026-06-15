@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useRef } from "react"
 import { useForm } from "react-hook-form"
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Camera, X, Flame, ChefHat, AlertTriangle } from "lucide-react"
 import type { Category } from "@/types"
+import Image from "next/image"
 
 const dishSchema = z.object({
   name_en: z.string().min(1, "Name is required"),
@@ -30,7 +31,7 @@ interface Props {
 }
 
 const badgeOptions = [
-  { id: "popular", label: "Popular", icon: Flame, color: "text-[#FF6B35]" },
+  { id: "popular", label: "Popular", icon: Flame, color: "text-[#25D366]" },
   { id: "chef_special", label: "Chef's Special", icon: ChefHat, color: "text-black" },
   { id: "spicy", label: "Spicy", icon: AlertTriangle, color: "text-[#DC2626]" },
 ]
@@ -80,7 +81,7 @@ export function AddDishForm({ categories, onSubmit, onCancel, initialData, submi
         <label className="block text-sm font-medium text-[#111] mb-2">Dish Image (optional)</label>
         {imagePreview ? (
           <div className="relative w-32 h-32 rounded-[10px] overflow-hidden border border-[#E8E8E8]">
-            <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+            <Image src={imagePreview} alt="Preview" width={128} height={128} className="w-full h-full object-cover" />
             <button
               type="button"
               onClick={clearImage}

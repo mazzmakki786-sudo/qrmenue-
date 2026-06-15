@@ -1,21 +1,26 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { createClient, createAdminClient } from "@/lib/supabase/server"
+import { SUPER_ADMIN_EMAIL, checkRateLimit, logAudit, getIp } from "@/lib/superadmin-security"
 
-export async function GET() {
-  const supabase = await createClient()
-
+async function checkAuth(supabase: Awaited<ReturnType<typeof createClient>>) {
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.email?.toLowerCase() !== process.env.SUPER_ADMIN_EMAIL?.toLowerCase()) {
+  if (!user || user.email?.toLowerCase() !== SUPER_ADMIN_EMAIL) return false
+  return true
+}
+
+export async function GET(request: Request) {
+  const ip = getIp(request)
+  if (!await checkRateLimit(ip)) return NextResponse.json({ error: "Too many requests" }, { status: 429 })
+
+  const supabase = await createClient()
+  if (!(await checkAuth(supabase))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
   }
 
-  const { data, error } = await supabase
-    .from("company_settings")
-    .select("*")
+  const admin = createAdminClient()
+  const { data, error } = await admin.from("company_settings").select("*")
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
-  }
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
 
   const settings: Record<string, string> = {}
   data.forEach((s: any) => { settings[s.key] = s.value })
@@ -23,19 +28,26 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
-  const supabase = await createClient()
-  const body = await request.json()
+  const ip = getIp(request)
+  if (!await checkRateLimit(ip)) return NextResponse.json({ error: "Too many requests" }, { status: 429 })
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.email?.toLowerCase() !== process.env.SUPER_ADMIN_EMAIL?.toLowerCase()) {
+  const supabase = await createClient()
+  if (!(await checkAuth(supabase))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
   }
 
+  const body = await request.json()
+  const admin = createAdminClient()
+
   for (const [key, value] of Object.entries(body)) {
-    await supabase
-      .from("company_settings")
-      .upsert({ key, value: String(value) }, { onConflict: "key" })
+    await admin.from("company_settings").upsert(
+      { key, value: String(value) },
+      { onConflict: "key" }
+    )
   }
+
+  const { data: { user } } = await supabase.auth.getUser()
+  await logAudit(user?.email || "", "settings_updated", { keys: Object.keys(body) })
 
   return NextResponse.json({ success: true })
 }

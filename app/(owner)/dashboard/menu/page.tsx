@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
@@ -7,10 +7,11 @@ import { AddDishForm } from "@/components/owner/AddDishForm"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Plus, Store, UtensilsCrossed, Eye, EyeOff, Pencil, Search, FolderPlus, Image as ImageIcon, AlertTriangle, ArrowRight } from "lucide-react"
+import { Plus, Store, UtensilsCrossed, Eye, EyeOff, Pencil, Search, FolderPlus, Image as ImageIcon, AlertTriangle, ArrowRight, X } from "lucide-react"
 import type { Category, Dish } from "@/types"
 import { useSubscription } from "@/lib/hooks/useSubscription"
 import Link from "next/link"
+import Image from "next/image"
 
 export default function MenuManagementPage() {
   const sub = useSubscription()
@@ -29,6 +30,7 @@ export default function MenuManagementPage() {
   const [search, setSearch] = useState("")
   const [limitError, setLimitError] = useState<string | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const [logoError, setLogoError] = useState(false)
 
   const fetchData = useCallback(async () => {
     if (!restaurant?.id) {
@@ -56,7 +58,7 @@ export default function MenuManagementPage() {
 
   const compressImage = (file: File, maxW = 600): Promise<Blob> =>
     new Promise((resolve, reject) => {
-      const img = new Image()
+      const img = new window.Image()
       img.onload = () => {
         const canvas = document.createElement("canvas")
         const ratio = Math.min(maxW / img.width, 1)
@@ -321,10 +323,10 @@ export default function MenuManagementPage() {
   if (loading) {
     return (
       <div>
-        <div className="h-8 w-48 bg-[#E8E8E8] rounded animate-pulse mb-6" />
+        <div className="h-8 w-48 bg-[#F0F0F0] rounded animate-pulse mb-6" />
         <div className="space-y-3">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-16 bg-[#E8E8E8] rounded-[10px] animate-pulse" />
+            <div key={i} className="h-16 bg-[#F0F0F0] rounded-xl animate-pulse" />
           ))}
         </div>
       </div>
@@ -333,24 +335,16 @@ export default function MenuManagementPage() {
 
   return (
     <div>
-      <div className="flex items-center gap-4 mb-6 p-4 bg-white rounded-[14px] border border-[#E8E8E8]">
-        <div className="w-14 h-14 rounded-full bg-[#F8F8F8] flex items-center justify-center overflow-hidden flex-shrink-0">
-          {restaurant?.logo_url ? (
-            <img
+      <div className="flex items-center gap-4 mb-6 p-4 bg-white rounded-xl border border-[#F0F0F0]">
+        <div className="w-14 h-14 rounded-full bg-[#F9FAFB] flex items-center justify-center overflow-hidden flex-shrink-0">
+          {restaurant?.logo_url && !logoError ? (
+            <Image
               src={restaurant.logo_url}
               alt={restaurant.name}
+              width={56}
+              height={56}
               className="w-full h-full object-cover"
-              onError={(e) => {
-                const target = e.currentTarget
-                target.style.display = "none"
-                const parent = target.parentElement
-                if (parent) {
-                  const fallback = document.createElement("span")
-                  fallback.className = "text-2xl font-bold text-[#555]"
-                  fallback.textContent = restaurant.name[0]
-                  parent.appendChild(fallback)
-                }
-              }}
+              onError={() => setLogoError(true)}
             />
           ) : (
             <span className="text-2xl font-bold text-[#555]">
@@ -360,12 +354,12 @@ export default function MenuManagementPage() {
         </div>
         <div className="flex-1 min-w-0">
           <h1 className="text-lg font-bold text-[#111] truncate">{restaurant?.name || "Menu Management"}</h1>
-          <p className="text-sm text-[#555]">{restaurant?.city}{restaurant?.cuisine_type ? ` • ${restaurant.cuisine_type}` : ""}</p>
+          <p className="text-sm text-[#555]">{restaurant?.city}{restaurant?.cuisine_type ? ` \u2022 ${restaurant.cuisine_type}` : ""}</p>
         </div>
       </div>
 
       {suspended && (
-        <div className="mb-4 rounded-[14px] p-4 flex items-start gap-3 bg-[#FEF3C7] border border-[#D97706]/30">
+        <div className="mb-4 rounded-xl p-4 flex items-start gap-3 bg-[#FEF3C7] border border-[#D97706]/30">
           <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5 text-[#D97706]" />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-[#92400E]">Account Suspended</p>
@@ -375,7 +369,7 @@ export default function MenuManagementPage() {
       )}
 
       {(trialExpired || graceActive) && (
-        <div className={`mb-4 rounded-[14px] p-4 flex items-start gap-3 ${
+        <div className={`mb-4 rounded-xl p-4 flex items-start gap-3 ${
           trialExpired
             ? "bg-[#DC2626]/10 border border-[#DC2626]/30"
             : "bg-[#D97706]/10 border border-[#D97706]/30"
@@ -383,14 +377,14 @@ export default function MenuManagementPage() {
           <AlertTriangle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${trialExpired ? "text-[#DC2626]" : "text-[#D97706]"}`} />
           <div className="flex-1 min-w-0">
             <p className={`text-sm font-semibold ${trialExpired ? "text-[#DC2626]" : "text-[#D97706]"}`}>
-              {trialExpired ? "Trial expired — upgrade to continue" : "Trial ended — grace period active"}
+              {trialExpired ? "Trial expired \u2014 upgrade to continue" : "Trial ended \u2014 grace period active"}
             </p>
             <p className="text-xs text-[#555] mt-0.5">
               Your data is saved. Upgrade to add new dishes and accept new orders.
             </p>
             <Link
               href="/dashboard/subscription"
-              className="inline-flex items-center gap-1 mt-2 text-xs font-semibold text-[#FF6B35] hover:underline"
+              className="inline-flex items-center gap-1 mt-2 text-xs font-semibold text-[#25D366] hover:underline"
             >
               Choose a plan <ArrowRight className="w-3 h-3" />
             </Link>
@@ -399,7 +393,7 @@ export default function MenuManagementPage() {
       )}
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
-        <div className="bg-white rounded-[14px] border border-[#E8E8E8] p-3 md:p-4">
+        <div className="bg-white rounded-xl border border-[#F0F0F0] p-3 md:p-4">
           <div className="flex items-center gap-1.5 text-xs text-[#999] mb-1">
             <UtensilsCrossed className="w-3.5 h-3.5" />
             Dishes
@@ -407,18 +401,18 @@ export default function MenuManagementPage() {
           <p className="text-xl md:text-2xl font-bold text-[#111]">
             {totalDishes}
             <span className="text-xs font-normal text-[#999] ml-1">
-              / {planLimits.maxDishes === Infinity ? "∞" : planLimits.maxDishes}
+              / {planLimits.maxDishes === Infinity ? "8" : planLimits.maxDishes}
             </span>
           </p>
         </div>
-        <div className="bg-white rounded-[14px] border border-[#E8E8E8] p-3 md:p-4">
+        <div className="bg-white rounded-xl border border-[#F0F0F0] p-3 md:p-4">
           <div className="flex items-center gap-1.5 text-xs text-[#16A34A] mb-1">
             <Eye className="w-3.5 h-3.5" />
             Active
           </div>
           <p className="text-xl md:text-2xl font-bold text-[#16A34A]">{activeDishes}</p>
         </div>
-        <div className="bg-white rounded-[14px] border border-[#E8E8E8] p-3 md:p-4">
+        <div className="bg-white rounded-xl border border-[#F0F0F0] p-3 md:p-4">
           <div className="flex items-center gap-1.5 text-xs text-[#555] mb-1">
             <ImageIcon className="w-3.5 h-3.5" />
             Images
@@ -426,7 +420,7 @@ export default function MenuManagementPage() {
           <p className="text-xl md:text-2xl font-bold text-[#111]">
             {imageCount}
             <span className="text-xs font-normal text-[#999] ml-1">
-              / {planLimits.maxImages === Infinity ? "∞" : planLimits.maxImages}
+              / {planLimits.maxImages === Infinity ? "8" : planLimits.maxImages}
             </span>
           </p>
         </div>
@@ -440,7 +434,7 @@ export default function MenuManagementPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search dishes..."
-            className="w-full h-10 pl-9 pr-4 rounded-xl bg-white border border-[#E8E8E8] text-sm placeholder:text-[#999] focus:outline-none focus:border-black transition-colors"
+            className="w-full h-10 pl-9 pr-4 rounded-xl bg-white border border-[#F0F0F0] text-sm placeholder:text-[#999] focus:outline-none focus:border-black transition-colors"
           />
         </div>
         <Button size="sm" variant="ghost" onClick={handleAddCategory}>
@@ -470,18 +464,20 @@ export default function MenuManagementPage() {
       </div>
 
       {limitError && (
-        <div className="bg-[#FEF3C7] border border-[#D97706]/30 rounded-[10px] p-3 mb-4 flex items-start gap-2">
+        <div className="bg-[#FEF3C7] border border-[#D97706]/30 rounded-xl p-3 mb-4 flex items-start gap-2">
           <AlertTriangle className="w-4 h-4 text-[#D97706] flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-xs text-[#92400E] font-medium">{limitError}</p>
             <Link
               href="/dashboard/subscription"
-              className="text-xs text-[#FF6B35] font-semibold hover:underline"
+              className="text-xs text-[#25D366] font-semibold hover:underline"
             >
-              Upgrade plan →
+              Upgrade plan &rarr;
             </Link>
           </div>
-          <button onClick={() => setLimitError(null)} className="text-[#92400E] text-xs">×</button>
+            <button onClick={() => setLimitError(null)} className="text-[#92400E] p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center hover:bg-[#D97706]/10 rounded-lg transition-colors">
+              <X className="w-4 h-4" />
+            </button>
         </div>
       )}
 
@@ -492,7 +488,7 @@ export default function MenuManagementPage() {
             className={`whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
               !activeCategory
                 ? "bg-black text-white"
-                : "bg-white text-[#555] border border-[#E8E8E8] hover:bg-[#F8F8F8]"
+                : "bg-white text-[#555] border border-[#F0F0F0] hover:bg-[#F9FAFB]"
             }`}
           >
             All ({dishes.length})
@@ -507,7 +503,7 @@ export default function MenuManagementPage() {
                 className={`whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                   isActive
                     ? "bg-black text-white"
-                    : "bg-white text-[#555] border border-[#E8E8E8] hover:bg-[#F8F8F8]"
+                    : "bg-white text-[#555] border border-[#F0F0F0] hover:bg-[#F9FAFB]"
                 }`}
               >
                 {cat.name_en} ({count})
@@ -519,8 +515,8 @@ export default function MenuManagementPage() {
 
       <div className="space-y-4">
         {filteredCategories.length === 0 ? (
-          <div className="bg-white rounded-[14px] border border-[#E8E8E8] p-10 text-center">
-            <div className="w-12 h-12 rounded-xl bg-[#F8F8F8] flex items-center justify-center mx-auto mb-3">
+          <div className="bg-white rounded-xl border border-[#F0F0F0] p-10 text-center">
+            <div className="w-12 h-12 rounded-xl bg-[#F9FAFB] flex items-center justify-center mx-auto mb-3">
               <UtensilsCrossed className="w-6 h-6 text-[#999]" />
             </div>
             <p className="text-sm text-[#555] mb-3">No categories yet</p>
@@ -535,8 +531,8 @@ export default function MenuManagementPage() {
               : dishes.filter((d) => d.category_id === cat.id)
             if (catDishes.length === 0 && search) return null
             return (
-              <div key={cat.id} className="bg-white rounded-[14px] border border-[#E8E8E8] overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-3 bg-[#F8F8F8] border-b border-[#E8E8E8]">
+              <div key={cat.id} className="bg-white rounded-xl border border-[#F0F0F0] overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-3 bg-[#F9FAFB] border-b border-[#F0F0F0]">
                   <div className="flex items-center gap-2 min-w-0">
                     <h2 className="text-sm font-semibold text-[#111] truncate">{cat.name_en}</h2>
                     {cat.name_ur && <span className="text-xs text-[#999] font-urdu flex-shrink-0">{cat.name_ur}</span>}
@@ -578,15 +574,15 @@ export default function MenuManagementPage() {
             </DialogTitle>
           </DialogHeader>
           {limitError && (
-            <div className="bg-[#FEF3C7] border border-[#D97706]/30 rounded-[10px] p-3 flex items-start gap-2">
+            <div className="bg-[#FEF3C7] border border-[#D97706]/30 rounded-xl p-3 flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 text-[#D97706] flex-shrink-0 mt-0.5" />
               <div className="flex-1">
                 <p className="text-xs text-[#92400E]">{limitError}</p>
                 <Link
                   href="/dashboard/subscription"
-                  className="text-xs text-[#FF6B35] font-semibold hover:underline"
+                  className="text-xs text-[#25D366] font-semibold hover:underline"
                 >
-                  Upgrade plan →
+                  Upgrade plan ?
                 </Link>
               </div>
             </div>
@@ -636,8 +632,8 @@ export default function MenuManagementPage() {
                 id="category_name_ur"
                 value={categoryNameUr}
                 onChange={(e) => setCategoryNameUr(e.target.value)}
-                placeholder="مثلاً سٹارٹرز"
-                className="flex h-12 w-full rounded-[10px] bg-[#F8F8F8] border border-[#E8E8E8] px-4 py-3 text-base placeholder:text-[#999] focus:outline-none focus:border-black transition-colors font-urdu"
+                placeholder="????? ???????"
+                className="flex h-12 w-full rounded-xl bg-[#F9FAFB] border border-[#F0F0F0] px-4 py-3 text-base placeholder:text-[#999] focus:outline-none focus:border-black transition-colors font-urdu"
               />
             </div>
             <div className="flex gap-3 pt-2">
@@ -669,7 +665,7 @@ export default function MenuManagementPage() {
               </Button>
               <button
                 onClick={confirmDeleteCategory}
-                className="flex-1 px-4 py-3 rounded-[10px] bg-[#DC2626] text-white text-sm font-semibold hover:bg-red-700 transition-colors"
+                className="flex-1 px-4 py-3 rounded-xl bg-[#DC2626] text-white text-sm font-semibold hover:bg-red-700 transition-colors"
               >
                 Delete Category
               </button>

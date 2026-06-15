@@ -8,7 +8,7 @@ interface Props {
   restaurantName: string
 }
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://qr-menue-one.vercel.app"
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "")
 
 export function QRCodeDisplay({ restaurantSlug, restaurantName }: Props) {
   const menuUrl = `${APP_URL}/menu/${restaurantSlug}`

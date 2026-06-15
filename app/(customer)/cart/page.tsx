@@ -14,11 +14,11 @@ export default function CartPage() {
   if (items.length === 0 || !restaurantName) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen px-4">
-        <div className="w-14 h-14 rounded-2xl bg-[#F5F5F5] flex items-center justify-center mb-4">
+        <div className="w-14 h-14 rounded-2xl bg-[#F9FAFB] flex items-center justify-center mb-4">
           <Store className="w-6 h-6 text-[#999]" />
         </div>
         <p className="font-semibold mb-1">Your cart is empty</p>
-        <p className="text-sm text-[#888] mb-6">Add items from a restaurant menu</p>
+        <p className="text-sm text-[#555] mb-6">Add items from a restaurant menu</p>
         <Link href="/restaurants">
           <Button variant="primary">Browse Restaurants</Button>
         </Link>
@@ -35,9 +35,9 @@ export default function CartPage() {
         <h1 className="text-lg font-semibold">Your Cart</h1>
       </div>
 
-      <div className="px-4 py-3 border-b border-[#F0F0F0] bg-[#FAFAFA]">
+      <div className="px-4 py-3 border-b border-[#F0F0F0] bg-[#F9FAFB]">
         <div className="flex items-center gap-2 text-sm">
-          <Store className="w-4 h-4 text-[#888]" />
+          <Store className="w-4 h-4 text-[#555]" />
           <span className="font-medium">{restaurantName}</span>
         </div>
       </div>
@@ -47,12 +47,12 @@ export default function CartPage() {
           <div key={item.dish.id} className="flex items-center gap-4 py-3 border-b border-[#F0F0F0]">
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium">{item.dish.name_en}</p>
-              <p className="text-sm text-[#888] mt-0.5">{formatPrice(item.dish.price)}</p>
+              <p className="text-sm text-[#555] mt-0.5">{formatPrice(item.dish.price)}</p>
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => updateQuantity(item.dish.id, item.quantity - 1)}
-                className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center hover:bg-[#EEE] transition-colors"
+                className="w-8 h-8 rounded-full bg-[#F9FAFB] flex items-center justify-center hover:bg-[#F0F0F0] transition-colors"
               >
                 <Minus className="w-4 h-4" />
               </button>
@@ -76,7 +76,7 @@ export default function CartPage() {
 
       <div className="fixed bottom-[60px] left-0 right-0 bg-white border-t border-[#F0F0F0] p-4 z-40 md:max-w-app md:mx-auto md:left-[calc(50%-240px)]">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm text-[#888]">{items.reduce((s, i) => s + i.quantity, 0)} items</span>
+          <span className="text-sm text-[#555]">{items.reduce((s, i) => s + i.quantity, 0)} items</span>
           <span className="text-lg font-bold">{formatPrice(getTotalPrice())}</span>
         </div>
         <Link href="/checkout">

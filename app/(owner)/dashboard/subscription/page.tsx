@@ -3,12 +3,11 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { SubscriptionBanner } from "@/components/shared/SubscriptionBanner"
 import { useCompanySettings } from "@/lib/hooks/useCompanySettings"
 import { useSubscription } from "@/lib/hooks/useSubscription"
 import { PLAN_LIMITS, PLAN_NAMES, PLAN_PRICES, type Plan, formatLimit } from "@/lib/subscription"
-import { Check, X, Sparkles, ArrowRight, Clock, ShoppingBag, Image as ImageIcon, Utensils, MessageCircle, Star, XCircle } from "lucide-react"
+import { Check, X, MessageCircle, Clock, ShoppingBag, Image as ImageIcon, Utensils, AlertTriangle, HelpCircle } from "lucide-react"
 
 const planOrder: Plan[] = ["trial", "starter", "growth", "premium"]
 
@@ -18,26 +17,20 @@ export default function SubscriptionPage() {
   const { settings } = useCompanySettings()
   const [mounted, setMounted] = useState(false)
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  useEffect(() => { setMounted(true) }, [])
 
   if (loading) {
     return (
-      <div className="space-y-6 max-w-2xl">
-        <div className="h-8 w-40 bg-[#E8E8E8] rounded animate-pulse" />
-        <div className="h-24 bg-[#E8E8E8] rounded-[14px] animate-pulse" />
-        <div className="h-64 bg-[#E8E8E8] rounded-[14px] animate-pulse" />
+      <div className="space-y-6 max-w-2xl mx-auto">
+        <div className="skeleton h-8 w-40 rounded" />
+        <div className="skeleton h-24 rounded-xl" />
+        <div className="skeleton h-64 rounded-xl" />
       </div>
     )
   }
 
   if (!restaurant) {
-    return (
-      <div className="text-center text-[#999] py-12">
-        No restaurant found.
-      </div>
-    )
+    return <div className="text-center text-[#999] py-12">No restaurant found.</div>
   }
 
   const isSuspended = "is_suspended" in restaurant ? (restaurant as any).is_suspended : false
@@ -57,77 +50,55 @@ export default function SubscriptionPage() {
   const isCurrentPaid = currentPlan !== "trial"
 
   return (
-    <div className="space-y-6 max-w-2xl">
-      <div>
-        <h1 className="text-xl md:text-2xl font-bold">Subscription</h1>
-        <p className="text-sm text-[#555] mt-1">
-          Manage your plan and billing
-        </p>
-      </div>
+    <div className="max-w-2xl mx-auto flex flex-col gap-6">
+      {/* Header */}
+      <section>
+        <h1 className="text-3xl font-bold text-black">Subscription</h1>
+        <p className="text-sm text-[#555] mt-1">Manage your plan and billing</p>
+      </section>
 
+      {/* Suspended Banner */}
       {isSuspended && (
-        <div className="bg-[#FEF3C7] border border-[#D97706]/30 rounded-[14px] p-4 flex items-start gap-3">
-          <div className="w-9 h-9 rounded-full bg-[#D97706] text-white flex items-center justify-center flex-shrink-0">
-            <XCircle className="w-5 h-5" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-[#92400E]">Account Suspended</p>
-            <p className="text-xs text-[#555] mt-1">
-              Your account has been temporarily suspended. Contact support for more information.
-            </p>
+        <div className="bg-gradient-to-r from-amber-50 to-amber-100 border border-amber-200 rounded-xl p-4 flex items-start gap-4 shadow-sm">
+          <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <h4 className="text-sm font-semibold text-amber-900">Subscription Suspended</h4>
+            <p className="text-xs text-amber-800 mt-1">Your account is currently in a restricted state. Please upgrade or renew your plan to continue receiving orders.</p>
           </div>
         </div>
       )}
 
       <SubscriptionBanner restaurant={restaurant} orderCount={orderCount} />
 
-      <div className="bg-white rounded-[14px] border border-[#E8E8E8] p-5">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-[#555]">Current Plan</span>
-          <Badge variant={(restaurant.plan as any) || "trial"} className="capitalize">
-            {PLAN_NAMES[currentPlan]}
-          </Badge>
+      {/* Current Plan Section */}
+      <section className="bg-white border border-[#F0F0F0] rounded-[14px] p-6 shadow-sm">
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-semibold text-[#555] uppercase tracking-wider">Current Plan</span>
+            <span className="bg-black text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">{PLAN_NAMES[currentPlan]}</span>
+          </div>
+          <div className="text-right">
+            <p className="text-sm font-semibold text-black">
+              {currentPlan === "trial" ? `${sub.trialDaysRemaining} days remaining` : sub.status?.daysRemaining ? `Renews in ${sub.status.daysRemaining} days` : "Active"}
+            </p>
+            <p className="text-xs text-[#555]">{currentPlan === "trial" ? "Trial period" : "Billing cycle"}</p>
+          </div>
         </div>
-        <p className="text-xs text-[#555] mb-4">
-          {currentPlan === "trial"
-            ? `${sub.trialDaysRemaining} days remaining in trial`
-            : sub.status?.daysRemaining
-              ? `Renews in ${sub.status.daysRemaining} days`
-              : "Active"}
-        </p>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 border-t border-[#F0F0F0]">
-          <UsageStat
-            icon={<Utensils className="w-3.5 h-3.5" />}
-            label="Dishes"
-            used={sub.dishCount}
-            limit={planLimits.maxDishes}
-          />
-          <UsageStat
-            icon={<ImageIcon className="w-3.5 h-3.5" />}
-            label="Images"
-            used={sub.imageCount}
-            limit={planLimits.maxImages}
-          />
-          <UsageStat
-            icon={<ShoppingBag className="w-3.5 h-3.5" />}
-            label="Orders"
-            used={orderCount}
-            limit={planLimits.maxOrders}
-          />
-          <UsageStat
-            icon={<Utensils className="w-3.5 h-3.5" />}
-            label="Categories"
-            used={sub.categoryCount}
-            limit={planLimits.maxCategories}
-          />
+        {/* Usage Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-[#F0F0F0] pt-6">
+          <UsageMeter icon={<Utensils className="w-3.5 h-3.5" />} label="Dishes" used={sub.dishCount} limit={planLimits.maxDishes} />
+          <UsageMeter icon={<ImageIcon className="w-3.5 h-3.5" />} label="Images" used={sub.imageCount} limit={planLimits.maxImages} />
+          <UsageMeter icon={<ShoppingBag className="w-3.5 h-3.5" />} label="Orders" used={orderCount} limit={planLimits.maxOrders} />
+          <UsageMeter icon={<Utensils className="w-3.5 h-3.5" />} label="Categories" used={sub.categoryCount} limit={planLimits.maxCategories} />
         </div>
-      </div>
+      </section>
 
+      {/* Upgrade Plans */}
       {!isCurrentPaid && (
-        <div>
-          <h2 className="text-lg font-semibold mb-3">Choose Your Plan</h2>
-          <div className="space-y-3">
+        <section className="space-y-4">
+          <h2 className="text-xl font-bold text-black">Upgrade Plans</h2>
+          <div className="flex flex-col gap-4">
             {upgradePlans.map((planKey) => {
               const price = PLAN_PRICES[planKey]
               const limits = PLAN_LIMITS[planKey]
@@ -135,168 +106,116 @@ export default function SubscriptionPage() {
               return (
                 <div
                   key={planKey}
-                  className={`rounded-2xl border p-5 transition-all ${
-                    isHighlight
-                      ? "border-black bg-gradient-to-br from-white to-[#FAFAFA] shadow-sm"
-                      : "border-[#E8E8E8] bg-white"
+                  className={`bg-white border rounded-[14px] p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 ${
+                    isHighlight ? "border-2 border-black shadow-xl relative" : "border-[#F0F0F0]"
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-base">{PLAN_NAMES[planKey]}</h3>
-                      {isHighlight && (
-                        <span className="text-[10px] font-semibold bg-black text-white px-2 py-0.5 rounded-full">
-                          POPULAR
-                        </span>
-                      )}
+                  {isHighlight && (
+                    <div className="absolute -top-3 left-3 md:left-6 bg-black text-white text-[10px] font-bold px-2 md:px-3 py-1 rounded-full uppercase tracking-widest whitespace-nowrap z-10">
+                      MOST POPULAR
                     </div>
-                    <p className="text-lg font-bold">
-                      PKR {price.toLocaleString()}
-                      <span className="text-xs font-normal text-[#555]">/mo</span>
-                    </p>
+                  )}
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold text-black">{PLAN_NAMES[planKey]}</h3>
+                    <p className="text-sm text-[#555] mb-4">{
+                      planKey === "starter" ? "Perfect for small kiosks" :
+                      planKey === "growth" ? "For growing restaurants" :
+                      "Complete enterprise solution"
+                    }</p>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                      <FeatureRow label={`${formatLimit(limits.maxDishes)} dishes`} included />
+                      <FeatureRow label={limits.maxImages === 0 ? "No images" : `${formatLimit(limits.maxImages)} images`} included={limits.maxImages > 0} />
+                      <FeatureRow label={limits.maxOrders === Infinity ? "Unlimited orders" : `${limits.maxOrders} orders/mo`} included />
+                      <FeatureRow label={limits.analytics ? "Analytics dashboard" : "No analytics"} included={limits.analytics} />
+                      <FeatureRow label={limits.customBranding ? "Custom branding" : "No branding"} included={limits.customBranding} />
+                      <FeatureRow label="QR code generation" included />
+                      <FeatureRow label="WhatsApp orders" included />
+                      <FeatureRow label="Priority support" included={planKey !== "starter"} />
+                    </div>
                   </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
-                    <UsageStat
-                      icon={<Utensils className="w-3 h-3" />}
-                      label="Dishes"
-                      used={sub.dishCount}
-                      limit={limits.maxDishes}
-                      compact
-                    />
-                    <UsageStat
-                      icon={<ImageIcon className="w-3 h-3" />}
-                      label="Images"
-                      used={sub.imageCount}
-                      limit={limits.maxImages}
-                      compact
-                    />
-                    <UsageStat
-                      icon={<ShoppingBag className="w-3 h-3" />}
-                      label="Orders"
-                      used={orderCount}
-                      limit={limits.maxOrders}
-                      compact
-                    />
-                    <UsageStat
-                      icon={<Utensils className="w-3 h-3" />}
-                      label="Categories"
-                      used={sub.categoryCount}
-                      limit={limits.maxCategories}
-                      compact
-                    />
+                  <div className="text-right w-full md:w-auto">
+                    <div className="text-3xl font-bold text-black mb-2">PKR {price.toLocaleString()}<span className="text-sm font-normal text-[#555]">/mo</span></div>
+                    <a href={whatsappLink} target="_blank" rel="noopener">
+                      <Button variant={isHighlight ? "accent" : "primary"} fullWidth>
+                        <MessageCircle className="w-4 h-4 mr-1.5" />
+                        Choose {PLAN_NAMES[planKey]} on WhatsApp
+                      </Button>
+                    </a>
                   </div>
-
-                  <div className="space-y-1.5 text-sm mb-4">
-                    <FeatureRow
-                      label={`${formatLimit(limits.maxDishes)} dish${limits.maxDishes === 1 ? "" : "es"}`}
-                      included
-                    />
-                    <FeatureRow
-                      label={
-                        limits.maxImages === 0
-                          ? "No images"
-                          : `${formatLimit(limits.maxImages)} image${limits.maxImages === 1 ? "" : "s"}`
-                      }
-                      included={limits.maxImages > 0}
-                    />
-                    <FeatureRow
-                      label={
-                        limits.maxOrders === Infinity
-                          ? "Unlimited orders"
-                          : `${limits.maxOrders} orders/mo`
-                      }
-                      included
-                    />
-                    <FeatureRow label="QR code generation" included />
-                    <FeatureRow label="WhatsApp orders" included />
-                    <FeatureRow label="Analytics dashboard" included={limits.analytics} />
-                    <FeatureRow label="Custom branding" included={limits.customBranding} />
-                    <FeatureRow label="Priority support" included={planKey !== "starter"} />
-                  </div>
-
-                  <a href={whatsappLink} target="_blank" rel="noopener" className="block">
-                    <Button variant={isHighlight ? "accent" : "primary"} fullWidth>
-                      <MessageCircle className="w-4 h-4 mr-1.5" />
-                      Choose {PLAN_NAMES[planKey]} on WhatsApp
-                    </Button>
-                  </a>
                 </div>
               )
             })}
           </div>
-        </div>
+        </section>
       )}
 
       {isCurrentPaid && (
-        <div className="bg-white rounded-2xl border border-[#E8E8E8] p-5">
-          <h3 className="text-sm font-semibold mb-3">Need to change your plan?</h3>
-          <p className="text-sm text-[#555] mb-4">
-            Contact us on WhatsApp to upgrade, downgrade, or extend your subscription.
-            Your data is preserved when you change plans.
-          </p>
-          <a href={whatsappLink} target="_blank" rel="noopener" className="block">
-            <Button variant="accent" fullWidth>
-              <MessageCircle className="w-4 h-4 mr-1.5" />
-              Contact on WhatsApp
+        <div className="bg-white rounded-xl border border-[#F0F0F0] p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="text-center md:text-left">
+            <h4 className="text-sm font-semibold text-black">Need to change your plan?</h4>
+            <p className="text-sm text-[#555]">Talk to us if you have unique requirements or need a custom plan.</p>
+          </div>
+          <a href={whatsappLink} target="_blank" rel="noopener">
+            <Button variant="accent">
+              <MessageCircle className="w-4 h-4 mr-2" />
+              Contact Support
             </Button>
           </a>
         </div>
       )}
 
-      <div className="bg-[#F8F8F8] rounded-2xl p-5 text-center">
-        <h3 className="text-sm font-semibold mb-3 flex items-center justify-center gap-1.5">
-          <Clock className="w-4 h-4" />
-          How to Pay
+      {/* How to Pay */}
+      <section className="bg-[#F9FAFB] border border-[#F0F0F0] rounded-xl p-8 space-y-6">
+        <h3 className="text-xl font-bold text-black flex items-center gap-2">
+          <Clock className="w-5 h-5" /> How to Pay
         </h3>
-        <div className="space-y-1 text-sm mb-4">
-          <p>JazzCash: {jazzcash} ({accountTitle})</p>
-          <p>Easypaisa: {easypaisa}</p>
-          <p>Bank: {bankName} — {accountNumber}</p>
-        </div>
-        <p className="text-xs text-[#999]">
-          After payment, message us on WhatsApp to activate your plan.
+        <p className="text-sm text-[#555]">
+          We currently accept manual payments via JazzCash, Easypaisa, and direct Bank Transfer. Please send the amount and share the screenshot with our support team.
         </p>
-      </div>
+        <div className="grid md:grid-cols-3 gap-4">
+          <div className="bg-white p-4 rounded-lg border border-[#F0F0F0]">
+            <p className="text-xs text-[#555] mb-1">JazzCash</p>
+            <p className="text-sm font-bold text-black">{jazzcash}</p>
+            <p className="text-[11px] text-[#555]">A/C Title: {accountTitle}</p>
+          </div>
+          <div className="bg-white p-4 rounded-lg border border-[#F0F0F0]">
+            <p className="text-xs text-[#555] mb-1">Easypaisa</p>
+            <p className="text-sm font-bold text-black">{easypaisa}</p>
+            <p className="text-[11px] text-[#555]">A/C Title: {accountTitle}</p>
+          </div>
+          <div className="bg-white p-4 rounded-lg border border-[#F0F0F0]">
+            <p className="text-xs text-[#555] mb-1">Bank Transfer</p>
+            <p className="text-sm font-bold text-black">{accountNumber}</p>
+            <p className="text-[11px] text-[#555]">{bankName}</p>
+          </div>
+        </div>
+        <div className="bg-[#25D366]/5 border border-[#25D366]/10 p-4 rounded-lg flex items-center gap-3">
+          <HelpCircle className="w-5 h-5 text-[#25D366] flex-shrink-0" />
+          <p className="text-sm text-[#555]">After payment, send your proof of receipt to our WhatsApp support for instant activation.</p>
+        </div>
+      </section>
     </div>
   )
 }
 
-function UsageStat({
-  icon,
-  label,
-  used,
-  limit,
-  compact = false,
-}: {
-  icon: React.ReactNode
-  label: string
-  used: number
-  limit: number
-  compact?: boolean
-}) {
+function UsageMeter({ icon, label, used, limit }: { icon: React.ReactNode; label: string; used: number; limit: number }) {
   const isUnlimited = limit === Infinity
   const percent = isUnlimited ? 0 : Math.min(100, (used / limit) * 100)
   const isNear = !isUnlimited && used >= limit
   const isWarning = !isUnlimited && used >= limit * 0.7
 
   return (
-    <div className={`rounded-lg ${compact ? "p-2" : "p-2.5"} bg-[#FAFAFA]`}>
-      <div className={`flex items-center gap-1 ${compact ? "text-[10px]" : "text-xs"} text-[#555] mb-1`}>
+    <div className="space-y-2">
+      <div className="flex items-center gap-1 text-xs text-[#555]">
         {icon}
-        <span className="font-medium">{label}</span>
+        <span>{label}</span>
       </div>
-      <div className={`${compact ? "text-[11px]" : "text-xs"} font-semibold ${isNear ? "text-[#DC2626]" : isWarning ? "text-[#D97706]" : "text-black"}`}>
-        {used} / {isUnlimited ? "∞" : limit}
+      <div className="flex justify-between items-end">
+        <span className="text-xl font-bold text-black">{used} <span className="text-sm font-normal text-[#555]">/ {isUnlimited ? "∞" : limit}</span></span>
       </div>
       {!isUnlimited && (
-        <div className={`mt-1 ${compact ? "h-1" : "h-1.5"} bg-[#E8E8E8] rounded-full overflow-hidden`}>
-          <div
-            className={`h-full rounded-full transition-all ${
-              isNear ? "bg-[#DC2626]" : isWarning ? "bg-[#D97706]" : "bg-black"
-            }`}
-            style={{ width: `${percent}%` }}
-          />
+        <div className="w-full h-1.5 bg-[#EDEEEF] rounded-full overflow-hidden">
+          <div className={`h-full rounded-full transition-all ${isNear ? "bg-[#ba1a1a]" : isWarning ? "bg-[#D97706]" : "bg-black"}`} style={{ width: `${percent}%` }} />
         </div>
       )}
     </div>
@@ -305,13 +224,13 @@ function UsageStat({
 
 function FeatureRow({ label, included }: { label: string; included: boolean }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 text-sm">
       {included ? (
-        <Check className="w-4 h-4 text-[#16A34A] flex-shrink-0" />
+        <Check className="w-4 h-4 text-[#25D366] flex-shrink-0" />
       ) : (
-        <X className="w-4 h-4 text-[#CCC] flex-shrink-0" />
+        <X className="w-4 h-4 text-[#C6C6C6] flex-shrink-0" />
       )}
-      <span className={included ? "" : "text-[#999]"}>{label}</span>
+      <span className={included ? "text-black" : "text-[#999]"}>{label}</span>
     </div>
   )
 }

@@ -4,6 +4,7 @@ import { useRef } from "react"
 import { formatPrice } from "@/lib/utils"
 import { Download, Printer } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
 
 interface Props {
   order: any
@@ -78,9 +79,11 @@ export function OrderReceipt({ order, restaurant }: Props) {
         {/* Restaurant Info */}
         <div className="text-center mb-4">
           {restaurant?.logo_url && (
-            <img
+            <Image
               src={restaurant.logo_url}
               alt={restaurant.name}
+              width={64}
+              height={64}
               className="w-16 h-16 rounded-full object-cover mx-auto mb-2"
             />
           )}

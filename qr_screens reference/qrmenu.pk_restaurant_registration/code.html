@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Register Your Restaurant | QRMenu.pk</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container": "#edeeef",
+                      "inverse-primary": "#3de273",
+                      "primary-fixed-dim": "#3de273",
+                      "tertiary-fixed-dim": "#ffb59b",
+                      "on-secondary-fixed-variant": "#474747",
+                      "on-secondary-fixed": "#1b1b1b",
+                      "surface-container-low": "#f3f4f5",
+                      "error-container": "#ffdad6",
+                      "surface-gray": "#F9FAFB",
+                      "surface-dim": "#d9dadb",
+                      "secondary": "#5e5e5e",
+                      "inverse-on-surface": "#f0f1f2",
+                      "on-primary": "#ffffff",
+                      "secondary-fixed-dim": "#c6c6c6",
+                      "on-primary-fixed": "#002109",
+                      "primary-fixed": "#66ff8e",
+                      "outline-variant": "#bbcbb9",
+                      "surface-container-high": "#e7e8e9",
+                      "on-primary-container": "#005523",
+                      "secondary-fixed": "#e2e2e2",
+                      "surface-bright": "#f8f9fa",
+                      "on-error-container": "#93000a",
+                      "surface-tint": "#006d2f",
+                      "tertiary-fixed": "#ffdbcf",
+                      "surface": "#f8f9fa",
+                      "on-primary-fixed-variant": "#005322",
+                      "border-light": "#F0F0F0",
+                      "deep-black": "#000000",
+                      "secondary-container": "#e2e2e2",
+                      "surface-container-highest": "#e1e3e4",
+                      "on-error": "#ffffff",
+                      "on-tertiary-container": "#78351b",
+                      "on-background": "#191c1d",
+                      "inverse-surface": "#2e3132",
+                      "background": "#f8f9fa",
+                      "tertiary": "#93492e",
+                      "primary": "#006d2f",
+                      "surface-variant": "#e1e3e4",
+                      "on-tertiary": "#ffffff",
+                      "whatsapp-green": "#25D366",
+                      "pure-white": "#FFFFFF",
+                      "on-secondary-container": "#646464",
+                      "on-tertiary-fixed-variant": "#763319",
+                      "tertiary-container": "#ffa07e",
+                      "on-surface-variant": "#3c4a3d",
+                      "on-surface": "#191c1d",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary-fixed": "#380d00",
+                      "text-muted": "#555555",
+                      "error": "#ba1a1a",
+                      "primary-container": "#25d366",
+                      "outline": "#6c7b6b",
+                      "surface-container-lowest": "#ffffff",
+                      "brand-orange": "#FF6B35",
+                      "input-bg": "#F8F8F8",
+                      "input-border": "#E8E8E8"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "10px": "10px",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "unit": "4px",
+                      "margin-desktop": "40px",
+                      "stack-lg": "32px",
+                      "margin-mobile": "16px",
+                      "gutter": "24px",
+                      "stack-sm": "8px",
+                      "stack-md": "16px",
+                      "container-max": "1280px"
+              },
+              "fontFamily": {
+                      "headline-lg": ["Inter", "sans-serif"],
+                      "body-lg": ["Inter", "sans-serif"],
+                      "label-sm": ["Inter", "sans-serif"],
+                      "display-lg": ["Inter", "sans-serif"],
+                      "label-md": ["Inter", "sans-serif"],
+                      "headline-lg-mobile": ["Inter", "sans-serif"],
+                      "body-sm": ["Inter", "sans-serif"],
+                      "body-md": ["Inter", "sans-serif"],
+                      "headline-md": ["Inter", "sans-serif"]
+              },
+              "fontSize": {
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-pure-white text-deep-black min-h-screen flex items-center justify-center p-margin-mobile">
+<!-- Main Registration Container -->
+<main class="w-full max-w-[400px] flex flex-col items-center">
+<!-- Header / Back Navigation -->
+<div class="w-full flex justify-between items-center mb-stack-lg">
+<a class="group flex items-center gap-1 text-text-muted hover:text-deep-black transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+<span class="font-label-md text-label-md">Back</span>
+</a>
+<img alt="QRMenu.pk Logo" class="w-8 h-8 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLuzgzQUwsl1JaCK6hs2mw9uJ-q_TOo7Wijr3FmjM-J24xoFSfZRk139MByJsXwgTZACf_744SXVDklXVCBQLDi9XJubLxQ0IRudNjcD6YvRh8KN86OCDr0Cfzy40dRtl9VybY9nuz7EZz2-AyBa7aQ54TQdzF7GJ-ZpvOKX_CwlEVlXUVcH7l2Me0BSh1xJSCKVWE4JhWdWrahaV6u13lEMPU2NcL_ezozOkVsSf0VEucEduxRnsa5GRhX5"/>
+</div>
+<!-- Identity Section -->
+<div class="flex flex-col items-center text-center mb-stack-lg">
+<div class="w-12 h-12 bg-brand-orange rounded-xl flex items-center justify-center mb-stack-md">
+<span class="material-symbols-outlined text-pure-white text-[24px]" style="font-variation-settings: 'FILL' 1;">store</span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-deep-black mb-1">Register Your Restaurant</h1>
+<p class="font-body-sm text-body-sm text-text-muted">Start your 7-day free trial today</p>
+</div>
+<!-- Registration Form -->
+<form class="w-full space-y-stack-md" onsubmit="return false;">
+<!-- Restaurant Name -->
+<div class="space-y-1.5">
+<label class="block font-label-md text-label-md text-deep-black">Restaurant Name *</label>
+<input class="w-full h-12 px-stack-md bg-input-bg border border-input-border rounded-10px focus:ring-1 focus:ring-deep-black focus:border-deep-black transition-all font-body-md text-body-md outline-none" placeholder="Al-Habib Grill" type="text"/>
+</div>
+<!-- City -->
+<div class="space-y-1.5">
+<label class="block font-label-md text-label-md text-deep-black">City *</label>
+<input class="w-full h-12 px-stack-md bg-input-bg border border-input-border rounded-10px focus:ring-1 focus:ring-deep-black focus:border-deep-black transition-all font-body-md text-body-md outline-none" placeholder="Lahore" type="text"/>
+</div>
+<!-- Phone / WhatsApp -->
+<div class="space-y-1.5">
+<label class="block font-label-md text-label-md text-deep-black">Phone / WhatsApp *</label>
+<input class="w-full h-12 px-stack-md bg-input-bg border border-input-border rounded-10px focus:ring-1 focus:ring-deep-black focus:border-deep-black transition-all font-body-md text-body-md outline-none" placeholder="0300-XXXXXXX" type="tel"/>
+</div>
+<!-- Email -->
+<div class="space-y-1.5">
+<label class="block font-label-md text-label-md text-deep-black">Email *</label>
+<input class="w-full h-12 px-stack-md bg-input-bg border border-input-border rounded-10px focus:ring-1 focus:ring-deep-black focus:border-deep-black transition-all font-body-md text-body-md outline-none" placeholder="owner@restaurant.com" type="email"/>
+</div>
+<!-- Password -->
+<div class="space-y-1.5">
+<label class="block font-label-md text-label-md text-deep-black">Password *</label>
+<input class="w-full h-12 px-stack-md bg-input-bg border border-input-border rounded-10px focus:ring-1 focus:ring-deep-black focus:border-deep-black transition-all font-body-md text-body-md outline-none" placeholder="At least 6 characters" type="password"/>
+</div>
+<!-- Primary CTA -->
+<button class="w-full h-12 bg-deep-black text-pure-white font-label-md text-label-md rounded-10px hover:opacity-90 active:scale-[0.98] transition-all duration-200 mt-2" type="submit">
+                Create Restaurant &amp; Start Trial
+            </button>
+</form>
+<!-- Divider -->
+<div class="w-full flex items-center gap-stack-md my-stack-lg">
+<div class="flex-1 h-[1px] bg-border-light"></div>
+<span class="font-label-sm text-label-sm text-text-muted uppercase tracking-wider">or</span>
+<div class="flex-1 h-[1px] bg-border-light"></div>
+</div>
+<!-- Social Auth -->
+<button class="w-full h-12 border border-input-border rounded-10px flex items-center justify-center gap-3 bg-pure-white hover:bg-surface-container-low transition-colors duration-200 active:scale-[0.98]">
+<svg class="w-5 h-5" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+<span class="font-label-md text-label-md text-deep-black">Continue with Google</span>
+</button>
+<!-- Footer Link -->
+<p class="mt-stack-lg font-body-sm text-body-sm text-text-muted">
+            Already have an account? 
+            <a class="text-brand-orange font-semibold hover:underline" href="#">Sign in</a>
+</p>
+</main>
+<script>
+        // Simple input focus micro-interactions
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.querySelector('label').style.color = '#000000';
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.querySelector('label').style.color = '';
+            });
+        });
+    </script>
+</body></html>

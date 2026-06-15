@@ -1,11 +1,14 @@
-﻿"use client"
+"use client"
 
 import { useCartStore } from "@/stores/cartStore"
 import { ShoppingCart } from "lucide-react"
 import Link from "next/link"
 
 export function CartBar() {
-  const { items, getTotalItems, getTotalPrice, restaurantName } = useCartStore()
+  const items = useCartStore((s) => s.items)
+  const getTotalItems = useCartStore((s) => s.getTotalItems)
+  const getTotalPrice = useCartStore((s) => s.getTotalPrice)
+  const restaurantName = useCartStore((s) => s.restaurantName)
   const totalItems = getTotalItems()
 
   if (totalItems === 0) return null
@@ -21,7 +24,7 @@ export function CartBar() {
             <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
               <ShoppingCart className="w-5 h-5" />
             </div>
-            <span className="absolute -top-1 -right-1 bg-[#FF6B35] text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
+            <span className="absolute -top-1 -right-1 bg-[#25D366] text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
               {totalItems}
             </span>
           </div>

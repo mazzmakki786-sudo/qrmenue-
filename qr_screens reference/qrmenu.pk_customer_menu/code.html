@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ghani Grill &amp; Steaks | SavorBite</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#474747",
+                        "on-primary-fixed": "#002109",
+                        "primary": "#006d2f",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#e7e8e9",
+                        "on-tertiary-fixed": "#380d00",
+                        "surface-gray": "#F9FAFB",
+                        "on-tertiary-fixed-variant": "#763319",
+                        "on-error-container": "#93000a",
+                        "surface-container-low": "#f3f4f5",
+                        "border-light": "#F0F0F0",
+                        "on-primary-container": "#005523",
+                        "on-surface": "#191c1d",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#e1e3e4",
+                        "outline": "#6c7b6b",
+                        "secondary-fixed": "#e2e2e2",
+                        "text-muted": "#555555",
+                        "surface": "#f8f9fa",
+                        "on-primary-fixed-variant": "#005322",
+                        "error": "#ba1a1a",
+                        "on-secondary-container": "#646464",
+                        "inverse-on-surface": "#f0f1f2",
+                        "primary-container": "#25d366",
+                        "tertiary-container": "#ffa07e",
+                        "primary-fixed": "#66ff8e",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb59b",
+                        "outline-variant": "#bbcbb9",
+                        "deep-black": "#000000",
+                        "primary-fixed-dim": "#3de273",
+                        "inverse-primary": "#3de273",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "on-tertiary-container": "#78351b",
+                        "surface-dim": "#d9dadb",
+                        "secondary-fixed-dim": "#c6c6c6",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#ffdbcf",
+                        "on-background": "#191c1d",
+                        "background": "#f8f9fa",
+                        "surface-tint": "#006d2f",
+                        "pure-white": "#FFFFFF",
+                        "whatsapp-green": "#25D366",
+                        "surface-variant": "#e1e3e4",
+                        "inverse-surface": "#2e3132",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface-variant": "#3c4a3d",
+                        "tertiary": "#93492e",
+                        "surface-container": "#edeeef",
+                        "secondary": "#5e5e5e",
+                        "surface-bright": "#f8f9fa",
+                        "secondary-container": "#e2e2e2",
+                        "on-tertiary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1280px",
+                        "stack-sm": "8px",
+                        "unit": "4px",
+                        "gutter": "24px",
+                        "stack-lg": "32px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "40px",
+                        "stack-md": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .glass-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+        }
+        .cart-drawer-transition {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .active-pill {
+            background-color: #000000;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body class="bg-pure-white text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container max-w-[600px] mx-auto min-h-screen pb-32">
+<!-- Top Navigation Bar (Shared Component Strategy) -->
+<header class="fixed top-0 w-full max-w-[600px] z-50 glass-header flex items-center justify-between px-margin-mobile py-stack-sm">
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-headline-md-mobile font-bold text-deep-black">SavorBite</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-deep-black hover:bg-surface-container-low p-2 rounded-full transition-colors" data-icon="translate"></button>
+<button class="material-symbols-outlined text-deep-black hover:bg-surface-container-low p-2 rounded-full transition-colors" data-icon="more_vert"></button>
+</div>
+</header>
+<!-- Hero Section -->
+<div class="pt-16 pb-6 px-margin-mobile">
+<div class="relative w-full h-48 rounded-3xl overflow-hidden mb-6 group">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10"></div>
+<div class="absolute inset-0 bg-gradient-to-br from-tertiary-container/20 to-transparent z-10"></div>
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A wide cinematic shot of a modern rustic steakhouse interior with dim ambient orange lighting, dark wood tables, and a professional grill station in the background. The atmosphere is warm and inviting, emphasizing premium dining quality with a minimalist and sophisticated aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAagE4Ava9P9V9_3HMsZt5-KPVVlWFFUL4iMwtXfiDrPwVx18IEDxVaPXLHCBXNshMwcUiP6RZ5zDJZIHcFqI6aeaIX18sl4SCZQCmOTX5m4mpLy8Ozd6QjhQ5YN9BpkM2TCo2pb0KrVblut8T_WQTOqFg9l5M0VpYmY3YjkS2VXwg7cDQx9vfmdExALHAZ9rFAqMq_wmlqh_b-gqOPOYaWEAw14ycjT32XNB3ClNIPpVgJo1EywAcxUdgSHk_T3-K61Q-DGftCFVTB"/>
+<div class="absolute bottom-4 left-4 z-20 flex items-end gap-4">
+<img class="w-14 h-14 rounded-2xl border-4 border-pure-white shadow-sm object-cover" data-alt="A professional restaurant logo for Ghani Grill &amp; Steaks featuring a stylized flame and cleaver icon, rendered in a clean, minimalist black and gold color palette on a white rounded square background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDp6D-KMUMXc4d8MQRS1HzkppOh7ssILdoahQpOKUbUYPuDkyw7x6ZXIeQXvnOVVatUqpdbQH3o7N00hhk4pUMubytkS2xSKTLk4upUIrH0t1lKeAkWQfo76eLDt9dgn3-AREeG2kQ71JxsvYOA7UpsgmrHKqLuja4BtU1BR1LpyE-_y64olGVey-7MCv5WhBo7Ee5HKz7V02DEoodjW_VU8Cb1WsjSBuJ8-aHYAmQJQRClH0OO6Rl_fU3dofcuHU63Itx6X5efYf3U"/>
+<div>
+<h1 class="text-pure-white font-headline-lg-mobile text-headline-lg-mobile">Ghani Grill &amp; Steaks</h1>
+<div class="flex items-center gap-3 text-pure-white/90 font-label-sm text-label-sm mt-1">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="location_on"></span> Karachi
+                        </span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="schedule"></span> 25-40 min
+                        </span>
+</div>
+</div>
+</div>
+</div>
+<p class="text-secondary font-body-sm text-body-sm leading-relaxed px-1">
+            Authentic Pakistani BBQ meets premium Continental Steaks. Every cut is hand-selected and grilled over natural oak charcoal for that signature smoky flavor.
+        </p>
+</div>
+<!-- Trial Expiration Alert (Conditional) -->
+<div class="mx-margin-mobile mb-6 p-4 bg-tertiary-fixed border border-tertiary-container/30 rounded-2xl flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary" data-icon="warning"></span>
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-tertiary-container">Trial Period Ending</p>
+<p class="text-[12px] text-on-tertiary-container/80">Contact administration for uninterrupted service.</p>
+</div>
+</div>
+<!-- Sticky Search & Filter -->
+<div class="sticky top-14 z-40 bg-pure-white/90 backdrop-blur-md py-4 px-margin-mobile">
+<div class="flex gap-3">
+<div class="relative flex-1 group">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-secondary group-focus-within:text-deep-black transition-colors" data-icon="search"></span>
+<input class="w-full bg-surface-gray border border-border-light rounded-xl py-3 pl-12 pr-4 font-body-sm text-body-sm focus:outline-none focus:border-deep-black transition-all" placeholder="Search for steaks, sides..." type="text"/>
+</div>
+<button class="bg-surface-gray border border-border-light px-4 rounded-xl flex items-center gap-2 hover:bg-surface-container-low transition-colors">
+<span class="font-label-md text-label-md text-deep-black">EN</span>
+<span class="w-[1px] h-4 bg-border-light"></span>
+<span class="font-label-md text-label-md text-secondary">اردو</span>
+</button>
+</div>
+<!-- Category Tabs -->
+<div class="flex gap-2 overflow-x-auto no-scrollbar pt-6 pb-2">
+<button class="flex-shrink-0 active-pill px-6 py-2 rounded-full font-label-md text-label-md">All</button>
+<button class="flex-shrink-0 bg-surface-gray text-secondary px-6 py-2 rounded-full font-label-md text-label-md hover:bg-surface-container-low flex items-center gap-2">
+                Steaks <span class="text-[10px] bg-border-light px-1.5 rounded-full">12</span>
+</button>
+<button class="flex-shrink-0 bg-surface-gray text-secondary px-6 py-2 rounded-full font-label-md text-label-md hover:bg-surface-container-low flex items-center gap-2">
+                Sides <span class="text-[10px] bg-border-light px-1.5 rounded-full">8</span>
+</button>
+<button class="flex-shrink-0 bg-surface-gray text-secondary px-6 py-2 rounded-full font-label-md text-label-md hover:bg-surface-container-low flex items-center gap-2">
+                Drinks <span class="text-[10px] bg-border-light px-1.5 rounded-full">5</span>
+</button>
+<button class="flex-shrink-0 bg-surface-gray text-secondary px-6 py-2 rounded-full font-label-md text-label-md hover:bg-surface-container-low flex items-center gap-2">
+                Desserts <span class="text-[10px] bg-border-light px-1.5 rounded-full">4</span>
+</button>
+</div>
+</div>
+<!-- Dish Grid -->
+<main class="px-margin-mobile space-y-10 mt-4">
+<!-- Category Section: Steaks -->
+<section id="steaks">
+<h2 class="font-headline-md text-headline-md mb-6 border-l-4 border-deep-black pl-3">Signature Steaks</h2>
+<div class="space-y-4">
+<!-- Card 1 -->
+<div class="group flex gap-4 p-4 bg-surface-gray rounded-2xl hover:bg-pure-white hover:shadow-lg transition-all duration-300 border border-transparent hover:border-border-light">
+<div class="relative w-24 h-24 flex-shrink-0 overflow-hidden rounded-xl">
+<img class="w-full h-full object-cover" data-alt="A top-down close-up shot of a perfectly seared Ribeye Steak resting on a black ceramic plate with a sprig of rosemary. The steak has deep char marks and is glistening with butter. High-contrast lighting highlights the texture of the meat against the minimalist dark plate." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvz6OdG6-xkJCrj0bKF8JEOJXpad7NAaYHaTvnA0GS46Nq6bMivhWxBfDfwwyknMePhmej5qYLPvPB-oR8-GIwx-5mtrakUSC1N9bithYcG95_oupz3q0d_PONNVo1OD_Q2swFKwYOXKD-W1jyuV83dvtbnt5HWMKVPCo7c_MT5TfUoTGcvf_mkKS2foYzAqT4vLGVSxV1TFW0O3OxGRltdMe4bmViy6fsOyIwqxQ3_2Tip0FG9Ju3ucL1gQaE1PWS-ZrTebfyB1cc"/>
+<div class="absolute top-1 right-1 bg-primary text-pure-white text-[10px] px-2 py-0.5 rounded-full font-bold">Popular</div>
+</div>
+<div class="flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-label-md text-label-md text-deep-black">Ribeye Steak | ریب آئی</h3>
+<span class="font-label-md text-label-md text-deep-black">PKR 2,450</span>
+</div>
+<p class="text-secondary font-body-sm text-body-sm line-clamp-2 mb-3">Prime cut ribeye grilled with garlic butter and signature herbs. Served with mash.</p>
+<div class="mt-auto flex justify-between items-center">
+<div class="flex gap-2">
+<span class="material-symbols-outlined text-tertiary text-lg" data-icon="local_fire_department"></span>
+<span class="text-[12px] text-text-muted">Continental</span>
+</div>
+<button class="bg-deep-black text-pure-white px-4 py-1.5 rounded-full font-label-md text-label-sm active:scale-95 transition-all" onclick="toggleCart()">+ Add</button>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group flex gap-4 p-4 bg-surface-gray rounded-2xl hover:bg-pure-white hover:shadow-lg transition-all duration-300 border border-transparent hover:border-border-light">
+<div class="relative w-24 h-24 flex-shrink-0 overflow-hidden rounded-xl">
+<img class="w-full h-full object-cover" data-alt="Glistening beef tenderloin steaks sizzling on an open charcoal grill. Glowing embers are visible beneath the grill bars, and light wisps of smoke rise. The lighting is dramatic and moody, emphasizing the authentic outdoor grilling process." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdyv72kgHpzymD2loo3SvsMohCfzovAP-7V5GC3Lc6WwGvU9mN6YjgDHmTGukYgng36bBsAwWNDNmDbfUXdvHb9xVOphTILxgTyPREneyD6qdAPLrP9ojlX3ezGlXnBefk-e2JwOm5BkWVDEhxnPYQSavjM-RkZlTl-n_CRjVzbNnaFD-6khsJ-n7osvw2pgGu7D0WHG5uVt-ICiC1i5iF9857r3zFErYIdweAMGZn_N0vnhhsviZ2Y2DskfHTyGSDqc_MWSDA7v21"/>
+</div>
+<div class="flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-label-md text-label-md text-deep-black">Tenderloin | ٹینڈرلوئن</h3>
+<span class="font-label-md text-label-md text-deep-black">PKR 2,850</span>
+</div>
+<p class="text-secondary font-body-sm text-body-sm line-clamp-2 mb-3">The leanest, most tender cut of beef, slow-seared to your preference.</p>
+<div class="mt-auto flex justify-between items-center">
+<div class="flex gap-2">
+<span class="text-[12px] text-text-muted">Continental</span>
+</div>
+<button class="bg-deep-black text-pure-white px-4 py-1.5 rounded-full font-label-md text-label-sm active:scale-95 transition-all" onclick="toggleCart()">+ Add</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Category Section: Sides -->
+<section id="sides">
+<h2 class="font-headline-md text-headline-md mb-6 border-l-4 border-deep-black pl-3">Sides</h2>
+<div class="grid grid-cols-1 gap-4">
+<!-- Side 1 -->
+<div class="group flex gap-4 p-4 bg-surface-gray rounded-2xl border border-transparent hover:border-border-light transition-all">
+<div class="w-24 h-24 flex-shrink-0 overflow-hidden rounded-xl">
+<img class="w-full h-full object-cover" data-alt="A rustic wooden bowl filled with golden-brown, crispy French fries sprinkled with sea salt and fresh parsley. The lighting is bright and clean, creating a fresh and appetizing look against a light grey surface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpX0U4PvSkDOeTkPROvJDj1OHr5y4y7kHceg3DXJapBGLn_VwIbOvrzD_OOhY-CUsBR4pI2Jl4kR9vE1E9ZaFmOdHyd42fssbtrm0ID6R5xnBHFmjfAYVakC5DdNBMjzfTm0HNB94dqZEb1bpRZlAh5jifPfVTUZFDVKoUwsDVRaqoZ9z5lPaWhkV-ejDVZaKKuwSVoKp_8XaNY23V01htRa6flwf87f9rG31TDiOesB2GJBzfQHZEH8GEnn2_JJvkN-aO_Z2VWaKu"/>
+</div>
+<div class="flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-label-md text-label-md text-deep-black">Masala Fries | مصالحہ فرائز</h3>
+<span class="font-label-md text-label-md text-deep-black">PKR 450</span>
+</div>
+<p class="text-secondary font-body-sm text-body-sm line-clamp-2 mb-3">Crispy hand-cut potatoes tossed in our secret spice blend.</p>
+<div class="mt-auto flex justify-end">
+<button class="bg-deep-black text-pure-white px-4 py-1.5 rounded-full font-label-md text-label-sm active:scale-95 transition-all" onclick="toggleCart()">+ Add</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Empty Search State Placeholder (Hidden by default) -->
+<div class="hidden flex flex-col items-center justify-center py-20 text-center" id="empty-state">
+<span class="material-symbols-outlined text-surface-container-highest text-6xl mb-4" data-icon="no_food"></span>
+<h4 class="font-headline-md text-headline-md text-deep-black">No results found</h4>
+<p class="text-secondary font-body-sm text-body-sm mt-2">Try searching for something else or browse categories.</p>
+</div>
+</main>
+<!-- Bottom Cart Bar (Floating Component) -->
+<div class="fixed bottom-6 left-margin-mobile right-margin-mobile z-[60] transform translate-y-0 opacity-100 transition-all duration-500" id="cart-bar">
+<button class="w-full bg-deep-black text-pure-white p-4 rounded-2xl shadow-xl flex items-center justify-between group active:scale-[0.98] transition-transform" onclick="toggleDrawer()">
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined" data-icon="shopping_basket"></span>
+<span class="absolute -top-2 -right-2 bg-tertiary-container text-on-tertiary-container text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-deep-black">1</span>
+</div>
+<div class="text-left">
+<p class="font-label-sm text-label-sm opacity-70 uppercase tracking-widest">View Cart</p>
+<p class="font-headline-md text-headline-md leading-none">PKR 2,450</p>
+</div>
+</div>
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform" data-icon="arrow_forward"></span>
+</button>
+</div>
+<!-- Cart Drawer Bottom Sheet -->
+<div class="fixed inset-0 bg-deep-black/40 backdrop-blur-sm z-[70] hidden opacity-0 transition-opacity duration-300" id="drawer-overlay" onclick="toggleDrawer()"></div>
+<div class="fixed bottom-0 left-0 right-0 max-w-[600px] mx-auto bg-pure-white rounded-t-3xl z-[80] transform translate-y-full cart-drawer-transition shadow-2xl" id="cart-drawer">
+<div class="w-12 h-1.5 bg-surface-container-highest rounded-full mx-auto mt-4 mb-6"></div>
+<div class="px-margin-mobile pb-margin-mobile">
+<div class="flex justify-between items-center mb-8">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-deep-black">Your Order</h2>
+<button class="material-symbols-outlined text-secondary" data-icon="close" onclick="toggleDrawer()"></button>
+</div>
+<!-- Cart Items List -->
+<div class="space-y-6 max-h-[512px] overflow-y-auto no-scrollbar mb-8">
+<div class="flex items-center justify-between">
+<div class="flex gap-4">
+<div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Small thumbnail of the ribeye steak." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYlkWx8jymtAERCtOoyfoIX-47HnrufeYIIsWQO1MUfRL9m4jKMPc_AOzrbOeYM9VZXbOFboSZYuWP7h8dXsptfgpcxsua33ZRr6lJ207pdrKt6pgO9nYJUPKczga6oIb34rmnFXu6gHfjbjo3Vy_afOLcfQtzNuv5V5D2xA_2jjhoIZWryZiehXjvQYs3uXgQRTyixn-RTh4vZVDl66YEJn7kZCUt-GSb4XgIhdveYePhkvqoDs11oJSLGVTTKxMUgqySLcKMa8TE"/>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-deep-black">Ribeye Steak</h4>
+<p class="text-secondary text-[12px]">Medium Rare, Mash</p>
+<p class="font-bold text-deep-black mt-1">PKR 2,450</p>
+</div>
+</div>
+<div class="flex items-center gap-3 bg-surface-gray px-3 py-1.5 rounded-full">
+<button class="material-symbols-outlined text-[20px]" data-icon="remove"></button>
+<span class="font-bold">1</span>
+<button class="material-symbols-outlined text-[20px]" data-icon="add"></button>
+</div>
+</div>
+</div>
+<!-- Totals -->
+<div class="border-t border-border-light pt-6 space-y-3 mb-8">
+<div class="flex justify-between text-secondary font-body-sm">
+<span>Subtotal</span>
+<span>PKR 2,450</span>
+</div>
+<div class="flex justify-between text-secondary font-body-sm">
+<span>Service Fee</span>
+<span>PKR 150</span>
+</div>
+<div class="flex justify-between text-deep-black font-bold text-lg pt-2">
+<span>Total</span>
+<span>PKR 2,600</span>
+</div>
+</div>
+<!-- Checkout Button -->
+<button class="w-full bg-tertiary-container text-on-tertiary-container py-4 rounded-2xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-all shadow-md">
+                Proceed to Checkout
+                <span class="material-symbols-outlined" data-icon="shopping_cart_checkout"></span>
+</button>
+</div>
+</div>
+<!-- Scripting for UI Interactions -->
+<script>
+        function toggleCart() {
+            const bar = document.getElementById('cart-bar');
+            bar.classList.remove('translate-y-20', 'opacity-0');
+        }
+
+        function toggleDrawer() {
+            const drawer = document.getElementById('cart-drawer');
+            const overlay = document.getElementById('drawer-overlay');
+            
+            if (drawer.classList.contains('translate-y-full')) {
+                drawer.classList.remove('translate-y-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+                document.body.style.overflow = 'hidden';
+            } else {
+                drawer.classList.add('translate-y-full');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Active State Tab Logic
+        const tabs = document.querySelectorAll('.flex-shrink-0.px-6');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active-pill', 'bg-surface-gray', 'text-secondary'));
+                tabs.forEach(t => {
+                    if (t !== tab) {
+                        t.classList.add('bg-surface-gray', 'text-secondary');
+                    }
+                });
+                tab.classList.add('active-pill');
+                tab.classList.remove('bg-surface-gray', 'text-secondary');
+            });
+        });
+
+        // Initialize scroll reveal for bottom bar
+        window.addEventListener('load', () => {
+            // Check if cart is empty to decide initial state of cart-bar
+            // For demo, we keep it visible as items are presumed added
+        });
+    </script>
+</body></html>

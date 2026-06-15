@@ -23,7 +23,7 @@ export function DeliveryForm({ name, phone, address, onNameChange, onPhoneChange
           value={address}
           onChange={(e) => onAddressChange(e.target.value)}
           placeholder="House #, Street, Area, City"
-          className="flex h-24 w-full rounded-[10px] bg-[#F8F8F8] border border-[#E8E8E8] px-4 py-3 text-base placeholder:text-[#999] focus:outline-none focus:border-black transition-colors resize-none"
+          className="flex h-24 w-full rounded-[10px] bg-[#F9FAFB] border border-[#F0F0F0] px-4 py-3 text-base placeholder:text-[#999] focus:outline-none focus:border-black transition-colors resize-none"
         />
       </div>
     </div>

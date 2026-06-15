@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import {
   Dialog,
@@ -11,6 +11,7 @@ import { DishBadges } from "./DishBadges"
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import Image from "next/image"
 
 interface Props {
   open: boolean
@@ -18,7 +19,11 @@ interface Props {
 }
 
 export function CartDrawer({ open, onOpenChange }: Props) {
-  const { items, getTotalPrice, updateQuantity, removeItem, restaurantName } = useCartStore()
+  const items = useCartStore((s) => s.items)
+  const getTotalPrice = useCartStore((s) => s.getTotalPrice)
+  const updateQuantity = useCartStore((s) => s.updateQuantity)
+  const removeItem = useCartStore((s) => s.removeItem)
+  const restaurantName = useCartStore((s) => s.restaurantName)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -31,10 +36,10 @@ export function CartDrawer({ open, onOpenChange }: Props) {
 
         {items.length === 0 ? (
           <div className="text-center py-12">
-            <div className="w-12 h-12 rounded-xl bg-[#F8F8F8] flex items-center justify-center mx-auto mb-3">
+            <div className="w-12 h-12 rounded-xl bg-[#F9FAFB] flex items-center justify-center mx-auto mb-3">
               <ShoppingBag className="w-6 h-6 text-[#999]" />
             </div>
-            <p className="text-sm text-[#999]">Your cart is empty</p>
+            <p className="text-sm text-[#555]">Your cart is empty</p>
           </div>
         ) : (
           <>
@@ -43,10 +48,11 @@ export function CartDrawer({ open, onOpenChange }: Props) {
                 <div key={item.dish.id} className="flex items-center gap-3 py-3 border-b border-[#F0F0F0]">
                   {item.dish.image_url && (
                     <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 relative">
-                      <img
+                      <Image
                         src={item.dish.image_url}
                         alt={item.dish.name_en}
-                        loading="lazy"
+                        width={48}
+                        height={48}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -59,7 +65,7 @@ export function CartDrawer({ open, onOpenChange }: Props) {
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={() => updateQuantity(item.dish.id, item.quantity - 1)}
-                      className="w-7 h-7 rounded-full bg-[#F8F8F8] flex items-center justify-center hover:bg-[#F0F0F0] transition-colors"
+                      className="w-7 h-7 rounded-full bg-[#F9FAFB] flex items-center justify-center hover:bg-[#F0F0F0] transition-colors"
                     >
                       <Minus className="w-3.5 h-3.5" />
                     </button>
@@ -82,13 +88,13 @@ export function CartDrawer({ open, onOpenChange }: Props) {
             </div>
 
             {restaurantName && (
-              <p className="text-xs text-[#999] text-center mt-2">{restaurantName}</p>
+              <p className="text-xs text-[#555] text-center mt-2">{restaurantName}</p>
             )}
 
             <div className="flex items-center justify-between pt-4 border-t border-[#F0F0F0] mt-4">
               <div>
                 <span className="text-lg font-bold">Rs {getTotalPrice().toLocaleString("en-PK")}</span>
-                <p className="text-xs text-[#999]">Total</p>
+                <p className="text-xs text-[#555]">Total</p>
               </div>
               <Link href="/checkout" onClick={() => onOpenChange(false)}>
                 <Button variant="accent">Proceed to Checkout</Button>

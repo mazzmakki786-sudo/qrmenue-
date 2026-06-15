@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { z } from "zod"
 import { PLAN_LIMITS, type Plan } from "@/lib/subscription"
+import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 
 const dishSchema = z.object({
   name_en: z.string().min(1, "Name is required"),
@@ -15,6 +16,12 @@ const dishSchema = z.object({
 })
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request)
+  const allowed = await rateLimit(ip, 20, 60)
+  if (!allowed) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 })
+  }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -23,16 +30,22 @@ export async function POST(request: Request) {
     .from("restaurants")
     .select("id, plan, is_active, is_suspended")
     .eq("owner_id", user.id)
-    .single()
+    .maybeSingle()
 
   if (!restaurant) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
   if (!restaurant.is_active) return NextResponse.json({ error: "Restaurant is not active" }, { status: 403 })
   if (restaurant.is_suspended) return NextResponse.json({ error: "Restaurant is suspended" }, { status: 403 })
 
   const plan = restaurant.plan as Plan
-  const limits = PLAN_LIMITS[plan]
+  const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.trial
 
-  const body = await request.json()
+  let body: any
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 })
+  }
+
   const parsed = dishSchema.safeParse(body)
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten().fieldErrors }, { status: 400 })
@@ -98,6 +111,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 400 })
   }
 
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+  fetch(`${origin}/api/notifications/new-dish`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ restaurant_id: restaurant.id, dish_id: data.id }),
+  }).catch((e) => console.error("New dish notification error:", e))
+
   return NextResponse.json({ dish: data })
 }
 
@@ -110,14 +130,20 @@ export async function PATCH(request: Request) {
     .from("restaurants")
     .select("id, plan")
     .eq("owner_id", user.id)
-    .single()
+    .maybeSingle()
 
   if (!restaurant) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
 
   const plan = restaurant.plan as Plan
-  const limits = PLAN_LIMITS[plan]
+  const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.trial
 
-  const body = await request.json()
+  let body: any
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 })
+  }
+
   const { id, ...updateData } = body
 
   if (!id) return NextResponse.json({ error: "Dish id required" }, { status: 400 })

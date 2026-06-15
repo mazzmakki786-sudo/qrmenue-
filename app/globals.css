@@ -7,8 +7,8 @@
 :root {
   --color-primary: #000000;
   --color-primary-hover: #1A1A1A;
-  --color-accent: #FF6B35;
-  --color-accent-hover: #E55A25;
+  --color-accent: #25D366;
+  --color-accent-hover: #1ba94a;
   --color-bg: #FFFFFF;
   --color-bg-muted: #F8F8F8;
   --color-bg-subtle: #F2F2F2;
@@ -64,10 +64,12 @@ img {
 }
 
 /* Scrollbar styles */
-.scrollbar-none::-webkit-scrollbar {
+.scrollbar-none::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar {
   display: none;
 }
-.scrollbar-none {
+.scrollbar-none,
+.no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }

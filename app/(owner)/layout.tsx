@@ -7,6 +7,7 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { BellNotification } from "@/components/owner/BellNotification"
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary"
+import Head from "next/head"
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -46,8 +47,11 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F8F8]">
-      <header className="hidden md:flex items-center justify-between h-16 px-6 bg-white border-b border-[#F0F0F0] sticky top-0 z-40">
+    <div className="min-h-screen bg-[#F9FAFB]">
+      <Head>
+        <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+      </Head>
+      <header className="hidden md:flex items-center justify-between h-16 px-6 bg-white/80 backdrop-blur-md border-b border-[#F0F0F0] sticky top-0 z-30">
         <div className="flex items-center gap-6 lg:gap-8">
           <Link href="/dashboard" className="font-bold text-lg tracking-tight flex-shrink-0">
             QRMenu.pk
@@ -83,7 +87,7 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
       </header>
 
       <div
-        className="md:hidden flex items-center justify-between h-14 px-4 bg-white border-b border-[#F0F0F0] sticky top-0 z-40"
+        className="md:hidden flex items-center justify-between h-14 px-4 bg-white/80 backdrop-blur-md border-b border-[#F0F0F0] sticky top-0 z-30"
         style={{ paddingTop: "env(safe-area-inset-top)", height: "calc(56px + env(safe-area-inset-top))" }}
       >
         <button onClick={() => setMobileOpen(true)} className="p-2 -ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center">

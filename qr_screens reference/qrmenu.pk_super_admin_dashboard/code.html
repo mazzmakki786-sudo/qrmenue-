@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Super Admin Dashboard | QRMenu.pk</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline-variant": "#bbcbb9",
+                    "on-secondary-fixed-variant": "#474747",
+                    "pure-white": "#FFFFFF",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-container": "#78351b",
+                    "on-background": "#191c1d",
+                    "on-tertiary": "#ffffff",
+                    "on-surface-variant": "#3c4a3d",
+                    "surface-container-lowest": "#ffffff",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed": "#ffdbcf",
+                    "deep-black": "#000000",
+                    "surface-container": "#edeeef",
+                    "surface-container-low": "#f3f4f5",
+                    "surface": "#f8f9fa",
+                    "secondary-fixed-dim": "#c6c6c6",
+                    "on-tertiary-fixed-variant": "#763319",
+                    "text-muted": "#555555",
+                    "on-primary-fixed": "#002109",
+                    "surface-bright": "#f8f9fa",
+                    "on-secondary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "secondary-fixed": "#e2e2e2",
+                    "on-primary-container": "#005523",
+                    "secondary": "#5e5e5e",
+                    "inverse-surface": "#2e3132",
+                    "tertiary-container": "#ffa07e",
+                    "error-container": "#ffdad6",
+                    "primary-fixed": "#66ff8e",
+                    "on-secondary-fixed": "#1b1b1b",
+                    "on-secondary-container": "#646464",
+                    "surface-tint": "#006d2f",
+                    "surface-variant": "#e1e3e4",
+                    "inverse-on-surface": "#f0f1f2",
+                    "primary": "#006d2f",
+                    "on-surface": "#191c1d",
+                    "on-tertiary-fixed": "#380d00",
+                    "background": "#f8f9fa",
+                    "surface-gray": "#F9FAFB",
+                    "on-primary-fixed-variant": "#005322",
+                    "secondary-container": "#e2e2e2",
+                    "primary-container": "#25d366",
+                    "on-error-container": "#93000a",
+                    "border-light": "#F0F0F0",
+                    "outline": "#6c7b6b",
+                    "tertiary-fixed-dim": "#ffb59b",
+                    "whatsapp-green": "#25D366",
+                    "surface-dim": "#d9dadb",
+                    "surface-container-high": "#e7e8e9",
+                    "primary-fixed-dim": "#3de273",
+                    "surface-container-highest": "#e1e3e4",
+                    "inverse-primary": "#3de273",
+                    "tertiary": "#93492e"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-sm": "8px",
+                    "unit": "4px",
+                    "margin-desktop": "40px",
+                    "stack-md": "16px",
+                    "margin-mobile": "16px",
+                    "container-max": "1280px",
+                    "stack-lg": "32px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "label-md": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8F8F8; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+        .glass-header { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .tab-active { border-bottom: 2px solid #000000; color: #000000 !important; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+    </style>
+</head>
+<body class="text-on-background antialiased">
+<!-- Top Navigation Bar -->
+<header class="glass-header bg-pure-white/80 fixed top-0 left-0 w-full z-50 border-b border-border-light">
+<div class="max-w-6xl mx-auto px-margin-desktop h-20 flex justify-between items-center">
+<div class="flex items-center gap-4">
+<h1 class="font-display-lg text-headline-md font-black text-deep-black">Super Admin</h1>
+<span class="h-6 w-[1px] bg-border-light"></span>
+<p class="font-label-md text-text-muted" id="live-timestamp">Oct 24, 2024 • 10:30 AM</p>
+</div>
+<div class="flex items-center gap-stack-lg">
+<button class="font-label-md text-deep-black hover:opacity-70 transition-opacity flex items-center gap-2">
+<span class="material-symbols-outlined">schedule</span>
+                    Activity Log
+                </button>
+<a class="font-label-md text-error font-bold hover:underline" href="#">Sign Out</a>
+</div>
+</div>
+</header>
+<!-- Main Content Wrapper -->
+<main class="pt-24 pb-stack-lg max-w-6xl mx-auto px-margin-desktop min-h-screen">
+<!-- Horizontal Tab Navigation -->
+<nav class="flex items-center gap-stack-lg mb-stack-lg overflow-x-auto pb-2 scrollbar-hide border-b border-border-light">
+<button class="tab-link active py-stack-md flex items-center gap-2 font-label-md text-text-muted hover:text-deep-black transition-all tab-active" id="tab-restaurants" onclick="switchTab('restaurants')">
+<span class="material-symbols-outlined">storefront</span>
+<span>Restaurants</span>
+</button>
+<button class="tab-link py-stack-md flex items-center gap-2 font-label-md text-text-muted hover:text-deep-black transition-all" id="tab-customers" onclick="switchTab('customers')">
+<span class="material-symbols-outlined">group</span>
+<span>Customers</span>
+</button>
+<button class="tab-link py-stack-md flex items-center gap-2 font-label-md text-text-muted hover:text-deep-black transition-all" id="tab-analytics" onclick="switchTab('analytics')">
+<span class="material-symbols-outlined">analytics</span>
+<span>Analytics</span>
+</button>
+<button class="tab-link py-stack-md flex items-center gap-2 font-label-md text-text-muted hover:text-deep-black transition-all" id="tab-announcements" onclick="switchTab('announcements')">
+<span class="material-symbols-outlined">campaign</span>
+<span>Announcements</span>
+</button>
+<button class="tab-link py-stack-md flex items-center gap-2 font-label-md text-text-muted hover:text-deep-black transition-all" id="tab-settings" onclick="switchTab('settings')">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</button>
+</nav>
+<!-- Tab: Restaurants -->
+<section class="tab-content block space-y-stack-md" id="content-restaurants">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-stack-md">
+<div class="relative w-full md:w-96">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-pure-white border border-border-light rounded-xl focus:ring-1 focus:ring-deep-black focus:border-deep-black outline-none transition-all font-body-sm" placeholder="Search by name, owner or city..." type="text"/>
+</div>
+<div class="flex gap-2">
+<button class="bg-deep-black text-pure-white px-6 py-2 rounded-xl font-label-md hover:bg-opacity-90 transition-all">Add Restaurant</button>
+</div>
+</div>
+<div class="bg-pure-white rounded-xl overflow-hidden border border-border-light">
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-gray border-b border-border-light">
+<th class="px-6 py-4 font-label-md text-text-muted uppercase tracking-wider">Name</th>
+<th class="px-6 py-4 font-label-md text-text-muted uppercase tracking-wider">Owner</th>
+<th class="px-6 py-4 font-label-md text-text-muted uppercase tracking-wider">City</th>
+<th class="px-6 py-4 font-label-md text-text-muted uppercase tracking-wider">Plan</th>
+<th class="px-6 py-4 font-label-md text-text-muted uppercase tracking-wider text-center">Status</th>
+<th class="px-6 py-4 font-label-md text-text-muted uppercase tracking-wider">Orders (7d/30d)</th>
+<th class="px-6 py-4 font-label-md text-text-muted uppercase tracking-wider">Revenue</th>
+<th class="px-6 py-4 font-label-md text-text-muted uppercase tracking-wider">Joined Date</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-light">
+<tr class="hover:bg-surface-gray/50 transition-colors">
+<td class="px-6 py-4 font-headline-md text-body-md text-deep-black">The Burger House</td>
+<td class="px-6 py-4 font-body-sm text-text-muted">Hamza Ahmed</td>
+<td class="px-6 py-4 font-body-sm text-text-muted">Lahore</td>
+<td class="px-6 py-4">
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase">Premium</span>
+</td>
+<td class="px-6 py-4 text-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-secondary-fixed rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</td>
+<td class="px-6 py-4 font-body-sm text-deep-black">124 / 482</td>
+<td class="px-6 py-4 font-body-sm font-bold text-deep-black">PKR 450k</td>
+<td class="px-6 py-4 font-body-sm text-text-muted">Oct 12, 2024</td>
+</tr>
+<tr class="hover:bg-surface-gray/50 transition-colors">
+<td class="px-6 py-4 font-headline-md text-body-md text-deep-black">Pizza Delight</td>
+<td class="px-6 py-4 font-body-sm text-text-muted">Sarah Khan</td>
+<td class="px-6 py-4 font-body-sm text-text-muted">Karachi</td>
+<td class="px-6 py-4">
+<span class="bg-secondary-fixed text-text-muted px-3 py-1 rounded-full text-xs font-bold uppercase">Basic</span>
+</td>
+<td class="px-6 py-4 text-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-secondary-fixed rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</td>
+<td class="px-6 py-4 font-body-sm text-deep-black">89 / 312</td>
+<td class="px-6 py-4 font-body-sm font-bold text-deep-black">PKR 210k</td>
+<td class="px-6 py-4 font-body-sm text-text-muted">Sep 28, 2024</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- Tab: Customers -->
+<section class="tab-content hidden space-y-stack-md" id="content-customers">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<div class="bg-pure-white p-stack-lg rounded-xl border border-border-light">
+<p class="font-label-md text-text-muted mb-2">Total Customers</p>
+<h3 class="font-display-lg text-headline-lg text-deep-black">12,842</h3>
+</div>
+<div class="bg-pure-white p-stack-lg rounded-xl border border-border-light">
+<p class="font-label-md text-text-muted mb-2">Active (30d)</p>
+<h3 class="font-display-lg text-headline-lg text-primary">8,210</h3>
+</div>
+<div class="bg-pure-white p-stack-lg rounded-xl border border-border-light">
+<p class="font-label-md text-text-muted mb-2">Total Spent</p>
+<h3 class="font-display-lg text-headline-lg text-deep-black">PKR 14.2M</h3>
+</div>
+</div>
+<div class="flex items-center gap-4 mb-stack-md">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">search</span>
+<input class="w-full pl-10 pr-4 py-3 bg-pure-white border border-border-light rounded-xl focus:ring-1 focus:ring-deep-black focus:border-deep-black outline-none font-body-sm" placeholder="Search customer name or phone..." type="text"/>
+</div>
+</div>
+<div class="bg-pure-white rounded-xl border border-border-light overflow-hidden">
+<table class="w-full text-left">
+<thead class="bg-surface-gray border-b border-border-light">
+<tr>
+<th class="px-6 py-4 font-label-md text-text-muted">Customer Name</th>
+<th class="px-6 py-4 font-label-md text-text-muted">Phone Number</th>
+<th class="px-6 py-4 font-label-md text-text-muted">Last Active</th>
+<th class="px-6 py-4 font-label-md text-text-muted">Total Orders</th>
+<th class="px-6 py-4 font-label-md text-text-muted">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-light">
+<tr>
+<td class="px-6 py-4 font-body-md">Ali Hassan</td>
+<td class="px-6 py-4 font-body-sm text-text-muted">+92 300 1234567</td>
+<td class="px-6 py-4 font-body-sm text-text-muted">2 hours ago</td>
+<td class="px-6 py-4 font-body-sm">45</td>
+<td class="px-6 py-4">
+<span class="bg-primary/10 text-primary px-2 py-1 rounded text-xs font-bold uppercase">Active</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Tab: Analytics -->
+<section class="tab-content hidden space-y-stack-lg" id="content-analytics">
+<!-- Key Metrics Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter">
+<div class="bg-pure-white p-stack-md rounded-xl border border-border-light">
+<p class="font-label-sm text-text-muted uppercase tracking-widest mb-1">Total Revenue</p>
+<h4 class="text-headline-md font-bold text-deep-black">PKR 2.4M</h4>
+<span class="text-xs text-primary font-bold">+12.5% vs last month</span>
+</div>
+<div class="bg-pure-white p-stack-md rounded-xl border border-border-light">
+<p class="font-label-sm text-text-muted uppercase tracking-widest mb-1">Conversion Rate</p>
+<h4 class="text-headline-md font-bold text-deep-black">4.82%</h4>
+<span class="text-xs text-primary font-bold">+0.4% improvement</span>
+</div>
+<div class="bg-pure-white p-stack-md rounded-xl border border-border-light">
+<p class="font-label-sm text-text-muted uppercase tracking-widest mb-1">Average Order Value</p>
+<h4 class="text-headline-md font-bold text-deep-black">PKR 1,250</h4>
+<span class="text-xs text-error font-bold">-2.1% drop</span>
+</div>
+<div class="bg-pure-white p-stack-md rounded-xl border border-border-light">
+<p class="font-label-sm text-text-muted uppercase tracking-widest mb-1">Churn Rate</p>
+<h4 class="text-headline-md font-bold text-deep-black">1.4%</h4>
+<span class="text-xs text-primary font-bold">Healthy</span>
+</div>
+</div>
+<!-- Main Charts -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
+<!-- Revenue Line Chart Visualization -->
+<div class="bg-pure-white p-stack-lg rounded-xl border border-border-light relative overflow-hidden">
+<h4 class="font-headline-md text-deep-black mb-stack-md">Revenue Growth</h4>
+<div class="h-64 w-full flex items-end gap-1 px-2 pb-6 relative">
+<div class="absolute top-0 right-0 flex gap-4">
+<div class="flex items-center gap-1"><span class="w-3 h-3 bg-primary rounded-full"></span> <span class="text-xs font-label-sm">7d Trend</span></div>
+<div class="flex items-center gap-1"><span class="w-3 h-3 bg-on-tertiary-container rounded-full"></span> <span class="text-xs font-label-sm">30d Trend</span></div>
+</div>
+<!-- Simple visual bars to represent a chart -->
+<div class="flex-1 bg-primary/20 h-[40%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/30 h-[55%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/40 h-[48%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/60 h-[70%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/80 h-[85%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary h-[95%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/90 h-[100%] rounded-t-sm"></div>
+</div>
+</div>
+<!-- Plan Distribution -->
+<div class="bg-pure-white p-stack-lg rounded-xl border border-border-light">
+<h4 class="font-headline-md text-deep-black mb-stack-md">Subscription Distribution</h4>
+<div class="flex items-center justify-between h-full py-8">
+<div class="relative w-40 h-40 rounded-full border-[12px] border-primary flex items-center justify-center">
+<div class="text-center">
+<span class="font-bold text-headline-md">64%</span>
+<p class="text-[10px] uppercase text-text-muted">Premium</p>
+</div>
+</div>
+<div class="space-y-stack-md flex-1 ml-10">
+<div class="flex justify-between items-center">
+<span class="text-body-sm font-medium">Premium</span>
+<span class="text-body-sm font-bold">1,240</span>
+</div>
+<div class="w-full bg-surface-gray h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full" style="width: 64%"></div>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-body-sm font-medium">Basic</span>
+<span class="text-body-sm font-bold">580</span>
+</div>
+<div class="w-full bg-surface-gray h-2 rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 30%"></div>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-body-sm font-medium">Trial</span>
+<span class="text-body-sm font-bold">120</span>
+</div>
+<div class="w-full bg-surface-gray h-2 rounded-full overflow-hidden">
+<div class="bg-outline-variant h-full" style="width: 6%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Lists and Progress -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<div class="bg-pure-white p-stack-lg rounded-xl border border-border-light lg:col-span-2">
+<h4 class="font-headline-md text-deep-black mb-stack-md">Top Performing Restaurants</h4>
+<div class="space-y-6">
+<div class="flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<span class="font-bold text-body-md">Monal Lahore</span>
+<span class="text-body-sm">PKR 850,000</span>
+</div>
+<div class="h-3 bg-surface-gray rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[92%]"></div>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<span class="font-bold text-body-md">Savour Foods</span>
+<span class="text-body-sm">PKR 720,000</span>
+</div>
+<div class="h-3 bg-surface-gray rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[78%]"></div>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<span class="font-bold text-body-md">Butt Karahi</span>
+<span class="text-body-sm">PKR 640,000</span>
+</div>
+<div class="h-3 bg-surface-gray rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[65%]"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-pure-white p-stack-lg rounded-xl border border-border-light">
+<h4 class="font-headline-md text-error mb-stack-md">Expiring Trials</h4>
+<div class="space-y-4">
+<div class="flex items-center justify-between border-b border-border-light pb-2">
+<div>
+<p class="font-bold text-body-sm">Spicy Crust</p>
+<p class="text-[10px] text-text-muted">Expires in 2 days</p>
+</div>
+<button class="text-primary font-bold text-xs uppercase hover:underline">Extend</button>
+</div>
+<div class="flex items-center justify-between border-b border-border-light pb-2">
+<div>
+<p class="font-bold text-body-sm">Kebab Station</p>
+<p class="text-[10px] text-text-muted">Expires tomorrow</p>
+</div>
+<button class="text-primary font-bold text-xs uppercase hover:underline">Extend</button>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="font-bold text-body-sm">Healthy Bowl</p>
+<p class="text-[10px] text-error font-bold uppercase">Expired today</p>
+</div>
+<button class="text-deep-black font-bold text-xs uppercase hover:underline">Contact</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Tab: Announcements -->
+<section class="tab-content hidden space-y-stack-lg" id="content-announcements">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Create Draft Form -->
+<div class="lg:col-span-5">
+<div class="bg-pure-white p-stack-lg rounded-xl border border-border-light">
+<div class="flex items-center justify-between mb-stack-md">
+<h4 class="font-headline-md text-deep-black">Draft Announcement</h4>
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase">New</span>
+</div>
+<form class="space-y-stack-md">
+<div>
+<label class="block font-label-md text-text-muted mb-2">Announcement Title</label>
+<input class="w-full px-4 py-3 bg-surface-gray border border-border-light rounded-xl focus:ring-1 focus:ring-deep-black focus:border-deep-black outline-none font-body-sm" placeholder="Enter headline..." type="text"/>
+</div>
+<div>
+<label class="block font-label-md text-text-muted mb-2">Message Content</label>
+<textarea class="w-full px-4 py-3 bg-surface-gray border border-border-light rounded-xl focus:ring-1 focus:ring-deep-black focus:border-deep-black outline-none font-body-sm resize-none" placeholder="Write your message here..." rows="6"></textarea>
+</div>
+<div class="flex gap-4">
+<button class="flex-1 bg-deep-black text-pure-white py-3 rounded-xl font-bold hover:opacity-90 transition-all" type="submit">Save Draft</button>
+<button class="flex-1 border border-border-light py-3 rounded-xl font-bold hover:bg-surface-gray transition-all" type="button">Preview</button>
+</div>
+</form>
+</div>
+</div>
+<!-- Existing Announcements -->
+<div class="lg:col-span-7 space-y-stack-md">
+<h4 class="font-headline-md text-deep-black px-2">Manage Announcements</h4>
+<div class="bg-pure-white p-stack-md rounded-xl border border-border-light hover:border-primary transition-all">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-secondary-fixed text-text-muted px-2 py-0.5 rounded text-[10px] font-bold uppercase">Draft</span>
+<span class="text-xs text-text-muted">Updated: 2 hours ago</span>
+</div>
+<h5 class="font-bold text-body-lg mb-2">Eid Special Campaign Offer</h5>
+<p class="text-body-sm text-text-muted line-clamp-2 mb-4">Starting from tomorrow, all restaurant partners will receive a 15% discount on their subscription renewal for the Eid festivities...</p>
+<div class="flex gap-4 pt-4 border-t border-border-light">
+<button class="text-primary font-bold text-sm flex items-center gap-1 hover:underline"><span class="material-symbols-outlined text-sm">send</span> Publish Now</button>
+<button class="text-text-muted font-bold text-sm flex items-center gap-1 hover:underline"><span class="material-symbols-outlined text-sm">edit</span> Edit</button>
+<button class="text-error font-bold text-sm flex items-center gap-1 hover:underline ml-auto"><span class="material-symbols-outlined text-sm">delete</span> Delete</button>
+</div>
+</div>
+<div class="bg-pure-white p-stack-md rounded-xl border border-border-light">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-primary/10 text-primary px-2 py-0.5 rounded text-[10px] font-bold uppercase">Published</span>
+<span class="text-xs text-text-muted">Live: 3 days ago</span>
+</div>
+<h5 class="font-bold text-body-lg mb-2">System Maintenance Notice</h5>
+<p class="text-body-sm text-text-muted line-clamp-2 mb-4">Please be informed that the admin dashboard will be undergoing scheduled maintenance on Sunday from 2:00 AM to 4:00 AM...</p>
+<div class="flex gap-4 pt-4 border-t border-border-light">
+<button class="text-text-muted font-bold text-sm flex items-center gap-1 hover:underline"><span class="material-symbols-outlined text-sm">visibility</span> View Stats</button>
+<button class="text-error font-bold text-sm flex items-center gap-1 hover:underline ml-auto"><span class="material-symbols-outlined text-sm">archive</span> Archive</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Tab: Settings -->
+<section class="tab-content hidden space-y-stack-lg" id="content-settings">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- Trial Limits Editor -->
+<div class="space-y-stack-lg">
+<div class="bg-pure-white p-stack-lg rounded-xl border border-border-light">
+<h4 class="font-headline-md text-deep-black mb-stack-md">Trial Limits Editor</h4>
+<div class="space-y-stack-md">
+<div>
+<label class="block font-label-md text-text-muted mb-2">Trial Duration (Days)</label>
+<input class="w-full px-4 py-2 border border-border-light rounded-xl focus:ring-deep-black focus:border-deep-black font-body-sm" type="number" value="14"/>
+</div>
+<div>
+<label class="block font-label-md text-text-muted mb-2">Max Menu Items</label>
+<input class="w-full px-4 py-2 border border-border-light rounded-xl focus:ring-deep-black focus:border-deep-black font-body-sm" type="number" value="25"/>
+</div>
+<button class="w-full bg-deep-black text-pure-white py-3 rounded-xl font-bold hover:opacity-90">Update Limits</button>
+</div>
+</div>
+<div class="bg-error/5 p-stack-lg rounded-xl border border-error/20">
+<h4 class="font-headline-md text-error mb-stack-md">Expired Trials Policy</h4>
+<div class="space-y-4">
+<label class="flex items-center gap-3 cursor-pointer">
+<input checked="" class="w-5 h-5 rounded border-error text-error focus:ring-error" type="checkbox"/>
+<span class="font-body-sm font-bold text-error">Block Digital Menu</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer">
+<input checked="" class="w-5 h-5 rounded border-error text-error focus:ring-error" type="checkbox"/>
+<span class="font-body-sm font-bold text-error">Block New Orders</span>
+</label>
+<p class="text-[10px] text-error opacity-70 italic">These settings apply immediately to all expired accounts without active subscriptions.</p>
+</div>
+</div>
+</div>
+<!-- Company Settings Form -->
+<div class="lg:col-span-2">
+<div class="bg-pure-white p-stack-lg rounded-xl border border-border-light">
+<h4 class="font-headline-md text-deep-black mb-stack-md">Company &amp; Payment Settings</h4>
+<form class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+<div class="md:col-span-1">
+<label class="block font-label-md text-text-muted mb-2">JazzCash Number</label>
+<input class="w-full px-4 py-2 border border-border-light rounded-xl focus:ring-deep-black focus:border-deep-black font-body-sm" placeholder="03XX XXXXXXX" type="text"/>
+</div>
+<div class="md:col-span-1">
+<label class="block font-label-md text-text-muted mb-2">Easypaisa Number</label>
+<input class="w-full px-4 py-2 border border-border-light rounded-xl focus:ring-deep-black focus:border-deep-black font-body-sm" placeholder="03XX XXXXXXX" type="text"/>
+</div>
+<div class="md:col-span-1">
+<label class="block font-label-md text-text-muted mb-2">Bank Name</label>
+<input class="w-full px-4 py-2 border border-border-light rounded-xl focus:ring-deep-black focus:border-deep-black font-body-sm" placeholder="e.g. Meezan Bank" type="text"/>
+</div>
+<div class="md:col-span-1">
+<label class="block font-label-md text-text-muted mb-2">Account Title</label>
+<input class="w-full px-4 py-2 border border-border-light rounded-xl focus:ring-deep-black focus:border-deep-black font-body-sm" placeholder="Full Holder Name" type="text"/>
+</div>
+<div class="md:col-span-2">
+<label class="block font-label-md text-text-muted mb-2">Account Number / IBAN</label>
+<input class="w-full px-4 py-2 border border-border-light rounded-xl focus:ring-deep-black focus:border-deep-black font-body-sm" placeholder="PK00 XXXX XXXX XXXX XXXX" type="text"/>
+</div>
+<div class="md:col-span-1">
+<label class="block font-label-md text-text-muted mb-2">WhatsApp Support</label>
+<input class="w-full px-4 py-2 border border-border-light rounded-xl focus:ring-deep-black focus:border-deep-black font-body-sm" placeholder="+92 3XX XXXXXXX" type="text"/>
+</div>
+<div class="md:col-span-1">
+<label class="block font-label-md text-text-muted mb-2">Company Email</label>
+<input class="w-full px-4 py-2 border border-border-light rounded-xl focus:ring-deep-black focus:border-deep-black font-body-sm" placeholder="admin@qrmenu.pk" type="email"/>
+</div>
+<div class="md:col-span-2 pt-stack-md border-t border-border-light mt-4">
+<button class="bg-primary text-pure-white px-8 py-3 rounded-xl font-bold hover:bg-primary-container transition-all" type="submit">Save All Changes</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-stack-md px-margin-desktop bg-surface-gray border-t border-border-light">
+<div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+<span class="font-label-sm text-text-muted">© 2024 QRMenu.pk Administrative Suite</span>
+<div class="flex gap-stack-lg">
+<a class="font-label-sm text-text-muted hover:text-deep-black" href="#">Privacy Policy</a>
+<a class="font-label-sm text-text-muted hover:text-deep-black" href="#">Terms of Service</a>
+<a class="font-label-sm text-text-muted hover:text-deep-black" href="#">Support</a>
+</div>
+</div>
+</footer>
+<script>
+        // Tab switching logic
+        function switchTab(tabName) {
+            // Hide all contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+                content.classList.remove('block');
+            });
+            // Show active content
+            const activeContent = document.getElementById(`content-${tabName}`);
+            activeContent.classList.remove('hidden');
+            activeContent.classList.add('block');
+
+            // Reset active styles for buttons
+            document.querySelectorAll('.tab-link').forEach(link => {
+                link.classList.remove('tab-active');
+                link.classList.add('text-text-muted');
+            });
+            // Add active style to clicked button
+            const activeLink = document.getElementById(`tab-${tabName}`);
+            activeLink.classList.add('tab-active');
+            activeLink.classList.remove('text-text-muted');
+        }
+
+        // Live timestamp update
+        function updateTimestamp() {
+            const now = new Date();
+            const options = { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
+            document.getElementById('live-timestamp').textContent = now.toLocaleDateString('en-US', options).replace(',', ' •');
+        }
+        setInterval(updateTimestamp, 1000);
+        updateTimestamp();
+
+        // Mobile responsiveness: simple log to track viewports
+        window.addEventListener('resize', () => {
+            if (window.innerWidth < 768) {
+                console.log('Mobile View Active');
+            }
+        });
+    </script>
+</body></html>

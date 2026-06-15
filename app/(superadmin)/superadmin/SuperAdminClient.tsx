@@ -5,18 +5,20 @@ import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import { formatPrice } from "@/lib/utils"
-import { Shield, LogOut, Eye, EyeOff, Search, ChevronRight, X, Users, Building2, BarChart3, Settings as SettingsIcon } from "lucide-react"
+import { Shield, LogOut, Eye, EyeOff, Users, Building2, BarChart3, Settings as SettingsIcon, Store, Megaphone, Clock } from "lucide-react"
 import { RestaurantTable } from "@/components/superadmin/RestaurantTable"
 import { CustomerTable } from "@/components/superadmin/CustomerTable"
 import { AnalyticsView } from "@/components/superadmin/AnalyticsView"
 import { CompanySettingsForm } from "@/components/superadmin/CompanySettingsForm"
 import { TrialLimitsEditor } from "@/components/superadmin/TrialLimitsEditor"
+import { AnnouncementsPanel } from "@/components/superadmin/AnnouncementsPanel"
+import { ActivityLogView } from "@/components/superadmin/ActivityLogView"
 
-const SUPER_ADMIN_EMAIL = "mazzmakki786@gmail.com"
+type Tab = "restaurants" | "customers" | "analytics" | "announcements" | "settings"
 
-type Tab = "restaurants" | "customers" | "analytics" | "settings"
+const SESSION_TIMEOUT_MS = 15 * 60 * 1000
 
-function LoginForm({ superAdminEmail, onLogin }: { superAdminEmail: string; onLogin: () => void }) {
+function LoginForm({ onLogin, locked }: { onLogin: () => void; locked: boolean }) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -28,12 +30,6 @@ function LoginForm({ superAdminEmail, onLogin }: { superAdminEmail: string; onLo
     setLoading(true)
     setError(null)
 
-    if (email.toLowerCase() !== superAdminEmail.toLowerCase()) {
-      setError("Only the company admin email can access this panel")
-      setLoading(false)
-      return
-    }
-
     const supabase = createClient()
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
     if (signInError) {
@@ -44,70 +40,66 @@ function LoginForm({ superAdminEmail, onLogin }: { superAdminEmail: string; onLo
     setLoading(false)
   }
 
+  if (locked) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
+        <div className="text-center max-w-sm">
+          <div className="w-14 h-14 rounded-xl bg-red-50 text-[#DC2626] flex items-center justify-center mx-auto mb-4">
+            <Shield className="w-7 h-7" />
+          </div>
+          <h1 className="text-xl font-bold mb-2">Access Locked</h1>
+          <p className="text-sm text-[#555] mb-6">
+            Your account has been temporarily locked due to multiple failed login attempts.
+            For security reasons, this cannot be undone automatically.
+          </p>
+          <div className="bg-[#F9FAFB] rounded-xl p-4 text-left space-y-2 mb-6">
+            <p className="text-xs font-medium text-[#555]">To regain access:</p>
+            <p className="text-xs text-[#555]">
+              1. Contact us via <strong className="text-black">WhatsApp</strong> at the support number provided during onboarding
+            </p>
+            <p className="text-xs text-[#555]">
+              2. Verify your identity with the recovery email on file
+            </p>
+            <p className="text-xs text-[#555]">
+              3. An administrator will reset your lockout status
+            </p>
+          </div>
+          <p className="text-[10px] text-[#999]">This is a security measure to protect the system.</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-[#F8F8F8] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-black text-white flex items-center justify-center mx-auto mb-4">
+          <div className="w-14 h-14 rounded-xl bg-black text-white flex items-center justify-center mx-auto mb-4">
             <Shield className="w-7 h-7" />
           </div>
           <h1 className="text-2xl font-bold">Super Admin</h1>
           <p className="text-sm text-[#555] mt-1">Company access only</p>
         </div>
 
-        <form onSubmit={handleLogin} className="bg-white rounded-2xl border border-[#E8E8E8] p-6 space-y-4">
+        <form onSubmit={handleLogin} className="bg-white rounded-xl border border-[#F0F0F0] p-6 space-y-4">
           <div>
-            <label htmlFor="email" className="block text-xs font-medium text-[#555] mb-1.5">
-              Company Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-11 px-3.5 rounded-xl border border-[#E8E8E8] bg-white text-sm outline-none focus:border-black transition-colors disabled:opacity-50"
-              placeholder="admin@company.com"
-              required
-            />
+            <label htmlFor="email" className="block text-xs font-medium text-[#555] mb-1.5">Company Email</label>
+            <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full h-11 px-3.5 rounded-xl border border-[#F0F0F0] bg-white text-sm outline-none focus:border-black transition-colors disabled:opacity-50" placeholder="admin@company.com" required />
           </div>
           <div className="relative">
-            <label htmlFor="password" className="block text-xs font-medium text-[#555] mb-1.5">
-              Password
-            </label>
-            <input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-11 px-3.5 rounded-xl border border-[#E8E8E8] bg-white text-sm outline-none focus:border-black transition-colors disabled:opacity-50"
-              placeholder="Enter password"
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-[34px] text-[#999] hover:text-black"
-            >
+            <label htmlFor="password" className="block text-xs font-medium text-[#555] mb-1.5">Password</label>
+            <input id="password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} className="w-full h-11 px-3.5 rounded-xl border border-[#F0F0F0] bg-white text-sm outline-none focus:border-black transition-colors disabled:opacity-50" placeholder="Enter password" required />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-[34px] text-[#999] hover:text-black">
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
-
-          {error && (
-            <p className="text-xs text-[#DC2626] bg-red-50 rounded-lg p-3">{error}</p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full h-11 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
-          >
+          {error && <p className="text-xs text-[#DC2626] bg-red-50 rounded-lg p-3">{error}</p>}
+          <button type="submit" disabled={loading} className="w-full h-11 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity">
             {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
-        <p className="text-xs text-[#999] text-center mt-6">
-          Only authorized company administrators can access this panel
-        </p>
+        <p className="text-xs text-[#999] text-center mt-6">Only authorized company administrators can access this panel</p>
       </div>
     </div>
   )
@@ -115,61 +107,111 @@ function LoginForm({ superAdminEmail, onLogin }: { superAdminEmail: string; onLo
 
 function AccessDenied({ email, onLogout }: { email: string; onLogout: () => void }) {
   return (
-    <div className="min-h-screen bg-[#F8F8F8] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="text-center max-w-sm">
-        <div className="w-14 h-14 rounded-2xl bg-red-50 text-[#DC2626] flex items-center justify-center mx-auto mb-4">
+        <div className="w-14 h-14 rounded-xl bg-red-50 text-[#DC2626] flex items-center justify-center mx-auto mb-4">
           <Shield className="w-7 h-7" />
         </div>
         <h1 className="text-xl font-bold mb-2">Access Denied</h1>
         <p className="text-sm text-[#555] mb-6">
           <strong>{email}</strong> is not authorized to access the Super Admin panel.
-          <br />Only the company admin email can log in.
         </p>
-        <button
-          onClick={onLogout}
-          className="h-11 px-6 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 transition-opacity"
-        >
-          Sign Out & Try Again
-        </button>
+        <button onClick={onLogout} className="h-11 px-6 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 transition-opacity">Sign Out & Try Again</button>
       </div>
     </div>
   )
 }
 
 const TABS: { id: Tab; label: string; icon: any }[] = [
-  { id: "restaurants", label: "Restaurants", icon: Building2 },
+  { id: "restaurants", label: "Restaurants", icon: Store },
   { id: "customers", label: "Customers", icon: Users },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
+  { id: "announcements", label: "Announcements", icon: Megaphone },
   { id: "settings", label: "Settings", icon: SettingsIcon },
 ]
 
-export default function SuperAdminClient({
-  currentUserEmail,
-}: {
-  currentUserEmail: string
-}) {
-  const [user, setUser] = useState<{ email: string } | null>(
-    currentUserEmail ? { email: currentUserEmail } : null
-  )
+export default function SuperAdminClient({ currentUserEmail }: { currentUserEmail: string }) {
+  const [user, setUser] = useState<{ email: string } | null>(currentUserEmail ? { email: currentUserEmail } : null)
   const [checking, setChecking] = useState(!currentUserEmail)
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false)
+  const [isLocked, setIsLocked] = useState(false)
   const [activeTab, setActiveTab] = useState<Tab>("restaurants")
   const [restaurants, setRestaurants] = useState<any[]>([])
   const [users, setUsers] = useState<Record<string, { email: string; last_sign_in_at: string | null }>>({})
   const [loading, setLoading] = useState(true)
+  const [showActivityLog, setShowActivityLog] = useState(false)
+  const [timestamp, setTimestamp] = useState(new Date().toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: true }).replace(",", " •"))
 
   const supabase = createClient()
   const router = useRouter()
   const debounceRef = useRef<NodeJS.Timeout | null>(null)
+  const inactivityRef = useRef<NodeJS.Timeout | null>(null)
+
+  const verifyAdmin = useCallback(async (email: string) => {
+    try {
+      const res = await fetch("/api/superadmin/check")
+      if (res.ok) {
+        const data = await res.json()
+        if (data.locked) {
+          setIsLocked(true)
+          setLoading(false)
+          return
+        }
+        setIsSuperAdmin(data.isSuperAdmin)
+        if (!data.isSuperAdmin) setLoading(false)
+      } else {
+        setIsSuperAdmin(false)
+        setLoading(false)
+      }
+    } catch {
+      setIsSuperAdmin(false)
+      setLoading(false)
+    }
+  }, [])
+
+  // Session inactivity timeout
+  const resetInactivityTimer = useCallback(() => {
+    if (inactivityRef.current) clearTimeout(inactivityRef.current)
+    if (isSuperAdmin) {
+      inactivityRef.current = setTimeout(async () => {
+        await supabase.auth.signOut()
+        setUser(null)
+        setIsSuperAdmin(false)
+        router.refresh()
+      }, SESSION_TIMEOUT_MS)
+    }
+  }, [isSuperAdmin, supabase, router])
+
+  useEffect(() => {
+    if (!isSuperAdmin) return
+    const events = ["mousedown", "keydown", "touchstart", "scroll"]
+    events.forEach((e) => window.addEventListener(e, resetInactivityTimer))
+    resetInactivityTimer()
+    return () => {
+      events.forEach((e) => window.removeEventListener(e, resetInactivityTimer))
+      if (inactivityRef.current) clearTimeout(inactivityRef.current)
+    }
+  }, [isSuperAdmin, resetInactivityTimer])
 
   useEffect(() => {
     if (!currentUserEmail) {
       supabase.auth.getSession().then(({ data: { session } }) => {
-        setUser(session?.user as { email: string } | null)
+        const u = session?.user as { email: string } | null
+        setUser(u)
         setChecking(false)
+        if (u?.email) verifyAdmin(u.email)
       })
     } else {
       setChecking(false)
+      verifyAdmin(currentUserEmail)
     }
+  }, [])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimestamp(new Date().toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: true }).replace(",", " •"))
+    }, 60000)
+    return () => clearInterval(interval)
   }, [])
 
   const fetchRestaurants = useCallback(async () => {
@@ -178,20 +220,9 @@ export default function SuperAdminClient({
       if (res.ok) {
         const json = await res.json()
         const list = json.restaurants || []
-        setRestaurants(
-          list.map((r: any) => ({
-            ...r,
-            dish_count: 0,
-            total_orders: r.total_orders || 0,
-            last7_orders: r.last7_orders || 0,
-            last30_orders: r.last30_orders || 0,
-            revenue: r.revenue || 0,
-          }))
-        )
+        setRestaurants(list.map((r: any) => ({ ...r, dish_count: 0, total_orders: r.total_orders || 0, last7_orders: r.last7_orders || 0, last30_orders: r.last30_orders || 0, revenue: r.revenue || 0 })))
       }
-    } catch (e) {
-      console.error("Failed to fetch restaurants", e)
-    }
+    } catch (e) { console.error("Failed to fetch restaurants", e) }
   }, [])
 
   const fetchUsers = useCallback(async () => {
@@ -200,14 +231,10 @@ export default function SuperAdminClient({
       if (res.ok) {
         const json = await res.json()
         const map: Record<string, { email: string; last_sign_in_at: string | null }> = {}
-        ;(json.users || []).forEach((u: any) => {
-          map[u.id] = { email: u.email, last_sign_in_at: u.last_sign_in_at }
-        })
+        ;(json.users || []).forEach((u: any) => { map[u.id] = { email: u.email, last_sign_in_at: u.last_sign_in_at } })
         setUsers(map)
       }
-    } catch (e) {
-      console.error("Failed to fetch users", e)
-    }
+    } catch (e) { console.error("Failed to fetch users", e) }
   }, [])
 
   const loadData = useCallback(async () => {
@@ -217,132 +244,113 @@ export default function SuperAdminClient({
   }, [fetchRestaurants, fetchUsers])
 
   useEffect(() => {
-    if (user?.email && user.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
-      loadData()
-    } else {
-      setLoading(false)
-    }
-  }, [user])
+    if (isSuperAdmin && user?.email) { loadData() }
+    else if (!checking) { setLoading(false) }
+  }, [isSuperAdmin, user, checking])
 
-  // Debounced 500ms refetch (used by real-time + polling fallback)
   const scheduleRefetch = useCallback(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => {
-      fetchRestaurants()
-    }, 500)
+    debounceRef.current = setTimeout(() => { fetchRestaurants() }, 500)
   }, [fetchRestaurants])
 
-  // Real-time subscription on restaurants + company_settings
   useEffect(() => {
-    if (!user || user.email.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) return
+    if (!isSuperAdmin) return
     const channel = supabase
       .channel(uid("restaurants-changes"))
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "restaurants" },
-        () => scheduleRefetch()
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "company_settings" },
-        () => scheduleRefetch()
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "restaurants" }, () => scheduleRefetch())
+      .on("postgres_changes", { event: "*", schema: "public", table: "company_settings" }, () => scheduleRefetch())
       .subscribe()
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
       supabase.removeChannel(channel)
     }
-  }, [user, scheduleRefetch, supabase])
+  }, [isSuperAdmin, scheduleRefetch, supabase])
 
-  // Polling fallback (30s) for when real-time is not enabled in Supabase
   useEffect(() => {
-    if (!user || user.email.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) return
-    const interval = setInterval(() => scheduleRefetch(), 15000)
+    if (!isSuperAdmin) return
+    const interval = setInterval(() => scheduleRefetch(), 30000)
     return () => clearInterval(interval)
-  }, [user, scheduleRefetch])
+  }, [isSuperAdmin, scheduleRefetch])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
     setUser(null)
+    setIsSuperAdmin(false)
+    setIsLocked(false)
   }
 
-  if (checking) {
-    return (
-      <div className="min-h-screen bg-[#F8F8F8] flex items-center justify-center">
-        <p className="text-[#999]">Loading...</p>
-      </div>
-    )
-  }
-
-  if (!user) {
-    return <LoginForm superAdminEmail={SUPER_ADMIN_EMAIL} onLogin={async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      setUser(session?.user as { email: string } | null)
-      router.refresh()
-    }} />
-  }
-
-  if (user.email.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
-    return <AccessDenied email={user.email} onLogout={handleLogout} />
-  }
+  if (checking) return <div className="min-h-screen bg-white flex items-center justify-center"><p className="text-[#999]">Loading...</p></div>
+  if (!user) return <LoginForm onLogin={async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    const u = session?.user as { email: string } | null
+    setUser(u)
+    if (u?.email) verifyAdmin(u.email)
+    router.refresh()
+  }} locked={isLocked} />
+  if (isLocked) return <LoginForm onLogin={async () => {}} locked={true} />
+  if (!isSuperAdmin) return <AccessDenied email={user.email} onLogout={handleLogout} />
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold">Super Admin</h1>
-          <p className="text-xs text-[#999]">Live data — {new Date().toLocaleString()}</p>
-        </div>
-        <button onClick={handleLogout} className="flex items-center gap-1 text-sm text-[#555] hover:text-[#DC2626] transition-colors">
-          <LogOut className="w-4 h-4" /> Sign Out
-        </button>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex items-center gap-1 overflow-x-auto border-b border-[#E8E8E8] -mx-4 px-4 md:mx-0 md:px-0">
-        {TABS.map((t) => {
-          const Icon = t.icon
-          return (
-            <button
-              key={t.id}
-              onClick={() => setActiveTab(t.id)}
-              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                activeTab === t.id
-                  ? "border-black text-black"
-                  : "border-transparent text-[#555] hover:text-black"
-              }`}
-            >
-              <Icon className="w-4 h-4" />
-              {t.label}
-            </button>
-          )
-        })}
-      </div>
-
-      {loading ? (
-        <div className="space-y-4">
-          <div className="h-8 w-40 bg-[#E8E8E8] rounded animate-pulse" />
-          <div className="h-64 bg-[#E8E8E8] rounded-[14px] animate-pulse" />
-        </div>
-      ) : (
-        <>
-          {activeTab === "restaurants" && (
-            <RestaurantTable
-              restaurants={restaurants}
-              users={users}
-              setRestaurants={setRestaurants}
-            />
-          )}
-          {activeTab === "customers" && <CustomerTable />}
-          {activeTab === "analytics" && <AnalyticsView />}
-          {activeTab === "settings" && (
-            <div className="space-y-6">
-              <TrialLimitsEditor />
-              <CompanySettingsForm />
+    <div className="min-h-screen bg-[#F8F8F8]">
+      <header className="bg-white/80 backdrop-blur-md fixed top-0 left-0 w-full z-50 border-b border-[#F0F0F0] safe-area-inset-top">
+        <div className="max-w-6xl mx-auto px-4 md:px-10 h-20 flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center">
+              <Shield className="w-4 h-4" />
             </div>
-          )}
-        </>
-      )}
+            <h1 className="text-xl font-black text-black">Super Admin</h1>
+            <span className="h-6 w-px bg-[#F0F0F0]" />
+            <p className="text-xs text-[#555] hidden sm:block" id="live-timestamp">{timestamp}</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <button onClick={() => setShowActivityLog(true)} className="text-xs text-black hover:opacity-70 transition-opacity flex items-center gap-2">
+              <Clock className="w-4 h-4" /> Activity Log
+            </button>
+            <button onClick={handleLogout} className="text-xs text-[#ba1a1a] font-bold hover:underline">Sign Out</button>
+          </div>
+        </div>
+      </header>
+
+      <main className="pt-24 pb-8 max-w-6xl mx-auto px-4 md:px-10 min-h-screen">
+        <nav className="flex items-center gap-4 mb-6 overflow-x-auto pb-2 border-b border-[#F0F0F0]">
+          {TABS.map((t) => {
+            const Icon = t.icon
+            const isActive = activeTab === t.id
+            return (
+              <button
+                key={t.id}
+                onClick={() => setActiveTab(t.id)}
+                className={`flex items-center gap-2 py-4 text-xs font-semibold transition-all whitespace-nowrap border-b-2 ${
+                  isActive ? "text-black border-black" : "text-[#555] border-transparent hover:text-black"
+                }`}
+              >
+                <Icon className="w-4 h-4" /> {t.label}
+              </button>
+            )
+          })}
+        </nav>
+
+        {loading ? (
+          <div className="space-y-4">
+            <div className="skeleton h-8 w-40 rounded" />
+            <div className="skeleton h-64 rounded-xl" />
+          </div>
+        ) : (
+          <>
+            {activeTab === "restaurants" && <RestaurantTable restaurants={restaurants} users={users} setRestaurants={setRestaurants} />}
+            {activeTab === "customers" && <CustomerTable />}
+            {activeTab === "analytics" && <AnalyticsView />}
+            {activeTab === "announcements" && <AnnouncementsPanel />}
+            {activeTab === "settings" && (
+              <div className="space-y-6">
+                <TrialLimitsEditor />
+                <CompanySettingsForm />
+              </div>
+            )}
+          </>
+        )}
+      </main>
+      <ActivityLogView open={showActivityLog} onClose={() => setShowActivityLog(false)} />
     </div>
   )
 }

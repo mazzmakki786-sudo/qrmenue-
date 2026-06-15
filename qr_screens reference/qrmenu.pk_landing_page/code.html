@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QRMenu.pk | Digital Menu for Every Restaurant</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#3de273",
+                        "tertiary-fixed-dim": "#ffb59b",
+                        "on-secondary-fixed-variant": "#474747",
+                        "outline": "#6c7b6b",
+                        "border-light": "#F0F0F0",
+                        "surface-variant": "#e1e3e4",
+                        "surface-container-highest": "#e1e3e4",
+                        "outline-variant": "#bbcbb9",
+                        "surface-gray": "#F9FAFB",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#763319",
+                        "primary-fixed-dim": "#3de273",
+                        "surface-container-low": "#f3f4f5",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-surface-variant": "#3c4a3d",
+                        "tertiary-container": "#ffa07e",
+                        "surface-tint": "#006d2f",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-container": "#78351b",
+                        "secondary-fixed-dim": "#c6c6c6",
+                        "deep-black": "#000000",
+                        "secondary-fixed": "#e2e2e2",
+                        "on-primary-fixed": "#002109",
+                        "on-secondary-container": "#646464",
+                        "error": "#ba1a1a",
+                        "whatsapp-green": "#25D366",
+                        "on-background": "#191c1d",
+                        "tertiary": "#93492e",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#edeeef",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#e7e8e9",
+                        "on-tertiary-fixed": "#380d00",
+                        "primary": "#006d2f",
+                        "primary-fixed": "#66ff8e",
+                        "pure-white": "#FFFFFF",
+                        "secondary-container": "#e2e2e2",
+                        "surface-bright": "#f8f9fa",
+                        "inverse-surface": "#2e3132",
+                        "on-primary-container": "#005523",
+                        "primary-container": "#25d366",
+                        "background": "#f8f9fa",
+                        "secondary": "#5e5e5e",
+                        "on-surface": "#191c1d",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#d9dadb",
+                        "tertiary-fixed": "#ffdbcf",
+                        "surface": "#f8f9fa",
+                        "text-muted": "#555555",
+                        "on-primary-fixed-variant": "#005322"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "unit": "4px",
+                        "container-max": "1280px",
+                        "margin-mobile": "16px",
+                        "stack-lg": "32px",
+                        "stack-md": "16px",
+                        "stack-sm": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-header { backdrop-filter: blur(12px); }
+        .hero-gradient {
+            background: linear-gradient(135deg, #000000 0%, #333333 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+        }
+        .transition-all { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="bg-pure-white text-deep-black antialiased">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-pure-white/80 glass-header border-b border-border-light">
+<nav class="flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto">
+<div class="flex items-center gap-2">
+<img alt="QRMenu.pk Logo" class="h-10 w-10 object-contain" src="data:image/png;base64,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"/>
+<span class="font-headline-md text-headline-md font-bold text-deep-black">QRMenu.pk</span>
+</div>
+<!-- Desktop Nav -->
+<div class="hidden md:flex items-center gap-8">
+<a class="font-label-md text-label-md text-text-muted hover:text-deep-black transition-colors duration-200" href="#pricing">Pricing</a>
+<a class="font-label-md text-label-md text-text-muted hover:text-deep-black transition-colors duration-200" href="#restaurants">Restaurants</a>
+<a class="font-label-md text-label-md text-text-muted hover:text-deep-black transition-colors duration-200" href="#contact">Contact</a>
+</div>
+<div class="flex items-center gap-4">
+<a class="hidden sm:block font-label-md text-label-md text-deep-black font-semibold hover:opacity-80 transition-opacity" href="/login">Sign In</a>
+<a class="bg-deep-black text-pure-white px-6 py-2.5 rounded-lg font-label-md text-label-md font-semibold hover:opacity-90 active:scale-95 transition-all" href="/signup">Get Started</a>
+</div>
+</nav>
+</header>
+<main>
+<!-- Hero Section -->
+<section class="pt-40 pb-20 px-margin-mobile md:px-margin-desktop text-center max-w-4xl mx-auto">
+<div class="inline-flex items-center bg-surface-gray border border-border-light px-4 py-1.5 rounded-full mb-8">
+<span class="flex h-2 w-2 rounded-full bg-whatsapp-green mr-2 animate-pulse"></span>
+<span class="font-label-sm text-label-sm font-semibold tracking-wider uppercase">Live in Pakistan</span>
+</div>
+<h1 class="font-display-lg text-display-lg md:text-[64px] md:leading-[1.1] hero-gradient mb-6">
+                Digital Menu for Every Restaurant
+            </h1>
+<p class="font-body-lg text-body-lg text-text-muted mb-10 max-w-2xl mx-auto">
+                No app. No commission. Just a QR code — customers scan, browse your menu, and order directly on WhatsApp.
+            </p>
+<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+<a class="w-full sm:w-auto bg-deep-black text-pure-white px-10 py-4 rounded-xl font-label-md text-label-md font-bold hover:shadow-lg transition-all active:scale-95" href="/signup">
+                    Start Free Trial
+                </a>
+<a class="w-full sm:w-auto border border-border-light px-10 py-4 rounded-xl font-label-md text-label-md font-bold hover:bg-surface-gray transition-all active:scale-95" href="/restaurants">
+                    Browse Restaurants
+                </a>
+</div>
+</section>
+<!-- How It Works Section -->
+<section class="py-24 bg-pure-white px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<div class="text-center mb-16">
+<h2 class="font-headline-lg text-headline-lg mb-4">How It Works</h2>
+<p class="font-body-md text-body-md text-text-muted">Get your restaurant online in under 5 minutes</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+<!-- Step 1 -->
+<div class="relative group">
+<div class="mb-6 flex items-center justify-center w-16 h-16 bg-deep-black text-pure-white rounded-full font-headline-md text-headline-md">01</div>
+<h3 class="font-headline-md text-headline-md mb-3">Create Menu</h3>
+<p class="font-body-md text-body-md text-text-muted leading-relaxed">Add your dishes, prices, and photos through our simple dashboard.</p>
+</div>
+<!-- Step 2 -->
+<div class="relative group">
+<div class="mb-6 flex items-center justify-center w-16 h-16 bg-deep-black text-pure-white rounded-full font-headline-md text-headline-md">02</div>
+<h3 class="font-headline-md text-headline-md mb-3">Print QR Code</h3>
+<p class="font-body-md text-body-md text-text-muted leading-relaxed">We generate a unique QR code for your restaurant. Print and place on tables.</p>
+</div>
+<!-- Step 3 -->
+<div class="relative group">
+<div class="mb-6 flex items-center justify-center w-16 h-16 bg-deep-black text-pure-white rounded-full font-headline-md text-headline-md">03</div>
+<h3 class="font-headline-md text-headline-md mb-3">Get Orders</h3>
+<p class="font-body-md text-body-md text-text-muted leading-relaxed">Customers scan, browse, and order via WhatsApp. No app download needed.</p>
+</div>
+</div>
+</section>
+<!-- Pricing Section -->
+<section class="py-24 bg-surface-gray" id="pricing">
+<div class="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<div class="text-center mb-16">
+<h2 class="font-headline-lg text-headline-lg mb-4">Simple, Transparent Pricing</h2>
+<p class="font-body-md text-body-md text-text-muted">No hidden fees. No commission on orders. Cancel anytime.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Free Trial -->
+<div class="bg-pure-white p-8 rounded-xl border border-border-light hover:shadow-xl transition-all flex flex-col">
+<span class="font-label-sm text-label-sm text-text-muted mb-4">7 days</span>
+<h3 class="font-headline-md text-headline-md mb-2">Free Trial</h3>
+<div class="mb-6">
+<span class="text-[32px] font-bold">PKR 0</span>
+<span class="text-text-muted font-body-sm">/7 days</span>
+</div>
+<ul class="space-y-4 mb-10 flex-grow">
+<li class="flex items-center gap-3 font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-[18px]">check_circle</span> 5 dishes
+                            </li>
+<li class="flex items-center gap-3 font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-[18px]">check_circle</span> 5 dish images
+                            </li>
+<li class="flex items-center gap-3 font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-[18px]">check_circle</span> 10 orders
+                            </li>
+<li class="flex items-center gap-3 font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-[18px]">check_circle</span> QR generation
+                            </li>
+</ul>
+<a class="w-full text-center border border-deep-black py-3 rounded-lg font-label-md text-label-md font-bold hover:bg-deep-black hover:text-pure-white transition-all" href="/signup">Start Free Trial</a>
+</div>
+<!-- Starter -->
+<div class="bg-pure-white p-8 rounded-xl border border-border-light hover:shadow-xl transition-all flex flex-col">
+<span class="font-label-sm text-label-sm text-text-muted mb-4">Essential</span>
+<h3 class="font-headline-md text-headline-md mb-2">Starter</h3>
+<div class="mb-6">
+<span class="text-[32px] font-bold">PKR 1,200</span>
+<span class="text-text-muted font-body-sm">/month</span>
+</div>
+<ul class="space-y-4 mb-10 flex-grow">
+<li class="flex items-center gap-3 font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-[18px]">check_circle</span> 30 dishes
+                            </li>
+<li class="flex items-center gap-3 font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-[18px]">check_circle</span> 10 dish images
+                            </li>
+<li class="flex items-center gap-3 font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-[18px]">check_circle</span> Unlimited orders
+                            </li>
+<li class="flex items-center gap-3 font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-[18px]">check_circle</span> WhatsApp orders
+                            </li>
+</ul>
+<a class="w-full text-center border border-deep-black py-3 rounded-lg font-label-md text-label-md font-bold hover:bg-deep-black hover:text-pure-white transition-all" href="/signup">Choose Plan</a>
+</div>
+<!-- Growth -->
+<div class="bg-deep-black text-pure-white p-8 rounded-xl border border-deep-black shadow-2xl relative flex flex-col scale-105 z-10">
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-whatsapp-green text-deep-black font-label-sm text-label-sm font-bold px-4 py-1 rounded-full whitespace-nowrap">MOST POPULAR</div>
+<span class="font-label-sm text-label-sm text-white/60 mb-4">Scale up</span>
+<h3 class="font-headline-md text-headline-md mb-2">Growth</h3>
+<div class="mb-6">
+<span class="text-[32px] font-bold">PKR 2,500</span>
+<span class="text-white/60 font-body-sm">/month</span>
+</div>
+<ul class="space-y-4 mb-10 flex-grow">
+<li class="flex items-center gap-3 font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-[18px]">check_circle</span> 50 dishes
+                            </li>
+<li class="flex items-center gap-3 font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-[18px]">check_circle</span> 20 dish images
+                            </li>
+<li class="flex items-center gap-3 font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-[18px]">check_circle</span> Custom branding
+                            </li>
+<li class="flex items-center gap-3 font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-[18px]">check_circle</span> Priority support
+                            </li>
+</ul>
+<a class="w-full text-center bg-pure-white text-deep-black py-3 rounded-lg font-label-md text-label-md font-bold hover:bg-whatsapp-green transition-all" href="/signup">Choose Plan</a>
+</div>
+<!-- Premium -->
+<div class="bg-pure-white p-8 rounded-xl border border-border-light hover:shadow-xl transition-all flex flex-col">
+<span class="font-label-sm text-label-sm text-text-muted mb-4">Enterprise</span>
+<h3 class="font-headline-md text-headline-md mb-2">Premium</h3>
+<div class="mb-6">
+<span class="text-[32px] font-bold">PKR 4,500</span>
+<span class="text-text-muted font-body-sm">/month</span>
+</div>
+<ul class="space-y-4 mb-10 flex-grow">
+<li class="flex items-center gap-3 font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-[18px]">check_circle</span> 100 dishes
+                            </li>
+<li class="flex items-center gap-3 font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-[18px]">check_circle</span> 100 images
+                            </li>
+<li class="flex items-center gap-3 font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-[18px]">check_circle</span> Full custom branding
+                            </li>
+<li class="flex items-center gap-3 font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-[18px]">check_circle</span> Everything in Growth
+                            </li>
+</ul>
+<a class="w-full text-center border border-deep-black py-3 rounded-lg font-label-md text-label-md font-bold hover:bg-deep-black hover:text-pure-white transition-all" href="/signup">Choose Plan</a>
+</div>
+</div>
+</div>
+</section>
+<!-- Comparison Table -->
+<section class="py-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto overflow-hidden">
+<h2 class="font-headline-lg text-headline-lg text-center mb-12">Compare Plans</h2>
+<div class="overflow-x-auto">
+<table class="w-full border-collapse">
+<thead>
+<tr class="border-b-2 border-deep-black">
+<th class="text-left py-6 px-4 font-headline-md text-headline-md min-w-[200px]">Feature</th>
+<th class="text-center py-6 px-4 font-headline-md text-headline-md">Free</th>
+<th class="text-center py-6 px-4 font-headline-md text-headline-md">Starter</th>
+<th class="text-center py-6 px-4 font-headline-md text-headline-md">Growth</th>
+<th class="text-center py-6 px-4 font-headline-md text-headline-md">Premium</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-border-light">
+<td class="py-6 px-4 font-body-md text-body-md">Unlimited dishes</td>
+<td class="text-center py-6 px-4">5</td>
+<td class="text-center py-6 px-4">30</td>
+<td class="text-center py-6 px-4">50</td>
+<td class="text-center py-6 px-4">100</td>
+</tr>
+<tr class="border-b border-border-light">
+<td class="py-6 px-4 font-body-md text-body-md">QR code generation</td>
+<td class="text-center py-6 px-4"><span class="material-symbols-outlined text-whatsapp-green">check</span></td>
+<td class="text-center py-6 px-4"><span class="material-symbols-outlined text-whatsapp-green">check</span></td>
+<td class="text-center py-6 px-4"><span class="material-symbols-outlined text-whatsapp-green">check</span></td>
+<td class="text-center py-6 px-4"><span class="material-symbols-outlined text-whatsapp-green">check</span></td>
+</tr>
+<tr class="border-b border-border-light">
+<td class="py-6 px-4 font-body-md text-body-md">WhatsApp notifications</td>
+<td class="text-center py-6 px-4"><span class="material-symbols-outlined text-whatsapp-green">check</span></td>
+<td class="text-center py-6 px-4"><span class="material-symbols-outlined text-whatsapp-green">check</span></td>
+<td class="text-center py-6 px-4"><span class="material-symbols-outlined text-whatsapp-green">check</span></td>
+<td class="text-center py-6 px-4"><span class="material-symbols-outlined text-whatsapp-green">check</span></td>
+</tr>
+<tr class="border-b border-border-light">
+<td class="py-6 px-4 font-body-md text-body-md">Dish images</td>
+<td class="text-center py-6 px-4">5</td>
+<td class="text-center py-6 px-4">10</td>
+<td class="text-center py-6 px-4">20</td>
+<td class="text-center py-6 px-4">100</td>
+</tr>
+<tr class="border-b border-border-light">
+<td class="py-6 px-4 font-body-md text-body-md">Custom branding</td>
+<td class="text-center py-6 px-4"><span class="material-symbols-outlined text-text-muted opacity-30">close</span></td>
+<td class="text-center py-6 px-4"><span class="material-symbols-outlined text-text-muted opacity-30">close</span></td>
+<td class="text-center py-6 px-4"><span class="material-symbols-outlined text-whatsapp-green">check</span></td>
+<td class="text-center py-6 px-4"><span class="material-symbols-outlined text-whatsapp-green">check</span></td>
+</tr>
+<tr class="border-b border-border-light">
+<td class="py-6 px-4 font-body-md text-body-md">Menu in Urdu (beta)</td>
+<td class="text-center py-6 px-4"><span class="material-symbols-outlined text-text-muted opacity-30">close</span></td>
+<td class="text-center py-6 px-4"><span class="material-symbols-outlined text-text-muted opacity-30">close</span></td>
+<td class="text-center py-6 px-4"><span class="material-symbols-outlined text-whatsapp-green">check</span></td>
+<td class="text-center py-6 px-4"><span class="material-symbols-outlined text-whatsapp-green">check</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="text-center mt-12 text-text-muted font-body-sm">All plans include free setup and basic support. Need help? <a class="text-deep-black font-bold underline" href="#contact">Contact us</a></p>
+</section>
+<!-- Contact Section -->
+<section class="py-24 bg-surface-gray" id="contact">
+<div class="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<div class="text-center mb-16">
+<h2 class="font-headline-lg text-headline-lg mb-4">Get in Touch</h2>
+<p class="font-body-md text-body-md text-text-muted">Have questions? We're here to help</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<a class="flex flex-col items-center p-12 bg-whatsapp-green/5 border border-whatsapp-green/20 rounded-2xl hover:bg-whatsapp-green hover:text-pure-white transition-all group" href="https://wa.me/923001234567" target="_blank">
+<span class="material-symbols-outlined text-[48px] mb-6 text-whatsapp-green group-hover:text-pure-white">chat</span>
+<h3 class="font-headline-md text-headline-md mb-2">WhatsApp</h3>
+<p class="font-body-md text-body-md text-center opacity-80">Chat with us on WhatsApp for quick support</p>
+</a>
+<div class="flex flex-col items-center p-12 bg-pure-white border border-border-light rounded-2xl">
+<span class="material-symbols-outlined text-[48px] mb-6 text-deep-black">mail</span>
+<h3 class="font-headline-md text-headline-md mb-2">Email</h3>
+<p class="font-body-md text-body-md text-center text-text-muted">support@qrmenu.pk</p>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Banner -->
+<section class="py-24 px-margin-mobile md:px-margin-desktop">
+<div class="max-w-container-max mx-auto bg-deep-black rounded-3xl p-12 md:p-20 text-center relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-whatsapp-green/10 to-transparent pointer-events-none"></div>
+<h2 class="font-display-lg text-display-lg text-pure-white mb-6 relative z-10">Ready to go digital?</h2>
+<p class="font-body-lg text-body-lg text-pure-white/70 mb-10 max-w-xl mx-auto relative z-10">
+                    Join hundreds of restaurants in Pakistan using QRMenu.pk to streamline their ordering process.
+                </p>
+<div class="relative z-10">
+<a class="inline-block bg-pure-white text-deep-black px-10 py-4 rounded-xl font-headline-md text-headline-md hover:bg-whatsapp-green hover:text-deep-black transition-all" href="/signup">
+                        Start Free Trial — No Credit Card
+                    </a>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-pure-white border-t border-border-light">
+<div class="flex flex-col md:flex-row justify-between items-center py-stack-lg px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto gap-8">
+<div class="flex flex-col items-center md:items-start gap-4">
+<div class="flex items-center gap-2">
+<span class="bg-deep-black text-pure-white w-8 h-8 rounded-lg flex items-center justify-center font-bold">Q</span>
+<span class="font-headline-sm text-headline-sm font-bold text-deep-black">QRMenu.pk</span>
+</div>
+<p class="font-label-sm text-label-sm text-text-muted">Made in Pakistan with 💚</p>
+</div>
+<div class="flex gap-8">
+<a class="font-label-sm text-label-sm text-text-muted hover:text-deep-black transition-colors" href="#pricing">Pricing</a>
+<a class="font-label-sm text-label-sm text-text-muted hover:text-deep-black transition-colors" href="#restaurants">Restaurants</a>
+<a class="font-label-sm text-label-sm text-text-muted hover:text-deep-black transition-colors" href="#contact">Contact</a>
+</div>
+<div class="flex gap-6">
+<a class="font-label-sm text-label-sm text-text-muted hover:text-deep-black underline transition-colors" href="/privacy">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-text-muted hover:text-deep-black underline transition-colors" href="/terms">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-text-muted hover:text-deep-black underline transition-colors" href="/faq">FAQ</a>
+</div>
+</div>
+<div class="text-center pb-8 opacity-40">
+<p class="font-label-sm text-[10px]">© 2024 QRMenu.pk. All rights reserved.</p>
+</div>
+</footer>
+<script>
+        // Simple scroll indicator for pricing cards
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('opacity-100', 'translate-y-0');
+                        entry.target.classList.remove('opacity-0', 'translate-y-10');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.pricing-card').forEach(card => {
+                card.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-10');
+                observer.observe(card);
+            });
+        });
+    </script>
+</body></html>

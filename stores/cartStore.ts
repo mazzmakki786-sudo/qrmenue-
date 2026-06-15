@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { persist } from "zustand/middleware"
+import { persist, subscribeWithSelector } from "zustand/middleware"
 import type { CartItem, Dish } from "@/types"
 
 interface CartState {
@@ -16,8 +16,9 @@ interface CartState {
 }
 
 export const useCartStore = create<CartState>()(
-  persist(
-    (set, get) => ({
+  subscribeWithSelector(
+    persist(
+      (set, get) => ({
       items: [],
       restaurantId: null,
       restaurantName: null,
@@ -65,5 +66,6 @@ export const useCartStore = create<CartState>()(
         get().items.reduce((sum, item) => sum + item.dish.price * item.quantity, 0),
     }),
     { name: "qrmenu-cart" }
+    )
   )
 )

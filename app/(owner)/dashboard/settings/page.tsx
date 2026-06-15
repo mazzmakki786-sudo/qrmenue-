@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { QRCodeDisplay } from "@/components/shared/QRCodeDisplay"
 import { Camera, Copy, Check } from "lucide-react"
 import type { Restaurant } from "@/types"
+import Image from "next/image"
 
 export default function SettingsPage() {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null)
@@ -91,7 +92,7 @@ export default function SettingsPage() {
   }
 
   const menuUrl = restaurant
-    ? `${process.env.NEXT_PUBLIC_APP_URL || "https://qrmenu.vercel.app"}/menu/${restaurant.slug}`
+    ? `${process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "")}/menu/${restaurant.slug}`
     : ""
 
   const handleCopyUrl = () => {
@@ -102,27 +103,30 @@ export default function SettingsPage() {
 
   if (!restaurant) {
     return <div className="text-center text-[#999] py-12">
-      <div className="h-6 w-40 bg-[#E8E8E8] rounded animate-pulse mx-auto mb-4" />
-      <div className="h-4 w-60 bg-[#E8E8E8] rounded animate-pulse mx-auto" />
+      <div className="h-6 w-40 bg-[#F0F0F0] rounded animate-pulse mx-auto mb-4" />
+      <div className="h-4 w-60 bg-[#F0F0F0] rounded animate-pulse mx-auto" />
     </div>
   }
 
   return (
-    <div className="space-y-6 max-w-lg">
-      <h1 className="text-xl font-bold">Profile</h1>
+    <div className="max-w-lg mx-auto space-y-4">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-black">Profile</h1>
+        <p className="text-sm text-[#555] mt-1">Manage your restaurant profile and preferences</p>
+      </div>
 
       {/* Restaurant Info */}
-      <div className="bg-white rounded-[14px] border border-[#E8E8E8] p-5 space-y-4">
-        <h2 className="text-sm font-semibold">Restaurant Info</h2>
+      <div className="bg-white rounded-[14px] border border-[#F0F0F0] p-5 space-y-4">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-black">Restaurant Info</h2>
 
         {/* Logo Upload */}
         <div className="flex items-center gap-4">
           <div className="relative">
-            <div className="w-16 h-16 rounded-full bg-[#F8F8F8] flex items-center justify-center overflow-hidden">
+            <div className="w-16 h-16 rounded-full bg-[#F9FAFB] flex items-center justify-center overflow-hidden border border-[#F0F0F0]">
               {logoPreview ? (
-                <img src={logoPreview} alt="Preview" className="w-full h-full object-cover" />
+                <Image src={logoPreview} alt="Preview" width={64} height={64} className="w-full h-full object-cover" />
               ) : logoUrl ? (
-                <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                <Image src={logoUrl} alt="Logo" width={64} height={64} className="w-full h-full object-cover" />
               ) : (
                 <span className="text-2xl font-bold text-[#555]">
                   {form.name ? form.name[0] : "R"}
@@ -131,7 +135,7 @@ export default function SettingsPage() {
             </div>
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="absolute -bottom-1 -right-1 w-6 h-6 bg-black text-white rounded-full flex items-center justify-center"
+              className="absolute -bottom-1 -right-1 w-6 h-6 bg-black text-white rounded-full flex items-center justify-center hover:opacity-90 transition-opacity"
             >
               <Camera className="w-3 h-3" />
             </button>
@@ -144,8 +148,8 @@ export default function SettingsPage() {
             />
           </div>
           <div className="text-sm text-[#555]">
-            <p className="font-medium text-[#111]">{form.name || "Your Restaurant"}</p>
-            <p>Upload logo (optional)</p>
+            <p className="font-medium text-black">{form.name || "Your Restaurant"}</p>
+            <p className="text-xs">Upload logo (optional)</p>
           </div>
         </div>
 
@@ -156,7 +160,7 @@ export default function SettingsPage() {
         <Input label="City *" id="city" value={form.city} onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))} />
         <Input label="Address" id="address" value={form.address} onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))} />
         <div className="space-y-1.5">
-          <label htmlFor="language" className="block text-sm font-medium text-[#111]">Default Language</label>
+          <label htmlFor="language" className="block text-sm font-medium text-black">Default Language</label>
           <select
             id="language"
             value={form.language}
@@ -173,25 +177,23 @@ export default function SettingsPage() {
       </div>
 
       {/* Your URL */}
-      <div className="bg-white rounded-[14px] border border-[#E8E8E8] p-5 space-y-3">
-        <h2 className="text-sm font-semibold">Your Restaurant URL</h2>
-        <div className="flex items-center gap-2 p-3 bg-[#F8F8F8] rounded-[10px]">
-          <code className="text-sm flex-1 break-all">{menuUrl}</code>
+      <div className="bg-white rounded-[14px] border border-[#F0F0F0] p-5">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-black mb-3">Your Restaurant URL</h2>
+        <div className="flex items-center gap-2 p-3 bg-[#F9FAFB] rounded-xl border border-[#F0F0F0]">
+          <code className="text-sm flex-1 break-all text-[#555] font-mono">{menuUrl}</code>
           <button
             onClick={handleCopyUrl}
-            className="flex-shrink-0 p-2 hover:bg-[#E8E8E8] rounded-lg transition-colors"
+            className="flex-shrink-0 p-2 hover:bg-[#F0F0F0] rounded-lg transition-colors"
           >
             {copied ? <Check className="w-4 h-4 text-[#16A34A]" /> : <Copy className="w-4 h-4 text-[#555]" />}
           </button>
         </div>
-        <p className="text-xs text-[#555]">
-          Share this link with your customers or generate a QR code below.
-        </p>
+        <p className="text-xs text-[#999] mt-2">Share this link with your customers or generate a QR code below.</p>
       </div>
 
       {/* QR Code */}
-      <div className="bg-white rounded-[14px] border border-[#E8E8E8] p-5">
-        <h2 className="text-sm font-semibold mb-4">Your QR Code</h2>
+      <div className="bg-white rounded-[14px] border border-[#F0F0F0] p-5">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-black mb-4">Your QR Code</h2>
         <QRCodeDisplay
           restaurantSlug={restaurant.slug}
           restaurantName={restaurant.name}

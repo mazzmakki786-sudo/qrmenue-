@@ -1,12 +1,11 @@
-﻿"use client"
+"use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { CategoryTabs } from "./CategoryTabs"
 import { DishGrid } from "./DishGrid"
 import { CartBar } from "./CartBar"
 import { useCartStore } from "@/stores/cartStore"
 import { Search } from "lucide-react"
-import { LanguageToggle } from "@/components/shared/LanguageToggle"
 import { useI18n } from "@/lib/i18n/context"
 import type { Category, Dish } from "@/types"
 
@@ -19,10 +18,11 @@ interface Props {
 export function MenuContent({ categories, restaurantId, restaurantName }: Props) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [search, setSearch] = useState("")
-  const { lang, t } = useI18n()
+  const { lang, setLang, t } = useI18n()
   const setRestaurant = useCartStore((s) => s.setRestaurant)
   const clearCart = useCartStore((s) => s.clearCart)
   const currentRestaurantId = useCartStore((s) => s.restaurantId)
+  const searchRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (currentRestaurantId && currentRestaurantId !== restaurantId) {
@@ -53,20 +53,30 @@ export function MenuContent({ categories, restaurantId, restaurantName }: Props)
 
   return (
     <div>
-      {/* Sticky top bar: search + lang toggle + category pills */}
-      <div className="sticky top-0 z-20 bg-white border-b border-[#F0F0F0]">
-        <div className="flex items-center gap-2 px-4 pt-3 pb-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#999]" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={t("customer.searchDishes")}
-              className="w-full h-10 pl-9 pr-4 rounded-xl bg-[#F8F8F8] text-sm placeholder:text-[#999] focus:outline-none focus:bg-[#F0F0F0] transition-colors"
-            />
+      {/* Sticky Search & Filter */}
+      <div className="sticky top-0 z-40 bg-white/90 backdrop-blur-md">
+        <div className="px-4 pt-4 pb-0">
+          <div className="flex gap-3">
+            <div className="relative flex-1 group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#555] group-focus-within:text-black transition-colors" />
+              <input
+                ref={searchRef}
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t("customer.searchDishes")}
+                className="w-full bg-[#F9FAFB] border border-[#F0F0F0] rounded-xl py-3 pl-11 pr-4 text-sm focus:outline-none focus:border-black transition-all placeholder:text-[#999]"
+              />
+            </div>
+            <button
+              onClick={() => setLang(lang === "en" ? "ur" : "en")}
+              className="bg-[#F9FAFB] border border-[#F0F0F0] px-4 rounded-xl flex items-center gap-2 hover:bg-[#F0F0F0] transition-colors text-sm font-semibold"
+            >
+              <span className={lang === "en" ? "text-black" : "text-[#555]"}>EN</span>
+              <span className="w-px h-4 bg-[#F0F0F0]" />
+              <span className={lang === "ur" ? "text-black font-urdu" : "text-[#555]"}>اردو</span>
+            </button>
           </div>
-          <LanguageToggle />
         </div>
         <CategoryTabs
           categories={categories}
@@ -75,17 +85,15 @@ export function MenuContent({ categories, restaurantId, restaurantName }: Props)
         />
       </div>
 
-      {/* Dish grid (Photo-First Card Grid - Zomato style) */}
+      {/* Dish List */}
       <div className="px-4 py-4">
         {noResults ? (
-          <div className="py-16 text-center">
-            <Search className="w-8 h-8 text-[#DDD] mx-auto mb-3" />
-            <p className="text-sm text-[#999]">
-              {t("customer.noDishes")}
-            </p>
-            <button onClick={() => setSearch("")} className="text-sm text-[#FF6B35] font-medium mt-2 hover:underline">
-              {t("customer.clearSearch")}
-            </button>
+          <div className="py-20 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-[#E1E3E4] flex items-center justify-center mx-auto mb-4">
+              <Search className="w-8 h-8 text-[#999]" />
+            </div>
+            <h4 className="text-lg font-semibold text-black">No results found</h4>
+            <p className="text-sm text-[#555] mt-2">Try searching for something else or browse categories.</p>
           </div>
         ) : (
           <DishGrid categories={searched} />

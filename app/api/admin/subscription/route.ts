@@ -20,6 +20,11 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
   }
 
+  const validPlans = ["trial", "starter", "growth", "premium"]
+  if (!validPlans.includes(body.plan)) {
+    return NextResponse.json({ error: "Invalid plan value" }, { status: 400 })
+  }
+
   const { data, error } = await supabase
     .from("restaurants")
     .update({

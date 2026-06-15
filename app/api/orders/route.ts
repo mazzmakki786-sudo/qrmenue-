@@ -5,6 +5,7 @@ import { z } from "zod"
 import { loadTrialLimitsFromDB } from "@/lib/subscription-server"
 import { DEFAULT_TRIAL_LIMITS, GRACE_PERIOD_DAYS } from "@/lib/subscription"
 import { checkAndSendOrderLimitAlert } from "@/lib/email/orderLimitAlert"
+import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 
 const orderItemSchema = z.object({
   id: z.string(),
@@ -28,6 +29,12 @@ const createOrderSchema = z.object({
 })
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request)
+  const allowed = await rateLimit(ip, 30, 60)
+  if (!allowed) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 })
+  }
+
   const supabase = await createClient()
   const body = await request.json()
 

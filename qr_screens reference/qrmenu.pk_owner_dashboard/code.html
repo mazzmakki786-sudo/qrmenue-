@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Restaurant Owner Dashboard | QRMenu.pk</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-container": "#78351b",
+                    "surface-container-highest": "#e1e3e4",
+                    "deep-black": "#000000",
+                    "primary": "#006d2f",
+                    "on-secondary-fixed": "#1b1b1b",
+                    "on-primary-fixed": "#002109",
+                    "border-light": "#F0F0F0",
+                    "surface-gray": "#F9FAFB",
+                    "inverse-primary": "#3de273",
+                    "primary-fixed": "#66ff8e",
+                    "on-tertiary-fixed": "#380d00",
+                    "background": "#f8f9fa",
+                    "primary-container": "#25d366",
+                    "surface-container-high": "#e7e8e9",
+                    "secondary-fixed": "#e2e2e2",
+                    "tertiary-container": "#ffa07e",
+                    "on-tertiary-fixed-variant": "#763319",
+                    "outline": "#6c7b6b",
+                    "whatsapp-green": "#25D366",
+                    "pure-white": "#FFFFFF",
+                    "on-primary-container": "#005523",
+                    "on-error-container": "#93000a",
+                    "text-muted": "#555555",
+                    "on-primary-fixed-variant": "#005322",
+                    "error": "#ba1a1a",
+                    "inverse-surface": "#2e3132",
+                    "secondary": "#5e5e5e",
+                    "primary-fixed-dim": "#3de273",
+                    "on-secondary-container": "#646464",
+                    "inverse-on-surface": "#f0f1f2",
+                    "secondary-container": "#e2e2e2",
+                    "on-surface": "#191c1d",
+                    "tertiary": "#93492e",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-fixed-dim": "#c6c6c6",
+                    "surface-tint": "#006d2f",
+                    "tertiary-fixed-dim": "#ffb59b",
+                    "on-error": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "surface-dim": "#d9dadb",
+                    "on-secondary": "#ffffff",
+                    "outline-variant": "#bbcbb9",
+                    "surface-bright": "#f8f9fa",
+                    "surface-variant": "#e1e3e4",
+                    "on-background": "#191c1d",
+                    "surface-container-low": "#f3f4f5",
+                    "tertiary-fixed": "#ffdbcf",
+                    "surface": "#f8f9fa",
+                    "on-tertiary": "#ffffff",
+                    "surface-container": "#edeeef",
+                    "on-primary": "#ffffff",
+                    "on-surface-variant": "#3c4a3d",
+                    "on-secondary-fixed-variant": "#474747"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-lg": "32px",
+                    "stack-sm": "8px",
+                    "gutter": "24px",
+                    "unit": "4px",
+                    "margin-desktop": "40px",
+                    "container-max": "1280px",
+                    "stack-md": "16px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": ["Inter"],
+                    "label-md": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8F8F8; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-nav { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-on-surface">
+<!-- Top Navigation Shell -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 max-w-container-max mx-auto bg-pure-white/80 backdrop-blur-md border-b border-border-light">
+<div class="flex items-center gap-stack-sm">
+<span class="font-headline-md text-headline-md font-bold text-deep-black">QRMenu.pk</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-secondary hover:bg-surface-container-low transition-colors p-2 rounded-full">notifications</button>
+<button class="material-symbols-outlined text-secondary hover:bg-surface-container-low transition-colors p-2 rounded-full">settings</button>
+<div class="h-8 w-8 rounded-full bg-surface-container-highest overflow-hidden">
+<img alt="Restaurant Owner Profile" class="w-full h-full object-cover" data-alt="A professional headshot of a restaurant owner in a modern minimalist kitchen, soft natural lighting, high-contrast black and white aesthetic, 4k resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBP-hdWukvO0HQwA_CcixcTHNpLdAbt572bInagGaKuwE9vmSimZFnWY2DQF3g3FpJmw-ORQQRuzpQ2AtjgGJGBh72qiiPt3xTFFrAttcfEgHWyfJZr4E1IuEQ_oi8x2ry6Gupo_XWP_4Z7MKarWPuLy28MgUqeVTpJ8bnRi2qfiSB9O2Bmf4sfivq-o1iv2-fQDUDJ-lcyrlQMuU7wI_MZDB6kpuOF-w4sw-MdMfaPNAg8ykataVT2m-qoXHp7CkDLuBsOmBfXkXEN"/>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-stack-lg px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<!-- 1. Top Row -->
+<div class="flex justify-between items-center mb-stack-lg">
+<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-deep-black">Dashboard</h1>
+<button class="bg-deep-black text-pure-white px-6 py-2.5 rounded-full flex items-center gap-2 font-label-md hover:opacity-90 transition-transform active:scale-95">
+<span class="material-symbols-outlined text-[20px]">assignment</span>
+                Orders
+            </button>
+</div>
+<!-- 2. Subscription Banner -->
+<section class="mb-stack-lg">
+<div class="relative overflow-hidden bg-gradient-to-r from-[#0052D4] via-[#4364F7] to-[#6FB1FC] p-8 rounded-[14px] text-pure-white shadow-sm">
+<div class="relative z-10">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<span class="bg-pure-white/20 px-3 py-1 rounded-full text-label-sm font-bold uppercase tracking-wider">Trial Version</span>
+<h2 class="font-headline-md text-headline-md mt-2">7 days left in trial</h2>
+</div>
+<div class="w-full md:w-64">
+<div class="flex justify-between text-label-sm mb-2 font-medium">
+<span>Order usage</span>
+<span>3/10 orders used</span>
+</div>
+<div class="h-2 w-full bg-pure-white/20 rounded-full overflow-hidden">
+<div class="h-full bg-pure-white w-[30%] transition-all duration-1000"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Subtle Texture Layer -->
+<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 24px 24px;"></div>
+</div>
+</section>
+<!-- 3. Quick Action Cards -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-stack-md mb-stack-lg">
+<div class="bg-deep-black p-6 rounded-[14px] flex items-center justify-between group cursor-pointer hover:shadow-lg transition-all duration-300">
+<div class="flex items-center gap-4">
+<div class="bg-pure-white/10 p-3 rounded-xl text-pure-white">
+<span class="material-symbols-outlined">restaurant_menu</span>
+</div>
+<div>
+<p class="text-pure-white font-headline-md">Manage Menu</p>
+<p class="text-pure-white/60 font-body-sm">Go to menu</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-pure-white group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+<div class="bg-pure-white border border-border-light p-6 rounded-[14px] flex items-center justify-between group cursor-pointer hover:bg-surface-container-low transition-all duration-300">
+<div class="flex items-center gap-4">
+<div class="bg-surface-container p-3 rounded-xl text-deep-black">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<p class="text-deep-black font-headline-md">Profile</p>
+<p class="text-secondary font-body-sm">Edit profile</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-deep-black group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-stack-lg">
+<!-- Left Column: Checklists -->
+<div class="lg:col-span-4 space-y-stack-lg">
+<!-- 4. Profile Completion Card -->
+<div class="bg-pure-white border border-border-light rounded-[14px] p-6">
+<h3 class="font-headline-md text-deep-black mb-4">Profile Completion</h3>
+<div class="flex items-baseline gap-2 mb-4">
+<span class="text-[40px] font-extrabold text-deep-black">80%</span>
+<span class="text-secondary font-body-sm">Complete</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full mb-6">
+<div class="h-full bg-deep-black w-[80%] rounded-full"></div>
+</div>
+<ul class="space-y-4">
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-on-surface">Phone number</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-on-surface">Address</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-on-surface">Logo</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-on-surface">Cuisine type</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline-variant">radio_button_unchecked</span>
+<span class="font-body-md text-secondary">Urdu name</span>
+</li>
+</ul>
+</div>
+<!-- 5. Menu Setup Card -->
+<div class="bg-pure-white border border-border-light rounded-[14px] p-6">
+<h3 class="font-headline-md text-deep-black mb-6">Menu Setup</h3>
+<ul class="space-y-4">
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-on-surface">Categories added</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-on-surface">Dishes added</span>
+</li>
+</ul>
+</div>
+</div>
+<!-- Right Column: Stats & Data -->
+<div class="lg:col-span-8 space-y-stack-lg">
+<!-- 6. Stats Row -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+<div class="bg-pure-white border border-border-light p-6 rounded-[14px] flex flex-col justify-between">
+<span class="text-secondary font-label-md">Today Orders</span>
+<span class="font-headline-lg text-[28px] text-deep-black mt-2">12</span>
+<span class="text-primary font-label-sm mt-4 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+                            +15% from yesterday
+                        </span>
+</div>
+<div class="bg-pure-white border border-border-light p-6 rounded-[14px] flex flex-col justify-between">
+<span class="text-secondary font-label-md">Today Revenue</span>
+<span class="font-headline-lg text-[28px] text-deep-black mt-2">PKR 8,400</span>
+<span class="text-primary font-label-sm mt-4 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+                            +8% from yesterday
+                        </span>
+</div>
+</div>
+<!-- 7. Orders Chart Card -->
+<div class="bg-pure-white border border-border-light rounded-[14px] p-6">
+<div class="flex justify-between items-center mb-8">
+<h3 class="font-headline-md text-deep-black">Order Trends</h3>
+<div class="bg-surface-container p-1 rounded-lg flex gap-1">
+<button class="px-3 py-1 text-label-sm font-bold bg-pure-white rounded-md shadow-sm">7d</button>
+<button class="px-3 py-1 text-label-sm font-medium text-secondary hover:text-deep-black transition-colors">30d</button>
+</div>
+</div>
+<div class="h-64 w-full flex items-end justify-between gap-2 px-2">
+<!-- Mock Chart Visualization using divs -->
+<div class="flex-1 bg-surface-container-highest rounded-t-sm h-[40%] relative group cursor-pointer">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-deep-black text-pure-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">8 orders</div>
+</div>
+<div class="flex-1 bg-surface-container-highest rounded-t-sm h-[60%] relative group cursor-pointer"></div>
+<div class="flex-1 bg-surface-container-highest rounded-t-sm h-[45%] relative group cursor-pointer"></div>
+<div class="flex-1 bg-deep-black rounded-t-sm h-[85%] relative group cursor-pointer">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-deep-black text-pure-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">15 orders</div>
+</div>
+<div class="flex-1 bg-surface-container-highest rounded-t-sm h-[55%] relative group cursor-pointer"></div>
+<div class="flex-1 bg-surface-container-highest rounded-t-sm h-[70%] relative group cursor-pointer"></div>
+<div class="flex-1 bg-deep-black/80 rounded-t-sm h-[95%] relative group cursor-pointer">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-deep-black text-pure-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">18 orders</div>
+</div>
+</div>
+<div class="flex justify-between mt-4 text-label-sm text-secondary px-2">
+<span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+</div>
+</div>
+<!-- 8. Popular Dishes Card -->
+<div class="bg-pure-white border border-border-light rounded-[14px] p-6">
+<h3 class="font-headline-md text-deep-black mb-6">Popular Dishes</h3>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-4 bg-surface-gray rounded-xl border border-transparent hover:border-border-light transition-colors">
+<div class="flex items-center gap-4">
+<span class="font-bold text-secondary w-4">1.</span>
+<span class="font-body-md text-deep-black font-semibold">Chicken Karahi</span>
+</div>
+<span class="text-secondary font-label-md">45 orders</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-gray rounded-xl border border-transparent hover:border-border-light transition-colors">
+<div class="flex items-center gap-4">
+<span class="font-bold text-secondary w-4">2.</span>
+<span class="font-body-md text-deep-black font-semibold">Garlic Naan</span>
+</div>
+<span class="text-secondary font-label-md">38 orders</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-gray rounded-xl border border-transparent hover:border-border-light transition-colors">
+<div class="flex items-center gap-4">
+<span class="font-bold text-secondary w-4">3.</span>
+<span class="font-body-md text-deep-black font-semibold">Seekh Kabab</span>
+</div>
+<span class="text-secondary font-label-md">22 orders</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 9. Recent Orders -->
+<section class="mt-stack-lg">
+<div class="bg-pure-white border border-border-light rounded-[14px] overflow-hidden">
+<div class="p-6 border-b border-border-light flex justify-between items-center">
+<h3 class="font-headline-md text-deep-black">Recent Orders</h3>
+<button class="text-primary font-label-md hover:underline">View All</button>
+</div>
+<div class="overflow-x-auto no-scrollbar">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-surface-gray text-secondary font-label-sm uppercase tracking-wider">
+<th class="px-6 py-4">Order #</th>
+<th class="px-6 py-4">Customer</th>
+<th class="px-6 py-4">Type</th>
+<th class="px-6 py-4">Price</th>
+<th class="px-6 py-4">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-light">
+<!-- Rows -->
+<tr class="hover:bg-surface-gray/50 transition-colors cursor-pointer group">
+<td class="px-6 py-4 font-label-md text-deep-black">#8492</td>
+<td class="px-6 py-4 font-body-md text-deep-black">Ahmed Khan</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-1.5 font-label-sm text-whatsapp-green">
+<span class="material-symbols-outlined text-[16px]">chat</span> WhatsApp
+                                    </span>
+</td>
+<td class="px-6 py-4 font-label-md text-deep-black">PKR 1,250</td>
+<td class="px-6 py-4">
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-label-sm font-bold">Delivered</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-gray/50 transition-colors cursor-pointer group">
+<td class="px-6 py-4 font-label-md text-deep-black">#8491</td>
+<td class="px-6 py-4 font-body-md text-deep-black">Sara Malik</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-1.5 font-label-sm text-secondary">
+<span class="material-symbols-outlined text-[16px]">restaurant</span> Dine-in
+                                    </span>
+</td>
+<td class="px-6 py-4 font-label-md text-deep-black">PKR 4,800</td>
+<td class="px-6 py-4">
+<span class="bg-surface-container text-secondary px-3 py-1 rounded-full text-label-sm font-bold">Pending</span>
+</td>
+</tr>
+<!-- Repeat for total 10 rows (mock) -->
+<tr class="hover:bg-surface-gray/50 transition-colors cursor-pointer group">
+<td class="px-6 py-4 font-label-md text-deep-black">#8490</td>
+<td class="px-6 py-4 font-body-md text-deep-black">Zubair Ali</td>
+<td class="px-6 py-4"><span class="flex items-center gap-1.5 font-label-sm text-whatsapp-green"><span class="material-symbols-outlined text-[16px]">chat</span> WhatsApp</span></td>
+<td class="px-6 py-4 font-label-md text-deep-black">PKR 850</td>
+<td class="px-6 py-4"><span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-label-sm font-bold">Delivered</span></td>
+</tr>
+<tr class="hover:bg-surface-gray/50 transition-colors cursor-pointer group">
+<td class="px-6 py-4 font-label-md text-deep-black">#8489</td>
+<td class="px-6 py-4 font-body-md text-deep-black">Usman Sheikh</td>
+<td class="px-6 py-4"><span class="flex items-center gap-1.5 font-label-sm text-secondary"><span class="material-symbols-outlined text-[16px]">restaurant</span> Dine-in</span></td>
+<td class="px-6 py-4 font-label-md text-deep-black">PKR 2,100</td>
+<td class="px-6 py-4"><span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-label-sm font-bold">Delivered</span></td>
+</tr>
+<tr class="hover:bg-surface-gray/50 transition-colors cursor-pointer group">
+<td class="px-6 py-4 font-label-md text-deep-black">#8488</td>
+<td class="px-6 py-4 font-body-md text-deep-black">Fatima Bibi</td>
+<td class="px-6 py-4"><span class="flex items-center gap-1.5 font-label-sm text-whatsapp-green"><span class="material-symbols-outlined text-[16px]">chat</span> WhatsApp</span></td>
+<td class="px-6 py-4 font-label-md text-deep-black">PKR 3,450</td>
+<td class="px-6 py-4"><span class="bg-surface-container text-secondary px-3 py-1 rounded-full text-label-sm font-bold">Pending</span></td>
+</tr>
+<tr class="hover:bg-surface-gray/50 transition-colors cursor-pointer group">
+<td class="px-6 py-4 font-label-md text-deep-black">#8487</td>
+<td class="px-6 py-4 font-body-md text-deep-black">Hamza Rao</td>
+<td class="px-6 py-4"><span class="flex items-center gap-1.5 font-label-sm text-secondary"><span class="material-symbols-outlined text-[16px]">restaurant</span> Dine-in</span></td>
+<td class="px-6 py-4 font-label-md text-deep-black">PKR 920</td>
+<td class="px-6 py-4"><span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-label-sm font-bold">Delivered</span></td>
+</tr>
+<tr class="hover:bg-surface-gray/50 transition-colors cursor-pointer group">
+<td class="px-6 py-4 font-label-md text-deep-black">#8486</td>
+<td class="px-6 py-4 font-body-md text-deep-black">Zoya Ahmed</td>
+<td class="px-6 py-4"><span class="flex items-center gap-1.5 font-label-sm text-whatsapp-green"><span class="material-symbols-outlined text-[16px]">chat</span> WhatsApp</span></td>
+<td class="px-6 py-4 font-label-md text-deep-black">PKR 1,700</td>
+<td class="px-6 py-4"><span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-label-sm font-bold">Delivered</span></td>
+</tr>
+<tr class="hover:bg-surface-gray/50 transition-colors cursor-pointer group">
+<td class="px-6 py-4 font-label-md text-deep-black">#8485</td>
+<td class="px-6 py-4 font-body-md text-deep-black">Imran Butt</td>
+<td class="px-6 py-4"><span class="flex items-center gap-1.5 font-label-sm text-secondary"><span class="material-symbols-outlined text-[16px]">restaurant</span> Dine-in</span></td>
+<td class="px-6 py-4 font-label-md text-deep-black">PKR 5,500</td>
+<td class="px-6 py-4"><span class="bg-surface-container text-secondary px-3 py-1 rounded-full text-label-sm font-bold">Pending</span></td>
+</tr>
+<tr class="hover:bg-surface-gray/50 transition-colors cursor-pointer group">
+<td class="px-6 py-4 font-label-md text-deep-black">#8484</td>
+<td class="px-6 py-4 font-body-md text-deep-black">Bilal Shah</td>
+<td class="px-6 py-4"><span class="flex items-center gap-1.5 font-label-sm text-whatsapp-green"><span class="material-symbols-outlined text-[16px]">chat</span> WhatsApp</span></td>
+<td class="px-6 py-4 font-label-md text-deep-black">PKR 450</td>
+<td class="px-6 py-4"><span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-label-sm font-bold">Delivered</span></td>
+</tr>
+<tr class="hover:bg-surface-gray/50 transition-colors cursor-pointer group border-b-0">
+<td class="px-6 py-4 font-label-md text-deep-black">#8483</td>
+<td class="px-6 py-4 font-body-md text-deep-black">Saeed Ghori</td>
+<td class="px-6 py-4"><span class="flex items-center gap-1.5 font-label-sm text-secondary"><span class="material-symbols-outlined text-[16px]">restaurant</span> Dine-in</span></td>
+<td class="px-6 py-4 font-label-md text-deep-black">PKR 2,900</td>
+<td class="px-6 py-4"><span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-label-sm font-bold">Delivered</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-stack-lg px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-stack-md border-t border-border-light bg-pure-white">
+<div class="flex flex-col md:flex-row items-center gap-stack-md">
+<span class="font-label-md text-label-md font-bold text-deep-black">QRMenu.pk</span>
+<div class="flex gap-4">
+<a class="font-label-sm text-label-sm text-text-muted hover:text-deep-black transition-colors" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-text-muted hover:text-deep-black transition-colors" href="#">Privacy Policy</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="text-text-muted font-label-sm">© 2024 QRMenu.pk. All rights reserved.</span>
+<button class="text-error font-label-md flex items-center gap-1 hover:underline transition-opacity opacity-80 hover:opacity-100">
+<span class="material-symbols-outlined text-[18px]">logout</span>
+                Sign Out
+            </button>
+</div>
+</footer>
+<script>
+        // Simple scale micro-interactions for buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => btn.classList.add('scale-95'));
+            btn.addEventListener('mouseup', () => btn.classList.remove('scale-95'));
+            btn.addEventListener('mouseleave', () => btn.classList.remove('scale-95'));
+        });
+    </script>
+</body></html>

@@ -100,7 +100,7 @@ export default function AccountPage() {
         <div className="h-14 border-b border-[#F0F0F0]" />
         <div className="p-4 space-y-3">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-20 bg-[#F8F8F8] rounded-[10px] animate-pulse" />
+            <div key={i} className="h-20 bg-[#F9FAFB] rounded-[10px] animate-pulse" />
           ))}
         </div>
       </div>
@@ -125,90 +125,99 @@ export default function AccountPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="flex items-center justify-between px-4 h-14 border-b border-[#F0F0F0]">
+      <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-[#F0F0F0] flex items-center justify-between px-4" style={{ height: "calc(48px + env(safe-area-inset-top, 0px))", paddingTop: "env(safe-area-inset-top, 0px)" }}>
         <h1 className="text-lg font-semibold">My Orders</h1>
-        <button onClick={handleLogout} className="text-sm text-[#DC2626] flex items-center gap-1">
+        <button onClick={handleLogout} className="text-sm text-[#DC2626] flex items-center gap-1 hover:underline">
           <LogOut className="w-4 h-4" /> Sign Out
         </button>
-      </div>
+      </header>
 
-      <div className="p-4 space-y-8">
-        {/* Active Orders */}
-        {activeOrders.length > 0 && (
-          <div>
-            <h2 className="text-xs font-semibold text-[#999] uppercase tracking-wider mb-3">Active Orders</h2>
-            <div className="space-y-2">
-              {activeOrders.map((order) => (
-                <Link
-                  key={order.id}
-                  href={`/order-confirm/${order.id}`}
-                  className="block p-4 rounded-xl border border-[#F0F0F0] hover:border-[#DDD] hover:shadow-sm transition-all active:scale-[0.99]"
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <p className="text-sm font-semibold">{order.order_number}</p>
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <Store className="w-3 h-3 text-[#999]" />
-                        <span className="text-xs text-[#555]">{order.restaurants?.name || "Restaurant"}</span>
+      <main className="pt-16 pb-8 px-4 max-w-[600px] mx-auto">
+        <div className="space-y-8 mt-4">
+          {/* Active Orders */}
+          {activeOrders.length > 0 && (
+            <div>
+              <h2 className="text-[12px] font-semibold text-[#999] uppercase tracking-wider mb-3">Active Orders</h2>
+              <div className="space-y-2">
+                {activeOrders.map((order) => (
+                  <Link
+                    key={order.id}
+                    href={`/order-confirm/${order.id}`}
+                    className="block p-4 rounded-xl border border-[#F0F0F0] hover:border-[#DDD] hover:shadow-sm transition-all active:scale-[0.99]"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <p className="text-sm font-semibold">{order.order_number}</p>
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <Store className="w-3 h-3 text-[#999]" />
+                          <span className="text-xs text-[#999]">{order.restaurants?.name || "Restaurant"}</span>
+                        </div>
                       </div>
+                      <span className={`text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full ${
+                        order.order_status === "received" ? "bg-[#25D366]/10 text-[#25D366]" :
+                        order.order_status === "preparing" ? "bg-blue-100 text-blue-600" :
+                        order.order_status === "ready" ? "bg-purple-100 text-purple-600" :
+                        "bg-gray-100 text-gray-500"
+                      }`}>
+                        {statusLabels[order.order_status] || order.order_status}
+                      </span>
                     </div>
-                    <Badge variant={statusColors[order.order_status] || "starter"} className="capitalize">
-                      {statusLabels[order.order_status] || order.order_status}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-[#999]">
-                    <span>{order.items?.length || 0} items • {formatPrice(order.total_price)}</span>
-                    <span>{new Date(order.created_at).toLocaleDateString("en-PK")}</span>
-                  </div>
-                </Link>
-              ))}
+                    <div className="flex items-center justify-between text-xs text-[#999]">
+                      <span>{order.items?.length || 0} items &bull; {formatPrice(order.total_price)}</span>
+                      <span>{new Date(order.created_at).toLocaleDateString("en-PK")}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Past Orders */}
-        {pastOrders.length > 0 && (
-          <div>
-            <h2 className="text-xs font-semibold text-[#999] uppercase tracking-wider mb-3">Past Orders</h2>
-            <div className="space-y-2">
-              {pastOrders.map((order) => (
-                <Link
-                  key={order.id}
-                  href={`/order-confirm/${order.id}`}
-                  className="block p-4 rounded-xl border border-[#F0F0F0] hover:border-[#DDD] hover:shadow-sm transition-all active:scale-[0.99]"
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <p className="text-sm font-semibold">{order.order_number}</p>
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <Store className="w-3 h-3 text-[#999]" />
-                        <span className="text-xs text-[#555]">{order.restaurants?.name || "Restaurant"}</span>
+          {/* Past Orders */}
+          {pastOrders.length > 0 && (
+            <div>
+              <h2 className="text-[12px] font-semibold text-[#999] uppercase tracking-wider mb-3">Past Orders</h2>
+              <div className="space-y-2">
+                {pastOrders.map((order) => (
+                  <Link
+                    key={order.id}
+                    href={`/order-confirm/${order.id}`}
+                    className="block p-4 rounded-xl border border-[#F0F0F0] hover:border-[#DDD] hover:shadow-sm transition-all active:scale-[0.99]"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <p className="text-sm font-semibold">{order.order_number}</p>
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <Store className="w-3 h-3 text-[#999]" />
+                          <span className="text-xs text-[#999]">{order.restaurants?.name || "Restaurant"}</span>
+                        </div>
                       </div>
+                      <span className={`text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full ${
+                        order.order_status === "completed" ? "bg-emerald-100 text-emerald-600" : "bg-gray-100 text-gray-500"
+                      }`}>
+                        {statusLabels[order.order_status] || order.order_status}
+                      </span>
                     </div>
-                    <Badge variant={order.order_status === "completed" ? "available" : "unavailable"}>
-                      {statusLabels[order.order_status] || order.order_status}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-[#999]">
-                    <span className="font-medium text-[#555]">{formatPrice(order.total_price)}</span>
-                    <span>{new Date(order.created_at).toLocaleDateString("en-PK")}</span>
-                  </div>
-                </Link>
-              ))}
+                    <div className="flex items-center justify-between text-xs text-[#999]">
+                      <span className="font-medium text-[#555]">{formatPrice(order.total_price)}</span>
+                      <span>{new Date(order.created_at).toLocaleDateString("en-PK")}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {orders.length === 0 && (
-          <div className="text-center py-12">
-            <Package className="w-10 h-10 text-[#999] mx-auto mb-3" />
-            <p className="text-[#555]">No orders yet</p>
-            <Link href="/restaurants" className="block mt-4">
-              <Button variant="primary">Browse Restaurants</Button>
-            </Link>
-          </div>
-        )}
-      </div>
+          {orders.length === 0 && (
+            <div className="text-center py-16">
+              <Package className="w-10 h-10 text-[#999] mx-auto mb-3" />
+              <p className="text-[#999]">No orders yet</p>
+              <Link href="/restaurants" className="block mt-4">
+                <Button variant="primary">Browse Restaurants</Button>
+              </Link>
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   )
 }

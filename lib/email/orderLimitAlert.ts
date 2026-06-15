@@ -1,5 +1,6 @@
 import { Resend } from "resend"
 import { createClient } from "@/lib/supabase/server"
+import { escapeHtml } from "@/lib/utils"
 
 let _r: Resend | null = null
 function get() {
@@ -55,12 +56,12 @@ export async function checkAndSendOrderLimitAlert(restaurantId: string): Promise
       subject: `You've received ${count} orders today — QRMenu.pk`,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #111;">
-          <h1 style="font-size: 22px; margin-bottom: 8px;">${restaurant.name}, you're busy today!</h1>
+          <h1 style="font-size: 22px; margin-bottom: 8px;">${escapeHtml(restaurant.name)}, you're busy today!</h1>
           <p style="color: #555; font-size: 15px; line-height: 1.6;">
             You've received <strong>${count} orders</strong> today. Your restaurant is doing great!
           </p>
           <p style="color: #555; font-size: 15px; line-height: 1.6;">
-            Keep an eye on your <a href="${process.env.NEXT_PUBLIC_APP_URL || ""}/dashboard/orders" style="color: #FF6B35;">orders dashboard</a> to stay on top of incoming orders.
+            Keep an eye on your <a href="${process.env.NEXT_PUBLIC_APP_URL || ""}/dashboard/orders" style="color: #25D366;">orders dashboard</a> to stay on top of incoming orders.
           </p>
           <div style="margin-top: 32px; padding: 20px; background: #F8F8F8; border-radius: 12px; text-align: center;">
             <p style="font-size: 36px; font-weight: bold; margin: 0;">${count}</p>

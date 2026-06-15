@@ -1,10 +1,10 @@
-﻿import { Flame, ChefHat, AlertTriangle } from "lucide-react"
+import { Flame, ChefHat, AlertTriangle } from "lucide-react"
 
 const badgeConfig: Record<string, { icon: typeof Flame; label: string; className: string }> = {
   popular: {
     icon: Flame,
     label: "Popular",
-    className: "text-[#FF6B35] bg-[#FF6B35]/10",
+    className: "text-[#25D366] bg-[#25D366]/10",
   },
   chef_special: {
     icon: ChefHat,

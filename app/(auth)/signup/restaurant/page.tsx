@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { slugify } from "@/lib/utils"
+import { ChevronLeft, Store } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 
 export default function RestaurantSignupPage() {
@@ -105,28 +106,30 @@ export default function RestaurantSignupPage() {
   ]
 
   if (checkingAuth) {
-    return <p className="text-center text-[#999] text-sm py-8">Loading...</p>
+    return <p className="text-center text-[#555555] text-sm py-8">Loading...</p>
   }
 
   return (
-    <div className="w-full">
-      <div className="mb-6">
-        <Link href="/signup" className="text-sm text-[#555] hover:text-black inline-flex items-center gap-1">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
-          Back
+    <div className="w-full max-w-[400px] mx-auto flex flex-col items-center">
+      {/* Header / Back Navigation */}
+      <div className="w-full flex justify-between items-center mb-8">
+        <Link href="/signup" className="group flex items-center gap-1 text-[#555] hover:text-black transition-colors">
+          <ChevronLeft className="w-[18px] h-[18px]" />
+          <span className="text-sm font-semibold">Back</span>
         </Link>
       </div>
-      <div className="text-center mb-8">
-        <div className="w-12 h-12 rounded-xl bg-[#FF6B35] text-white flex items-center justify-center mx-auto mb-4">
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
-          </svg>
+
+      {/* Identity Section */}
+      <div className="flex flex-col items-center text-center mb-8">
+        <div className="w-12 h-12 bg-[#25D366] rounded-xl flex items-center justify-center mb-4">
+          <Store className="w-6 h-6 text-white" />
         </div>
-        <h1 className="text-2xl font-bold">Register Your Restaurant</h1>
-        <p className="text-sm text-[#555] mt-1">Start your 7-day free trial today</p>
+        <h1 className="text-2xl font-bold text-black mb-1">Register Your Restaurant</h1>
+        <p className="text-sm text-[#555]">Start your 7-day free trial today</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Registration Form */}
+      <form onSubmit={handleSubmit} className="w-full space-y-4">
         {restaurantFields.map((f) => (
           <Input
             key={f.id}
@@ -160,12 +163,13 @@ export default function RestaurantSignupPage() {
         </Button>
       </form>
 
+      {/* Divider */}
       {!user && (
         <>
-          <div className="flex items-center gap-3 my-6">
-            <div className="flex-1 h-px bg-[#E8E8E8]" />
-            <span className="text-xs text-[#999]">or</span>
-            <div className="flex-1 h-px bg-[#E8E8E8]" />
+          <div className="w-full flex items-center gap-4 my-6">
+            <div className="flex-1 h-px bg-[#F0F0F0]" />
+            <span className="text-xs text-[#555] uppercase tracking-wider">or</span>
+            <div className="flex-1 h-px bg-[#F0F0F0]" />
           </div>
 
           <Button variant="google" onClick={handleGoogleSignup}>
@@ -188,7 +192,7 @@ export default function RestaurantSignupPage() {
 
       <p className="text-sm text-[#555] text-center mt-6">
         Already have an account?{" "}
-        <Link href="/login" className="text-[#FF6B35] font-semibold hover:underline">Sign in</Link>
+        <Link href="/login" className="text-[#25D366] font-semibold hover:underline">Sign in</Link>
       </p>
     </div>
   )

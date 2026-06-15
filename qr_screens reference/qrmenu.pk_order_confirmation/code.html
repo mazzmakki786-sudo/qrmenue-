@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Order Confirmed | QRMenu.pk</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "whatsapp-green": "#25D366",
+                    "background": "#f8f9fa",
+                    "surface-container-highest": "#e1e3e4",
+                    "on-primary-fixed-variant": "#005322",
+                    "inverse-surface": "#2e3132",
+                    "deep-black": "#000000",
+                    "surface-container": "#edeeef",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed": "#e2e2e2",
+                    "surface-variant": "#e1e3e4",
+                    "on-error-container": "#93000a",
+                    "surface-container-lowest": "#ffffff",
+                    "surface": "#f8f9fa",
+                    "outline-variant": "#bbcbb9",
+                    "on-primary-container": "#005523",
+                    "tertiary-fixed": "#ffdbcf",
+                    "outline": "#6c7b6b",
+                    "on-background": "#191c1d",
+                    "secondary-fixed-dim": "#c6c6c6",
+                    "on-tertiary-fixed": "#380d00",
+                    "inverse-on-surface": "#f0f1f2",
+                    "on-secondary-container": "#646464",
+                    "on-primary-fixed": "#002109",
+                    "tertiary-fixed-dim": "#ffb59b",
+                    "on-surface": "#191c1d",
+                    "on-secondary-fixed-variant": "#474747",
+                    "surface-bright": "#f8f9fa",
+                    "on-tertiary-container": "#78351b",
+                    "on-surface-variant": "#3c4a3d",
+                    "secondary": "#5e5e5e",
+                    "on-tertiary-fixed-variant": "#763319",
+                    "pure-white": "#FFFFFF",
+                    "on-secondary-fixed": "#1b1b1b",
+                    "inverse-primary": "#3de273",
+                    "primary": "#006d2f",
+                    "surface-dim": "#d9dadb",
+                    "surface-container-low": "#f3f4f5",
+                    "on-tertiary": "#ffffff",
+                    "secondary-container": "#e2e2e2",
+                    "surface-gray": "#F9FAFB",
+                    "primary-fixed": "#66ff8e",
+                    "border-light": "#F0F0F0",
+                    "primary-container": "#25d366",
+                    "tertiary-container": "#ffa07e",
+                    "surface-tint": "#006d2f",
+                    "primary-fixed-dim": "#3de273",
+                    "on-error": "#ffffff",
+                    "text-muted": "#555555",
+                    "surface-container-high": "#e7e8e9",
+                    "tertiary": "#93492e",
+                    "on-secondary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-sm": "8px",
+                    "margin-mobile": "16px",
+                    "unit": "4px",
+                    "margin-desktop": "40px",
+                    "gutter": "24px",
+                    "container-max": "1280px",
+                    "stack-md": "16px",
+                    "stack-lg": "32px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "label-md": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8F8F8; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .success-pulse { animation: pulse-subtle 2s infinite ease-in-out; }
+        @keyframes pulse-subtle { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    </style>
+</head>
+<body class="text-on-background antialiased min-h-screen pb-24">
+<!-- Top AppBar (Suppressed Navigation according to Shell Visibility Rule) -->
+<header class="bg-pure-white/80 backdrop-blur-md sticky top-0 z-50 w-full shadow-sm">
+<div class="flex items-center justify-between px-margin-mobile h-16 w-full max-w-container-max mx-auto">
+<div class="flex items-center gap-4">
+<button class="active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-deep-black">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-deep-black">Order Placed</h1>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">help</span>
+<span class="material-symbols-outlined text-secondary">more_vert</span>
+</div>
+</div>
+</header>
+<main class="max-w-[500px] mx-auto px-margin-mobile py-stack-lg space-y-gutter">
+<!-- Success Card -->
+<section class="bg-pure-white border border-border-light rounded-[14px] p-6 text-center shadow-sm">
+<div class="flex justify-center mb-4">
+<div class="w-16 h-16 bg-[#DCFCE7] rounded-full flex items-center justify-center success-pulse">
+<span class="material-symbols-outlined text-whatsapp-green text-[32px]" style="font-variation-settings: 'wght' 600;">check</span>
+</div>
+</div>
+<h2 class="font-headline-md text-headline-md font-bold text-deep-black mb-1">Order Placed!</h2>
+<p class="font-label-md text-label-md text-primary font-bold mb-3">#QR-8291</p>
+<p class="font-body-sm text-body-sm text-secondary px-4">Your order has been sent to <span class="font-semibold">Ghani Grill</span> on WhatsApp</p>
+</section>
+<!-- WhatsApp Automation Status -->
+<section class="bg-pure-white border border-border-light rounded-[14px] p-5 shadow-sm overflow-hidden transition-all duration-500" id="whatsapp-container">
+<div class="space-y-stack-md" id="countdown-state">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-whatsapp-green">chat</span>
+<span class="font-label-md text-label-md text-deep-black">Opening WhatsApp...</span>
+</div>
+<span class="font-label-md text-label-md text-secondary" id="timer-text">5s</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-whatsapp-green w-0 transition-all duration-[5000ms] ease-linear" id="progress-bar"></div>
+</div>
+</div>
+<div class="hidden flex items-center justify-between" id="success-state">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-whatsapp-green" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-md text-label-md text-deep-black">WhatsApp opened!</span>
+</div>
+<button class="font-label-md text-label-md text-primary font-bold">Resend</button>
+</div>
+<button class="w-full mt-4 bg-whatsapp-green text-pure-white font-label-md text-label-md py-3.5 rounded-lg font-bold flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
+                Send on WhatsApp now
+            </button>
+</section>
+<!-- Order Summary Card -->
+<section class="bg-pure-white border border-border-light rounded-[14px] p-5 shadow-sm">
+<div class="flex items-center gap-2 mb-gutter">
+<span class="material-symbols-outlined text-[#F97316]">package_2</span>
+<h3 class="font-headline-md text-headline-md font-bold text-deep-black">Order Summary</h3>
+</div>
+<div class="space-y-stack-md mb-stack-lg">
+<div class="flex justify-between items-center">
+<span class="font-body-md text-body-md text-deep-black">Chicken Tikka x 2</span>
+<span class="font-body-md text-body-md text-deep-black">Rs. 1,100</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-body-md text-body-md text-deep-black">Garlic Naan x 3</span>
+<span class="font-body-md text-body-md text-deep-black">Rs. 240</span>
+</div>
+<div class="pt-stack-md border-t border-border-light flex justify-between items-center">
+<span class="font-headline-md text-headline-md font-bold text-deep-black">Total</span>
+<span class="font-headline-md text-headline-md font-bold text-deep-black">Rs. 1,340</span>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-xl p-4 space-y-3">
+<div class="flex justify-between">
+<span class="font-label-sm text-label-sm text-secondary">Customer</span>
+<span class="font-label-sm text-label-sm text-deep-black font-semibold">Ahmed Khan</span>
+</div>
+<div class="flex justify-between">
+<span class="font-label-sm text-label-sm text-secondary">Phone</span>
+<span class="font-label-sm text-label-sm text-deep-black font-semibold">+92 300 1234567</span>
+</div>
+<div class="flex justify-between">
+<span class="font-label-sm text-label-sm text-secondary">Table</span>
+<span class="font-label-sm text-label-sm text-deep-black font-semibold">Table 4</span>
+</div>
+<div class="flex justify-between">
+<span class="font-label-sm text-label-sm text-secondary">Type</span>
+<span class="font-label-sm text-label-sm text-deep-black font-semibold">Dine-in</span>
+</div>
+<div class="flex justify-between">
+<span class="font-label-sm text-label-sm text-secondary">Payment</span>
+<span class="font-label-sm text-label-sm text-deep-black font-semibold">Cash</span>
+</div>
+</div>
+</section>
+<!-- Sign-in Prompt -->
+<section class="bg-pure-white border border-border-light rounded-[14px] p-4 shadow-sm flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-surface-container rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">login</span>
+</div>
+<span class="font-body-md text-body-md font-medium text-deep-black">Track your order</span>
+</div>
+<a class="font-label-md text-label-md text-[#F97316] font-bold" href="#">Sign in</a>
+</section>
+<!-- Bottom Actions -->
+<div class="space-y-3 pt-stack-md">
+<button class="w-full flex items-center justify-center gap-2 py-3 rounded-lg text-secondary font-label-md text-label-md border border-border-light hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[20px]">content_paste</span>
+                View my orders
+            </button>
+<button class="w-full flex items-center justify-center gap-2 py-3 rounded-lg text-secondary font-label-md text-label-md border border-border-light hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[20px]">storefront</span>
+                Browse more restaurants
+            </button>
+</div>
+</main>
+<script>
+        // WhatsApp Automation Simulation
+        window.addEventListener('DOMContentLoaded', () => {
+            const progressBar = document.getElementById('progress-bar');
+            const timerText = document.getElementById('timer-text');
+            const countdownState = document.getElementById('countdown-state');
+            const successState = document.getElementById('success-state');
+            
+            let timeLeft = 5;
+
+            // Trigger progress bar
+            setTimeout(() => {
+                progressBar.style.width = '100%';
+            }, 100);
+
+            const timerInterval = setInterval(() => {
+                timeLeft--;
+                timerText.textContent = timeLeft + 's';
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    countdownState.classList.add('hidden');
+                    successState.classList.remove('hidden');
+                }
+            }, 1000);
+        });
+    </script>
+</body></html>

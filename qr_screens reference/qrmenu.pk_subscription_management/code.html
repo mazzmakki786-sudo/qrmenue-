@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Subscription Management | QRMenu.pk</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-header {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 0.1; }
+            50% { opacity: 0.3; }
+        }
+        .skeleton {
+            background-color: #e2e8f0;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            transform: translateX(-100%);
+            background-image: linear-gradient(90deg, rgba(255, 255, 255, 0) 0, rgba(255, 255, 255, 0.2) 20%, rgba(255, 255, 255, 0.5) 60%, rgba(255, 255, 255, 0));
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer {
+            100% { transform: translateX(100%); }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                "secondary-fixed-dim": "#c6c6c6",
+                "on-tertiary-container": "#78351b",
+                "on-error-container": "#93000a",
+                "on-secondary": "#ffffff",
+                "tertiary-container": "#ffa07e",
+                "surface-tint": "#006d2f",
+                "on-surface-variant": "#3c4a3d",
+                "inverse-on-surface": "#f0f1f2",
+                "surface-container-low": "#f3f4f5",
+                "primary-fixed-dim": "#3de273",
+                "on-tertiary-fixed-variant": "#763319",
+                "error-container": "#ffdad6",
+                "surface-gray": "#F9FAFB",
+                "outline-variant": "#bbcbb9",
+                "surface-container-highest": "#e1e3e4",
+                "surface-variant": "#e1e3e4",
+                "border-light": "#F0F0F0",
+                "outline": "#6c7b6b",
+                "on-secondary-fixed-variant": "#474747",
+                "tertiary-fixed-dim": "#ffb59b",
+                "inverse-primary": "#3de273",
+                "surface-container-lowest": "#ffffff",
+                "on-primary-fixed-variant": "#005322",
+                "text-muted": "#555555",
+                "surface": "#f8f9fa",
+                "tertiary-fixed": "#ffdbcf",
+                "surface-dim": "#d9dadb",
+                "on-tertiary": "#ffffff",
+                "on-surface": "#191c1d",
+                "secondary": "#5e5e5e",
+                "background": "#f8f9fa",
+                "primary-container": "#25d366",
+                "on-primary-container": "#005523",
+                "inverse-surface": "#2e3132",
+                "surface-bright": "#f8f9fa",
+                "secondary-container": "#e2e2e2",
+                "pure-white": "#FFFFFF",
+                "primary-fixed": "#66ff8e",
+                "primary": "#006d2f",
+                "surface-container-high": "#e7e8e9",
+                "on-tertiary-fixed": "#380d00",
+                "surface-container": "#edeeef",
+                "on-primary": "#ffffff",
+                "on-error": "#ffffff",
+                "tertiary": "#93492e",
+                "on-secondary-fixed": "#1b1b1b",
+                "on-background": "#191c1d",
+                "whatsapp-green": "#25D366",
+                "on-secondary-container": "#646464",
+                "error": "#ba1a1a",
+                "on-primary-fixed": "#002109",
+                "secondary-fixed": "#e2e2e2",
+                "deep-black": "#000000"
+              },
+              "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+              },
+              "spacing": {
+                "margin-mobile": "16px",
+                "stack-md": "16px",
+                "stack-lg": "32px",
+                "stack-sm": "8px",
+                "gutter": "24px",
+                "margin-desktop": "40px",
+                "unit": "4px",
+                "container-max": "1280px"
+              },
+              "fontFamily": {
+                "label-md": ["Inter"],
+                "headline-lg-mobile": ["Inter"],
+                "body-md": ["Inter"],
+                "display-lg": ["Inter"],
+                "body-sm": ["Inter"],
+                "headline-lg": ["Inter"],
+                "body-lg": ["Inter"],
+                "label-sm": ["Inter"],
+                "headline-md": ["Inter"]
+              },
+              "fontSize": {
+                "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-[#F8F8F8] font-body-md text-on-surface">
+<!-- Top Navigation (Shared Component Style) -->
+<nav class="bg-pure-white/80 glass-header sticky top-0 z-50 w-full h-16 border-b border-border-light flex items-center px-margin-desktop">
+<div class="max-w-container-max mx-auto w-full flex justify-between items-center">
+<span class="font-headline-md text-headline-md font-bold text-deep-black">QRMenu.pk</span>
+<div class="hidden md:flex gap-8 items-center">
+<a class="font-body-md text-body-md text-text-muted hover:text-deep-black transition-colors" href="#">Dashboard</a>
+<a class="font-body-md text-body-md text-text-muted hover:text-deep-black transition-colors" href="#">Menu</a>
+<a class="font-body-md text-body-md text-text-muted hover:text-deep-black transition-colors" href="#">Orders</a>
+<a class="font-body-md text-body-md text-deep-black border-b-2 border-deep-black pb-1" href="#">Subscription</a>
+<a class="font-body-md text-body-md text-text-muted hover:text-deep-black transition-colors" href="#">Settings</a>
+</div>
+<button class="bg-deep-black text-pure-white px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-all">Support</button>
+</div>
+</nav>
+<main class="max-w-2xl mx-auto px-margin-mobile py-stack-lg flex flex-col gap-stack-lg">
+<!-- Header Section -->
+<section class="space-y-2">
+<h1 class="font-headline-lg text-headline-lg font-bold text-deep-black">Subscription</h1>
+<p class="font-body-md text-body-md text-text-muted">Manage your plan and billing</p>
+</section>
+<!-- Suspended Banner -->
+<div class="bg-gradient-to-r from-amber-50 to-amber-100 border border-amber-200 rounded-xl p-4 flex items-start gap-4 shadow-sm">
+<span class="material-symbols-outlined text-amber-600" data-icon="warning">warning</span>
+<div>
+<h4 class="font-label-md text-label-md text-amber-900">Subscription Suspended</h4>
+<p class="font-body-sm text-body-sm text-amber-800">Your account is currently in a restricted state. Please upgrade or renew your plan to continue receiving orders.</p>
+</div>
+</div>
+<!-- Current Plan Section -->
+<section class="bg-pure-white border border-border-light rounded-[14px] p-6 shadow-sm">
+<div class="flex justify-between items-center mb-6">
+<div class="flex items-center gap-3">
+<span class="font-label-md text-label-md text-text-muted uppercase tracking-wider">Current Plan</span>
+<span class="bg-deep-black text-pure-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Starter</span>
+</div>
+<div class="text-right">
+<p class="font-label-md text-label-md text-deep-black">7 days remaining</p>
+<p class="font-body-sm text-body-sm text-text-muted">Renew on Oct 24, 2024</p>
+</div>
+</div>
+<!-- Usage Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-gutter border-t border-border-light pt-6">
+<!-- Dishes -->
+<div class="space-y-2">
+<span class="font-label-sm text-label-sm text-text-muted">Dishes</span>
+<div class="flex justify-between items-end">
+<span class="font-headline-md text-headline-md text-deep-black">28 <span class="text-text-muted text-sm font-normal">/ 30</span></span>
+</div>
+<div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-amber-500" style="width: 93%;"></div>
+</div>
+</div>
+<!-- Images -->
+<div class="space-y-2">
+<span class="font-label-sm text-label-sm text-text-muted">Images</span>
+<div class="flex justify-between items-end">
+<span class="font-headline-md text-headline-md text-deep-black">10 <span class="text-text-muted text-sm font-normal">/ 10</span></span>
+</div>
+<div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-error" style="width: 100%;"></div>
+</div>
+</div>
+<!-- Orders -->
+<div class="space-y-2">
+<span class="font-label-sm text-label-sm text-text-muted">Orders</span>
+<div class="flex justify-between items-end">
+<span class="font-headline-md text-headline-md text-deep-black">∞</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-deep-black" style="width: 10%;"></div>
+</div>
+</div>
+<!-- Categories -->
+<div class="space-y-2">
+<span class="font-label-sm text-label-sm text-text-muted">Categories</span>
+<div class="flex justify-between items-end">
+<span class="font-headline-md text-headline-md text-deep-black">5 <span class="text-text-muted text-sm font-normal">/ 8</span></span>
+</div>
+<div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-deep-black" style="width: 62.5%;"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Skeleton Loader Example (Simulating data fetching for historical items) -->
+<div class="space-y-3 opacity-50">
+<div class="h-4 w-32 skeleton rounded"></div>
+<div class="h-24 w-full skeleton rounded-xl"></div>
+</div>
+<!-- Upgrade Plans Section -->
+<section class="space-y-stack-md">
+<h2 class="font-headline-md text-headline-md font-bold text-deep-black">Upgrade Plans</h2>
+<!-- Plan Stack -->
+<div class="flex flex-col gap-4">
+<!-- Starter Plan -->
+<div class="bg-pure-white border border-border-light rounded-[14px] p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+<div class="flex-1">
+<h3 class="font-headline-md text-headline-md text-deep-black">Starter</h3>
+<p class="font-body-sm text-body-sm text-text-muted mb-4">Perfect for small kiosks</p>
+<ul class="grid grid-cols-2 gap-x-4 gap-y-2">
+<li class="flex items-center gap-2 text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-lg" data-icon="check_circle">check_circle</span> 30 dishes
+                            </li>
+<li class="flex items-center gap-2 text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-lg" data-icon="check_circle">check_circle</span> 10 images
+                            </li>
+<li class="flex items-center gap-2 text-body-sm">
+<span class="material-symbols-outlined text-secondary-fixed-dim text-lg" data-icon="cancel">cancel</span> No Branding
+                            </li>
+</ul>
+</div>
+<div class="text-right w-full md:w-auto">
+<div class="font-headline-lg text-headline-lg text-deep-black mb-2">PKR 1,200<span class="text-sm font-normal">/mo</span></div>
+<button class="w-full md:w-auto bg-deep-black text-pure-white px-6 py-3 rounded-xl font-label-md text-label-md hover:bg-zinc-800 transition-all">Choose Starter</button>
+</div>
+</div>
+<!-- Growth Plan (POPULAR) -->
+<div class="bg-pure-white border-2 border-deep-black rounded-[20px] p-6 relative flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-xl">
+<div class="absolute -top-3 left-6 bg-deep-black text-pure-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">MOST POPULAR</div>
+<div class="flex-1">
+<h3 class="font-headline-md text-headline-md text-deep-black">Growth</h3>
+<p class="font-body-sm text-body-sm text-text-muted mb-4">For growing restaurants</p>
+<ul class="grid grid-cols-2 gap-x-4 gap-y-2">
+<li class="flex items-center gap-2 text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-lg" data-icon="check_circle">check_circle</span> 50 dishes
+                            </li>
+<li class="flex items-center gap-2 text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-lg" data-icon="check_circle">check_circle</span> 20 images
+                            </li>
+<li class="flex items-center gap-2 text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-lg" data-icon="check_circle">check_circle</span> Custom Branding
+                            </li>
+<li class="flex items-center gap-2 text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-lg" data-icon="check_circle">check_circle</span> Priority Support
+                            </li>
+</ul>
+</div>
+<div class="text-right w-full md:w-auto">
+<div class="font-headline-lg text-headline-lg text-deep-black mb-2">PKR 2,500<span class="text-sm font-normal">/mo</span></div>
+<button class="w-full md:w-auto bg-whatsapp-green text-pure-white px-6 py-3 rounded-xl font-label-md text-label-md hover:opacity-90 transition-all flex items-center justify-center gap-2">
+                            Choose Growth on WhatsApp
+                        </button>
+</div>
+</div>
+<!-- Premium Plan -->
+<div class="bg-pure-white border border-border-light rounded-[14px] p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+<div class="flex-1">
+<h3 class="font-headline-md text-headline-md text-deep-black">Premium</h3>
+<p class="font-body-sm text-body-sm text-text-muted mb-4">Complete enterprise solution</p>
+<ul class="grid grid-cols-2 gap-x-4 gap-y-2">
+<li class="flex items-center gap-2 text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-lg" data-icon="check_circle">check_circle</span> 100 dishes
+                            </li>
+<li class="flex items-center gap-2 text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-lg" data-icon="check_circle">check_circle</span> 100 images
+                            </li>
+<li class="flex items-center gap-2 text-body-sm">
+<span class="material-symbols-outlined text-whatsapp-green text-lg" data-icon="check_circle">check_circle</span> Everything in Growth
+                            </li>
+</ul>
+</div>
+<div class="text-right w-full md:w-auto">
+<div class="font-headline-lg text-headline-lg text-deep-black mb-2">PKR 4,500<span class="text-sm font-normal">/mo</span></div>
+<button class="w-full md:w-auto bg-deep-black text-pure-white px-6 py-3 rounded-xl font-label-md text-label-md hover:bg-zinc-800 transition-all">Choose Premium</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Payment Instructions -->
+<section class="bg-surface-gray border border-border-light rounded-xl p-8 space-y-6">
+<h3 class="font-headline-md text-headline-md font-bold text-deep-black">How to Pay</h3>
+<p class="font-body-sm text-body-sm text-text-muted">We currently accept manual payments via JazzCash, Easypaisa, and direct Bank Transfer. Please send the amount and share the screenshot with our support team.</p>
+<div class="grid md:grid-cols-3 gap-6">
+<div class="bg-pure-white p-4 rounded-lg border border-border-light">
+<p class="font-label-sm text-label-sm text-text-muted mb-1">JazzCash</p>
+<p class="font-label-md text-label-md text-deep-black">0300 1234567</p>
+<p class="text-[11px] text-text-muted">A/C Title: QRMenu Pk</p>
+</div>
+<div class="bg-pure-white p-4 rounded-lg border border-border-light">
+<p class="font-label-sm text-label-sm text-text-muted mb-1">Easypaisa</p>
+<p class="font-label-md text-label-md text-deep-black">0300 1234567</p>
+<p class="text-[11px] text-text-muted">A/C Title: QRMenu Pk</p>
+</div>
+<div class="bg-pure-white p-4 rounded-lg border border-border-light">
+<p class="font-label-sm text-label-sm text-text-muted mb-1">Bank Transfer</p>
+<p class="font-label-md text-label-md text-deep-black">PK00 HABB 0000 1234</p>
+<p class="text-[11px] text-text-muted">Habib Bank Limited</p>
+</div>
+</div>
+<div class="bg-whatsapp-green/5 border border-whatsapp-green/10 p-4 rounded-lg flex items-center gap-3">
+<span class="material-symbols-outlined text-whatsapp-green" data-icon="help_center">help_center</span>
+<p class="font-body-sm text-body-sm text-on-surface">After payment, send your proof of receipt to our WhatsApp support for instant activation.</p>
+</div>
+</section>
+<!-- Support Card -->
+<section class="bg-pure-white border border-border-light rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+<div class="text-center md:text-left">
+<h4 class="font-label-md text-label-md text-deep-black">Need to change your plan?</h4>
+<p class="font-body-sm text-body-sm text-text-muted">Talk to us if you have unique requirements or need a custom plan.</p>
+</div>
+<a class="bg-whatsapp-green text-pure-white px-6 py-3 rounded-full font-label-md text-label-md flex items-center gap-2 hover:opacity-90 transition-all shadow-md" href="https://wa.me/923001234567" target="_blank">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+                Contact Support
+            </a>
+</section>
+</main>
+<!-- Footer (Shared Component Style) -->
+<footer class="bg-pure-white border-t border-border-light py-10 mt-20">
+<div class="max-w-container-max mx-auto px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex flex-col items-center md:items-start gap-2">
+<span class="font-label-md text-label-md font-bold text-deep-black">QRMenu.pk</span>
+<p class="font-body-sm text-body-sm text-text-muted">© 2024 QRMenu.pk. All rights reserved.</p>
+</div>
+<div class="flex gap-8">
+<a class="font-body-sm text-body-sm text-text-muted hover:text-deep-black transition-colors" href="#">Privacy Policy</a>
+<a class="font-body-sm text-body-sm text-text-muted hover:text-deep-black transition-colors" href="#">Terms of Service</a>
+<a class="font-body-sm text-body-sm text-text-muted hover:text-deep-black transition-colors" href="#">WhatsApp Support</a>
+</div>
+</div>
+</footer>
+<script>
+        // Simple Interaction: Simulate checking for plan status
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const originalText = btn.innerHTML;
+                btn.innerHTML = `<span class="animate-spin material-symbols-outlined text-lg" data-icon="progress_activity">progress_activity</span>`;
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                }, 1500);
+            });
+        });
+    </script>
+</body></html>

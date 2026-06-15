@@ -1,6 +1,7 @@
 import { Resend } from "resend"
 import { createClient } from "@/lib/supabase/server"
 import { PLAN_NAMES, PLAN_PRICES, type Plan } from "@/lib/subscription"
+import { escapeHtml } from "@/lib/utils"
 
 let _resend: Resend | null = null
 function getResend(): Resend {
@@ -38,6 +39,7 @@ interface EmailContent {
 
 function buildContent(opts: SendOptions): EmailContent {
   const { restaurantName, type, daysRemaining = 0 } = opts
+  const safeRestaurantName = escapeHtml(restaurantName)
   const trialDays = 7
   const graceDays = 3
 
@@ -51,7 +53,7 @@ function buildContent(opts: SendOptions): EmailContent {
 
   const buttonStyle = `
     display: inline-block;
-    background: #FF6B35;
+    background: #25D366;
     color: white;
     padding: 14px 32px;
     border-radius: 10px;
@@ -60,7 +62,7 @@ function buildContent(opts: SendOptions): EmailContent {
     font-size: 15px;
   `
 
-  const upgradeUrl = `${process.env.NEXT_PUBLIC_APP_URL || "https://qr-menue-one.vercel.app"}/dashboard/subscription`
+  const upgradeUrl = `${process.env.NEXT_PUBLIC_APP_URL || ""}/dashboard/subscription`
 
   switch (type) {
     case "5_days_left":
@@ -68,7 +70,7 @@ function buildContent(opts: SendOptions): EmailContent {
         subject: `${daysRemaining} days left in your QRMenu trial — upgrade to keep going`,
         html: `
           <div style="${sharedStyle}">
-            <h1 style="font-size: 24px; margin-bottom: 8px;">${restaurantName}, your trial is halfway through</h1>
+            <h1 style="font-size: 24px; margin-bottom: 8px;">${safeRestaurantName}, your trial is halfway through</h1>
             <p style="color: #555; font-size: 15px; line-height: 1.6;">
               You have <strong>${daysRemaining} days left</strong> in your free trial. We hope QRMenu is helping you take more orders.
             </p>
@@ -90,7 +92,7 @@ function buildContent(opts: SendOptions): EmailContent {
         subject: `3 days left — don't lose your menu`,
         html: `
           <div style="${sharedStyle}">
-            <h1 style="font-size: 24px; margin-bottom: 8px;">3 days left, ${restaurantName}</h1>
+            <h1 style="font-size: 24px; margin-bottom: 8px;">3 days left, ${safeRestaurantName}</h1>
             <p style="color: #555; font-size: 15px; line-height: 1.6;">
               Your trial ends in <strong>3 days</strong>. After that, your menu will go offline.
             </p>
@@ -113,7 +115,7 @@ function buildContent(opts: SendOptions): EmailContent {
         subject: `⏰ Last day of your trial — upgrade to keep your menu live`,
         html: `
           <div style="${sharedStyle}">
-            <h1 style="font-size: 24px; margin-bottom: 8px;">Last day, ${restaurantName}</h1>
+            <h1 style="font-size: 24px; margin-bottom: 8px;">Last day, ${safeRestaurantName}</h1>
             <p style="color: #555; font-size: 15px; line-height: 1.6;">
               Your free trial ends <strong>tomorrow</strong>. After that, your menu will be hidden from customers.
             </p>
@@ -137,7 +139,7 @@ function buildContent(opts: SendOptions): EmailContent {
           <div style="${sharedStyle}">
             <h1 style="font-size: 24px; margin-bottom: 8px;">Trial ended</h1>
             <p style="color: #555; font-size: 15px; line-height: 1.6;">
-              Your ${trialDays}-day free trial has ended, ${restaurantName}. You now have <strong>${graceDays} days of grace</strong> to upgrade before your menu goes offline.
+              Your ${trialDays}-day free trial has ended, ${safeRestaurantName}. You now have <strong>${graceDays} days of grace</strong> to upgrade before your menu goes offline.
             </p>
             <p style="color: #555; font-size: 15px; line-height: 1.6;">
               <strong>Your data is safe.</strong> All your dishes, images, and orders are preserved. Just pick a plan to restore full access.
@@ -156,7 +158,7 @@ function buildContent(opts: SendOptions): EmailContent {
           <div style="${sharedStyle}">
             <h1 style="font-size: 24px; margin-bottom: 8px;">1 day of grace left</h1>
             <p style="color: #555; font-size: 15px; line-height: 1.6;">
-              ${restaurantName}, your grace period ends tomorrow. After that, your menu will be hidden.
+              ${safeRestaurantName}, your grace period ends tomorrow. After that, your menu will be hidden.
             </p>
             <div style="margin: 32px 0; text-align: center;">
               <a href="${upgradeUrl}" style="${buttonStyle}">Upgrade Now →</a>
@@ -172,7 +174,7 @@ function buildContent(opts: SendOptions): EmailContent {
           <div style="${sharedStyle}">
             <h1 style="font-size: 24px; margin-bottom: 8px;">Last day of grace</h1>
             <p style="color: #555; font-size: 15px; line-height: 1.6;">
-              ${restaurantName}, this is your final reminder. After today, your menu will be hidden from customers.
+              ${safeRestaurantName}, this is your final reminder. After today, your menu will be hidden from customers.
             </p>
             <div style="margin: 32px 0; text-align: center;">
               <a href="${upgradeUrl}" style="${buttonStyle}">Keep My Menu Live →</a>

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { z } from "zod"
-import { getEffectiveLimits, type Plan } from "@/lib/subscription"
+import { PLAN_LIMITS, type Plan } from "@/lib/subscription"
+import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 
 const createSchema = z.object({
   name_en: z.string().min(1, "Name is required"),
@@ -14,6 +15,12 @@ const deleteSchema = z.object({
 })
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request)
+  const allowed = await rateLimit(ip, 20, 60)
+  if (!allowed) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 })
+  }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -22,20 +29,26 @@ export async function POST(request: Request) {
     .from("restaurants")
     .select("id, plan, is_active, is_suspended, plan_limits_override")
     .eq("owner_id", user.id)
-    .single()
+    .maybeSingle()
 
   if (!restaurant) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
   if (!restaurant.is_active) return NextResponse.json({ error: "Restaurant is not active" }, { status: 403 })
   if (restaurant.is_suspended) return NextResponse.json({ error: "Restaurant is suspended" }, { status: 403 })
 
-  const body = await request.json()
+  let body: any
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 })
+  }
+
   const parsed = createSchema.safeParse(body)
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten().fieldErrors }, { status: 400 })
   }
 
   const plan = restaurant.plan as Plan
-  const limits = getEffectiveLimits(plan, restaurant.plan_limits_override)
+  const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.trial
 
   const { count: categoryCount } = await supabase
     .from("categories")
@@ -72,7 +85,13 @@ export async function DELETE(request: Request) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const body = await request.json()
+  let body: any
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 })
+  }
+
   const parsed = deleteSchema.safeParse(body)
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten().fieldErrors }, { status: 400 })
@@ -82,7 +101,7 @@ export async function DELETE(request: Request) {
     .from("categories")
     .select("id, restaurant_id")
     .eq("id", parsed.data.id)
-    .single()
+    .maybeSingle()
 
   if (!category) return NextResponse.json({ error: "Category not found" }, { status: 404 })
 
@@ -91,9 +110,22 @@ export async function DELETE(request: Request) {
     .select("id")
     .eq("id", category.restaurant_id)
     .eq("owner_id", user.id)
-    .single()
+    .maybeSingle()
 
   if (!restaurant) return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
+
+  const { count: dishCount } = await supabase
+    .from("dishes")
+    .select("id", { count: "exact", head: true })
+    .eq("category_id", parsed.data.id)
+
+  if ((dishCount ?? 0) > 0) {
+    return NextResponse.json({
+      error: "CATEGORY_HAS_DISHES",
+      message: `Cannot delete category with ${dishCount} dish(es). Move or delete dishes first.`,
+      dishCount: dishCount ?? 0,
+    }, { status: 409 })
+  }
 
   const { error } = await supabase
     .from("categories")

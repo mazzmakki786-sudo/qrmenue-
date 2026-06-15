@@ -22,18 +22,18 @@ export function CategoryTabs({ categories, activeCategory, onSelect }: Props) {
   }, [activeCategory])
 
   return (
-    <div ref={scrollRef} className="overflow-x-auto scrollbar-hide [mask-image:linear-gradient(to_right,black_calc(100%-24px),transparent_100%)]">
-      <div className="flex gap-1.5 px-4 pb-3">
+    <div className="overflow-x-auto no-scrollbar pb-3 pt-6 px-4">
+      <div className="flex gap-2">
         <button
           onClick={() => onSelect(null)}
-          className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+          className={`flex-shrink-0 px-6 py-2 rounded-full text-sm font-semibold transition-colors flex items-center gap-2 ${
             !activeCategory
               ? "bg-black text-white shadow-sm"
-              : "bg-[#F8F8F8] text-[#555] hover:bg-[#F0F0F0]"
+              : "bg-[#F9FAFB] text-[#555] hover:bg-[#F0F0F0]"
           } ${lang === "ur" ? "font-urdu" : ""}`}
         >
           {lang === "ur" ? "تمام" : "All"}
-          <span className="ml-1.5 text-xs opacity-60">({categories.length})</span>
+          <span className="text-[10px] bg-[#F0F0F0] px-1.5 rounded-full">{categories.length}</span>
         </button>
         {categories.map((cat) => {
           const isActive = activeCategory === cat.id
@@ -44,14 +44,14 @@ export function CategoryTabs({ categories, activeCategory, onSelect }: Props) {
               key={cat.id}
               ref={isActive ? activeRef : null}
               onClick={() => onSelect(isActive ? null : cat.id)}
-              className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              className={`flex-shrink-0 px-6 py-2 rounded-full text-sm font-semibold transition-colors flex items-center gap-2 ${
                 isActive
                   ? "bg-black text-white shadow-sm"
-                  : "bg-[#F8F8F8] text-[#555] hover:bg-[#F0F0F0]"
+                  : "bg-[#F9FAFB] text-[#555] hover:bg-[#F0F0F0]"
               } ${lang === "ur" ? "font-urdu" : ""}`}
             >
               {label}
-              <span className="ml-1.5 text-xs opacity-60">({count})</span>
+              <span className={`text-[10px] ${isActive ? "bg-white/20 text-white" : "bg-[#F0F0F0] text-[#555]"} px-1.5 rounded-full`}>{count}</span>
             </button>
           )
         })}

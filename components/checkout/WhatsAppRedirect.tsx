@@ -40,7 +40,7 @@ export function WhatsAppRedirect({ order, restaurant, customerName, customerPhon
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center justify-center h-12 px-6 rounded-[10px] border border-[#E8E8E8] text-[#111] font-semibold hover:bg-[#F8F8F8] transition-colors"
+        className="inline-flex items-center justify-center h-12 px-6 rounded-[10px] border border-[#F0F0F0] text-[#111] font-semibold hover:bg-[#F9FAFB] transition-colors"
       >
         Resend WhatsApp Message
       </a>

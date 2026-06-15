@@ -47,9 +47,20 @@ export async function PATCH(
 
   const admin = createAdminClient()
   const body = await request.json()
+
+  const allowedFields = ["name", "slug", "phone", "city", "logo_url", "is_active", "is_suspended", "language"]
+  const updates: Record<string, any> = {}
+  for (const field of allowedFields) {
+    if (field in body) updates[field] = body[field]
+  }
+
+  if (Object.keys(updates).length === 0) {
+    return NextResponse.json({ error: "No valid fields to update" }, { status: 400 })
+  }
+
   const { data, error } = await admin
     .from("restaurants")
-    .update(body)
+    .update(updates)
     .eq("id", id)
     .select()
     .single()

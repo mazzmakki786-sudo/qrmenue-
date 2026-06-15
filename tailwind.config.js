@@ -7,8 +7,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
-        urdu: ["Noto Naskh Arabic", "serif"],
+        sans: ["var(--font-inter)", "sans-serif"],
+        urdu: ["var(--font-urdu)", "serif"],
       },
       colors: {
         primary: {
@@ -16,15 +16,15 @@ module.exports = {
           hover: "#1A1A1A",
         },
         accent: {
-          DEFAULT: "#FF6B35",
-          hover: "#E55A25",
+          DEFAULT: "#25D366",
+          hover: "#1DA85C",
         },
         muted: {
-          DEFAULT: "#F5F5F5",
-          foreground: "#666666",
+          DEFAULT: "#F9FAFB",
+          foreground: "#555555",
         },
         border: {
-          DEFAULT: "#E5E5E5",
+          DEFAULT: "#F0F0F0",
           strong: "#CCCCCC",
         },
         success: "#22C55E",

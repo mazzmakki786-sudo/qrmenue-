@@ -1,63 +1,85 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
 import Image from "next/image"
-import { MapPin, Store, Timer } from "lucide-react"
+import { MapPin, Timer } from "lucide-react"
 
 interface Props {
   name: string
   nameUr?: string | null
   logoUrl?: string | null
+  coverUrl?: string | null
   city: string
   cuisineType?: string | null
+  description?: string | null
   lang?: "en" | "ur"
 }
 
-export function MenuHeader({ name, nameUr, logoUrl, city, cuisineType, lang = "en" }: Props) {
+export function MenuHeader({ name, nameUr, logoUrl, coverUrl, city, cuisineType, description, lang = "en" }: Props) {
   const [logoError, setLogoError] = useState(false)
+  const [coverError, setCoverError] = useState(false)
   const displayName = lang === "ur" && nameUr ? nameUr : name
 
   return (
-    <div className="relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-[#FF6B35]/5 to-transparent" />
-      <div className="relative flex items-start gap-4 pt-6 pb-4 px-4">
-        {logoUrl && !logoError ? (
-          <div className="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0 relative shadow-sm">
-            <Image
-              src={logoUrl}
-              alt={displayName}
-              fill
-              className="object-cover"
-              sizes="56px"
-              onError={() => setLogoError(true)}
-            />
-          </div>
-        ) : logoUrl && logoError ? (
-          <div className="w-14 h-14 rounded-2xl bg-[#F8F8F8] flex items-center justify-center flex-shrink-0 shadow-sm">
-            <Store className="w-6 h-6 text-[#999]" />
-          </div>
-        ) : null}
-        <div className="flex-1 min-w-0">
-          <h1 className={`text-2xl font-bold text-[#111] leading-tight ${lang === "ur" ? "font-urdu" : ""}`}>
-            {displayName}
-          </h1>
-          <div className="flex items-center gap-3 mt-1.5 flex-wrap">
-            <div className="flex items-center gap-1">
-              <MapPin className="w-3.5 h-3.5 text-[#999]" />
-              <span className="text-sm text-[#555]">{city}</span>
+    <div className="pt-16 pb-4 px-4">
+      {/* Cover Image */}
+      <div className="relative w-full h-48 rounded-3xl overflow-hidden mb-6 group">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#25D366]/20 to-transparent z-10" />
+        {coverUrl && !coverError ? (
+          <Image
+            src={coverUrl}
+            alt={displayName}
+            fill
+            className="object-cover transition-transform duration-700 group-hover:scale-110"
+            sizes="(max-width: 768px) 100vw, 600px"
+            onError={() => setCoverError(true)}
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-[#0052D4] via-[#4364F7] to-[#6FB1FC]" />
+        )}
+        <div className="absolute bottom-4 left-4 z-20 flex items-end gap-4">
+          {logoUrl && !logoError ? (
+            <div className="w-14 h-14 rounded-2xl border-4 border-white shadow-sm overflow-hidden relative flex-shrink-0">
+              <Image
+                src={logoUrl}
+                alt={displayName}
+                fill
+                className="object-cover"
+                sizes="56px"
+                priority
+                onError={() => setLogoError(true)}
+              />
             </div>
-            {cuisineType && (
-              <>
-                <span className="text-[#DDD]">|</span>
-                <div className="flex items-center gap-1">
-                  <Timer className="w-3.5 h-3.5 text-[#999]" />
-                  <span className="text-sm text-[#555]">{cuisineType}</span>
-                </div>
-              </>
-            )}
+          ) : (
+            <div className="w-14 h-14 rounded-2xl border-4 border-white shadow-sm bg-[#EDEEEF] flex items-center justify-center flex-shrink-0">
+              <span className="text-lg font-bold text-[#555]">
+                {displayName.charAt(0).toUpperCase()}
+              </span>
+            </div>
+          )}
+          <div>
+            <h1 className="text-white text-2xl font-bold leading-tight">{displayName}</h1>
+            <div className="flex items-center gap-3 text-white/90 text-xs mt-1">
+              <span className="flex items-center gap-1">
+                <MapPin className="w-3.5 h-3.5" /> {city}
+              </span>
+              {cuisineType && (
+                <span className="flex items-center gap-1">
+                  <Timer className="w-3.5 h-3.5" /> {cuisineType}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Description */}
+      {description && (
+        <p className="text-sm text-[#555] leading-relaxed px-1">
+          {description}
+        </p>
+      )}
     </div>
   )
 }

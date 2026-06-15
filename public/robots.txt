@@ -1,0 +1,25 @@
+# QRMenu.pk - robots.txt
+# https://qrmenu.pk
+
+User-agent: *
+Allow: /
+Allow: /menu/*
+Allow: /restaurants
+Allow: /pricing
+Allow: /login
+Allow: /signup
+
+# Disallow private/dashboard pages
+Disallow: /dashboard/
+Disallow: /superadmin/
+Disallow: /cart
+Disallow: /checkout
+Disallow: /order-confirm/
+Disallow: /account
+Disallow: /api/
+
+# Crawl-delay (optional, Google ignores this but other bots respect it)
+Crawl-delay: 1
+
+# Sitemap
+Sitemap: https://qrmenu.pk/sitemap.xml
