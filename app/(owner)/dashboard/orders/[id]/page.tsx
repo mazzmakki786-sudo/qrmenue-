@@ -68,20 +68,24 @@ export default function OrderDetailPage() {
   const updateStatus = async (newStatus: string) => {
     if (updating) return
     setUpdating(true)
-    const supabase = createClient()
-    const { error } = await supabase
-      .from("orders")
-      .update({ order_status: newStatus })
-      .eq("id", id)
-      .select()
-      .single()
-    if (error) {
-      console.error("Failed to update order status:", error.message)
+    try {
+      const res = await fetch(`/api/orders/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order_status: newStatus }),
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        console.error("Failed to update order status:", err.error)
+        setUpdating(false)
+        return
+      }
+      await fetchData()
+    } catch (e) {
+      console.error("Failed to update order status:", e)
+    } finally {
       setUpdating(false)
-      return
     }
-    await fetchData()
-    setUpdating(false)
   }
 
   if (loading) return <div className="text-center text-[#999] py-12">Loading order...</div>

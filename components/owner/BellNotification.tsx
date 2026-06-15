@@ -231,16 +231,15 @@ export function BellNotification({ restaurantId }: Props) {
           )}
         </button>
 
-        {/* Toast notifications for orders - centered on screen */}
+        {/* Toast notifications for orders - top right corner */}
         {alerts.length > 0 && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-            <div className="flex flex-col gap-3 w-full max-w-sm pointer-events-auto">
-              {alerts.map((alert) => (
-                <Link
-                  key={alert.id}
-                  href={`/dashboard/orders/${alert.id}`}
-                  className="bg-black text-white rounded-2xl p-5 shadow-2xl animate-slide-up block"
-                >
+          <div className="fixed top-4 right-4 z-40 flex flex-col gap-3 w-full max-w-sm pointer-events-none">
+            {alerts.map((alert) => (
+              <Link
+                key={alert.id}
+                href={`/dashboard/orders/${alert.id}`}
+                className="bg-black text-white rounded-2xl p-5 shadow-2xl animate-slide-up pointer-events-auto block"
+              >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
@@ -279,8 +278,8 @@ export function BellNotification({ restaurantId }: Props) {
 
         {/* Dropdown - Today's Orders */}
         {showDropdown && (
-          <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setShowDropdown(false)} />
+          <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-20 p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => { setShowDropdown(false); setAlerts([]) }} />
             <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[70vh] flex flex-col overflow-hidden animate-scale-up">
               <div className="p-4 border-b border-[#F0F0F0] flex items-center justify-between shrink-0">
                 <p className="text-base font-bold">Today&apos;s Orders</p>

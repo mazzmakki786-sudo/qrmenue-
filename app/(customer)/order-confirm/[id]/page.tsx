@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { uid } from "@/lib/realtime"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Check, ArrowLeft, ClipboardList, Store, ExternalLink, Phone, RotateCcw } from "lucide-react"
@@ -41,7 +42,7 @@ function buildWhatsAppUrl(order: any): string {
   return `https://wa.me/92${phone.slice(1)}?text=${encodeURIComponent(message)}`
 }
 
-const STATUS_STEPS = ["placed", "received", "preparing", "ready"] as const
+const STATUS_STEPS = ["received", "preparing", "ready", "completed"] as const
 
 function StatusTimeline({ currentStatus }: { currentStatus: string }) {
   const currentIndex = STATUS_STEPS.indexOf(currentStatus as any)
@@ -113,6 +114,27 @@ export default function OrderConfirmPage({ params }: any) {
     fetchOrder()
   }, [params.id, router])
 
+  useEffect(() => {
+    if (!params.id) return
+    const supabase = createClient()
+    const channel = supabase
+      .channel(uid(`order-tracking-${params.id}`))
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "orders",
+          filter: `id=eq.${params.id}`,
+        },
+        (payload) => {
+          setOrder((prev: any) => prev ? { ...prev, ...payload.new } : prev)
+        }
+      )
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [params.id])
+
   const handleReorder = () => {
     if (!order) return
     clearCart()
@@ -182,7 +204,7 @@ export default function OrderConfirmPage({ params }: any) {
         {/* Status Timeline */}
         <section className="bg-white border border-[#F0F0F0] rounded-[14px] p-5 shadow-sm">
           <h3 className="text-sm font-semibold mb-4 text-black">Order Status</h3>
-          <StatusTimeline currentStatus={order.status || "placed"} />
+          <StatusTimeline currentStatus={order.order_status || "received"} />
         </section>
 
         {/* WhatsApp Button */}
