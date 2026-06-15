@@ -240,106 +240,105 @@ export function BellNotification({ restaurantId }: Props) {
                 href={`/dashboard/orders/${alert.id}`}
                 className="bg-black text-white rounded-2xl p-5 shadow-2xl animate-slide-up pointer-events-auto block"
               >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#25D366] animate-pulse shrink-0" />
-                        <span className="text-sm font-bold">New Order</span>
-                      </div>
-                      <p className="text-xs text-white/60 mb-2">{alert.order_number}</p>
-                      <div className="space-y-1.5">
-                        <p className="text-sm font-medium">{alert.customer_name}</p>
-                        <p className="text-xs text-white/70">{alert.items.length} item{alert.items.length > 1 ? "s" : ""} &bull; {alert.order_type.replace("_", " ")}</p>
-                        <div className="flex flex-wrap gap-1 mt-1.5">
-                          {alert.items.slice(0, 3).map((item, i) => (
-                            <span key={i} className="text-[10px] bg-white/10 px-2 py-0.5 rounded-full">
-                              {item.name_en} x{item.quantity}
-                            </span>
-                          ))}
-                          {alert.items.length > 3 && (
-                            <span className="text-[10px] text-white/40">+{alert.items.length - 3} more</span>
-                          )}
-                        </div>
-                        <p className="text-base font-bold mt-2">{formatPrice(alert.total_price)}</p>
-                      </div>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#25D366] animate-pulse shrink-0" />
+                      <span className="text-sm font-bold">New Order</span>
                     </div>
-                    <button
-                      onClick={(e) => { e.preventDefault(); dismissAlert(alert.id) }}
-                      className="p-2 hover:bg-white/10 rounded-lg shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
+                    <p className="text-xs text-white/60 mb-2">{alert.order_number}</p>
+                    <div className="space-y-1.5">
+                      <p className="text-sm font-medium">{alert.customer_name}</p>
+                      <p className="text-xs text-white/70">{alert.items.length} item{alert.items.length > 1 ? "s" : ""} &bull; {alert.order_type.replace("_", " ")}</p>
+                      <div className="flex flex-wrap gap-1 mt-1.5">
+                        {alert.items.slice(0, 3).map((item, i) => (
+                          <span key={i} className="text-[10px] bg-white/10 px-2 py-0.5 rounded-full">
+                            {item.name_en} x{item.quantity}
+                          </span>
+                        ))}
+                        {alert.items.length > 3 && (
+                          <span className="text-[10px] text-white/40">+{alert.items.length - 3} more</span>
+                        )}
+                      </div>
+                      <p className="text-base font-bold mt-2">{formatPrice(alert.total_price)}</p>
+                    </div>
                   </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Dropdown - Today's Orders */}
-        {showDropdown && (
-          <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-20 p-4">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => { setShowDropdown(false); setAlerts([]) }} />
-            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[70vh] flex flex-col overflow-hidden animate-scale-up">
-              <div className="p-4 border-b border-[#F0F0F0] flex items-center justify-between shrink-0">
-                <p className="text-base font-bold">Today&apos;s Orders</p>
-                <button
-                  onClick={() => setShowDropdown(false)}
-                  className="p-2 hover:bg-[#F0F0F0] rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="overflow-y-auto flex-1">
-                {dropdownLoading ? (
-                  <div className="flex flex-col gap-2 p-4">
-                    {[...Array(3)].map((_, i) => (
-                      <div key={i} className="h-16 bg-[#F5F5F5] rounded-xl animate-pulse" />
-                    ))}
-                  </div>
-                ) : todayOrders.length === 0 ? (
-                  <div className="text-center py-10 text-sm text-[#999]">
-                    No orders today
-                  </div>
-                ) : (
-                  <div className="divide-y divide-[#F0F0F0]">
-                    {todayOrders.map((order) => (
-                      <Link
-                        key={order.id}
-                        href={`/dashboard/orders/${order.id}`}
-                        onClick={() => setShowDropdown(false)}
-                        className="flex items-center justify-between p-4 hover:bg-[#F9FAFB] active:bg-[#F0F0F0] transition-colors"
-                      >
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold text-black">
-                              #{order.order_number}
-                            </span>
-                            <span className="text-[10px] text-[#999] flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              {timeAgo(order.created_at)}
-                            </span>
-                          </div>
-                          <p className="text-xs text-[#555] mt-0.5">
-                            {order.customer_name} &bull; {order.order_type.replace("_", " ")}
-                          </p>
-                          <p className="text-xs text-[#999]">
-                            {(order.items || []).length} item{(order.items || []).length !== 1 ? "s" : ""}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2 shrink-0 ml-3">
-                          <span className="text-sm font-bold text-black">{formatPrice(order.total_price)}</span>
-                          <ChevronRight className="w-4 h-4 text-[#999]" />
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+                  <button
+                    onClick={(e) => { e.preventDefault(); dismissAlert(alert.id) }}
+                    className="p-2 hover:bg-white/10 rounded-lg shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </Link>
+            ))}
           </div>
         )}
       </div>
+
+      {/* Dropdown - Today's Orders */}
+      {showDropdown && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-20 p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => { setShowDropdown(false); setAlerts([]) }} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[70vh] flex flex-col overflow-hidden animate-scale-up">
+            <div className="p-4 border-b border-[#F0F0F0] flex items-center justify-between shrink-0">
+              <p className="text-base font-bold">Today&apos;s Orders</p>
+              <button
+                onClick={() => setShowDropdown(false)}
+                className="p-2 hover:bg-[#F0F0F0] rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="overflow-y-auto flex-1">
+              {dropdownLoading ? (
+                <div className="flex flex-col gap-2 p-4">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="h-16 bg-[#F5F5F5] rounded-xl animate-pulse" />
+                  ))}
+                </div>
+              ) : todayOrders.length === 0 ? (
+                <div className="text-center py-10 text-sm text-[#999]">
+                  No orders today
+                </div>
+              ) : (
+                <div className="divide-y divide-[#F0F0F0]">
+                  {todayOrders.map((order) => (
+                    <Link
+                      key={order.id}
+                      href={`/dashboard/orders/${order.id}`}
+                      onClick={() => setShowDropdown(false)}
+                      className="flex items-center justify-between p-4 hover:bg-[#F9FAFB] active:bg-[#F0F0F0] transition-colors"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-black">
+                            #{order.order_number}
+                          </span>
+                          <span className="text-[10px] text-[#999] flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {timeAgo(order.created_at)}
+                          </span>
+                        </div>
+                        <p className="text-xs text-[#555] mt-0.5">
+                          {order.customer_name} &bull; {order.order_type.replace("_", " ")}
+                        </p>
+                        <p className="text-xs text-[#999]">
+                          {(order.items || []).length} item{(order.items || []).length !== 1 ? "s" : ""}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0 ml-3">
+                        <span className="text-sm font-bold text-black">{formatPrice(order.total_price)}</span>
+                        <ChevronRight className="w-4 h-4 text-[#999]" />
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Announcement Center Modal */}
       {announcementModal && (
