@@ -96,7 +96,9 @@ export default function SettingsPage() {
     : ""
 
   const handleCopyUrl = () => {
-    navigator.clipboard.writeText(menuUrl)
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(menuUrl).catch(() => {})
+    }
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }

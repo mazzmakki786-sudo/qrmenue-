@@ -83,7 +83,9 @@ export default function QRPage() {
   }
 
   const handleCopyUrl = () => {
-    navigator.clipboard.writeText(menuUrl)
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(menuUrl).catch(() => {})
+    }
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -115,7 +117,7 @@ export default function QRPage() {
           <h1 className="text-2xl font-bold text-black">QR Code</h1>
           <p className="text-sm text-[#555] mt-1">Manage and download your digital menu access</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={() => downloadQR(`${restaurant.slug}-qr-code.png`)}
             className="bg-black text-white px-6 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all"
@@ -240,12 +242,12 @@ export default function QRPage() {
           {/* URL Card */}
           <div className="bg-white p-6 rounded-[14px] border border-[#F0F0F0]">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-black mb-5">Restaurant URL</h3>
-            <div className="flex items-center gap-3">
-              <div className="flex-1 bg-[#F9FAFB] p-3 rounded-xl border border-[#F0F0F0] flex items-center justify-between group">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <div className="flex-1 min-w-0 bg-[#F9FAFB] p-3 rounded-xl border border-[#F0F0F0] flex items-center justify-between gap-2">
                 <code className="text-sm text-[#555] font-mono truncate">{menuUrl}</code>
                 <button
                   onClick={handleCopyUrl}
-                  className="text-[#555] hover:text-black p-1 transition-colors flex-shrink-0 ml-2"
+                  className="text-[#555] hover:text-black p-1 transition-colors shrink-0"
                 >
                   {copied ? <Check className="w-4 h-4 text-[#16A34A]" /> : <Copy className="w-4 h-4" />}
                 </button>
@@ -254,7 +256,7 @@ export default function QRPage() {
                 href={menuUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-[#F3F4F5] p-3 rounded-xl border border-[#F0F0F0] text-[#555] hover:text-black transition-all"
+                className="bg-[#F3F4F5] p-3 rounded-xl border border-[#F0F0F0] text-[#555] hover:text-black transition-all flex items-center justify-center sm:flex-shrink-0"
               >
                 <ExternalLink className="w-5 h-5" />
               </a>

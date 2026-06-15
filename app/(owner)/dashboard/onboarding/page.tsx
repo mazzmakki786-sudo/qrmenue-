@@ -36,7 +36,9 @@ export default function OnboardingPage() {
   const menuUrl = `${process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "")}/menu/${restaurant.slug}`
 
   const handleCopyUrl = () => {
-    navigator.clipboard.writeText(menuUrl)
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(menuUrl).catch(() => {})
+    }
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
