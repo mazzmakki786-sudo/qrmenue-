@@ -279,7 +279,7 @@ export function BellNotification({ restaurantId }: Props) {
 
         {/* Dropdown - Today's Orders */}
         {showDropdown && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4">
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDropdown(false)} />
             <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[70vh] flex flex-col overflow-hidden animate-scale-up">
               <div className="p-4 border-b border-[#F0F0F0] flex items-center justify-between shrink-0">

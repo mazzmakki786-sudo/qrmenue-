@@ -1,4 +1,8 @@
-﻿-- Migration: add_personal_branding_fields (2026-06-15)
+﻿-- Migration: add_is_suspended_column (2026-06-15)
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_suspended BOOLEAN DEFAULT false;
+-- ============================================
+
+-- Migration: add_personal_branding_fields (2026-06-15)
 ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS brand_primary_color TEXT DEFAULT '#25D366';
 ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS brand_accent_color TEXT DEFAULT '#000000';
 ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS banner_enabled BOOLEAN DEFAULT false;

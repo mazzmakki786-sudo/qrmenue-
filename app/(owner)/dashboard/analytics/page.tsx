@@ -54,7 +54,7 @@ export default function AnalyticsPage() {
     ])
 
     if (statsRes.data && statsRes.data.length > 0) {
-      const reversed = statsRes.data.reverse()
+      const reversed = [...statsRes.data].reverse()
       setGraph7d(reversed.slice(-7))
       setGraph30d(reversed)
       setTotalOrders(statsRes.data.reduce((s, d) => s + d.total_orders, 0))
@@ -65,7 +65,9 @@ export default function AnalyticsPage() {
 
       const grouped: Record<string, { total_orders: number; total_revenue: number }> = {}
       ordersRes.data.forEach((o: any) => {
-        const day = new Date(o.created_at).toISOString().split("T")[0]
+        const d = new Date(o.created_at)
+        const pkDate = new Date(d.getTime() + 5 * 60 * 60 * 1000).toISOString().split("T")[0]
+        const day = pkDate
         if (!grouped[day]) grouped[day] = { total_orders: 0, total_revenue: 0 }
         grouped[day].total_orders += 1
         grouped[day].total_revenue += o.total_price

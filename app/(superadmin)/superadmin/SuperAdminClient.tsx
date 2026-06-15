@@ -221,7 +221,7 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
       const res = await fetch("/api/superadmin/restaurants-stats")
       if (res.ok) {
         const json = await res.json()
-        const list = json.restaurants || []
+        const list = json.data || []
         setRestaurants(list.map((r: any) => ({ ...r, dish_count: 0, total_orders: r.total_orders || 0, last7_orders: r.last7_orders || 0, last30_orders: r.last30_orders || 0, revenue: r.revenue || 0 })))
       }
     } catch (e) { console.error("Failed to fetch restaurants", e) }

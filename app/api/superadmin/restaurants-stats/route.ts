@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
   const [allRestaurantsRes, allOrdersRes, countRes] = await Promise.all([
     supabaseAdmin
       .from("restaurants")
-      .select("id, name, city, plan, plan_end_date, trial_end, is_active, image_upload_allowed, created_at")
+      .select("id, name, slug, owner_id, city, plan, plan_end_date, trial_end, is_active, is_suspended, image_upload_allowed, created_at")
       .range(offset, offset + limit - 1),
     supabaseAdmin
       .from("orders")
