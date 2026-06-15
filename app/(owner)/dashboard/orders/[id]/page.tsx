@@ -23,6 +23,7 @@ export default function OrderDetailPage() {
   const [restaurant, setRestaurant] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [showReceipt, setShowReceipt] = useState(false)
+  const [updating, setUpdating] = useState(false)
 
   const fetchData = async () => {
     const supabase = createClient()
@@ -65,9 +66,22 @@ export default function OrderDetailPage() {
   }, [id])
 
   const updateStatus = async (newStatus: string) => {
+    if (updating) return
+    setUpdating(true)
     const supabase = createClient()
-    await supabase.from("orders").update({ order_status: newStatus }).eq("id", id)
-    fetchData()
+    const { error } = await supabase
+      .from("orders")
+      .update({ order_status: newStatus })
+      .eq("id", id)
+      .select()
+      .single()
+    if (error) {
+      console.error("Failed to update order status:", error.message)
+      setUpdating(false)
+      return
+    }
+    await fetchData()
+    setUpdating(false)
   }
 
   if (loading) return <div className="text-center text-[#999] py-12">Loading order...</div>
@@ -200,17 +214,17 @@ export default function OrderDetailPage() {
       {order.order_status !== "cancelled" && order.order_status !== "completed" && (
         <div className="space-y-2">
           {order.order_status === "received" && (
-            <Button variant="primary" fullWidth onClick={() => updateStatus("preparing")}>
+            <Button variant="primary" fullWidth disabled={updating} onClick={() => updateStatus("preparing")}>
               <Check className="w-4 h-4 mr-2" /> Confirm Order
             </Button>
           )}
           {statusFlow[currentIndex + 1] && order.order_status !== "received" && (
-            <Button variant="primary" fullWidth onClick={() => updateStatus(statusFlow[currentIndex + 1])}>
-              Mark as {statusFlow[currentIndex + 1].charAt(0).toUpperCase() + statusFlow[currentIndex + 1].slice(1)}
+            <Button variant="primary" fullWidth disabled={updating} onClick={() => updateStatus(statusFlow[currentIndex + 1])}>
+              {updating ? "Updating..." : `Mark as ${statusFlow[currentIndex + 1].charAt(0).toUpperCase() + statusFlow[currentIndex + 1].slice(1)}`}
             </Button>
           )}
           {currentIndex < statusFlow.length - 1 && (
-            <Button variant="ghost" fullWidth onClick={() => updateStatus("cancelled")}>
+            <Button variant="ghost" fullWidth disabled={updating} onClick={() => updateStatus("cancelled")}>
               <X className="w-4 h-4 mr-2" /> Cancel Order
             </Button>
           )}
