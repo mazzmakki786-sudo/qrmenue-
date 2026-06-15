@@ -18,7 +18,7 @@ const notoUrdu = Noto_Nastaliq_Urdu({
 })
 
 const APP_NAME = "QRMenu.pk"
-const SITE_URL = "https://qr-menue-one.vercel.app"
+const SITE_URL = "https://qrmenu.pk"
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -90,6 +90,7 @@ export const metadata: Metadata = {
     },
   },
   icons: { icon: "/favicon.svg" },
+  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     title: APP_NAME,

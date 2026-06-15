@@ -4,19 +4,18 @@ import { ItemListJsonLd } from "@/components/JsonLd"
 import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
-  title: "Restaurants in Pakistan — Browse Menus",
+  title: "Restaurants in Pakistan — Browse Menus | QRMenu.pk",
   description:
-    "Find and browse restaurants across Pakistan. View menus, prices, and order via WhatsApp. Lahore, Karachi, Islamabad and more cities.",
+    "Find restaurants in Lahore, Karachi, Islamabad and more. Browse digital menus, view dishes, and order via WhatsApp.",
   openGraph: {
-    title: "Restaurants in Pakistan — Browse Menus | QRMenu.pk",
-    description:
-      "Find and browse restaurants across Pakistan. View menus, prices, and order via WhatsApp.",
+    title: "Restaurants | QRMenu.pk",
+    description: "Browse restaurant menus in Pakistan",
     type: "website",
-    url: "https://qr-menue-one.vercel.app/restaurants",
+    url: "https://qrmenu.pk/restaurants",
     siteName: "QRMenu.pk",
   },
   alternates: {
-    canonical: "https://qr-menue-one.vercel.app/restaurants",
+    canonical: "https://qrmenu.pk/restaurants",
   },
 }
 
@@ -32,7 +31,7 @@ export default async function RestaurantsPage() {
   const items =
     restaurants?.map((r) => ({
       name: r.name,
-      url: `https://qr-menue-one.vercel.app/menu/${r.slug}`,
+      url: `https://qrmenu.pk/menu/${r.slug}`,
       description: r.description || undefined,
     })) ?? []
 

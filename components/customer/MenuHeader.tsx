@@ -38,7 +38,7 @@ export function MenuHeader({ name, nameUr, logoUrl, coverUrl, city, cuisineType,
         {coverUrl && !coverError ? (
           <Image
             src={coverUrl}
-            alt={displayName}
+            alt={`${name} cover photo`}
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-110"
             sizes="(max-width: 768px) 100vw, 600px"
@@ -52,7 +52,7 @@ export function MenuHeader({ name, nameUr, logoUrl, coverUrl, city, cuisineType,
             <div className="w-14 h-14 rounded-2xl border-4 border-white shadow-sm overflow-hidden relative flex-shrink-0">
               <Image
                 src={logoUrl}
-                alt={displayName}
+                alt={`${name} logo`}
                 fill
                 className="object-cover"
                 sizes="56px"

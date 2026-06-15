@@ -1,5 +1,5 @@
 # QRMenu.pk - robots.txt
-# https://qrmenu.pk
+# https://qr-menue-one.vercel.app
 
 User-agent: *
 Allow: /

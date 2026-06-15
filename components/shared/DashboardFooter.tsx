@@ -20,7 +20,7 @@ export function DashboardFooter() {
       </button>
       <div className="flex flex-col md:flex-row items-center gap-2 text-center">
         <span className="text-xs font-bold text-black">QRMenu.pk</span>
-        <span className="text-[12px] text-[#555]">&copy; 2024 QRMenu.pk. All rights reserved.</span>
+        <span className="text-[12px] text-[#555]">&copy; 2026 QRMenu.pk. All rights reserved.</span>
       </div>
     </footer>
   )

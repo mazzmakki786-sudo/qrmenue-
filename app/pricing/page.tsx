@@ -3,19 +3,18 @@ import { PricingClient } from "./PricingClient"
 import { PricingJsonLd, FaqJsonLd } from "@/components/JsonLd"
 
 export const metadata: Metadata = {
-  title: "Pricing — QR Menu Plans",
+  title: "Pricing — QRMenu.pk Plans",
   description:
-    "Simple, transparent pricing for QRMenu.pk. Start with a free trial. Plans from PKR 1,200/month. No commission on orders.",
+    "Choose the right QRMenu.pk plan for your restaurant. Free trial, Starter, Growth, and Premium plans available.",
   openGraph: {
-    title: "Pricing — QR Menu Plans | QRMenu.pk",
-    description:
-      "Simple, transparent pricing. Start with a free trial. No commission on orders.",
+    title: "Pricing | QRMenu.pk",
+    description: "QR menu plans for restaurants",
     type: "website",
-    url: "https://qr-menue-one.vercel.app/pricing",
+    url: "https://qrmenu.pk/pricing",
     siteName: "QRMenu.pk",
   },
   alternates: {
-    canonical: "https://qr-menue-one.vercel.app/pricing",
+    canonical: "https://qrmenu.pk/pricing",
   },
 }
 

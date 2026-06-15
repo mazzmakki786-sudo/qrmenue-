@@ -6,31 +6,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticPages: MetadataRoute.Sitemap = [
     {
-      url: "https://qr-menue-one.vercel.app",
+      url: "https://qrmenu.pk",
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 1.0,
     },
     {
-      url: "https://qr-menue-one.vercel.app/pricing",
+      url: "https://qrmenu.pk/pricing",
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
-      url: "https://qr-menue-one.vercel.app/restaurants",
+      url: "https://qrmenu.pk/restaurants",
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: 0.9,
     },
     {
-      url: "https://qr-menue-one.vercel.app/login",
+      url: "https://qrmenu.pk/login",
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.3,
     },
     {
-      url: "https://qr-menue-one.vercel.app/signup",
+      url: "https://qrmenu.pk/signup",
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.5,
@@ -45,7 +45,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const menuPages: MetadataRoute.Sitemap =
     restaurants?.map((r) => ({
-      url: `https://qr-menue-one.vercel.app/menu/${r.slug}`,
+      url: `https://qrmenu.pk/menu/${r.slug}`,
       lastModified: new Date(r.updated_at),
       changeFrequency: "daily" as const,
       priority: 0.9,
