@@ -280,7 +280,7 @@ export function BellNotification({ restaurantId }: Props) {
         {/* Dropdown - Today's Orders */}
         {showDropdown && (
           <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDropdown(false)} />
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setShowDropdown(false)} />
             <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[70vh] flex flex-col overflow-hidden animate-scale-up">
               <div className="p-4 border-b border-[#F0F0F0] flex items-center justify-between shrink-0">
                 <p className="text-base font-bold">Today&apos;s Orders</p>
@@ -345,7 +345,7 @@ export function BellNotification({ restaurantId }: Props) {
       {/* Announcement Center Modal */}
       {announcementModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => dismissAnnouncement(announcementModal.id)} />
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => dismissAnnouncement(announcementModal.id)} />
           <div className="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 animate-scale-up" style={{ maxHeight: "calc(100vh - 32px)", overflowY: "auto" }}>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-[#25D366]/10 flex items-center justify-center shrink-0">
