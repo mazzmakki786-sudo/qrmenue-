@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button"
 interface Props {
   restaurantSlug: string
   restaurantName: string
+  fgColor?: string
+  bgColor?: string
 }
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "")
 
-export function QRCodeDisplay({ restaurantSlug, restaurantName }: Props) {
+export function QRCodeDisplay({ restaurantSlug, restaurantName, fgColor = "#000000", bgColor = "#FFFFFF" }: Props) {
   const menuUrl = `${APP_URL}/menu/${restaurantSlug}`
 
   const downloadQR = () => {
@@ -40,6 +42,8 @@ export function QRCodeDisplay({ restaurantSlug, restaurantName }: Props) {
         size={200}
         level="H"
         includeMargin
+        fgColor={fgColor}
+        bgColor={bgColor}
       />
       <p className="text-sm text-[#555]">{restaurantName}</p>
       <Button variant="ghost" size="sm" onClick={downloadQR}>

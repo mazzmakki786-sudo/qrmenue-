@@ -19,6 +19,11 @@
   is_active: boolean
   is_suspended: boolean
   plan_limits_override: Record<string, number> | null
+  brand_primary_color: string | null
+  brand_accent_color: string | null
+  banner_enabled: boolean | null
+  banner_image_url: string | null
+  banner_link_url: string | null
   created_at: string
   updated_at: string
 }

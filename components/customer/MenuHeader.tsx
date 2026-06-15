@@ -4,6 +4,7 @@ import { useState } from "react"
 import Image from "next/image"
 import { MapPin, UtensilsCrossed, ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
+import type { BrandingConfig } from "@/lib/branding"
 
 interface Props {
   name: string
@@ -14,13 +15,17 @@ interface Props {
   cuisineType?: string | null
   description?: string | null
   lang?: "en" | "ur"
+  branding?: BrandingConfig
 }
 
-export function MenuHeader({ name, nameUr, logoUrl, coverUrl, city, cuisineType, description, lang = "en" }: Props) {
+export function MenuHeader({ name, nameUr, logoUrl, coverUrl, city, cuisineType, description, lang = "en", branding }: Props) {
   const router = useRouter()
   const [logoError, setLogoError] = useState(false)
   const [coverError, setCoverError] = useState(false)
   const displayName = lang === "ur" && nameUr ? nameUr : name
+
+  const primaryColor = branding?.hasCustomBranding ? branding.primaryColor : "#25D366"
+  const accentColor = branding?.hasCustomBranding ? branding.accentColor : "#000000"
 
   return (
     <div className="pb-4 px-4">
@@ -34,25 +39,35 @@ export function MenuHeader({ name, nameUr, logoUrl, coverUrl, city, cuisineType,
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10" />
-        <div className="absolute inset-0 bg-gradient-to-br from-[#25D366]/20 to-transparent z-10" />
+        <div
+          className="absolute inset-0 z-10"
+          style={{
+            background: `linear-gradient(135deg, ${primaryColor}20, transparent)`,
+          }}
+        />
         {coverUrl && !coverError ? (
           <Image
             src={coverUrl}
-            alt={`${name} cover photo`}
+            alt={displayName}
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-110"
             sizes="(max-width: 768px) 100vw, 600px"
             onError={() => setCoverError(true)}
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-[#0052D4] via-[#4364F7] to-[#6FB1FC]" />
+          <div
+            className="w-full h-full"
+            style={{
+              background: `linear-gradient(135deg, ${primaryColor}, ${accentColor})`,
+            }}
+          />
         )}
         <div className="absolute bottom-4 left-4 z-20 flex items-end gap-4">
           {logoUrl && !logoError ? (
             <div className="w-14 h-14 rounded-2xl border-4 border-white shadow-sm overflow-hidden relative flex-shrink-0">
               <Image
                 src={logoUrl}
-                alt={`${name} logo`}
+                alt={displayName}
                 fill
                 className="object-cover"
                 sizes="56px"

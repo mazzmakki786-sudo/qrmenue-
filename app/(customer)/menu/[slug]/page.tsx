@@ -1,8 +1,11 @@
 import { createClient } from "@/lib/supabase/server"
 import { MenuHeader } from "@/components/customer/MenuHeader"
 import { MenuContent } from "@/components/customer/MenuContent"
+import { MenuFooter } from "@/components/customer/MenuFooter"
+import { PremiumBanner } from "@/components/customer/PremiumBanner"
 import { notFound } from "next/navigation"
-import { GRACE_PERIOD_DAYS } from "@/lib/subscription"
+import { GRACE_PERIOD_DAYS, PLAN_LIMITS } from "@/lib/subscription"
+import { buildBrandingConfig, DEFAULT_BRANDING } from "@/lib/branding"
 import { RestaurantJsonLd } from "@/components/JsonLd"
 import type { Category, Dish } from "@/types"
 import type { Metadata } from "next"
@@ -19,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const { data: restaurant } = await supabase
     .from("restaurants")
-    .select("name, name_ur, description, city, cuisine_type, logo_url")
+    .select("name, name_ur, description, city, cuisine_type, logo_url, plan, brand_primary_color, brand_accent_color")
     .eq("slug", slug)
     .eq("is_active", true)
     .single()
@@ -28,34 +31,46 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Menu Not Found" }
   }
 
+  const planLimits = PLAN_LIMITS[restaurant.plan as keyof typeof PLAN_LIMITS]
+  const branding = planLimits
+    ? buildBrandingConfig(restaurant.plan, planLimits, restaurant)
+    : DEFAULT_BRANDING
+
   const cityName = restaurant.city || "Pakistan"
   const cuisine = restaurant.cuisine_type || "Restaurant"
-  const title = `${restaurant.name} Menu — ${cuisine} in ${cityName} | QRMenu.pk`
+  const siteName = branding.hasCustomBranding ? restaurant.name : "QRMenu.pk"
+
+  const title = branding.hasCustomBranding
+    ? `${restaurant.name} Menu — ${cuisine} in ${cityName}`
+    : `${restaurant.name} Menu — ${cuisine} in ${cityName} | QRMenu.pk`
+
   const description =
     restaurant.description ||
-    `View ${restaurant.name}'s digital menu. Browse dishes, prices, and order directly via WhatsApp. Powered by QRMenu.pk — Pakistan's #1 QR menu platform.`
+    (branding.hasCustomBranding
+      ? `View ${restaurant.name}'s digital menu. Browse dishes, prices, and order directly via WhatsApp.`
+      : `View ${restaurant.name}'s digital menu. Browse dishes, prices, and order directly via WhatsApp. Powered by QRMenu.pk — Pakistan's #1 QR menu platform.`)
 
   return {
     title,
     description,
     openGraph: {
-      title: `${restaurant.name} Menu — ${cuisine} in ${cityName} | QRMenu.pk`,
+      title,
       description,
       type: "website",
       url: `https://qrmenu.pk/menu/${slug}`,
-      siteName: "QRMenu.pk",
+      siteName,
       images: [
         {
           url: restaurant.logo_url || "https://qrmenu.pk/og-image.svg",
           width: 1200,
           height: 630,
-          alt: `${restaurant.name} menu on QRMenu.pk`,
+          alt: `${restaurant.name} menu`,
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${restaurant.name} Menu — ${cuisine} in ${cityName} | QRMenu.pk`,
+      title,
       description,
       images: [restaurant.logo_url || "https://qrmenu.pk/og-image.svg"],
     },
@@ -103,6 +118,11 @@ export default async function MenuPage({ params }: Props) {
     }
   }
 
+  const planLimits = PLAN_LIMITS[restaurant.plan as keyof typeof PLAN_LIMITS]
+  const branding = planLimits
+    ? buildBrandingConfig(restaurant.plan, planLimits, restaurant)
+    : DEFAULT_BRANDING
+
   const categories: (Category & { dishes: Dish[] })[] = restaurant.categories || []
 
   return (
@@ -125,20 +145,39 @@ export default async function MenuPage({ params }: Props) {
           })),
         }))}
       />
-      <div className="max-w-[600px] mx-auto min-h-screen pb-32 bg-white px-4">
+      <div
+        className="max-w-[600px] mx-auto min-h-screen pb-32 bg-white px-4"
+        style={{
+          ...(branding.hasCustomBranding
+            ? {
+                "--brand-primary": branding.primaryColor,
+                "--brand-accent": branding.accentColor,
+              } as React.CSSProperties
+            : {}),
+        }}
+      >
         <MenuHeader
           name={restaurant.name}
           nameUr={restaurant.name_ur}
           logoUrl={restaurant.logo_url}
+          coverUrl={null}
           city={restaurant.city}
           cuisineType={restaurant.cuisine_type}
           description={null}
+          branding={branding}
         />
+        {branding.bannerEnabled && branding.bannerImageUrl && (
+          <PremiumBanner
+            imageUrl={branding.bannerImageUrl}
+            linkUrl={branding.bannerLinkUrl}
+          />
+        )}
         <MenuContent
           categories={categories}
           restaurantId={restaurant.id}
           restaurantName={restaurant.name}
         />
+        <MenuFooter branding={branding} />
       </div>
     </>
   )

@@ -3,18 +3,24 @@
 import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { QRCodeSVG } from "qrcode.react"
-import { Download, Printer, Copy, Check, ExternalLink, Info, Share2 } from "lucide-react"
+import { useSubscription } from "@/lib/hooks/useSubscription"
+import { QR_GRADIENT_PRESETS, type QRGradientPreset } from "@/lib/branding"
+import { Download, Printer, Copy, Check, ExternalLink, Info, Share2, Palette } from "lucide-react"
 import type { Restaurant } from "@/types"
 import { escapeHtml } from "@/lib/utils"
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "")
+
+const GRADIENT_KEYS = Object.keys(QR_GRADIENT_PRESETS) as QRGradientPreset[]
 
 export default function QRPage() {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null)
   const [copied, setCopied] = useState(false)
   const [size, setSize] = useState(200)
   const [qrLoaded, setQrLoaded] = useState(false)
+  const [selectedGradient, setSelectedGradient] = useState<QRGradientPreset>("classic")
   const qrRef = useRef<HTMLDivElement>(null)
+  const { planLimits } = useSubscription()
 
   useEffect(() => {
     const fetch = async () => {
@@ -29,7 +35,7 @@ export default function QRPage() {
         .single()
 
       if (data) {
-        setRestaurant(data)
+        setRestaurant(data as Restaurant)
         setTimeout(() => setQrLoaded(true), 400)
       }
     }
@@ -50,6 +56,10 @@ export default function QRPage() {
       </div>
     )
   }
+
+  const hasCustomBranding = planLimits.customBranding
+  const gradient = QR_GRADIENT_PRESETS[selectedGradient]
+  const showGradientOptions = hasCustomBranding && GRADIENT_KEYS.length > 0
 
   const menuUrl = `${APP_URL}/menu/${restaurant.slug}`
 
@@ -152,6 +162,8 @@ export default function QRPage() {
                   size={size}
                   level="H"
                   includeMargin
+                  fgColor={gradient.fgColor}
+                  bgColor={gradient.bgColor}
                   className="w-full h-full"
                 />
               )}
@@ -185,6 +197,45 @@ export default function QRPage() {
             </div>
             <p className="mt-3 text-sm text-[#555]">Select the resolution for your download. Higher resolution is recommended for large prints.</p>
           </div>
+
+          {/* QR Color Style (Growth/Premium only) */}
+          {showGradientOptions && (
+            <div className="bg-white p-6 rounded-[14px] border border-[#F0F0F0]">
+              <div className="flex items-center gap-2 mb-5">
+                <Palette className="w-4 h-4" />
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-black">QR Color Style</h3>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {GRADIENT_KEYS.map((key) => {
+                  const preset = QR_GRADIENT_PRESETS[key]
+                  const isSelected = selectedGradient === key
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => setSelectedGradient(key)}
+                      className={`rounded-xl border-2 p-3 text-left transition-all ${
+                        isSelected ? "border-black bg-[#F8F8F8]" : "border-[#F0F0F0] hover:border-[#999]"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div
+                          className="w-8 h-8 rounded-lg"
+                          style={{ background: preset.fgColor }}
+                        />
+                        {isSelected && (
+                          <div className="w-5 h-5 rounded-full bg-black flex items-center justify-center">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-sm font-medium text-black">{preset.label}</p>
+                      <p className="text-[11px] text-[#999] font-mono mt-0.5">{preset.fgColor}</p>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
 
           {/* URL Card */}
           <div className="bg-white p-6 rounded-[14px] border border-[#F0F0F0]">

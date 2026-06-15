@@ -231,73 +231,75 @@ export function BellNotification({ restaurantId }: Props) {
           )}
         </button>
 
-        {/* Toast notifications for orders */}
+        {/* Toast notifications for orders - centered on screen */}
         {alerts.length > 0 && (
-          <div className="fixed bottom-0 left-0 right-0 z-50 flex flex-col gap-2 p-4 pb-[calc(16px+env(safe-area-inset-bottom))] max-h-[40vh] overflow-y-auto pointer-events-none sm:bottom-4 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto sm:w-full sm:max-w-sm sm:p-0">
-            {alerts.map((alert) => (
-              <Link
-                key={alert.id}
-                href={`/dashboard/orders/${alert.id}`}
-                className="pointer-events-auto bg-black text-white rounded-xl p-4 shadow-2xl animate-slide-up"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse shrink-0" />
-                      <span className="text-sm font-semibold">New Order</span>
-                    </div>
-                    <p className="text-xs text-white/60">{alert.order_number}</p>
-                    <div className="mt-2 space-y-1">
-                      <p className="text-xs font-medium">{alert.customer_name}</p>
-                      <p className="text-xs text-white/70">{alert.items.length} item{alert.items.length > 1 ? "s" : ""} &bull; {alert.order_type.replace("_", " ")}</p>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {alert.items.slice(0, 3).map((item, i) => (
-                          <span key={i} className="text-[10px] bg-white/10 px-2 py-0.5 rounded-full">
-                            {item.name_en} x{item.quantity}
-                          </span>
-                        ))}
-                        {alert.items.length > 3 && (
-                          <span className="text-[10px] text-white/40">+{alert.items.length - 3} more</span>
-                        )}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+            <div className="flex flex-col gap-3 w-full max-w-sm pointer-events-auto">
+              {alerts.map((alert) => (
+                <Link
+                  key={alert.id}
+                  href={`/dashboard/orders/${alert.id}`}
+                  className="bg-black text-white rounded-2xl p-5 shadow-2xl animate-slide-up block"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#25D366] animate-pulse shrink-0" />
+                        <span className="text-sm font-bold">New Order</span>
                       </div>
-                      <p className="text-sm font-bold mt-1">{formatPrice(alert.total_price)}</p>
+                      <p className="text-xs text-white/60 mb-2">{alert.order_number}</p>
+                      <div className="space-y-1.5">
+                        <p className="text-sm font-medium">{alert.customer_name}</p>
+                        <p className="text-xs text-white/70">{alert.items.length} item{alert.items.length > 1 ? "s" : ""} &bull; {alert.order_type.replace("_", " ")}</p>
+                        <div className="flex flex-wrap gap-1 mt-1.5">
+                          {alert.items.slice(0, 3).map((item, i) => (
+                            <span key={i} className="text-[10px] bg-white/10 px-2 py-0.5 rounded-full">
+                              {item.name_en} x{item.quantity}
+                            </span>
+                          ))}
+                          {alert.items.length > 3 && (
+                            <span className="text-[10px] text-white/40">+{alert.items.length - 3} more</span>
+                          )}
+                        </div>
+                        <p className="text-base font-bold mt-2">{formatPrice(alert.total_price)}</p>
+                      </div>
                     </div>
+                    <button
+                      onClick={(e) => { e.preventDefault(); dismissAlert(alert.id) }}
+                      className="p-2 hover:bg-white/10 rounded-lg shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
                   </div>
-                  <button
-                    onClick={(e) => { e.preventDefault(); dismissAlert(alert.id) }}
-                    className="p-2 hover:bg-white/10 rounded-lg shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))}
+            </div>
           </div>
         )}
 
         {/* Dropdown - Today's Orders */}
         {showDropdown && (
-          <>
-            <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
-            <div className="fixed bottom-0 left-0 right-0 sm:absolute sm:top-full sm:right-0 sm:left-auto sm:bottom-auto sm:mt-2 z-50 sm:w-80 bg-white sm:border sm:border-[#F0F0F0] sm:rounded-xl overflow-hidden rounded-t-2xl sm:rounded-t-xl shadow-2xl max-h-[60vh] sm:max-h-[calc(100vh-80px)] flex flex-col">
-              <div className="p-3 border-b border-[#F0F0F0] flex items-center justify-between shrink-0">
-                <p className="text-sm font-semibold">Today&apos;s Orders</p>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDropdown(false)} />
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[70vh] flex flex-col overflow-hidden animate-scale-up">
+              <div className="p-4 border-b border-[#F0F0F0] flex items-center justify-between shrink-0">
+                <p className="text-base font-bold">Today&apos;s Orders</p>
                 <button
                   onClick={() => setShowDropdown(false)}
-                  className="sm:hidden p-2 hover:bg-[#F0F0F0] rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center"
+                  className="p-2 hover:bg-[#F0F0F0] rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
               <div className="overflow-y-auto flex-1">
                 {dropdownLoading ? (
-                  <div className="flex flex-col gap-2 p-3">
+                  <div className="flex flex-col gap-2 p-4">
                     {[...Array(3)].map((_, i) => (
-                      <div key={i} className="h-16 bg-[#F5F5F5] rounded-lg animate-pulse" />
+                      <div key={i} className="h-16 bg-[#F5F5F5] rounded-xl animate-pulse" />
                     ))}
                   </div>
                 ) : todayOrders.length === 0 ? (
-                  <div className="text-center py-8 text-sm text-[#999]">
+                  <div className="text-center py-10 text-sm text-[#999]">
                     No orders today
                   </div>
                 ) : (
@@ -307,7 +309,7 @@ export function BellNotification({ restaurantId }: Props) {
                         key={order.id}
                         href={`/dashboard/orders/${order.id}`}
                         onClick={() => setShowDropdown(false)}
-                        className="flex items-center justify-between p-3 hover:bg-[#F9FAFB] active:bg-[#F0F0F0] transition-colors"
+                        className="flex items-center justify-between p-4 hover:bg-[#F9FAFB] active:bg-[#F0F0F0] transition-colors"
                       >
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
@@ -336,7 +338,7 @@ export function BellNotification({ restaurantId }: Props) {
                 )}
               </div>
             </div>
-          </>
+          </div>
         )}
       </div>
 

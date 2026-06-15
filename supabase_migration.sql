@@ -1,4 +1,12 @@
-﻿-- Migration: add_dish_tags (2026-05-31)
+﻿-- Migration: add_personal_branding_fields (2026-06-15)
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS brand_primary_color TEXT DEFAULT '#25D366';
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS brand_accent_color TEXT DEFAULT '#000000';
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS banner_enabled BOOLEAN DEFAULT false;
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS banner_image_url TEXT;
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS banner_link_url TEXT;
+-- ============================================
+
+-- Migration: add_dish_tags (2026-05-31)
 ALTER TABLE dishes ADD COLUMN IF NOT EXISTS tags JSONB DEFAULT '[]'::jsonb;
 -- ============================================
 -- QRMenu.pk â€” Complete Database Schema

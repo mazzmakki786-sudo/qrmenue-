@@ -48,12 +48,12 @@ export default function AnalyticsPage() {
         .limit(30),
       supabase
         .from("orders")
-        .select("items, total_price, order_type")
+        .select("items, total_price, order_type, created_at")
         .eq("restaurant_id", restaurant.id)
         .neq("order_status", "cancelled"),
     ])
 
-    if (statsRes.data) {
+    if (statsRes.data && statsRes.data.length > 0) {
       const reversed = statsRes.data.reverse()
       setGraph7d(reversed.slice(-7))
       setGraph30d(reversed)
@@ -62,6 +62,25 @@ export default function AnalyticsPage() {
     } else if (ordersRes.data) {
       setTotalOrders(ordersRes.data.length)
       setTotalRevenue(ordersRes.data.reduce((s, o) => s + o.total_price, 0))
+
+      const grouped: Record<string, { total_orders: number; total_revenue: number }> = {}
+      ordersRes.data.forEach((o: any) => {
+        const day = new Date(o.created_at).toISOString().split("T")[0]
+        if (!grouped[day]) grouped[day] = { total_orders: 0, total_revenue: 0 }
+        grouped[day].total_orders += 1
+        grouped[day].total_revenue += o.total_price
+      })
+      const graphData: DailyStats[] = Object.entries(grouped)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([date, v]) => ({
+          restaurant_id: restaurant.id,
+          order_date: date,
+          total_orders: v.total_orders,
+          total_revenue: v.total_revenue,
+          unique_customers: 0,
+        }))
+      setGraph7d(graphData.slice(-7))
+      setGraph30d(graphData.slice(-30))
     }
 
     if (ordersRes.data) {

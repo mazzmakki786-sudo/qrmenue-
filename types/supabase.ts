@@ -23,6 +23,13 @@ export interface Database {
           trial_end: string
           image_upload_allowed: boolean
           is_active: boolean
+          is_suspended: boolean | null
+          plan_limits_override: Json | null
+          brand_primary_color: string | null
+          brand_accent_color: string | null
+          banner_enabled: boolean | null
+          banner_image_url: string | null
+          banner_link_url: string | null
           created_at: string
           updated_at: string
         }
@@ -45,6 +52,13 @@ export interface Database {
           trial_end?: string
           image_upload_allowed?: boolean
           is_active?: boolean
+          is_suspended?: boolean | null
+          plan_limits_override?: Json | null
+          brand_primary_color?: string | null
+          brand_accent_color?: string | null
+          banner_enabled?: boolean | null
+          banner_image_url?: string | null
+          banner_link_url?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -67,6 +81,13 @@ export interface Database {
           trial_end?: string
           image_upload_allowed?: boolean
           is_active?: boolean
+          is_suspended?: boolean | null
+          plan_limits_override?: Json | null
+          brand_primary_color?: string | null
+          brand_accent_color?: string | null
+          banner_enabled?: boolean | null
+          banner_image_url?: string | null
+          banner_link_url?: string | null
           created_at?: string
           updated_at?: string
         }

@@ -26,6 +26,8 @@ export default function DashboardPage() {
   const [yesterdayOrders, setYesterdayOrders] = useState(0)
   const [todayRevenue, setTodayRevenue] = useState(0)
   const [yesterdayRevenue, setYesterdayRevenue] = useState(0)
+  const [monthlyOrders, setMonthlyOrders] = useState(0)
+  const [monthlyRevenue, setMonthlyRevenue] = useState(0)
   const [graph7d, setGraph7d] = useState<DailyStats[]>([])
   const [graph30d, setGraph30d] = useState<DailyStats[]>([])
   const [recentOrders, setRecentOrders] = useState<Order[]>([])
@@ -44,9 +46,10 @@ export default function DashboardPage() {
     const supabase = createClient()
     const today = new Date().toISOString().split("T")[0]
     const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0]
+    const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split("T")[0]
 
     try {
-      const [todayRes, yesterdayRes, statsRes, ordersRes, catRes, dishRes] = await Promise.all([
+      const [todayRes, yesterdayRes, monthlyRes, statsRes, ordersRes, catRes, dishRes] = await Promise.all([
         supabase
           .from("orders")
           .select("total_price")
@@ -59,6 +62,12 @@ export default function DashboardPage() {
           .eq("restaurant_id", restaurant.id)
           .gte("created_at", yesterday)
           .lt("created_at", today)
+          .neq("order_status", "cancelled"),
+        supabase
+          .from("orders")
+          .select("total_price")
+          .eq("restaurant_id", restaurant.id)
+          .gte("created_at", monthStart)
           .neq("order_status", "cancelled"),
         supabase
           .from("daily_order_stats")
@@ -92,6 +101,11 @@ export default function DashboardPage() {
       if (yesterdayRes.data) {
         setYesterdayOrders(yesterdayRes.data.length)
         setYesterdayRevenue(yesterdayRes.data.reduce((sum, o) => sum + o.total_price, 0))
+      }
+
+      if (monthlyRes.data) {
+        setMonthlyOrders(monthlyRes.data.length)
+        setMonthlyRevenue(monthlyRes.data.reduce((sum, o) => sum + o.total_price, 0))
       }
 
       if (statsRes.data) {
@@ -173,7 +187,9 @@ export default function DashboardPage() {
     return (
       <div className="space-y-6 animate-pulse">
         <div className="h-8 w-40 bg-[#F0F0F0] rounded" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="h-32 bg-[#F0F0F0] rounded-[14px]" />
+          <div className="h-32 bg-[#F0F0F0] rounded-[14px]" />
           <div className="h-32 bg-[#F0F0F0] rounded-[14px]" />
           <div className="h-32 bg-[#F0F0F0] rounded-[14px]" />
         </div>
@@ -352,7 +368,7 @@ export default function DashboardPage() {
         {/* Right Column - full width when onboarding hidden */}
         <div className={`${onboardingComplete ? "lg:col-span-12" : "lg:col-span-8"} space-y-6`}>
           {/* Stats Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-white border border-[#F0F0F0] p-6 rounded-[14px] flex flex-col justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-[#555]">Today Orders</span>
               <span className="text-[28px] font-bold text-black mt-2">{todayOrders}</span>
@@ -367,6 +383,20 @@ export default function DashboardPage() {
               <span className={`text-xs font-medium mt-4 flex items-center gap-1 ${revenueTrend >= 0 ? "text-[#25D366]" : "text-[#DC2626]"}`}>
                 {revenueTrend >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
                 {revenueTrend === 0 && todayRevenue === 0 ? "No data yet" : `${Math.abs(revenueTrend)}% vs yesterday`}
+              </span>
+            </div>
+            <div className="bg-white border border-[#F0F0F0] p-6 rounded-[14px] flex flex-col justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-[#555]">Monthly Orders</span>
+              <span className="text-[28px] font-bold text-black mt-2">{monthlyOrders}</span>
+              <span className="text-xs font-medium mt-4 text-[#999]">
+                This month
+              </span>
+            </div>
+            <div className="bg-white border border-[#F0F0F0] p-6 rounded-[14px] flex flex-col justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-[#555]">Monthly Revenue</span>
+              <span className="text-[28px] font-bold text-black mt-2">{formatPrice(monthlyRevenue)}</span>
+              <span className="text-xs font-medium mt-4 text-[#999]">
+                This month
               </span>
             </div>
           </div>

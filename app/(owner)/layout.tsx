@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { LayoutDashboard, UtensilsCrossed, ClipboardList, BarChart3, User, CreditCard, QrCode, Menu, X, LogOut } from "lucide-react"
+import { LayoutDashboard, UtensilsCrossed, ClipboardList, BarChart3, User, CreditCard, QrCode, Palette, Menu, X, LogOut } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { BellNotification } from "@/components/owner/BellNotification"
@@ -16,6 +16,7 @@ const navItems = [
   { href: "/dashboard/settings", label: "Profile", icon: User },
   { href: "/dashboard/subscription", label: "Subscription", icon: CreditCard },
   { href: "/dashboard/qr", label: "QR Code", icon: QrCode },
+  { href: "/dashboard/branding", label: "Branding", icon: Palette },
 ]
 
 export default function OwnerLayout({ children }: { children: React.ReactNode }) {
