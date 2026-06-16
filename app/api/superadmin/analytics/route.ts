@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server"
+import { safeRoute } from "@/lib/api-error"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
 
-export async function GET() {
+export const GET = safeRoute(async () => {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -221,4 +222,4 @@ export async function GET() {
     trialList: expiringSoonTrials.slice(0, 10),
     trialOrderUsage,
   })
-}
+})

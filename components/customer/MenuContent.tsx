@@ -68,8 +68,8 @@ export function MenuContent({ categories, restaurantId, restaurantName }: Props)
   return (
     <div>
       {/* Sticky Search & Filter */}
-      <div className="sticky top-0 z-40 bg-white/90 backdrop-blur-md">
-        <div className="px-4 pt-4 pb-0">
+      <div className="sticky top-0 z-40 bg-white/90" style={{ backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}>
+        <div className="pt-4 pb-0">
           <div className="flex gap-3">
             <div className="relative flex-1 group">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#555] group-focus-within:text-black transition-colors" />
@@ -79,7 +79,7 @@ export function MenuContent({ categories, restaurantId, restaurantName }: Props)
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder={t("customer.searchDishes")}
-                className="w-full bg-[#F9FAFB] border border-[#F0F0F0] rounded-xl py-3 pl-11 pr-10 text-sm focus:outline-none focus:border-black transition-all placeholder:text-[#999]"
+                className="w-full bg-[#F9FAFB] border border-[#F0F0F0] rounded-xl py-3 pl-12 pr-4 text-[14px] text-black placeholder:text-[#999] focus:outline-none focus:border-black transition-all"
               />
               {searchInput && (
                 <button
@@ -93,7 +93,7 @@ export function MenuContent({ categories, restaurantId, restaurantName }: Props)
             </div>
             <button
               onClick={() => setLang(lang === "en" ? "ur" : "en")}
-              className="bg-[#F9FAFB] border border-[#F0F0F0] px-4 rounded-xl flex items-center gap-2 hover:bg-[#F0F0F0] transition-colors text-sm font-semibold"
+              className="bg-[#F9FAFB] border border-[#F0F0F0] px-4 rounded-xl flex items-center gap-2 hover:bg-[#F0F0F0] transition-colors text-[14px] font-semibold"
             >
               <span className={lang === "en" ? "text-black" : "text-[#555]"}>EN</span>
               <span className="w-px h-4 bg-[#F0F0F0]" />
@@ -109,14 +109,12 @@ export function MenuContent({ categories, restaurantId, restaurantName }: Props)
       </div>
 
       {/* Dish List */}
-      <div className="px-4 py-4">
+      <div className="mt-4">
         {noResults ? (
           <div className="py-20 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-[#E1E3E4] flex items-center justify-center mx-auto mb-4">
-              <Search className="w-8 h-8 text-[#999]" />
-            </div>
-            <h4 className="text-lg font-semibold text-black">No results found</h4>
-            <p className="text-sm text-[#555] mt-2">Try searching for something else or browse categories.</p>
+            <Search className="w-10 h-10 text-[#CCC] mx-auto mb-4" />
+            <h4 className="text-[16px] font-semibold text-black">No results found</h4>
+            <p className="text-[14px] text-[#555] mt-2">Try searching for something else or browse categories.</p>
           </div>
         ) : (
           <DishGrid categories={searched} />

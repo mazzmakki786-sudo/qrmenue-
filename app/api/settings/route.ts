@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { safeRoute } from "@/lib/api-error"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 
 export const dynamic = "force-dynamic"
 
-export async function GET(request: Request) {
+export const GET = safeRoute(async (request) => {
   const ip = getClientIp(request)
   const allowed = await rateLimit(ip, 15, 60)
   if (!allowed) {
@@ -27,4 +28,4 @@ export async function GET(request: Request) {
   return NextResponse.json({ settings }, {
     headers: { "Cache-Control": "no-store" },
   })
-}
+})

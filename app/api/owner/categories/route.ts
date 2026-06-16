@@ -4,6 +4,7 @@ import { z } from "zod"
 import { PLAN_LIMITS, type Plan } from "@/lib/subscription"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 import { csrfGuard } from "@/lib/csrf"
+import { safeRoute } from "@/lib/api-error"
 import { logOwnerAction, getIpSimple } from "@/lib/owner-audit"
 
 const createSchema = z.object({
@@ -16,7 +17,7 @@ const deleteSchema = z.object({
   id: z.string().uuid(),
 })
 
-export async function POST(request: Request) {
+export const POST = safeRoute(async (request) => {
   const ip = getClientIp(request)
   const allowed = await rateLimit(ip, 15, 60)
   if (!allowed) {
@@ -88,9 +89,9 @@ export async function POST(request: Request) {
   }, getIpSimple(request)).catch(() => {})
 
   return NextResponse.json({ category: data })
-}
+})
 
-export async function DELETE(request: Request) {
+export const DELETE = safeRoute(async (request) => {
   const csrfResponse = csrfGuard(request)
   if (csrfResponse) return csrfResponse
 
@@ -152,4 +153,4 @@ export async function DELETE(request: Request) {
   }, getIpSimple(request)).catch(() => {})
 
   return NextResponse.json({ success: true })
-}
+})

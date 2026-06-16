@@ -3,9 +3,10 @@ import { createClient } from "@/lib/supabase/server"
 import { checkAndSendOrderLimitAlert } from "@/lib/email/orderLimitAlert"
 import { checkAndSendPlanEndingAlert } from "@/lib/email/planEndingAlert"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
+import { safeRoute } from "@/lib/api-error"
 import { csrfGuard } from "@/lib/csrf"
 
-export async function POST(request: Request) {
+export const POST = safeRoute(async (request) => {
   const csrfResponse = csrfGuard(request)
   if (csrfResponse) return csrfResponse
 
@@ -45,4 +46,4 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({ results })
-}
+})

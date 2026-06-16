@@ -4,6 +4,7 @@ import { z } from "zod"
 import { PLAN_LIMITS, type Plan } from "@/lib/subscription"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 import { csrfGuard } from "@/lib/csrf"
+import { safeRoute } from "@/lib/api-error"
 import { logOwnerAction, getIpSimple } from "@/lib/owner-audit"
 
 const dishSchema = z.object({
@@ -17,7 +18,7 @@ const dishSchema = z.object({
   tags: z.array(z.string()).optional(),
 })
 
-export async function POST(request: Request) {
+export const POST = safeRoute(async (request) => {
   const ip = getClientIp(request)
   const allowed = await rateLimit(ip, 15, 60)
   if (!allowed) {
@@ -129,9 +130,9 @@ export async function POST(request: Request) {
   }, getIpSimple(request)).catch(() => {})
 
   return NextResponse.json({ dish: data })
-}
+})
 
-export async function PATCH(request: Request) {
+export const PATCH = safeRoute(async (request) => {
   const csrfResponse = csrfGuard(request)
   if (csrfResponse) return csrfResponse
 
@@ -212,4 +213,4 @@ export async function PATCH(request: Request) {
   }, getIpSimple(request)).catch(() => {})
 
   return NextResponse.json({ dish: data })
-}
+})

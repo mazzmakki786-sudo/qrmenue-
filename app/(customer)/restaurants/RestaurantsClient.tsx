@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import Image from "next/image"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
-import { Search, X, MapPin, Clock, ChevronRight, Utensils } from "lucide-react"
+import { Search, X, ArrowLeft } from "lucide-react"
 
 interface RestaurantSummary {
   id: string
@@ -13,26 +13,6 @@ interface RestaurantSummary {
   city: string
   cuisine_type: string | null
   logo_url: string | null
-  created_at: string
-}
-
-const gradients = [
-  "from-[#FF6B6B] to-[#EE5A24]",
-  "from-[#6C5CE7] to-[#A29BFE]",
-  "from-[#00B894] to-[#00CEC9]",
-  "from-[#FDCB6E] to-[#F39C12]",
-  "from-[#E17055] to-[#D63031]",
-  "from-[#0984E3] to-[#74B9FF]",
-  "from-[#00B894] to-[#55EFC4]",
-  "from-[#636E72] to-[#2D3436]",
-]
-
-function getGradient(name: string) {
-  let hash = 0
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash)
-  }
-  return gradients[Math.abs(hash) % gradients.length]
 }
 
 export function RestaurantsClient() {
@@ -61,7 +41,7 @@ export function RestaurantsClient() {
       const supabase = createClient()
       let query = supabase
         .from("restaurants")
-        .select("id, name, slug, city, cuisine_type, logo_url, created_at")
+        .select("id, name, slug, city, cuisine_type, logo_url")
         .eq("is_active", true)
 
       if (selectedCity) {
@@ -98,49 +78,52 @@ export function RestaurantsClient() {
   const filteredCount = Object.values(filteredGrouped).reduce((s, arr) => s + arr.length, 0)
 
   return (
-    <div className="min-h-screen bg-[#F7F8F8]">
-      {/* Header */}
-      <div className="bg-white sticky top-0 z-40 border-b border-[#E8E9EA]">
-        <div className="px-4 pt-12 pb-3 max-w-app mx-auto">
-          {/* Location */}
-          <div className="flex items-center gap-2 mb-3">
-            <MapPin className="w-4 h-4 text-[#e21b70] shrink-0" />
-            <span className="text-sm font-semibold text-black truncate">
-              {selectedCity || "All Cities"}
-            </span>
-            <ChevronRight className="w-4 h-4 text-[#999] shrink-0" />
+    <div className="min-h-screen bg-white">
+      {/* Glass Header */}
+      <div
+        className="fixed top-0 left-0 right-0 z-40 bg-white/80"
+        style={{ backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}
+      >
+        <div className="px-4 pt-3 pb-3 max-w-[600px] mx-auto">
+          {/* Brand */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <span className="text-[20px] font-semibold text-black tracking-tight">
+                QRMenu.pk
+              </span>
+            </div>
           </div>
 
           {/* Search */}
-          <div className="relative group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7175] group-focus-within:text-[#e21b70] transition-colors" />
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#999]" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search restaurants or cuisines..."
-              className="w-full bg-[#F7F8F8] rounded-xl py-2.5 pl-10 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-[#e21b70]/20 transition-all placeholder:text-[#B7BABC]"
+              className="w-full bg-[#F9FAFB] border border-[#F0F0F0] rounded-xl py-2.5 pl-10 pr-10 text-[14px] text-black placeholder:text-[#999] focus:outline-none focus:border-black transition-colors"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
                 className="absolute right-3 top-1/2 -translate-y-1/2"
               >
-                <X className="w-4 h-4 text-[#6B7175]" />
+                <X className="w-4 h-4 text-[#999]" />
               </button>
             )}
           </div>
         </div>
 
-        {/* City Filters - Horizontal Scroll */}
-        <div className="px-4 pb-3 max-w-app mx-auto">
-          <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4">
+        {/* City Filter Chips */}
+        <div className="px-4 pb-3 max-w-[600px] mx-auto">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar">
             <button
               onClick={() => setSelectedCity("")}
-              className={`shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
+              className={`shrink-0 px-5 py-2 rounded-full text-[12px] font-medium whitespace-nowrap transition-colors ${
                 !selectedCity
-                  ? "bg-[#e21b70] text-white"
-                  : "bg-white text-[#2E3138] border border-[#D3D5D7]"
+                  ? "bg-black text-white"
+                  : "bg-[#F5F5F5] text-[#666] hover:bg-[#EEE]"
               }`}
             >
               All
@@ -149,10 +132,10 @@ export function RestaurantsClient() {
               <button
                 key={city}
                 onClick={() => setSelectedCity(city)}
-                className={`shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+                className={`shrink-0 px-5 py-2 rounded-full text-[12px] font-medium whitespace-nowrap transition-colors ${
                   selectedCity === city
-                    ? "bg-[#e21b70] text-white"
-                    : "bg-white text-[#2E3138] border border-[#D3D5D7]"
+                    ? "bg-black text-white"
+                    : "bg-[#F5F5F5] text-[#666] hover:bg-[#EEE]"
                 }`}
               >
                 {city}
@@ -162,96 +145,73 @@ export function RestaurantsClient() {
         </div>
       </div>
 
-      <main className="px-4 pt-4 pb-24 max-w-app mx-auto">
-        {/* Result Count */}
-        {!loading && (
-          <p className="text-xs text-[#6B7175] mb-3">
-            {filteredCount} {filteredCount === 1 ? "restaurant" : "restaurants"} found
-          </p>
-        )}
-
+      {/* Main Content */}
+      <main className="pt-[140px] pb-8 px-4 max-w-[600px] mx-auto">
         {/* Restaurant List */}
         {loading ? (
           <div className="space-y-4">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="bg-white rounded-xl overflow-hidden">
-                <div className="h-32 bg-[#E8E9EA] animate-pulse" />
-                <div className="p-3 space-y-2">
-                  <div className="h-4 bg-[#E8E9EA] rounded animate-pulse w-1/2" />
-                  <div className="h-3 bg-[#E8E9EA] rounded animate-pulse w-1/3" />
+              <div key={i} className="flex items-center gap-4 p-4 border border-[#F0F0F0] rounded-xl">
+                <div className="w-14 h-14 rounded-xl bg-[#F5F5F5] animate-pulse shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 bg-[#F5F5F5] rounded animate-pulse w-1/2" />
+                  <div className="h-3 bg-[#F5F5F5] rounded animate-pulse w-1/3" />
                 </div>
+                <div className="w-1.5 h-1.5 rounded-full bg-[#F5F5F5] animate-pulse" />
               </div>
             ))}
           </div>
         ) : filteredCount === 0 ? (
           <div className="py-24 text-center">
-            <div className="w-16 h-16 rounded-full bg-[#F7F8F8] flex items-center justify-center mx-auto mb-4">
-              <Utensils className="w-8 h-8 text-[#B7BABC]" />
-            </div>
-            <p className="text-sm font-semibold text-[#2E3138] mb-1">No restaurants found</p>
-            <p className="text-xs text-[#6B7175]">Try a different search or city</p>
+            <Search className="w-10 h-10 text-[#CCC] mx-auto mb-4" />
+            <p className="text-[16px] text-[#999]">No restaurants found</p>
           </div>
         ) : (
-          <div className="space-y-5">
+          <div className="space-y-8">
             {Object.entries(filteredGrouped).map(([city, items]) => (
-              <section key={city}>
+              <section key={city} className="space-y-4">
                 {/* City Header */}
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-base font-bold text-[#2E3138]">{city}</h2>
-                    <span className="text-xs text-[#6B7175]">({items.length})</span>
-                  </div>
-                </div>
+                <h2 className="text-[12px] font-semibold text-[#999] tracking-wider uppercase">
+                  {city}
+                </h2>
 
                 {/* Restaurant Cards */}
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {items.map((r) => (
                     <Link
                       key={r.id}
                       href={`/menu/${r.slug}`}
-                      className="block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all active:scale-[0.99]"
+                      className="flex items-center gap-4 p-4 border border-[#F0F0F0] rounded-xl hover:border-[#DDD] hover:shadow-[0px_4px_20px_rgba(0,0,0,0.05)] transition-all active:scale-[0.99] group"
                     >
-                      {/* Cover Image */}
-                      <div className="relative h-36 overflow-hidden">
-                        <div className={`absolute inset-0 bg-gradient-to-br ${getGradient(r.name)}`} />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-
-                        {/* Tags */}
-                        <div className="absolute top-3 left-3 flex gap-1.5">
-                          <span className="bg-[#e21b70] text-white text-[10px] font-bold px-2 py-0.5 rounded">
-                            POPULAR
-                          </span>
+                      {/* Logo */}
+                      {r.logo_url ? (
+                        <div className="w-14 h-14 rounded-xl overflow-hidden bg-black flex items-center justify-center shrink-0">
+                          <Image
+                            src={r.logo_url}
+                            alt={r.name}
+                            width={56}
+                            height={56}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
-
-                        {/* Logo */}
-                        <div className="absolute bottom-3 left-3">
-                          {r.logo_url ? (
-                            <div className="w-14 h-14 rounded-xl overflow-hidden border-2 border-white shadow-md bg-white">
-                              <Image src={r.logo_url} alt={r.name} width={56} height={56} className="w-full h-full object-cover" />
-                            </div>
-                          ) : (
-                            <div className="w-14 h-14 rounded-xl bg-white border-2 border-white shadow-md flex items-center justify-center">
-                              <span className="text-xl font-bold text-[#2E3138]">{r.name[0]}</span>
-                            </div>
-                          )}
+                      ) : (
+                        <div className="w-14 h-14 rounded-xl bg-black text-white flex items-center justify-center font-bold text-[20px] shrink-0">
+                          {r.name.charAt(0).toUpperCase()}
                         </div>
-                      </div>
+                      )}
 
                       {/* Info */}
-                      <div className="p-3">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="min-w-0 flex-1">
-                            <h3 className="text-sm font-bold text-[#2E3138] truncate">{r.name}</h3>
-                            <p className="text-xs text-[#6B7175] mt-0.5 truncate">
-                              {r.cuisine_type || "Restaurant"} &bull; {r.city}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-1 shrink-0 bg-[#F7F8F8] px-2 py-1 rounded-lg">
-                            <Clock className="w-3 h-3 text-[#6B7175]" />
-                            <span className="text-[10px] font-semibold text-[#6B7175]">20-30 min</span>
-                          </div>
-                        </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-[14px] text-black truncate">
+                          {r.name}
+                        </h3>
+                        <p className="text-[12px] text-[#999] truncate">
+                          {r.cuisine_type || "Restaurant"}
+                        </p>
                       </div>
+
+                      {/* Dot Indicator */}
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#DDD] group-hover:bg-black transition-colors shrink-0" />
                     </Link>
                   ))}
                 </div>

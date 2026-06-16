@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { getEffectiveLimits, type Plan } from "@/lib/subscription"
+import { safeRoute } from "@/lib/api-error"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 
-export async function GET(request: Request) {
+export const GET = safeRoute(async (request) => {
   const ip = getClientIp(request)
   const allowed = await rateLimit(ip, 30, 60)
   if (!allowed) {
@@ -48,4 +49,4 @@ export async function GET(request: Request) {
     canAddImage: imageCount < limits.maxImages,
     canAddCategory: categoryCount < limits.maxCategories,
   })
-}
+})

@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
+import { safeRoute } from "@/lib/api-error"
 import { SUPER_ADMIN_EMAIL, checkRateLimit, logAudit, getIp } from "@/lib/superadmin-security"
 
-export async function GET(request: Request) {
+export const GET = safeRoute(async (request) => {
   const ip = getIp(request)
   if (!(await checkRateLimit(ip))) return NextResponse.json({ error: "Too many requests" }, { status: 429 })
 
@@ -20,9 +21,9 @@ export async function GET(request: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
   return NextResponse.json({ announcements: data })
-}
+})
 
-export async function POST(request: Request) {
+export const POST = safeRoute(async (request) => {
   const ip = getIp(request)
   if (!(await checkRateLimit(ip))) return NextResponse.json({ error: "Too many requests" }, { status: 429 })
 
@@ -54,4 +55,4 @@ export async function POST(request: Request) {
 
   await logAudit(user.email || "", "announcement_created", { title: body.title })
   return NextResponse.json({ announcement: data })
-}
+})

@@ -5,6 +5,7 @@ import { z } from "zod"
 import { loadTrialLimitsFromDB } from "@/lib/subscription-server"
 import { DEFAULT_TRIAL_LIMITS, GRACE_PERIOD_DAYS } from "@/lib/subscription"
 import { checkAndSendOrderLimitAlert } from "@/lib/email/orderLimitAlert"
+import { safeRoute } from "@/lib/api-error"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 
 const orderItemSchema = z.object({
@@ -28,7 +29,7 @@ const createOrderSchema = z.object({
   payment_method: z.enum(["cod", "bank_transfer", "jazzcash", "easypaisa"]).optional(),
 })
 
-export async function POST(request: Request) {
+export const POST = safeRoute(async (request) => {
   const ip = getClientIp(request)
   const allowed = await rateLimit(ip, 5, 60)
   if (!allowed) {
@@ -147,7 +148,7 @@ export async function POST(request: Request) {
     order: data,
     whatsapp_url: whatsappUrl,
   })
-}
+})
 
 function buildWhatsAppURL(order: {
   orderNumber: string
@@ -188,6 +189,6 @@ function buildWhatsAppURL(order: {
     `Type: ${order.orderType.replace("_", " ")}`,
   ].join("\n")
 
-  const phone = order.restaurantPhone.replace(/[^0-9]/g, "")
+  const phone = (order.restaurantPhone || "").replace(/[^0-9]/g, "")
   return `https://wa.me/92${phone.slice(1)}?text=${encodeURIComponent(message)}`
 }

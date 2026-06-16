@@ -2,9 +2,10 @@ import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 import { csrfGuard } from "@/lib/csrf"
+import { safeRoute } from "@/lib/api-error"
 import { logOwnerAction, getIpSimple } from "@/lib/owner-audit"
 
-export async function PATCH(request: Request) {
+export const PATCH = safeRoute(async (request) => {
   const csrfResponse = csrfGuard(request)
   if (csrfResponse) return csrfResponse
 
@@ -57,4 +58,4 @@ export async function PATCH(request: Request) {
   }, getIpSimple(request)).catch(() => {})
 
   return NextResponse.json({ restaurant: data })
-}
+})

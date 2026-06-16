@@ -14,7 +14,7 @@ export function MenuFooter({ branding }: Props) {
           href="https://qrmenu.pk"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-xs text-[#999] hover:text-[#555] transition-colors"
+          className="inline-flex items-center gap-2 text-[12px] text-[#999] hover:text-[#555] transition-colors"
         >
           <span className="w-1.5 h-1.5 rounded-full bg-[#25D366]" />
           Powered by QRMenu.pk

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
+import { safeRoute } from "@/lib/api-error"
 import { SUPER_ADMIN_EMAIL, checkRateLimit, logAudit, getIp } from "@/lib/superadmin-security"
 
 async function checkAuth(supabase: Awaited<ReturnType<typeof createClient>>) {
@@ -8,7 +9,7 @@ async function checkAuth(supabase: Awaited<ReturnType<typeof createClient>>) {
   return true
 }
 
-export async function GET(request: Request) {
+export const GET = safeRoute(async (request) => {
   const ip = getIp(request)
   if (!await checkRateLimit(ip)) return NextResponse.json({ error: "Too many requests" }, { status: 429 })
 
@@ -25,9 +26,9 @@ export async function GET(request: Request) {
   const settings: Record<string, string> = {}
   data.forEach((s: any) => { settings[s.key] = s.value })
   return NextResponse.json({ settings })
-}
+})
 
-export async function PATCH(request: Request) {
+export const PATCH = safeRoute(async (request) => {
   const ip = getIp(request)
   if (!await checkRateLimit(ip)) return NextResponse.json({ error: "Too many requests" }, { status: 429 })
 
@@ -50,4 +51,4 @@ export async function PATCH(request: Request) {
   await logAudit(user?.email || "", "settings_updated", { keys: Object.keys(body) })
 
   return NextResponse.json({ success: true })
-}
+})

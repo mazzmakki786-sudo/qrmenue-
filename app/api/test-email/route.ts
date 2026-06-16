@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server"
 import { Resend } from "resend"
 import { createClient } from "@/lib/supabase/server"
+import { safeRoute } from "@/lib/api-error"
 import { SUPER_ADMIN_EMAIL } from "@/lib/superadmin-security"
 
-export async function GET() {
+export const GET = safeRoute(async () => {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || user.email?.toLowerCase() !== SUPER_ADMIN_EMAIL) {
@@ -48,4 +49,4 @@ export async function GET() {
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })
   }
-}
+})

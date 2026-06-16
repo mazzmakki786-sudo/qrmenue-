@@ -2,9 +2,10 @@ import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { checkAndSendReminders } from "@/lib/email/trialReminders"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
+import { safeRoute } from "@/lib/api-error"
 import { csrfGuard } from "@/lib/csrf"
 
-export async function POST(request: Request) {
+export const POST = safeRoute(async (request) => {
   const csrfResponse = csrfGuard(request)
   if (csrfResponse) return csrfResponse
 
@@ -41,9 +42,9 @@ export async function POST(request: Request) {
     console.error("Reminder check error", e)
     return NextResponse.json({ error: e?.message || "Unknown error" }, { status: 500 })
   }
-}
+})
 
-export async function GET(request: Request) {
+export const GET = safeRoute(async (request) => {
   const ip = getClientIp(request)
   const allowed = await rateLimit(ip, 5, 60)
   if (!allowed) {
@@ -78,4 +79,4 @@ export async function GET(request: Request) {
     console.error("Reminder check error", e)
     return NextResponse.json({ error: e?.message || "Unknown error" }, { status: 500 })
   }
-}
+})

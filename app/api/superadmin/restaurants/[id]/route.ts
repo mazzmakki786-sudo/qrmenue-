@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { safeRoute } from "@/lib/api-error"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
 
 async function checkAuth(supabase: Awaited<ReturnType<typeof createClient>>) {
@@ -9,10 +10,10 @@ async function checkAuth(supabase: Awaited<ReturnType<typeof createClient>>) {
   return true
 }
 
-export async function GET(
-  _request: Request,
+export const GET = safeRoute(async (
+  _request,
   { params }: { params: Promise<{ id: string }> }
-) {
+) => {
   const { id } = await params
   const supabase = await createClient()
 
@@ -32,12 +33,12 @@ export async function GET(
   }
 
   return NextResponse.json({ restaurant: data })
-}
+})
 
-export async function PATCH(
-  request: Request,
+export const PATCH = safeRoute(async (
+  request,
   { params }: { params: Promise<{ id: string }> }
-) {
+) => {
   const { id } = await params
   const supabase = await createClient()
 
@@ -70,4 +71,4 @@ export async function PATCH(
   }
 
   return NextResponse.json({ restaurant: data })
-}
+})

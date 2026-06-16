@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server"
+import { safeRoute } from "@/lib/api-error"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
 
-export async function PATCH(
-  request: Request,
+export const PATCH = safeRoute(async (
+  request,
   { params }: { params: Promise<{ id: string }> }
-) {
+) => {
   const { id } = await params
   const supabase = await createClient()
 
@@ -47,4 +48,4 @@ export async function PATCH(
   }
 
   return NextResponse.json({ restaurant: data })
-}
+})

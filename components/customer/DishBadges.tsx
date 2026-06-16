@@ -26,7 +26,7 @@ export function DishBadges({ tags }: Props) {
   if (!tags || tags.length === 0) return null
 
   return (
-    <div className="flex flex-wrap gap-1.5 mt-1.5">
+    <div className="flex flex-wrap gap-1">
       {tags.map((tag) => {
         const config = badgeConfig[tag]
         if (!config) return null
@@ -34,9 +34,9 @@ export function DishBadges({ tags }: Props) {
         return (
           <span
             key={tag}
-            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium ${config.className}`}
+            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${config.className}`}
           >
-            <Icon className="w-3 h-3" />
+            <Icon className="w-2.5 h-2.5" />
             {config.label}
           </span>
         )

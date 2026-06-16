@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
+import { safeRoute } from "@/lib/api-error"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
 
-export async function GET(request: NextRequest) {
+export const GET = safeRoute(async (request) => {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -59,4 +60,4 @@ export async function GET(request: NextRequest) {
   }))
 
   return NextResponse.json({ data: restaurantsWithStats, page, limit, total })
-}
+})

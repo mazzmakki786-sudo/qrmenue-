@@ -2,16 +2,17 @@ import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 import { csrfGuard } from "@/lib/csrf"
+import { safeRoute } from "@/lib/api-error"
 import { logOwnerAction, getIpSimple } from "@/lib/owner-audit"
 
 const VALID_STATUSES = ["received", "preparing", "ready", "completed", "cancelled"] as const
 const VALID_PAYMENT_STATUSES = ["pending", "paid", "failed"] as const
 const VALID_PAYMENT_METHODS = ["cod", "bank_transfer", "jazzcash", "easypaisa"] as const
 
-export async function GET(
-  _request: Request,
+export const GET = safeRoute(async (
+  _request,
   { params }: { params: Promise<{ id: string }> }
-) {
+) => {
   const { id } = await params
   const supabase = await createClient()
 
@@ -42,12 +43,12 @@ export async function GET(
   }
 
   return NextResponse.json({ order: data })
-}
+})
 
-export async function PATCH(
-  request: Request,
+export const PATCH = safeRoute(async (
+  request,
   { params }: { params: Promise<{ id: string }> }
-) {
+) => {
   const csrfResponse = csrfGuard(request)
   if (csrfResponse) return csrfResponse
 
@@ -127,4 +128,4 @@ export async function PATCH(
   }, getIpSimple(request)).catch(() => {})
 
   return NextResponse.json({ order: data })
-}
+})

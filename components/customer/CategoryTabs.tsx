@@ -27,7 +27,7 @@ export function CategoryTabs({ categories, activeCategory, onSelect }: Props) {
   }, [activeCategory])
 
   return (
-    <div className="relative overflow-hidden pb-3 pt-6 px-4">
+    <div className="relative overflow-hidden pb-2 pt-6 px-4">
       {/* Left fade */}
       <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
       {/* Right fade */}
@@ -35,17 +35,16 @@ export function CategoryTabs({ categories, activeCategory, onSelect }: Props) {
       <div ref={scrollRef} className="flex gap-2 overflow-x-auto no-scrollbar">
         <button
           onClick={() => onSelect(null)}
-          className={`relative flex-shrink-0 px-6 py-2 rounded-full text-sm font-semibold transition-colors flex items-center gap-2 ${
+          className={`relative flex-shrink-0 px-6 py-2 rounded-full text-[14px] font-semibold transition-colors ${
             !activeCategory
-              ? "bg-black text-white shadow-sm"
-              : "bg-[#F9FAFB] text-[#555] hover:bg-[#F0F0F0]"
+              ? "bg-black text-white"
+              : "bg-[#F5F5F5] text-[#666] hover:bg-[#EEE]"
           } ${lang === "ur" ? "font-urdu" : ""}`}
         >
           {lang === "ur" ? "تمام" : "All"}
-          <span className={`text-[10px] ${!activeCategory ? "bg-white/20 text-white" : "bg-[#F0F0F0]"} px-1.5 rounded-full`}>{totalDishes}</span>
-          {!activeCategory && (
-            <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-5 h-0.5 bg-black rounded-full" />
-          )}
+          <span className={`text-[10px] ml-2 ${!activeCategory ? "bg-white/20 text-white" : "bg-[#F0F0F0] text-[#666]"} px-1.5 rounded-full`}>
+            {totalDishes}
+          </span>
         </button>
         {categories.map((cat) => {
           const isActive = activeCategory === cat.id
@@ -56,17 +55,16 @@ export function CategoryTabs({ categories, activeCategory, onSelect }: Props) {
               key={cat.id}
               ref={isActive ? activeRef : null}
               onClick={() => onSelect(isActive ? null : cat.id)}
-              className={`relative flex-shrink-0 px-6 py-2 rounded-full text-sm font-semibold transition-colors flex items-center gap-2 ${
+              className={`relative flex-shrink-0 px-6 py-2 rounded-full text-[14px] font-semibold transition-colors ${
                 isActive
-                  ? "bg-black text-white shadow-sm"
-                  : "bg-[#F9FAFB] text-[#555] hover:bg-[#F0F0F0]"
+                  ? "bg-black text-white"
+                  : "bg-[#F5F5F5] text-[#666] hover:bg-[#EEE]"
               } ${lang === "ur" ? "font-urdu" : ""}`}
             >
               {label}
-              <span className={`text-[10px] ${isActive ? "bg-white/20 text-white" : "bg-[#F0F0F0] text-[#555]"} px-1.5 rounded-full`}>{count}</span>
-              {isActive && (
-                <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-5 h-0.5 bg-black rounded-full" />
-              )}
+              <span className={`text-[10px] ml-2 ${isActive ? "bg-white/20 text-white" : "bg-[#F0F0F0] text-[#666]"} px-1.5 rounded-full`}>
+                {count}
+              </span>
             </button>
           )
         })}

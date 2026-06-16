@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { PLAN_LIMITS } from "@/lib/subscription"
+import { safeRoute } from "@/lib/api-error"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 
-export async function GET(
-  request: Request,
+export const GET = safeRoute(async (
+  request,
   { params }: { params: Promise<{ slug: string }> }
-) {
+) => {
   const ip = getClientIp(request)
   const allowed = await rateLimit(ip, 15, 60)
   if (!allowed) {
@@ -78,4 +79,4 @@ export async function GET(
     plan,
     message,
   })
-}
+})

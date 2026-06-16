@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { safeRoute } from "@/lib/api-error"
+import { createClient, createAdminClient } from "@/lib/supabase/server"
 
-export async function POST(
-  _request: Request,
+export const POST = safeRoute(async (
+  _request,
   { params }: { params: Promise<{ id: string }> }
-) {
+) => {
   const { id } = await params
   const supabase = await createClient()
 
@@ -13,11 +14,7 @@ export async function POST(
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
   }
 
-  const supabaseAdmin = (await import("@supabase/supabase-js")).createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  )
+  const supabaseAdmin = createAdminClient()
 
   const { data: existing } = await supabaseAdmin
     .from("restaurants")
@@ -65,4 +62,4 @@ export async function POST(
     message: `Trial reset for ${existing.name}. New trial ends ${new Date(newTrialEnd).toLocaleDateString()}.`,
     restaurant: data,
   })
-}
+})

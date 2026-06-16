@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { safeRoute } from "@/lib/api-error"
 import { DEFAULT_TRIAL_LIMITS, DEFAULT_EXPIRED_TRIAL_LIMITS, type TrialLimitConfig, type ExpiredTrialLimitConfig } from "@/lib/subscription"
 
 async function getSetting(key: string) {
@@ -19,7 +20,7 @@ async function upsertSetting(key: string, value: string) {
     .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: "key" })
 }
 
-export async function GET() {
+export const GET = safeRoute(async () => {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || user.email?.toLowerCase() !== process.env.SUPER_ADMIN_EMAIL?.toLowerCase()) {
@@ -29,18 +30,18 @@ export async function GET() {
   const trialRaw = await getSetting("trial_limits")
   const expiredRaw = await getSetting("expired_trial_limits")
 
-  const config: TrialLimitConfig = trialRaw
-    ? { ...DEFAULT_TRIAL_LIMITS, ...JSON.parse(trialRaw) }
-    : { ...DEFAULT_TRIAL_LIMITS }
+  let parsedTrial: Partial<TrialLimitConfig> = {}
+  let parsedExpired: Partial<ExpiredTrialLimitConfig> = {}
+  try { if (trialRaw) parsedTrial = JSON.parse(trialRaw) } catch { parsedTrial = {} }
+  try { if (expiredRaw) parsedExpired = JSON.parse(expiredRaw) } catch { parsedExpired = {} }
 
-  const expiredConfig: ExpiredTrialLimitConfig = expiredRaw
-    ? { ...DEFAULT_EXPIRED_TRIAL_LIMITS, ...JSON.parse(expiredRaw) }
-    : { ...DEFAULT_EXPIRED_TRIAL_LIMITS }
+  const config: TrialLimitConfig = { ...DEFAULT_TRIAL_LIMITS, ...parsedTrial }
+  const expiredConfig: ExpiredTrialLimitConfig = { ...DEFAULT_EXPIRED_TRIAL_LIMITS, ...parsedExpired }
 
   return NextResponse.json({ config, expiredConfig })
-}
+})
 
-export async function PATCH(request: Request) {
+export const PATCH = safeRoute(async (request) => {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || user.email?.toLowerCase() !== process.env.SUPER_ADMIN_EMAIL?.toLowerCase()) {
@@ -62,9 +63,9 @@ export async function PATCH(request: Request) {
   await upsertSetting("trial_limits", JSON.stringify(config))
 
   return NextResponse.json({ config, message: "Trial limits updated" })
-}
+})
 
-export async function PUT(request: Request) {
+export const PUT = safeRoute(async (request) => {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || user.email?.toLowerCase() !== process.env.SUPER_ADMIN_EMAIL?.toLowerCase()) {
@@ -85,4 +86,4 @@ export async function PUT(request: Request) {
   await upsertSetting("expired_trial_limits", JSON.stringify(expiredConfig))
 
   return NextResponse.json({ expiredConfig, message: "Expired trial limits updated" })
-}
+})

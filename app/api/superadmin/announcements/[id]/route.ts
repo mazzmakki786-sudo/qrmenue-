@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
+import { safeRoute } from "@/lib/api-error"
 import { SUPER_ADMIN_EMAIL, checkRateLimit, logAudit, getIp } from "@/lib/superadmin-security"
 
-export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export const DELETE = safeRoute(async (request, { params }: { params: Promise<{ id: string }> }) => {
   const ip = getIp(request)
   if (!(await checkRateLimit(ip))) return NextResponse.json({ error: "Too many requests" }, { status: 429 })
 
@@ -31,9 +32,9 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 
   await logAudit(user.email || "", "announcement_deleted", { id })
   return NextResponse.json({ success: true })
-}
+})
 
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export const PATCH = safeRoute(async (request, { params }: { params: Promise<{ id: string }> }) => {
   const ip = getIp(request)
   if (!(await checkRateLimit(ip))) return NextResponse.json({ error: "Too many requests" }, { status: 429 })
 
@@ -84,4 +85,4 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   await logAudit(user.email || "", "announcement_updated", { id, ...updates })
   return NextResponse.json({ announcement: data })
-}
+})

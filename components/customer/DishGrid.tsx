@@ -35,10 +35,10 @@ export function DishGrid({ categories }: Props) {
 
         return (
           <section key={category.id} id={`cat-${category.id}`}>
-            <h2 className={`text-lg font-semibold mb-4 border-l-4 border-black pl-3 ${lang === "ur" ? "font-urdu" : ""}`}>
+            <h2 className={`text-[20px] font-semibold mb-6 border-l-4 border-black pl-3 ${lang === "ur" ? "font-urdu" : ""}`}>
               {categoryLabel}
             </h2>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-4">
               {availableDishes.map((dish) => (
                 <Card key={dish.id} dish={dish} />
               ))}
@@ -72,57 +72,73 @@ const Card = React.memo(function Card({ dish, unavailable = false }: { dish: Dis
   const badges = (dish.tags || []).filter((t) => recognizedTags.includes(t))
 
   return (
-    <div className={`bg-white rounded-xl border border-[#E8E8E8] overflow-hidden flex flex-col ${unavailable ? "opacity-50" : ""}`}>
-      <div className="relative aspect-square w-full overflow-hidden">
+    <div className={`group flex gap-4 p-4 bg-[#F9FAFB] rounded-2xl border border-transparent hover:border-[#F0F0F0] hover:bg-white hover:shadow-[0px_4px_20px_rgba(0,0,0,0.05)] transition-all duration-300 ${unavailable ? "opacity-50" : ""}`}>
+      {/* Image */}
+      <div className="relative w-24 h-24 flex-shrink-0 overflow-hidden rounded-xl">
         {dish.image_url && !imgError ? (
           <Image
             src={dish.image_url}
             alt={dish.name_en}
             fill
-            className="object-cover rounded-t-xl"
-            sizes="(max-width: 768px) 50vw, 25vw"
+            className="object-cover"
+            sizes="96px"
             onError={() => setImgError(true)}
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-[#F9FAFB] to-[#EEE] flex items-center justify-center rounded-t-xl">
-            <ImageOff className="w-8 h-8 text-[#BBB]" />
+          <div className="w-full h-full bg-[#E1E3E4] flex items-center justify-center">
+            <ImageOff className="w-6 h-6 text-[#BBB]" />
           </div>
         )}
         {badges.length > 0 && (
-          <div className="absolute top-2 left-2 z-10">
+          <div className="absolute top-1 right-1 z-10">
             <DishBadges tags={badges} />
           </div>
         )}
         {unavailable && (
-          <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-t-xl">
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-xl">
             <span className="text-white text-[10px] font-semibold bg-black/60 px-2 py-0.5 rounded-full">Unavailable</span>
           </div>
         )}
       </div>
-      <div className="flex flex-col flex-1 p-3">
-        <h3 className={`text-sm font-semibold text-black line-clamp-1 ${lang === "ur" ? "font-urdu" : ""}`}>
-          {name}
-        </h3>
-        {nameSecondary && (
-          <p className={`text-[11px] text-[#555] line-clamp-1 ${lang !== "ur" ? "font-urdu" : ""}`}>
-            {nameSecondary}
+
+      {/* Info */}
+      <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex justify-between items-start mb-1 gap-2">
+          <div className="min-w-0 flex-1">
+            <h3 className={`text-[14px] font-semibold text-black line-clamp-1 ${lang === "ur" ? "font-urdu" : ""}`}>
+              {name}
+            </h3>
+            {nameSecondary && (
+              <p className={`text-[12px] text-[#555] line-clamp-1 ${lang !== "ur" ? "font-urdu" : ""}`}>
+                {nameSecondary}
+              </p>
+            )}
+          </div>
+          <span className="text-[14px] font-semibold text-black shrink-0">
+            Rs {dish.price.toLocaleString("en-PK")}
+          </span>
+        </div>
+
+        {description && (
+          <p className="text-[12px] text-[#555] line-clamp-2 mb-2">
+            {description}
           </p>
         )}
-        <span className="text-sm font-bold text-black mt-1">Rs {dish.price}</span>
-        <div className="mt-auto pt-2">
+
+        <div className="mt-auto flex justify-end">
           {cartItem ? (
-            <div className="flex items-center justify-between bg-black text-white rounded-full overflow-hidden">
+            <div className="flex items-center gap-3 bg-[#F0F0F0] px-3 py-1.5 rounded-full">
               <button
                 onClick={() => updateQuantity(dish.id, cartItem.quantity - 1)}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center hover:opacity-70 transition-opacity"
+                className="min-h-[32px] min-w-[32px] flex items-center justify-center hover:opacity-70 transition-opacity text-[16px]"
                 aria-label="Decrease quantity"
               >
                 −
               </button>
-              <span className="text-sm font-semibold min-w-[24px] text-center">{cartItem.quantity}</span>
+              <span className="text-[14px] font-bold min-w-[20px] text-center">{cartItem.quantity}</span>
               <button
                 onClick={() => addItem(dish)}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center hover:opacity-70 transition-opacity"
+                className="min-h-[32px] min-w-[32px] flex items-center justify-center hover:opacity-70 transition-opacity text-[16px]"
                 aria-label="Increase quantity"
               >
                 +
@@ -132,7 +148,7 @@ const Card = React.memo(function Card({ dish, unavailable = false }: { dish: Dis
             <button
               onClick={() => addItem(dish)}
               disabled={unavailable}
-              className="w-full bg-black text-white py-2.5 rounded-full text-xs font-semibold active:scale-95 transition-all disabled:opacity-50 min-h-[44px]"
+              className="bg-black text-white px-4 py-1.5 rounded-full text-[12px] font-semibold active:scale-95 transition-all disabled:opacity-50"
             >
               + Add
             </button>

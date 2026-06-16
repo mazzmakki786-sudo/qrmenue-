@@ -2,9 +2,10 @@ import { NextResponse } from "next/server"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { Resend } from "resend"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
+import { safeRoute } from "@/lib/api-error"
 import { escapeHtml } from "@/lib/utils"
 
-export async function POST(request: Request) {
+export const POST = safeRoute(async (request) => {
   const ip = getClientIp(request)
   const allowed = await rateLimit(ip, 5, 60)
   if (!allowed) {
@@ -97,4 +98,4 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({ success: true, notified: true })
-}
+})

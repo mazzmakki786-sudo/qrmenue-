@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { SUPER_ADMIN_EMAIL, logAudit, getIp } from "@/lib/superadmin-security"
 import { Resend } from "resend"
+import { safeRoute } from "@/lib/api-error"
 import { escapeHtml } from "@/lib/utils"
 
 async function checkAuth() {
@@ -10,7 +11,7 @@ async function checkAuth() {
   return user && user.email?.toLowerCase() === SUPER_ADMIN_EMAIL
 }
 
-export async function POST(_: Request, { params }: { params: Promise<{ id: string }> }) {
+export const POST = safeRoute(async (_, { params }: { params: Promise<{ id: string }> }) => {
   if (!(await checkAuth())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
   }
@@ -96,4 +97,4 @@ export async function POST(_: Request, { params }: { params: Promise<{ id: strin
   })
 
   return NextResponse.json({ success: true, notified: notifiedCount, total: restaurants.length })
-}
+})

@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
+import { safeRoute } from "@/lib/api-error"
 import { SUPER_ADMIN_EMAIL, checkRateLimit, getIp } from "@/lib/superadmin-security"
 
-export async function GET(request: Request) {
+export const GET = safeRoute(async (request) => {
   const ip = getIp(request)
   if (!await checkRateLimit(ip)) return NextResponse.json({ error: "Too many requests" }, { status: 429 })
 
@@ -22,4 +23,4 @@ export async function GET(request: Request) {
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
 
   return NextResponse.json({ logs: data || [] })
-}
+})

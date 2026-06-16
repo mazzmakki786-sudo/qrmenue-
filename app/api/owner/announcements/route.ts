@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { createClient, createAdminClient } from "@/lib/supabase/server"
+import { safeRoute } from "@/lib/api-error"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
+import { csrfGuard } from "@/lib/csrf"
 
-export async function GET(request: Request) {
+export const GET = safeRoute(async (request) => {
   const ip = getClientIp(request)
   const allowed = await rateLimit(ip, 30, 60)
   if (!allowed) {
@@ -43,9 +45,16 @@ export async function GET(request: Request) {
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
 
   return NextResponse.json({ announcements: data || [] })
-}
+})
 
-export async function PATCH(request: Request) {
+export const PATCH = safeRoute(async (request) => {
+  const csrfResponse = csrfGuard(request)
+  if (csrfResponse) return csrfResponse
+
+  const ip = getClientIp(request)
+  const allowed = await rateLimit(ip, 15, 60)
+  if (!allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 })
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -63,8 +72,8 @@ export async function PATCH(request: Request) {
 
   if (!restaurant) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
 
-  const adminSupabase = (await import("@/lib/supabase/server")).createAdminClient()
-  const { error } = await adminSupabase
+  const admin = createAdminClient()
+  const { error } = await admin
     .from("owner_notifications")
     .update({ is_read: true })
     .eq("id", body.announcement_id)
@@ -72,9 +81,16 @@ export async function PATCH(request: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
   return NextResponse.json({ success: true })
-}
+})
 
-export async function POST(request: Request) {
+export const POST = safeRoute(async (request) => {
+  const csrfResponse = csrfGuard(request)
+  if (csrfResponse) return csrfResponse
+
+  const ip = getClientIp(request)
+  const allowed = await rateLimit(ip, 15, 60)
+  if (!allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 })
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -87,8 +103,8 @@ export async function POST(request: Request) {
 
   if (!restaurant) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
 
-  const adminSupabase = (await import("@/lib/supabase/server")).createAdminClient()
-  const { data, error } = await adminSupabase
+  const admin = createAdminClient()
+  const { data, error } = await admin
     .from("owner_notifications")
     .update({ is_read: true })
     .eq("restaurant_id", restaurant.id)
@@ -98,4 +114,4 @@ export async function POST(request: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
   return NextResponse.json({ success: true, count: data?.length || 0 })
-}
+})
