@@ -1,4 +1,4 @@
-﻿-- Migration: add_is_suspended_column (2026-06-15)
+-- Migration: add_is_suspended_column (2026-06-15)
 ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_suspended BOOLEAN DEFAULT false;
 -- ============================================
 
@@ -312,11 +312,7 @@ CREATE POLICY "Owner manages own dishes"
     )
   );
 
--- Orders: anyone can view (by order ID UUID), owner reads own, anyone can create
-CREATE POLICY "Anyone can view orders"
-  ON orders FOR SELECT
-  USING (true);
-
+-- Orders: owner reads own restaurant orders, customer reads own orders only
 CREATE POLICY "Owner can read own restaurant orders"
   ON orders FOR SELECT
   USING (
@@ -325,9 +321,16 @@ CREATE POLICY "Owner can read own restaurant orders"
     )
   );
 
-CREATE POLICY "Anyone can create orders"
+CREATE POLICY "Customer can read own orders"
+  ON orders FOR SELECT
+  USING (
+    customer_id = auth.uid()
+  );
+
+-- Orders: only API layer creates orders (admin client bypasses RLS)
+CREATE POLICY "Authenticated users can create orders"
   ON orders FOR INSERT
-  WITH CHECK (true);
+  WITH CHECK (auth.role() = 'authenticated');
 
 -- Orders: owner can update own restaurant orders
 CREATE POLICY "Owner can update own restaurant orders"

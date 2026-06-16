@@ -4,8 +4,12 @@ import { Resend } from "resend"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 import { safeRoute } from "@/lib/api-error"
 import { escapeHtml } from "@/lib/utils"
+import { csrfGuard } from "@/lib/csrf"
 
 export const POST = safeRoute(async (request) => {
+  const csrfResponse = csrfGuard(request)
+  if (csrfResponse) return csrfResponse
+
   const ip = getClientIp(request)
   const allowed = await rateLimit(ip, 5, 60)
   if (!allowed) {

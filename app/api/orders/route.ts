@@ -7,6 +7,7 @@ import { DEFAULT_TRIAL_LIMITS, GRACE_PERIOD_DAYS } from "@/lib/subscription"
 import { checkAndSendOrderLimitAlert } from "@/lib/email/orderLimitAlert"
 import { safeRoute } from "@/lib/api-error"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
+import { csrfGuard } from "@/lib/csrf"
 
 const orderItemSchema = z.object({
   id: z.string(),
@@ -30,6 +31,9 @@ const createOrderSchema = z.object({
 })
 
 export const POST = safeRoute(async (request) => {
+  const csrfResponse = csrfGuard(request)
+  if (csrfResponse) return csrfResponse
+
   const ip = getClientIp(request)
   const allowed = await rateLimit(ip, 5, 60)
   if (!allowed) {
@@ -119,7 +123,7 @@ export const POST = safeRoute(async (request) => {
     .single()
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return NextResponse.json({ error: "Failed to create order" }, { status: 400 })
   }
 
   const whatsappUrl = buildWhatsAppURL({

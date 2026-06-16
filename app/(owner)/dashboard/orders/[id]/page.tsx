@@ -95,12 +95,14 @@ export default function OrderDetailPage() {
     if (!content) return
     const printWindow = window.open("", "_blank")
     if (!printWindow) return
+    const clone = content.cloneNode(true) as HTMLElement
     printWindow.document.write(`
       <html><head><title>Order ${order?.order_number}</title>
       <style>body{font-family:sans-serif;padding:20px;max-width:400px;margin:auto;}table{width:100%;}td{padding:4px 0;font-size:14px;}</style>
-      </head><body>${content.innerHTML}</body></html>
+      </head><body><div id="receipt"></div></body></html>
     `)
     printWindow.document.close()
+    printWindow.document.getElementById("receipt")?.appendChild(clone)
     printWindow.print()
   }
 

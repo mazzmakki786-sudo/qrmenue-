@@ -6,9 +6,34 @@ import { Download, Printer } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 
+interface OrderItem {
+  name_en: string
+  quantity: number
+  subtotal: number
+}
+
+interface OrderData {
+  id: string
+  order_number: string
+  created_at: string
+  items: OrderItem[]
+  total_price: number
+  payment_method: string
+  order_type: string
+  table_number?: string | null
+  customer_name: string
+  order_status: string
+}
+
+interface RestaurantData {
+  name: string
+  city?: string | null
+  logo_url?: string | null
+}
+
 interface Props {
-  order: any
-  restaurant: any
+  order: OrderData
+  restaurant: RestaurantData
 }
 
 export function OrderReceipt({ order, restaurant }: Props) {
@@ -17,6 +42,7 @@ export function OrderReceipt({ order, restaurant }: Props) {
   const handlePrint = () => {
     const win = window.open("", "_blank")
     if (!win || !receiptRef.current) return
+    const clone = receiptRef.current.cloneNode(true) as HTMLElement
     const html = `
       <html>
         <head><title>Receipt - ${order.order_number}</title>
@@ -46,15 +72,14 @@ export function OrderReceipt({ order, restaurant }: Props) {
         </style>
         </head>
         <body>
-          <div class="receipt">
-            ${receiptRef.current.innerHTML}
-          </div>
+          <div class="receipt"></div>
           <script>window.print();<\/script>
         </body>
       </html>
     `
     win.document.write(html)
     win.document.close()
+    win.document.querySelector(".receipt")?.appendChild(clone)
   }
 
   const handleDownload = () => {

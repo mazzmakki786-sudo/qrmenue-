@@ -63,7 +63,7 @@ export const POST = safeRoute(async (request) => {
     .single()
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return NextResponse.json({ error: "Failed to create dish" }, { status: 400 })
   }
 
   logOwnerAction(parsed.data.restaurant_id, user.id, "dish_created", {

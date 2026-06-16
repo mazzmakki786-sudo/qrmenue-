@@ -16,7 +16,7 @@ export const GET = safeRoute(async () => {
   }
 
   const resend = new Resend(process.env.RESEND_API_KEY)
-  const testEmail = process.env.SUPER_ADMIN_EMAIL || "mazzmakki786@gmail.com"
+  const testEmail = process.env.SUPER_ADMIN_EMAIL || ""
 
   try {
     const { data, error } = await resend.emails.send({
@@ -47,6 +47,6 @@ export const GET = safeRoute(async () => {
 
     return NextResponse.json({ success: true, data })
   } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 })
+    return NextResponse.json({ error: "Failed to send test email" }, { status: 500 })
   }
 })

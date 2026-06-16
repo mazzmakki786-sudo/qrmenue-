@@ -114,7 +114,7 @@ export const POST = safeRoute(async (request) => {
     .single()
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return NextResponse.json({ error: "Failed to create dish" }, { status: 400 })
   }
 
   const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
@@ -204,7 +204,7 @@ export const PATCH = safeRoute(async (request) => {
     .single()
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return NextResponse.json({ error: "Failed to update dish" }, { status: 400 })
   }
 
   logOwnerAction(restaurant.id, user.id, "dish_updated", {

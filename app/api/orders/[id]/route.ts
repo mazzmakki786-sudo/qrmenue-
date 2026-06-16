@@ -119,7 +119,7 @@ export const PATCH = safeRoute(async (
     .single()
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return NextResponse.json({ error: "Failed to update order" }, { status: 400 })
   }
 
   logOwnerAction(restaurant.id, user.id, "order_updated", {

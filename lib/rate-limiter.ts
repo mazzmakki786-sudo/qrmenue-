@@ -7,18 +7,18 @@ export interface RateLimitConfig {
 }
 
 const DEFAULTS: Record<string, RateLimitConfig> = {
-  "superadmin:write": { maxRequests: 15, windowSeconds: 60 },
-  "superadmin:read": { maxRequests: 60, windowSeconds: 60 },
-  "orders:create": { maxRequests: 20, windowSeconds: 60 },
-  "orders:update": { maxRequests: 20, windowSeconds: 60 },
-  "orders:check": { maxRequests: 30, windowSeconds: 60 },
-  "owner:write": { maxRequests: 30, windowSeconds: 60 },
-  "owner:read": { maxRequests: 60, windowSeconds: 60 },
-  "admin:write": { maxRequests: 15, windowSeconds: 60 },
-  "menu:read": { maxRequests: 60, windowSeconds: 60 },
-  "notifications:send": { maxRequests: 10, windowSeconds: 60 },
-  "settings:read": { maxRequests: 30, windowSeconds: 60 },
-  default: { maxRequests: 30, windowSeconds: 60 },
+  "superadmin:write": { maxRequests: 10, windowSeconds: 60 },
+  "superadmin:read": { maxRequests: 30, windowSeconds: 60 },
+  "orders:create": { maxRequests: 5, windowSeconds: 60 },
+  "orders:update": { maxRequests: 10, windowSeconds: 60 },
+  "orders:check": { maxRequests: 15, windowSeconds: 60 },
+  "owner:write": { maxRequests: 15, windowSeconds: 60 },
+  "owner:read": { maxRequests: 30, windowSeconds: 60 },
+  "admin:write": { maxRequests: 10, windowSeconds: 60 },
+  "menu:read": { maxRequests: 30, windowSeconds: 60 },
+  "notifications:send": { maxRequests: 5, windowSeconds: 60 },
+  "settings:read": { maxRequests: 20, windowSeconds: 60 },
+  default: { maxRequests: 20, windowSeconds: 60 },
 }
 
 export class RateLimitError extends Error {
@@ -44,7 +44,7 @@ export function getClientIp(request: Request | NextRequest): string {
 }
 
 function shouldBypassRateLimit(identifier: string): boolean {
-  return identifier === "unknown" || identifier === "127.0.0.1" || identifier === "::1"
+  return identifier === "127.0.0.1" || identifier === "::1"
 }
 
 export async function rateLimit(

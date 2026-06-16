@@ -5,6 +5,15 @@ import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 
 export const dynamic = "force-dynamic"
 
+const PUBLIC_SETTINGS = [
+  "brand_primary_color",
+  "brand_accent_color",
+  "company_name",
+  "company_tagline",
+  "whatsapp_number",
+  "support_email",
+]
+
 export const GET = safeRoute(async (request) => {
   const ip = getClientIp(request)
   const allowed = await rateLimit(ip, 15, 60)
@@ -12,12 +21,18 @@ export const GET = safeRoute(async (request) => {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 })
   }
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   const { data, error } = await supabase
     .from("company_settings")
     .select("key, value")
+    .in("key", PUBLIC_SETTINGS)
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return NextResponse.json({ error: "Failed to load settings" }, { status: 500 })
   }
 
   const settings: Record<string, string> = {}

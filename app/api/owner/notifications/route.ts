@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { safeRoute } from "@/lib/api-error"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
+import { csrfGuard } from "@/lib/csrf"
 
 export const GET = safeRoute(async (request) => {
   const ip = getClientIp(request)
@@ -34,6 +35,9 @@ export const GET = safeRoute(async (request) => {
 })
 
 export const PATCH = safeRoute(async (request) => {
+  const csrfResponse = csrfGuard(request)
+  if (csrfResponse) return csrfResponse
+
   const ip = getClientIp(request)
   const allowed = await rateLimit(ip, 15, 60)
   if (!allowed) {

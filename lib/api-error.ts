@@ -14,7 +14,9 @@ export function safeRoute<T = { params: Promise<Record<string, string>> }>(
     } catch (err: unknown) {
       console.error("[API Error]", err)
       const message =
-        err instanceof Error ? err.message : "An unexpected error occurred"
+        process.env.NODE_ENV === "production"
+          ? "An unexpected error occurred"
+          : err instanceof Error ? err.message : "An unexpected error occurred"
       return NextResponse.json(
         { error: "INTERNAL_SERVER_ERROR", message },
         { status: 500 }

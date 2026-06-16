@@ -33,29 +33,8 @@ export const PATCH = safeRoute(async (request) => {
     return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
   }
 
-  const validPlans = ["trial", "starter", "growth", "premium"]
-  if (!validPlans.includes(body.plan)) {
-    return NextResponse.json({ error: "Invalid plan value" }, { status: 400 })
-  }
-
-  const { data, error } = await supabase
-    .from("restaurants")
-    .update({
-      plan: body.plan,
-      plan_end_date: body.plan_end_date || null,
-    })
-    .eq("id", restaurant.id)
-    .select()
-    .single()
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
-  }
-
-  logOwnerAction(restaurant.id, user.id, "plan_updated", {
-    plan: body.plan,
-    plan_end_date: body.plan_end_date,
-  }, getIpSimple(request)).catch(() => {})
-
-  return NextResponse.json({ restaurant: data })
+  return NextResponse.json(
+    { error: "Plan changes must be made through the admin panel or payment gateway" },
+    { status: 403 }
+  )
 })

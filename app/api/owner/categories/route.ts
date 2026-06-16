@@ -81,7 +81,7 @@ export const POST = safeRoute(async (request) => {
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+  if (error) return NextResponse.json({ error: "Failed to create category" }, { status: 400 })
 
   logOwnerAction(restaurant.id, user.id, "category_created", {
     category_id: data.id,
@@ -146,7 +146,7 @@ export const DELETE = safeRoute(async (request) => {
     .delete()
     .eq("id", parsed.data.id)
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+  if (error) return NextResponse.json({ error: "Failed to delete category" }, { status: 400 })
 
   logOwnerAction(restaurant.id, user.id, "category_deleted", {
     category_id: parsed.data.id,

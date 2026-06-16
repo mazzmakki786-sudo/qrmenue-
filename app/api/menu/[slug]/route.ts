@@ -18,7 +18,7 @@ export const GET = safeRoute(async (
 
   const { data, error } = await supabase
     .from("restaurants")
-    .select("*, categories(*, dishes(*))")
+    .select("name, slug, city, logo_url, language, cuisine_type, description, categories(name_en, name_ur, sort_order, dishes(name_en, name_ur, description_en, description_ur, price, image_url, is_available, tags))")
     .eq("slug", slug)
     .eq("is_active", true)
     .single()

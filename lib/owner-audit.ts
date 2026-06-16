@@ -17,7 +17,9 @@ export async function logOwnerAction(
       ip_address: ipAddress,
     })
   } catch (err) {
-    console.error("[owner-audit] Failed to log action:", err)
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[owner-audit] Failed to log action:", err)
+    }
   }
 }
 

@@ -40,7 +40,7 @@ export const POST = safeRoute(async (request) => {
     return NextResponse.json({ success: true })
   } catch (e: any) {
     console.error("Reminder check error", e)
-    return NextResponse.json({ error: e?.message || "Unknown error" }, { status: 500 })
+    return NextResponse.json({ error: "Failed to check reminders" }, { status: 500 })
   }
 })
 
@@ -77,6 +77,6 @@ export const GET = safeRoute(async (request) => {
     return NextResponse.json({ success: true })
   } catch (e: any) {
     console.error("Reminder check error", e)
-    return NextResponse.json({ error: e?.message || "Unknown error" }, { status: 500 })
+    return NextResponse.json({ error: "Failed to check reminders" }, { status: 500 })
   }
 })

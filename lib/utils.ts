@@ -11,7 +11,9 @@ export function formatPrice(price: number): string {
 
 export function generateOrderNumber(): string {
   const year = new Date().getFullYear()
-  const random = Math.floor(1000 + Math.random() * 9000)
+  const array = new Uint8Array(2)
+  crypto.getRandomValues(array)
+  const random = 1000 + (array[0] * 256 + array[1]) % 9000
   return `ORD-${year}-${random}`
 }
 

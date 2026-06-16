@@ -31,7 +31,7 @@ export function QRCodeDisplay({ restaurantSlug, restaurantName, fgColor = "#0000
       a.href = canvas.toDataURL("image/png")
       a.click()
     }
-    img.src = "data:image/svg+xml;base64," + btoa(svgData)
+    img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)))
   }
 
   return (
