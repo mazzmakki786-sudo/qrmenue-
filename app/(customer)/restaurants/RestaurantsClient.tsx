@@ -180,7 +180,7 @@ export function RestaurantsClient() {
                   {items.map((r) => (
                     <Link
                       key={r.id}
-                      href={`/menu/${r.slug}`}
+                      href={`/restaurant/${r.slug}`}
                       className="flex items-center gap-4 p-4 border border-[#F0F0F0] rounded-xl hover:border-[#DDD] hover:shadow-[0px_4px_20px_rgba(0,0,0,0.05)] transition-all active:scale-[0.99] group"
                     >
                       {/* Logo */}

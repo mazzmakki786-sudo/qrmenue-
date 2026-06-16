@@ -113,14 +113,14 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4" aria-hidden="true">
         <div className="h-7 w-32 bg-[#F0F0F0] rounded-lg animate-pulse" />
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3" aria-hidden="true">
           <div className="h-24 bg-[#F0F0F0] rounded-2xl animate-pulse" />
           <div className="h-24 bg-[#F0F0F0] rounded-2xl animate-pulse" />
         </div>
-        <div className="h-48 bg-[#F0F0F0] rounded-2xl animate-pulse" />
-        <div className="h-48 bg-[#F0F0F0] rounded-2xl animate-pulse" />
+        <div className="h-48 bg-[#F0F0F0] rounded-2xl animate-pulse" aria-hidden="true" />
+        <div className="h-48 bg-[#F0F0F0] rounded-2xl animate-pulse" aria-hidden="true" />
       </div>
     )
   }

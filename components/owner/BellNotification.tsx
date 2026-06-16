@@ -269,7 +269,7 @@ export function BellNotification({ restaurantId }: Props) {
                     <p className="text-xs text-white/60 mt-0.5">{alert.items.length} item{alert.items.length > 1 ? "s" : ""} &bull; {alert.order_type.replace("_", " ")}</p>
                     <div className="flex flex-wrap gap-1 mt-2">
                       {alert.items.slice(0, 3).map((item, i) => (
-                        <span key={i} className="text-[10px] bg-white/10 px-2 py-0.5 rounded-full">
+                        <span key={`${alert.id}-item-${i}`} className="text-[10px] bg-white/10 px-2 py-0.5 rounded-full">
                           {item.name_en} x{item.quantity}
                         </span>
                       ))}

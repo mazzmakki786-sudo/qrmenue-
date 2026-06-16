@@ -14,17 +14,34 @@ const planOrder: Plan[] = ["trial", "starter", "growth", "premium"]
 export default function SubscriptionPage() {
   const sub = useSubscription()
   const { restaurant, orderCount, planLimits, loading } = sub
-  const { settings } = useCompanySettings()
+  const { settings, loading: settingsLoading } = useCompanySettings()
   const [mounted, setMounted] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => { setMounted(true) }, [])
 
-  if (loading) {
+  useEffect(() => {
+    if (!loading && !restaurant) {
+      setError("Failed to load subscription data.")
+    }
+  }, [loading, restaurant])
+
+  if (loading || settingsLoading) {
     return (
       <div className="space-y-6 max-w-2xl mx-auto">
         <div className="skeleton h-8 w-40 rounded" />
         <div className="skeleton h-24 rounded-xl" />
         <div className="skeleton h-64 rounded-xl" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-2xl mx-auto text-center py-12">
+        <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3">
+          <p className="text-sm text-red-700">{error}</p>
+        </div>
       </div>
     )
   }

@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server"
 import { safeRoute } from "@/lib/api-error"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
+import { csrfGuard } from "@/lib/csrf"
 
 export const POST = safeRoute(async (
-  _request,
+  request,
   { params }: { params: Promise<{ id: string }> }
 ) => {
+  const csrfResponse = csrfGuard(request); if (csrfResponse) return csrfResponse
   const { id } = await params
   const supabase = await createClient()
 

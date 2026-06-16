@@ -1,4 +1,5 @@
 import { create } from "zustand"
+import { persist } from "zustand/middleware"
 import type { Order, OrderType, PaymentMethod } from "@/types"
 
 interface OrderFormState {
@@ -33,20 +34,25 @@ const initialFormState = {
   paymentMethod: "cod" as PaymentMethod,
 }
 
-export const useOrderStore = create<OrderFormState>((set) => ({
-  ...initialFormState,
-  currentOrder: null,
-  isLoading: false,
-  error: null,
+export const useOrderStore = create<OrderFormState>()(
+  persist(
+    (set) => ({
+      ...initialFormState,
+      currentOrder: null,
+      isLoading: false,
+      error: null,
 
-  setOrderType: (type) => set({ orderType: type }),
-  setCustomerName: (name) => set({ customerName: name }),
-  setCustomerPhone: (phone) => set({ customerPhone: phone }),
-  setTableNumber: (table) => set({ tableNumber: table }),
-  setDeliveryAddress: (address) => set({ deliveryAddress: address }),
-  setPaymentMethod: (method) => set({ paymentMethod: method }),
-  setCurrentOrder: (order) => set({ currentOrder: order }),
-  setLoading: (loading) => set({ isLoading: loading }),
-  setError: (error) => set({ error: error }),
-  resetForm: () => set({ ...initialFormState, error: null }),
-}))
+      setOrderType: (type) => set({ orderType: type }),
+      setCustomerName: (name) => set({ customerName: name }),
+      setCustomerPhone: (phone) => set({ customerPhone: phone }),
+      setTableNumber: (table) => set({ tableNumber: table }),
+      setDeliveryAddress: (address) => set({ deliveryAddress: address }),
+      setPaymentMethod: (method) => set({ paymentMethod: method }),
+      setCurrentOrder: (order) => set({ currentOrder: order }),
+      setLoading: (loading) => set({ isLoading: loading }),
+      setError: (error) => set({ error: error }),
+      resetForm: () => set({ ...initialFormState, error: null }),
+    }),
+    { name: "order-form-storage" }
+  )
+)

@@ -1,11 +1,9 @@
 import { Resend } from "resend"
 
 let _resend: Resend | null = null
-function getResend() {
+function getResend(): Resend | null {
   if (!_resend) {
-    if (!process.env.RESEND_API_KEY) {
-      throw new Error("RESEND_API_KEY not configured")
-    }
+    if (!process.env.RESEND_API_KEY) return null
     _resend = new Resend(process.env.RESEND_API_KEY)
   }
   return _resend
@@ -17,7 +15,9 @@ export async function sendOrderEmail(order: any, restaurant: any) {
     return
   }
   try {
-    await getResend().emails.send({
+    const resend = getResend()
+    if (!resend) return
+    await resend.emails.send({
       from: "orders@qrmenu.pk",
       to: restaurant.owner_email,
       subject: `New Order #${order.order_number} — ${restaurant.name}`,
@@ -47,7 +47,9 @@ export async function sendNewDishEmail(dish: any, restaurant: any, customerEmail
     return
   }
   try {
-    await getResend().emails.send({
+    const resend = getResend()
+    if (!resend) return
+    await resend.emails.send({
       from: "updates@qrmenu.pk",
       to: customerEmails,
       subject: `New dish at ${restaurant.name}: ${dish.name_en}`,

@@ -2,8 +2,10 @@ import { NextResponse } from "next/server"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { safeRoute } from "@/lib/api-error"
 import { SUPER_ADMIN_EMAIL, checkRateLimit, logAudit, getIp } from "@/lib/superadmin-security"
+import { csrfGuard } from "@/lib/csrf"
 
 export const DELETE = safeRoute(async (request, { params }: { params: Promise<{ id: string }> }) => {
+  const csrfResponse = csrfGuard(request); if (csrfResponse) return csrfResponse
   const ip = getIp(request)
   if (!(await checkRateLimit(ip))) return NextResponse.json({ error: "Too many requests" }, { status: 429 })
 
@@ -35,6 +37,7 @@ export const DELETE = safeRoute(async (request, { params }: { params: Promise<{ 
 })
 
 export const PATCH = safeRoute(async (request, { params }: { params: Promise<{ id: string }> }) => {
+  const csrfResponse = csrfGuard(request); if (csrfResponse) return csrfResponse
   const ip = getIp(request)
   if (!(await checkRateLimit(ip))) return NextResponse.json({ error: "Too many requests" }, { status: 429 })
 

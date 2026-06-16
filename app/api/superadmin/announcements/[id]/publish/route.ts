@@ -4,6 +4,7 @@ import { SUPER_ADMIN_EMAIL, logAudit, getIp } from "@/lib/superadmin-security"
 import { Resend } from "resend"
 import { safeRoute } from "@/lib/api-error"
 import { escapeHtml } from "@/lib/utils"
+import { csrfGuard } from "@/lib/csrf"
 
 async function checkAuth() {
   const supabase = await createClient()
@@ -11,7 +12,8 @@ async function checkAuth() {
   return user && user.email?.toLowerCase() === SUPER_ADMIN_EMAIL
 }
 
-export const POST = safeRoute(async (_, { params }: { params: Promise<{ id: string }> }) => {
+export const POST = safeRoute(async (request, { params }: { params: Promise<{ id: string }> }) => {
+  const csrfResponse = csrfGuard(request); if (csrfResponse) return csrfResponse
   if (!(await checkAuth())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
   }

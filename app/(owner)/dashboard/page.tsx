@@ -164,7 +164,7 @@ export default function DashboardPage() {
 
   if (loading || subLoading) {
     return (
-      <div className="space-y-4 animate-pulse">
+      <div className="space-y-4 animate-pulse" aria-hidden="true">
         <div className="h-7 w-32 bg-[#F0F0F0] rounded-lg" />
         <div className="h-20 bg-[#F0F0F0] rounded-2xl" />
         <div className="grid grid-cols-2 gap-3">

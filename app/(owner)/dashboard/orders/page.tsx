@@ -35,10 +35,12 @@ export default function OrdersPage() {
   const [filter, setFilter] = useState<"today" | "week" | "all">("today")
   const [currentPage, setCurrentPage] = useState(1)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [restaurantId, setRestaurantId] = useState<string | null>(null)
 
   const fetchOrders = useCallback(async () => {
     const supabase = createClient()
+    setError(null)
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
@@ -71,6 +73,7 @@ export default function OrdersPage() {
       setOrders(data || [])
     } catch (err) {
       console.error("Orders fetch error:", err)
+      setError("Failed to load orders. Please try again.")
     } finally {
       setLoading(false)
     }
@@ -204,6 +207,13 @@ export default function OrdersPage() {
               <p className="text-[10px] text-[#999] font-medium">{s.label}</p>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3">
+          <p className="text-sm text-red-700">{error}</p>
         </div>
       )}
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, use } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import { useRouter } from "next/navigation"
@@ -42,66 +42,81 @@ function buildWhatsAppUrl(order: any): string {
   return `https://wa.me/92${phone.slice(1)}?text=${encodeURIComponent(message)}`
 }
 
-export default function OrderConfirmPage({ params }: any) {
+export default function OrderConfirmPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
   const router = useRouter()
   const [order, setOrder] = useState<any>(null)
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [whatsappSuccess, setWhatsappSuccess] = useState(false)
-  const [showNotification, setShowNotification] = useState(false)
+  const [confirmedToast, setConfirmedToast] = useState(false)
+  const [showNotification, setShowNotification] = useState<string | false>(false)
   const addItem = useCartStore((s) => s.addItem)
   const clearCart = useCartStore((s) => s.clearCart)
   const setRestaurant = useCartStore((s) => s.setRestaurant)
 
   useEffect(() => {
     const fetchOrder = async () => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
+      setError(null)
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        setUser(user)
 
-      const { data } = await supabase
-        .from("orders")
-        .select("*, restaurants(*)")
-        .eq("id", params.id)
-        .single()
+        const { data, error: fetchError } = await supabase
+          .from("orders")
+          .select("*, restaurants(*)")
+          .eq("id", id)
+          .single()
 
-      if (!data) {
-        router.replace("/restaurants")
-        return
+        if (fetchError) throw new Error(fetchError.message)
+
+        if (!data) {
+          router.replace("/restaurants")
+          return
+        }
+
+        setOrder(data)
+        setLoading(false)
+        if (data.order_status === "received") {
+          setShowNotification("confirmed")
+          setTimeout(() => setShowNotification(false), 5000)
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load order.")
+        setLoading(false)
       }
-
-      setOrder(data)
-      setLoading(false)
     }
     fetchOrder()
-  }, [params.id, router])
+  }, [id, router])
 
   useEffect(() => {
-    if (!params.id) return
+    if (!id) return
     const supabase = createClient()
     const channel = supabase
-      .channel(uid(`order-tracking-${params.id}`))
+      .channel(uid(`order-tracking-${id}`))
       .on(
         "postgres_changes",
         {
           event: "UPDATE",
           schema: "public",
           table: "orders",
-          filter: `id=eq.${params.id}`,
+          filter: `id=eq.${id}`,
         },
         (payload) => {
           const newStatus = (payload.new as any).order_status
           const oldStatus = (payload.old as any)?.order_status
           setOrder((prev: any) => prev ? { ...prev, ...payload.new } : prev)
           if (newStatus !== oldStatus && newStatus === "ready") {
-            setShowNotification(true)
+            setShowNotification("ready")
             setTimeout(() => setShowNotification(false), 6000)
           }
         }
       )
       .subscribe()
     return () => { supabase.removeChannel(channel) }
-  }, [params.id])
+  }, [id])
 
   const handleReorder = () => {
     if (!order) return
@@ -134,6 +149,23 @@ export default function OrderConfirmPage({ params }: any) {
     )
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#F9FAFB] flex flex-col items-center justify-center gap-4 px-6">
+        <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center">
+          <X className="w-6 h-6 text-[#DC2626]" />
+        </div>
+        <p className="text-sm text-red-700 text-center">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="text-sm font-semibold text-[#25D366] hover:underline"
+        >
+          Try again
+        </button>
+      </div>
+    )
+  }
+
   if (!order) return null
 
   const whatsappUrl = buildWhatsAppUrl(order)
@@ -148,12 +180,18 @@ export default function OrderConfirmPage({ params }: any) {
     <div className="min-h-screen bg-[#F9FAFB] pb-20">
       {showNotification && (
         <div className="fixed top-4 left-4 right-4 z-50 max-w-[500px] mx-auto bg-black text-white rounded-2xl p-4 shadow-2xl animate-slide-up flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center shrink-0">
-            <Check className="w-5 h-5 text-white" style={{ strokeWidth: 3 }} />
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${showNotification === "ready" ? "bg-[#25D366]" : "bg-black border border-white/30"}`}>
+            {showNotification === "ready" ? (
+              <Check className="w-5 h-5 text-white" style={{ strokeWidth: 3 }} />
+            ) : (
+              <Clock className="w-5 h-5 text-white" />
+            )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold">Order Confirmed!</p>
-            <p className="text-xs text-white/70 mt-0.5">Your order is now being prepared</p>
+            <p className="text-sm font-bold">{showNotification === "ready" ? "Order Ready!" : "Order Confirmed!"}</p>
+            <p className="text-xs text-white/70 mt-0.5">
+              {showNotification === "ready" ? "Your order is ready for pickup/delivery" : "Your order has been placed successfully"}
+            </p>
           </div>
           <button onClick={() => setShowNotification(false)} className="p-1.5 hover:bg-white/10 rounded-lg shrink-0">
             <X className="w-4 h-4" />

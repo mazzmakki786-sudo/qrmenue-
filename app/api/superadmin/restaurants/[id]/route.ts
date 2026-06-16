@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { safeRoute } from "@/lib/api-error"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
+import { csrfGuard } from "@/lib/csrf"
 
 async function checkAuth(supabase: Awaited<ReturnType<typeof createClient>>) {
   const { data: { user } } = await supabase.auth.getUser()
@@ -39,6 +40,7 @@ export const PATCH = safeRoute(async (
   request,
   { params }: { params: Promise<{ id: string }> }
 ) => {
+  const csrfResponse = csrfGuard(request); if (csrfResponse) return csrfResponse
   const { id } = await params
   const supabase = await createClient()
 

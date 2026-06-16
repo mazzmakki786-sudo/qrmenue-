@@ -67,7 +67,7 @@ export async function rateLimit(
       .gte("window_start", windowStart.toISOString())
 
     if (error) {
-      console.error("[rate-limiter] DB query failed, denying request:", error.message)
+      if (process.env.NODE_ENV !== "production") console.error("[rate-limiter] DB query failed, denying request:", error.message)
       return false
     }
 
@@ -83,12 +83,12 @@ export async function rateLimit(
     })
 
     if (insertError) {
-      console.error("[rate-limiter] DB insert failed:", insertError.message)
+      if (process.env.NODE_ENV !== "production") console.error("[rate-limiter] DB insert failed:", insertError.message)
     }
 
     return true
   } catch (err) {
-    console.error("[rate-limiter] Unexpected error, denying request:", err)
+    if (process.env.NODE_ENV !== "production") console.error("[rate-limiter] Unexpected error, denying request:", err)
     return false
   }
 }
@@ -117,7 +117,7 @@ export async function checkRateLimit(
     .gte("window_start", windowStart.toISOString())
 
   if (error) {
-    console.error("[rate-limiter] checkRateLimit DB error, denying request:", error.message)
+    if (process.env.NODE_ENV !== "production") console.error("[rate-limiter] checkRateLimit DB error, denying request:", error.message)
     throw new RateLimitError(config.windowSeconds, "Rate limit check failed. Please try again.")
   }
 
@@ -133,7 +133,7 @@ export async function checkRateLimit(
   })
 
   if (insertError) {
-    console.error("[rate-limiter] checkRateLimit insert failed:", insertError.message)
+    if (process.env.NODE_ENV !== "production") console.error("[rate-limiter] checkRateLimit insert failed:", insertError.message)
   }
 }
 

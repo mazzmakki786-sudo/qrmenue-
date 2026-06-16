@@ -19,29 +19,41 @@ export default function SettingsPage() {
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const fetchRestaurant = async () => {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+    setLoading(true)
+    setError(null)
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
 
-    const { data } = await supabase
-      .from("restaurants")
-      .select("*")
-      .eq("owner_id", user.id)
-      .single()
+      const { data, error: fetchError } = await supabase
+        .from("restaurants")
+        .select("*")
+        .eq("owner_id", user.id)
+        .single()
 
-    if (data) {
-      setRestaurant(data)
-      setForm({
-        name: data.name, name_ur: data.name_ur || "",
-        phone: data.phone || "", city: data.city,
-        address: data.address || "",
-        cuisine_type: data.cuisine_type || "",
-        language: data.language,
-      })
-      setLogoUrl(data.logo_url)
+      if (fetchError) throw new Error(fetchError.message)
+
+      if (data) {
+        setRestaurant(data)
+        setForm({
+          name: data.name, name_ur: data.name_ur || "",
+          phone: data.phone || "", city: data.city,
+          address: data.address || "",
+          cuisine_type: data.cuisine_type || "",
+          language: data.language,
+        })
+        setLogoUrl(data.logo_url)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load settings.")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -89,11 +101,42 @@ export default function SettingsPage() {
     setTimeout(() => setSaved(false), 3000)
   }
 
+  if (loading) {
+    return (
+      <div className="max-w-lg mx-auto space-y-4">
+        <div className="mb-6">
+          <div className="h-8 w-24 bg-[#F0F0F0] rounded-lg animate-pulse" />
+          <div className="h-4 w-48 bg-[#F0F0F0] rounded animate-pulse mt-2" />
+        </div>
+        <div className="bg-white rounded-2xl border border-[#F0F0F0] p-5 space-y-4">
+          <div className="h-4 w-32 bg-[#F0F0F0] rounded animate-pulse" />
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-full bg-[#F0F0F0] animate-pulse" />
+            <div className="space-y-2">
+              <div className="h-4 w-36 bg-[#F0F0F0] rounded animate-pulse" />
+              <div className="h-3 w-24 bg-[#F0F0F0] rounded animate-pulse" />
+            </div>
+          </div>
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-12 w-full bg-[#F0F0F0] rounded-xl animate-pulse" />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-lg mx-auto text-center py-12">
+        <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3">
+          <p className="text-sm text-red-700">{error}</p>
+        </div>
+      </div>
+    )
+  }
+
   if (!restaurant) {
-    return <div className="text-center text-[#999] py-12">
-      <div className="h-6 w-40 bg-[#F0F0F0] rounded animate-pulse mx-auto mb-4" />
-      <div className="h-4 w-60 bg-[#F0F0F0] rounded animate-pulse mx-auto" />
-    </div>
+    return <div className="text-center text-[#999] py-12">No restaurant found.</div>
   }
 
   return (

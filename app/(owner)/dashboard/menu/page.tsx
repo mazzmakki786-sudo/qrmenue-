@@ -401,8 +401,8 @@ export default function MenuManagementPage() {
   if (loading) {
     return (
       <div>
-        <div className="h-8 w-48 bg-[#F0F0F0] rounded animate-pulse mb-6" />
-        <div className="space-y-3">
+        <div className="h-8 w-48 bg-[#F0F0F0] rounded animate-pulse mb-6" aria-hidden="true" />
+        <div className="space-y-3" aria-hidden="true">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="h-16 bg-[#F0F0F0] rounded-xl animate-pulse" />
           ))}

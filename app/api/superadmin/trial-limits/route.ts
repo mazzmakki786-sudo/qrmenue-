@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { safeRoute } from "@/lib/api-error"
 import { DEFAULT_TRIAL_LIMITS, DEFAULT_EXPIRED_TRIAL_LIMITS, type TrialLimitConfig, type ExpiredTrialLimitConfig } from "@/lib/subscription"
+import { csrfGuard } from "@/lib/csrf"
 
 async function getSetting(key: string) {
   const supabase = await createClient()
@@ -42,6 +43,7 @@ export const GET = safeRoute(async () => {
 })
 
 export const PATCH = safeRoute(async (request) => {
+  const csrfResponse = csrfGuard(request); if (csrfResponse) return csrfResponse
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || user.email?.toLowerCase() !== process.env.SUPER_ADMIN_EMAIL?.toLowerCase()) {
@@ -66,6 +68,7 @@ export const PATCH = safeRoute(async (request) => {
 })
 
 export const PUT = safeRoute(async (request) => {
+  const csrfResponse = csrfGuard(request); if (csrfResponse) return csrfResponse
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || user.email?.toLowerCase() !== process.env.SUPER_ADMIN_EMAIL?.toLowerCase()) {

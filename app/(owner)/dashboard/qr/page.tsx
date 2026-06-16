@@ -31,7 +31,7 @@ export default function QRPage() {
         .single()
 
       if (data) {
-        setRestaurant(data as Restaurant)
+        setRestaurant(data)
         setTimeout(() => setQrLoaded(true), 400)
       }
     }

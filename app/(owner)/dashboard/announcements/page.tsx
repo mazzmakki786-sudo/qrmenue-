@@ -19,6 +19,7 @@ type Filter = "all" | "unread" | "read"
 export default function AnnouncementsPage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<Filter>("all")
   const [restaurantId, setRestaurantId] = useState<string | null>(null)
 
@@ -40,6 +41,7 @@ export default function AnnouncementsPage() {
   const fetchAnnouncements = async () => {
     if (!restaurantId) return
     setLoading(true)
+    setError(null)
     try {
       const params = new URLSearchParams()
       if (filter !== "all") params.set("filter", filter)
@@ -48,6 +50,7 @@ export default function AnnouncementsPage() {
       setAnnouncements(data.announcements || [])
     } catch {
       setAnnouncements([])
+      setError("Failed to load announcements. Please try again.")
     } finally {
       setLoading(false)
     }
@@ -149,8 +152,14 @@ export default function AnnouncementsPage() {
         ))}
       </div>
 
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3">
+          <p className="text-sm text-red-700">{error}</p>
+        </div>
+      )}
+
       {loading ? (
-        <div className="space-y-3 animate-pulse">
+        <div className="space-y-3 animate-pulse" aria-hidden="true">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="bg-white border border-[#F0F0F0] rounded-2xl p-5">
               <div className="h-4 w-2/3 bg-[#F0F0F0] rounded-lg mb-3" />
