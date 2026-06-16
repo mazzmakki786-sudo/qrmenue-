@@ -127,7 +127,6 @@ export default function SubscriptionPage() {
                       <FeatureRow label={limits.maxImages === 0 ? "No images" : `${formatLimit(limits.maxImages)} images`} included={limits.maxImages > 0} />
                       <FeatureRow label={limits.maxOrders === Infinity ? "Unlimited orders" : `${limits.maxOrders} orders/mo`} included />
                       <FeatureRow label={limits.analytics ? "Analytics dashboard" : "No analytics"} included={limits.analytics} />
-                      <FeatureRow label={limits.customBranding ? "Custom branding" : "No branding"} included={limits.customBranding} />
                       <FeatureRow label="QR code generation" included />
                       <FeatureRow label="WhatsApp orders" included />
                       <FeatureRow label="Priority support" included={planKey !== "starter"} />

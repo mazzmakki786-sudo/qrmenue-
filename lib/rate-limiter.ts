@@ -7,11 +7,18 @@ export interface RateLimitConfig {
 }
 
 const DEFAULTS: Record<string, RateLimitConfig> = {
-  "superadmin:write": { maxRequests: 30, windowSeconds: 60 },
-  "superadmin:read": { maxRequests: 100, windowSeconds: 60 },
-  "orders:create": { maxRequests: 20, windowSeconds: 60 },
-  "owner:write": { maxRequests: 60, windowSeconds: 60 },
-  default: { maxRequests: 60, windowSeconds: 60 },
+  "superadmin:write": { maxRequests: 10, windowSeconds: 60 },
+  "superadmin:read": { maxRequests: 30, windowSeconds: 60 },
+  "orders:create": { maxRequests: 5, windowSeconds: 60 },
+  "orders:update": { maxRequests: 10, windowSeconds: 60 },
+  "orders:check": { maxRequests: 15, windowSeconds: 60 },
+  "owner:write": { maxRequests: 15, windowSeconds: 60 },
+  "owner:read": { maxRequests: 30, windowSeconds: 60 },
+  "admin:write": { maxRequests: 10, windowSeconds: 60 },
+  "menu:read": { maxRequests: 30, windowSeconds: 60 },
+  "notifications:send": { maxRequests: 5, windowSeconds: 60 },
+  "settings:read": { maxRequests: 15, windowSeconds: 60 },
+  default: { maxRequests: 20, windowSeconds: 60 },
 }
 
 export class RateLimitError extends Error {
@@ -29,7 +36,15 @@ export function getClientIp(request: Request | NextRequest): string {
   if (forwarded) {
     return forwarded.split(",")[0].trim()
   }
+  const realIp = request.headers.get("x-real-ip")
+  if (realIp) return realIp
+  const cfIp = request.headers.get("cf-connecting-ip")
+  if (cfIp) return cfIp
   return "unknown"
+}
+
+function shouldBypassRateLimit(identifier: string): boolean {
+  return identifier === "unknown" || identifier === "127.0.0.1" || identifier === "::1"
 }
 
 export async function rateLimit(
@@ -37,6 +52,8 @@ export async function rateLimit(
   maxRequests: number,
   windowSeconds: number
 ): Promise<boolean> {
+  if (shouldBypassRateLimit(identifier)) return true
+
   try {
     const supabase = createAdminClient()
     const now = new Date()
@@ -49,21 +66,29 @@ export async function rateLimit(
       .eq("endpoint", "__generic__")
       .gte("window_start", windowStart.toISOString())
 
-    if (error) return false
+    if (error) {
+      console.error("[rate-limiter] DB query failed, denying request:", error.message)
+      return false
+    }
 
     if ((count ?? 0) >= maxRequests) {
       return false
     }
 
-    await supabase.from("rate_limits").insert({
+    const { error: insertError } = await supabase.from("rate_limits").insert({
       identifier,
       endpoint: "__generic__",
       request_count: 1,
       window_start: now.toISOString(),
     })
 
+    if (insertError) {
+      console.error("[rate-limiter] DB insert failed:", insertError.message)
+    }
+
     return true
-  } catch {
+  } catch (err) {
+    console.error("[rate-limiter] Unexpected error, denying request:", err)
     return false
   }
 }
@@ -74,6 +99,9 @@ export async function checkRateLimit(
 ): Promise<void> {
   const config = DEFAULTS[tier] || DEFAULTS.default
   const identifier = getClientIp(request)
+
+  if (shouldBypassRateLimit(identifier)) return
+
   const url = new URL(request.url)
   const endpoint = url.pathname
 
@@ -88,18 +116,25 @@ export async function checkRateLimit(
     .eq("endpoint", endpoint)
     .gte("window_start", windowStart.toISOString())
 
-  if (error) return
+  if (error) {
+    console.error("[rate-limiter] checkRateLimit DB error, denying request:", error.message)
+    throw new RateLimitError(config.windowSeconds, "Rate limit check failed. Please try again.")
+  }
 
   if ((count ?? 0) >= config.maxRequests) {
     throw new RateLimitError(config.windowSeconds)
   }
 
-  await supabase.from("rate_limits").insert({
+  const { error: insertError } = await supabase.from("rate_limits").insert({
     identifier,
     endpoint,
     request_count: 1,
     window_start: now.toISOString(),
   })
+
+  if (insertError) {
+    console.error("[rate-limiter] checkRateLimit insert failed:", insertError.message)
+  }
 }
 
 export function rateLimitMiddleware(handler: Function, tier?: string) {

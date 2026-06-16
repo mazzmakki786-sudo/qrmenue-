@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Check, ArrowLeft, ClipboardList, Store, ExternalLink, Phone, RotateCcw } from "lucide-react"
+import { Check, ArrowLeft, ClipboardList, Store, ExternalLink, Phone, RotateCcw, X, Clock } from "lucide-react"
 import { useCartStore } from "@/stores/cartStore"
 
 function buildWhatsAppUrl(order: any): string {
@@ -38,47 +38,8 @@ function buildWhatsAppUrl(order: any): string {
     `Type: ${order.order_type.replace("_", " ")}`,
   ].join("\n")
 
-  const phone = restaurant.phone.replace(/[^0-9]/g, "")
+  const phone = restaurant.phone.replace(/[^0-9+]/g, "")
   return `https://wa.me/92${phone.slice(1)}?text=${encodeURIComponent(message)}`
-}
-
-const STATUS_STEPS = ["received", "preparing", "ready", "completed"] as const
-
-function StatusTimeline({ currentStatus }: { currentStatus: string }) {
-  const currentIndex = STATUS_STEPS.indexOf(currentStatus as any)
-  const activeIndex = currentIndex >= 0 ? currentIndex : 0
-
-  return (
-    <div className="flex items-center justify-between px-2">
-      {STATUS_STEPS.map((step, i) => {
-        const isCompleted = i <= activeIndex
-        const isCurrent = i === activeIndex
-        return (
-          <div key={step} className="flex items-center flex-1 last:flex-none">
-            <div className="flex flex-col items-center">
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                isCompleted
-                  ? "bg-[#25D366] text-white"
-                  : "border-2 border-[#DDD] text-[#999]"
-              }`}>
-                {isCompleted ? <Check className="w-3.5 h-3.5" style={{ strokeWidth: 3 }} /> : i + 1}
-              </div>
-              <span className={`text-[10px] mt-1 font-medium capitalize ${
-                isCurrent ? "text-black" : isCompleted ? "text-[#25D366]" : "text-[#999]"
-              }`}>
-                {step}
-              </span>
-            </div>
-            {i < STATUS_STEPS.length - 1 && (
-              <div className={`flex-1 h-0.5 mx-1 mb-4 ${
-                i < activeIndex ? "bg-[#25D366]" : "bg-[#E8E8E8]"
-              }`} />
-            )}
-          </div>
-        )
-      })}
-    </div>
-  )
 }
 
 export default function OrderConfirmPage({ params }: any) {
@@ -87,6 +48,7 @@ export default function OrderConfirmPage({ params }: any) {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [whatsappSuccess, setWhatsappSuccess] = useState(false)
+  const [showNotification, setShowNotification] = useState(false)
   const addItem = useCartStore((s) => s.addItem)
   const clearCart = useCartStore((s) => s.clearCart)
   const setRestaurant = useCartStore((s) => s.setRestaurant)
@@ -128,7 +90,13 @@ export default function OrderConfirmPage({ params }: any) {
           filter: `id=eq.${params.id}`,
         },
         (payload) => {
+          const newStatus = (payload.new as any).order_status
+          const oldStatus = (payload.old as any)?.order_status
           setOrder((prev: any) => prev ? { ...prev, ...payload.new } : prev)
+          if (newStatus !== oldStatus && newStatus === "ready") {
+            setShowNotification(true)
+            setTimeout(() => setShowNotification(false), 6000)
+          }
         }
       )
       .subscribe()
@@ -172,8 +140,27 @@ export default function OrderConfirmPage({ params }: any) {
   const restaurant = order.restaurants
   const restaurantPhone = restaurant?.phone?.replace(/[^0-9+]/g, "")
 
+  const isReady = order.order_status === "ready"
+  const isCancelled = order.order_status === "cancelled"
+  const isPending = order.order_status === "received"
+
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-20">
+      {showNotification && (
+        <div className="fixed top-4 left-4 right-4 z-50 max-w-[500px] mx-auto bg-black text-white rounded-2xl p-4 shadow-2xl animate-slide-up flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center shrink-0">
+            <Check className="w-5 h-5 text-white" style={{ strokeWidth: 3 }} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold">Order Confirmed!</p>
+            <p className="text-xs text-white/70 mt-0.5">Your order is now being prepared</p>
+          </div>
+          <button onClick={() => setShowNotification(false)} className="p-1.5 hover:bg-white/10 rounded-lg shrink-0">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Top AppBar */}
       <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-[#F0F0F0]">
         <div className="flex items-center justify-between px-4 h-16 max-w-[500px] mx-auto">
@@ -181,31 +168,60 @@ export default function OrderConfirmPage({ params }: any) {
             <Link href={user ? "/account" : "/restaurants"} className="active:scale-95 transition-transform">
               <ArrowLeft className="w-5 h-5" />
             </Link>
-            <h1 className="text-lg font-bold">Order Placed</h1>
+            <h1 className="text-lg font-bold">
+              {isReady ? "Order Ready" : isCancelled ? "Order Cancelled" : "Order Placed"}
+            </h1>
           </div>
         </div>
       </header>
 
       <main className="max-w-[500px] mx-auto px-4 py-6 space-y-6">
-        {/* Success Card */}
-        <section className="bg-white border border-[#F0F0F0] rounded-[14px] p-6 text-center shadow-sm">
-          <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-[#DCFCE7] rounded-full flex items-center justify-center">
-              <Check className="w-8 h-8 text-[#25D366]" style={{ strokeWidth: 3 }} />
-            </div>
-          </div>
-          <h2 className="text-lg font-bold text-black mb-1">Order Placed!</h2>
-          <p className="text-sm font-semibold text-[#25D366] mb-3">#{order.order_number}</p>
-          <p className="text-sm text-[#555] px-4">
-            Your order has been sent to <span className="font-semibold text-black">{restaurant?.name || "the restaurant"}</span>
-          </p>
-        </section>
 
-        {/* Status Timeline */}
-        <section className="bg-white border border-[#F0F0F0] rounded-[14px] p-5 shadow-sm">
-          <h3 className="text-sm font-semibold mb-4 text-black">Order Status</h3>
-          <StatusTimeline currentStatus={order.order_status || "received"} />
-        </section>
+        {/* Status Card */}
+        {isReady && (
+          <section className="bg-white border border-[#F0F0F0] rounded-[14px] p-6 text-center shadow-sm">
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-[#DCFCE7] rounded-full flex items-center justify-center">
+                <Check className="w-8 h-8 text-[#25D366]" style={{ strokeWidth: 3 }} />
+              </div>
+            </div>
+            <h2 className="text-lg font-bold text-black mb-1">Order Ready!</h2>
+            <p className="text-sm font-semibold text-[#25D366] mb-3">#{order.order_number}</p>
+            <p className="text-sm text-[#555] px-4">
+              Your order from <span className="font-semibold text-black">{restaurant?.name || "the restaurant"}</span> is ready for pickup
+            </p>
+          </section>
+        )}
+
+        {isCancelled && (
+          <section className="bg-white border border-[#F0F0F0] rounded-[14px] p-6 text-center shadow-sm">
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center">
+                <X className="w-8 h-8 text-[#DC2626]" style={{ strokeWidth: 3 }} />
+              </div>
+            </div>
+            <h2 className="text-lg font-bold text-black mb-1">Order Cancelled</h2>
+            <p className="text-sm font-semibold text-[#DC2626] mb-3">#{order.order_number}</p>
+            <p className="text-sm text-[#555] px-4">
+              Your order from <span className="font-semibold text-black">{restaurant?.name || "the restaurant"}</span> has been cancelled
+            </p>
+          </section>
+        )}
+
+        {isPending && (
+          <section className="bg-white border border-[#F0F0F0] rounded-[14px] p-6 text-center shadow-sm">
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center">
+                <Clock className="w-8 h-8 text-[#D97706]" style={{ strokeWidth: 3 }} />
+              </div>
+            </div>
+            <h2 className="text-lg font-bold text-black mb-1">Order Placed!</h2>
+            <p className="text-sm font-semibold text-[#D97706] mb-3">#{order.order_number}</p>
+            <p className="text-sm text-[#555] px-4">
+              Waiting for <span className="font-semibold text-black">{restaurant?.name || "the restaurant"}</span> to confirm your order
+            </p>
+          </section>
+        )}
 
         {/* WhatsApp Button */}
         {whatsappUrl && (

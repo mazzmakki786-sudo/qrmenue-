@@ -141,9 +141,6 @@ export function BellNotification({ restaurantId }: Props) {
               order_type: order.order_type,
             } as OrderAlert, ...prev].slice(0, 5)
           )
-          setTimeout(() => {
-            setAlerts((prev) => prev.filter((a) => a.id !== order.id))
-          }, 8000)
         }
       )
       .subscribe()
@@ -222,10 +219,10 @@ export function BellNotification({ restaurantId }: Props) {
     <>
       {/* Bell Icon */}
       <div className="relative" ref={dropdownRef}>
-        <button onClick={handleToggleDropdown} className="relative p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
+        <button onClick={handleToggleDropdown} className="relative w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#F0F0F0] transition-colors">
           <Bell className="w-5 h-5 text-[#555]" />
           {unreadCount > 0 && (
-            <span className="absolute top-0.5 right-0.5 w-4 h-4 bg-[#25D366] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#25D366] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
@@ -233,39 +230,37 @@ export function BellNotification({ restaurantId }: Props) {
 
         {/* Toast notifications for orders - top right corner */}
         {alerts.length > 0 && (
-          <div className="fixed top-4 right-4 z-40 flex flex-col gap-3 w-full max-w-sm pointer-events-none">
+          <div className="fixed top-4 left-4 right-4 sm:left-auto sm:right-4 z-[60] flex flex-col gap-3 sm:w-[340px] pointer-events-none">
             {alerts.map((alert) => (
               <Link
                 key={alert.id}
                 href={`/dashboard/orders/${alert.id}`}
-                className="bg-black text-white rounded-2xl p-5 shadow-2xl animate-slide-up pointer-events-auto block"
+                className="bg-black text-white rounded-2xl p-4 shadow-2xl animate-slide-up pointer-events-auto block"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#25D366] animate-pulse shrink-0" />
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse shrink-0" />
                       <span className="text-sm font-bold">New Order</span>
                     </div>
-                    <p className="text-xs text-white/60 mb-2">{alert.order_number}</p>
-                    <div className="space-y-1.5">
-                      <p className="text-sm font-medium">{alert.customer_name}</p>
-                      <p className="text-xs text-white/70">{alert.items.length} item{alert.items.length > 1 ? "s" : ""} &bull; {alert.order_type.replace("_", " ")}</p>
-                      <div className="flex flex-wrap gap-1 mt-1.5">
-                        {alert.items.slice(0, 3).map((item, i) => (
-                          <span key={i} className="text-[10px] bg-white/10 px-2 py-0.5 rounded-full">
-                            {item.name_en} x{item.quantity}
-                          </span>
-                        ))}
-                        {alert.items.length > 3 && (
-                          <span className="text-[10px] text-white/40">+{alert.items.length - 3} more</span>
-                        )}
-                      </div>
-                      <p className="text-base font-bold mt-2">{formatPrice(alert.total_price)}</p>
+                    <p className="text-[11px] text-white/50 mb-1.5">{alert.order_number}</p>
+                    <p className="text-sm font-medium truncate">{alert.customer_name}</p>
+                    <p className="text-xs text-white/60 mt-0.5">{alert.items.length} item{alert.items.length > 1 ? "s" : ""} &bull; {alert.order_type.replace("_", " ")}</p>
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {alert.items.slice(0, 3).map((item, i) => (
+                        <span key={i} className="text-[10px] bg-white/10 px-2 py-0.5 rounded-full">
+                          {item.name_en} x{item.quantity}
+                        </span>
+                      ))}
+                      {alert.items.length > 3 && (
+                        <span className="text-[10px] text-white/40">+{alert.items.length - 3} more</span>
+                      )}
                     </div>
+                    <p className="text-sm font-bold mt-2">{formatPrice(alert.total_price)}</p>
                   </div>
                   <button
                     onClick={(e) => { e.preventDefault(); dismissAlert(alert.id) }}
-                    className="p-2 hover:bg-white/10 rounded-lg shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                    className="p-1.5 hover:bg-white/10 rounded-lg shrink-0"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -278,16 +273,16 @@ export function BellNotification({ restaurantId }: Props) {
 
       {/* Dropdown - Today's Orders */}
       {showDropdown && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-20 p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => { setShowDropdown(false); setAlerts([]) }} />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[70vh] flex flex-col overflow-hidden animate-scale-up">
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
+          <div className="fixed top-14 right-4 sm:absolute sm:top-full sm:right-0 sm:mt-2 z-50 w-80 max-h-[70vh] bg-white rounded-2xl shadow-2xl border border-[#F0F0F0] flex flex-col overflow-hidden animate-scale-up">
             <div className="p-4 border-b border-[#F0F0F0] flex items-center justify-between shrink-0">
-              <p className="text-base font-bold">Today&apos;s Orders</p>
+              <p className="text-sm font-bold">Today&apos;s Orders</p>
               <button
                 onClick={() => setShowDropdown(false)}
-                className="p-2 hover:bg-[#F0F0F0] rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center"
+                className="p-1.5 hover:bg-[#F0F0F0] rounded-lg transition-colors"
               >
-                <X className="w-4 h-4" />
+                <X className="w-4 h-4 text-[#555]" />
               </button>
             </div>
             <div className="overflow-y-auto flex-1">
@@ -337,7 +332,7 @@ export function BellNotification({ restaurantId }: Props) {
               )}
             </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* Announcement Center Modal */}

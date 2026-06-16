@@ -4,21 +4,17 @@ import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { QRCodeSVG } from "qrcode.react"
 import { useSubscription } from "@/lib/hooks/useSubscription"
-import { QR_GRADIENT_PRESETS, type QRGradientPreset } from "@/lib/branding"
-import { Download, Printer, Copy, Check, ExternalLink, Info, Share2, Palette } from "lucide-react"
+import { Download, Printer, Copy, Check, ExternalLink, Info, Share2 } from "lucide-react"
 import type { Restaurant } from "@/types"
 import { escapeHtml } from "@/lib/utils"
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "")
-
-const GRADIENT_KEYS = Object.keys(QR_GRADIENT_PRESETS) as QRGradientPreset[]
 
 export default function QRPage() {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null)
   const [copied, setCopied] = useState(false)
   const [size, setSize] = useState(200)
   const [qrLoaded, setQrLoaded] = useState(false)
-  const [selectedGradient, setSelectedGradient] = useState<QRGradientPreset>("classic")
   const qrRef = useRef<HTMLDivElement>(null)
   const { planLimits } = useSubscription()
 
@@ -57,29 +53,35 @@ export default function QRPage() {
     )
   }
 
-  const hasCustomBranding = planLimits.customBranding
-  const gradient = QR_GRADIENT_PRESETS[selectedGradient]
-  const showGradientOptions = hasCustomBranding && GRADIENT_KEYS.length > 0
-
   const menuUrl = `${APP_URL}/menu/${restaurant.slug}`
 
   const downloadQR = (filename: string) => {
     const svg = document.getElementById("restaurant-qr")
     if (!svg) return
-    const svgData = new XMLSerializer().serializeToString(svg)
+
+    const svgClone = svg.cloneNode(true) as SVGSVGElement
+    svgClone.removeAttribute("class")
+    svgClone.removeAttribute("style")
+    svgClone.setAttribute("width", String(size))
+    svgClone.setAttribute("height", String(size))
+
+    const svgData = new XMLSerializer().serializeToString(svgClone)
     const canvas = document.createElement("canvas")
     canvas.width = size * 2
     canvas.height = size * 2
     const ctx = canvas.getContext("2d")
+    if (!ctx) return
     const img = new Image()
     img.onload = () => {
-      ctx!.drawImage(img, 0, 0)
+      ctx.fillStyle = "#FFFFFF"
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
       const a = document.createElement("a")
       a.download = filename
       a.href = canvas.toDataURL("image/png")
       a.click()
     }
-    img.src = "data:image/svg+xml;base64," + btoa(svgData)
+    img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)))
   }
 
   const handleCopyUrl = () => {
@@ -91,18 +93,26 @@ export default function QRPage() {
   }
 
   const handlePrint = () => {
-    const printWindow = window.open("", "_blank")
-    if (!printWindow) return
     const svg = document.getElementById("restaurant-qr")
     if (!svg) return
+
+    const svgClone = svg.cloneNode(true) as SVGSVGElement
+    svgClone.removeAttribute("class")
+    svgClone.removeAttribute("style")
+    svgClone.setAttribute("width", "300")
+    svgClone.setAttribute("height", "300")
+    const svgString = new XMLSerializer().serializeToString(svgClone)
+
+    const printWindow = window.open("", "_blank")
+    if (!printWindow) return
     printWindow.document.write(`
       <html>
         <head><title>QR Code - ${escapeHtml(restaurant.name)}</title></head>
-        <body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;">
-          ${svg.outerHTML}
+        <body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;margin:0;">
+          ${svgString}
           <p style="margin-top:16px;font-size:18px;color:#555;">${escapeHtml(restaurant.name)}</p>
           <p style="font-size:14px;color:#999;">${menuUrl}</p>
-          <script>window.print();<\/script>
+          <script>window.print();window.close();<\/script>
         </body>
       </html>
     `)
@@ -164,9 +174,6 @@ export default function QRPage() {
                   size={size}
                   level="H"
                   includeMargin
-                  fgColor={gradient.fgColor}
-                  bgColor={gradient.bgColor}
-                  className="w-full h-full"
                 />
               )}
             </div>
@@ -199,45 +206,6 @@ export default function QRPage() {
             </div>
             <p className="mt-3 text-sm text-[#555]">Select the resolution for your download. Higher resolution is recommended for large prints.</p>
           </div>
-
-          {/* QR Color Style (Growth/Premium only) */}
-          {showGradientOptions && (
-            <div className="bg-white p-6 rounded-[14px] border border-[#F0F0F0]">
-              <div className="flex items-center gap-2 mb-5">
-                <Palette className="w-4 h-4" />
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-black">QR Color Style</h3>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                {GRADIENT_KEYS.map((key) => {
-                  const preset = QR_GRADIENT_PRESETS[key]
-                  const isSelected = selectedGradient === key
-                  return (
-                    <button
-                      key={key}
-                      onClick={() => setSelectedGradient(key)}
-                      className={`rounded-xl border-2 p-3 text-left transition-all ${
-                        isSelected ? "border-black bg-[#F8F8F8]" : "border-[#F0F0F0] hover:border-[#999]"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div
-                          className="w-8 h-8 rounded-lg"
-                          style={{ background: preset.fgColor }}
-                        />
-                        {isSelected && (
-                          <div className="w-5 h-5 rounded-full bg-black flex items-center justify-center">
-                            <Check className="w-3 h-3 text-white" />
-                          </div>
-                        )}
-                      </div>
-                      <p className="text-sm font-medium text-black">{preset.label}</p>
-                      <p className="text-[11px] text-[#999] font-mono mt-0.5">{preset.fgColor}</p>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-          )}
 
           {/* URL Card */}
           <div className="bg-white p-6 rounded-[14px] border border-[#F0F0F0]">

@@ -1,7 +1,19 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { rateLimit, getClientIp } from "@/lib/rate-limiter"
+import { csrfGuard } from "@/lib/csrf"
+import { logOwnerAction, getIpSimple } from "@/lib/owner-audit"
 
 export async function PATCH(request: Request) {
+  const csrfResponse = csrfGuard(request)
+  if (csrfResponse) return csrfResponse
+
+  const ip = getClientIp(request)
+  const allowed = await rateLimit(ip, 10, 60)
+  if (!allowed) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 })
+  }
+
   const supabase = await createClient()
   const body = await request.json()
 
@@ -38,6 +50,11 @@ export async function PATCH(request: Request) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 })
   }
+
+  logOwnerAction(restaurant.id, user.id, "plan_updated", {
+    plan: body.plan,
+    plan_end_date: body.plan_end_date,
+  }, getIpSimple(request)).catch(() => {})
 
   return NextResponse.json({ restaurant: data })
 }

@@ -6,17 +6,11 @@ import { formatPrice, timeAgo } from "@/lib/utils"
 import { ChevronRight, ClipboardList, UtensilsCrossed, User, Check, TrendingUp, TrendingDown, AlertCircle, RefreshCw } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import type { DailyStats, Order } from "@/types"
+import type { Order } from "@/types"
 import { useSubscription } from "@/lib/hooks/useSubscription"
 import { Badge } from "@/components/ui/badge"
 import { DashboardFooter } from "@/components/shared/DashboardFooter"
-import dynamic from "next/dynamic"
-
-const OrdersChart = dynamic(() => import("@/components/owner/OrdersChart").then((m) => ({ default: m.OrdersChart })), {
-  loading: () => <div className="h-64 bg-[#F0F0F0] animate-pulse rounded-[14px]" />,
-})
-
-type Period = "today" | "7d" | "30d"
+import { BellNotification } from "@/components/owner/BellNotification"
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -28,15 +22,12 @@ export default function DashboardPage() {
   const [yesterdayRevenue, setYesterdayRevenue] = useState(0)
   const [monthlyOrders, setMonthlyOrders] = useState(0)
   const [monthlyRevenue, setMonthlyRevenue] = useState(0)
-  const [graph7d, setGraph7d] = useState<DailyStats[]>([])
-  const [graph30d, setGraph30d] = useState<DailyStats[]>([])
   const [recentOrders, setRecentOrders] = useState<Order[]>([])
   const [topDishes, setTopDishes] = useState<{ name: string; count: number }[]>([])
   const [categoryCount, setCategoryCount] = useState(0)
   const [dishCount, setDishCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [period, setPeriod] = useState<Period>("today")
 
   const fetchData = useCallback(async () => {
     if (!restaurant?.id) {
@@ -49,7 +40,7 @@ export default function DashboardPage() {
     const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split("T")[0]
 
     try {
-      const [todayRes, yesterdayRes, monthlyRes, statsRes, ordersRes, catRes, dishRes] = await Promise.all([
+      const [todayRes, yesterdayRes, monthlyRes, ordersRes, catRes, dishRes] = await Promise.all([
         supabase
           .from("orders")
           .select("total_price")
@@ -69,12 +60,6 @@ export default function DashboardPage() {
           .eq("restaurant_id", restaurant.id)
           .gte("created_at", monthStart)
           .neq("order_status", "cancelled"),
-        supabase
-          .from("daily_order_stats")
-          .select("*")
-          .eq("restaurant_id", restaurant.id)
-          .order("order_date", { ascending: false })
-          .limit(30),
         supabase
           .from("orders")
           .select("*")
@@ -106,12 +91,6 @@ export default function DashboardPage() {
       if (monthlyRes.data) {
         setMonthlyOrders(monthlyRes.data.length)
         setMonthlyRevenue(monthlyRes.data.reduce((sum, o) => sum + o.total_price, 0))
-      }
-
-      if (statsRes.data) {
-        const reversed = statsRes.data.reverse()
-        setGraph7d(reversed.slice(-7))
-        setGraph30d(reversed)
       }
 
       if (ordersRes.data) {
@@ -185,15 +164,16 @@ export default function DashboardPage() {
 
   if (loading || subLoading) {
     return (
-      <div className="space-y-6 animate-pulse">
-        <div className="h-8 w-40 bg-[#F0F0F0] rounded" />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="h-32 bg-[#F0F0F0] rounded-[14px]" />
-          <div className="h-32 bg-[#F0F0F0] rounded-[14px]" />
-          <div className="h-32 bg-[#F0F0F0] rounded-[14px]" />
-          <div className="h-32 bg-[#F0F0F0] rounded-[14px]" />
+      <div className="space-y-4 animate-pulse">
+        <div className="h-7 w-32 bg-[#F0F0F0] rounded-lg" />
+        <div className="h-20 bg-[#F0F0F0] rounded-2xl" />
+        <div className="grid grid-cols-2 gap-3">
+          <div className="h-24 bg-[#F0F0F0] rounded-2xl" />
+          <div className="h-24 bg-[#F0F0F0] rounded-2xl" />
+          <div className="h-24 bg-[#F0F0F0] rounded-2xl" />
+          <div className="h-24 bg-[#F0F0F0] rounded-2xl" />
         </div>
-        <div className="h-64 bg-[#F0F0F0] rounded-[14px]" />
+        <div className="h-48 bg-[#F0F0F0] rounded-2xl" />
       </div>
     )
   }
@@ -215,149 +195,126 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
 
       {/* Top Row */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-[#000]">Dashboard</h1>
-        <Link
-          href="/dashboard/orders"
-          className="bg-black text-white px-6 py-2.5 rounded-full flex items-center gap-2 text-sm font-semibold hover:opacity-90 transition-all active:scale-95"
-        >
-          <ClipboardList className="w-4 h-4" />
-          Orders
-        </Link>
+        <h1 className="text-xl font-bold text-black">Dashboard</h1>
+        <div className="flex items-center gap-2">
+          {restaurant?.id && <BellNotification restaurantId={restaurant.id} />}
+          <Link
+            href="/dashboard/orders"
+            className="bg-black text-white px-5 py-2 rounded-full flex items-center gap-2 text-sm font-semibold hover:opacity-90 transition-all active:scale-95"
+          >
+            <ClipboardList className="w-4 h-4" />
+            Orders
+          </Link>
+        </div>
       </div>
 
       {/* Subscription Banner */}
       {restaurant && (
-        <section>
-          <div className="relative overflow-hidden bg-gradient-to-r from-[#0052D4] via-[#4364F7] to-[#6FB1FC] p-6 rounded-[14px] text-white shadow-sm">
-            <div className="relative z-10">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                  <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                    {isTrial ? "Trial Version" : `${restaurant.plan} Plan`}
-                  </span>
-                  <h2 className="text-lg font-semibold mt-2">
-                    {isTrial
-                      ? `${trialDaysRemaining} days left in trial`
-                      : "Plan Active"}
-                  </h2>
-                </div>
-                {isTrial && (
-                  <div className="w-full md:w-64">
-                    <div className="flex justify-between text-xs font-medium mb-2">
-                      <span>Order usage</span>
-                      <span>{orderCount}/{10} orders used</span>
-                    </div>
-                    <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-white rounded-full transition-all duration-1000"
-                        style={{ width: `${Math.min(100, (orderCount / 10) * 100)}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
+        <div className="relative overflow-hidden bg-gradient-to-r from-[#0052D4] via-[#4364F7] to-[#6FB1FC] p-5 md:p-6 rounded-2xl text-white shadow-sm">
+          <div className="relative z-10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                  {isTrial ? "Trial Version" : `${restaurant.plan} Plan`}
+                </span>
+                <h2 className="text-lg font-semibold mt-2">
+                  {isTrial
+                    ? `${trialDaysRemaining} days left in trial`
+                    : "Plan Active"}
+                </h2>
               </div>
+              {isTrial && (
+                <div className="w-full sm:w-56">
+                  <div className="flex justify-between text-xs font-medium mb-2">
+                    <span>Order usage</span>
+                    <span>{orderCount}/{10} orders used</span>
+                  </div>
+                  <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-white rounded-full transition-all duration-1000"
+                      style={{ width: `${Math.min(100, (orderCount / 10) * 100)}%` }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 0)", backgroundSize: "24px 24px" }} />
           </div>
-        </section>
+          <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 0)", backgroundSize: "24px 24px" }} />
+        </div>
       )}
 
-      {/* Period Selector */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
-        {(["today", "7d", "30d"] as const).map((p) => (
-          <button
-            key={p}
-            onClick={() => setPeriod(p)}
-            className={`px-5 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${
-              period === p
-                ? "bg-black text-white"
-                : "bg-[#F0F0F0] text-[#555] hover:bg-[#E2E2E2]"
-            }`}
-          >
-            {p === "today" ? "Today" : p === "7d" ? "7 Days" : "30 Days"}
-          </button>
-        ))}
-      </div>
-
       {/* Quick Action Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         <Link
           href="/dashboard/menu"
-          className="bg-black text-white p-6 rounded-[14px] flex items-center justify-between group cursor-pointer hover:shadow-lg transition-all duration-300"
+          className="bg-black text-white p-4 rounded-2xl flex items-center gap-3 group cursor-pointer hover:shadow-lg transition-shadow"
         >
-          <div className="flex items-center gap-4">
-            <div className="bg-white/10 p-3 rounded-xl">
-              <UtensilsCrossed className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-lg font-semibold">Manage Menu</p>
-              <p className="text-sm text-white/60">Categories & dishes</p>
-            </div>
+          <div className="bg-white/10 p-2.5 rounded-xl shrink-0">
+            <UtensilsCrossed className="w-5 h-5" />
           </div>
-          <ChevronRight className="w-5 h-5 text-white/60 group-hover:translate-x-1 transition-transform" />
+          <div className="min-w-0">
+            <p className="text-sm font-semibold truncate">Menu</p>
+            <p className="text-[10px] text-white/60">Categories & dishes</p>
+          </div>
         </Link>
         <Link
           href="/dashboard/settings"
-          className="bg-white border border-[#F0F0F0] p-6 rounded-[14px] flex items-center justify-between group cursor-pointer hover:bg-[#F9FAFB] transition-all duration-300"
+          className="bg-white border border-[#F0F0F0] p-4 rounded-2xl flex items-center gap-3 group cursor-pointer hover:bg-[#F9FAFB] transition-colors"
         >
-          <div className="flex items-center gap-4">
-            <div className="bg-[#EDEEEF] p-3 rounded-xl text-black">
-              <User className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-lg font-semibold text-black">Profile</p>
-              <p className="text-sm text-[#555]">Restaurant info</p>
-            </div>
+          <div className="bg-[#EDEEEF] p-2.5 rounded-xl text-black shrink-0">
+            <User className="w-5 h-5" />
           </div>
-          <ChevronRight className="w-5 h-5 text-black/40 group-hover:translate-x-1 transition-transform" />
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-black truncate">Profile</p>
+            <p className="text-[10px] text-[#555]">Restaurant info</p>
+          </div>
         </Link>
       </div>
 
       {/* 2-Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Left Column - Onboarding (hide when complete) */}
         {!onboardingComplete && (
-          <div className="lg:col-span-4 space-y-6">
+          <div className="lg:col-span-4 space-y-4">
             {/* Profile Completion */}
-            <div className="bg-white border border-[#F0F0F0] rounded-[14px] p-6">
-              <h3 className="text-lg font-semibold text-black mb-4">Profile Completion</h3>
-              <div className="flex items-baseline gap-2 mb-4">
-                <span className="text-[40px] font-extrabold text-black">{profilePercent}%</span>
-                <span className="text-sm text-[#555]">Complete</span>
+            <div className="bg-white border border-[#F0F0F0] rounded-2xl p-4">
+              <h3 className="text-sm font-semibold text-black mb-3">Profile Completion</h3>
+              <div className="flex items-baseline gap-2 mb-3">
+                <span className="text-3xl font-extrabold text-black">{profilePercent}%</span>
               </div>
-              <div className="h-1.5 w-full bg-[#EDEEEF] rounded-full mb-6">
-                <div className="h-full bg-black w-[80%] rounded-full" style={{ width: `${profilePercent}%` }} />
+              <div className="h-1.5 w-full bg-[#EDEEEF] rounded-full mb-4">
+                <div className="h-full bg-black rounded-full" style={{ width: `${profilePercent}%` }} />
               </div>
-              <ul className="space-y-4">
+              <ul className="space-y-3">
                 {profileFields.map((f) => (
-                  <li key={f.label} className="flex items-center gap-3">
+                  <li key={f.label} className="flex items-center gap-2.5">
                     {f.done ? (
-                      <Check className="w-5 h-5 text-[#25D366]" />
+                      <Check className="w-4 h-4 text-[#25D366] shrink-0" />
                     ) : (
-                      <div className="w-5 h-5 rounded-full border-2 border-[#BBCBB9]" />
+                      <div className="w-4 h-4 rounded-full border-2 border-[#BBCBB9] shrink-0" />
                     )}
-                    <span className="text-sm text-[#191c1d]">{f.label}</span>
+                    <span className="text-xs text-[#191c1d]">{f.label}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
             {/* Menu Setup */}
-            <div className="bg-white border border-[#F0F0F0] rounded-[14px] p-6">
-              <h3 className="text-lg font-semibold text-black mb-6">Menu Setup</h3>
-              <ul className="space-y-4">
+            <div className="bg-white border border-[#F0F0F0] rounded-2xl p-4">
+              <h3 className="text-sm font-semibold text-black mb-3">Menu Setup</h3>
+              <ul className="space-y-3">
                 {menuFields.map((f) => (
-                  <li key={f.label} className="flex items-center gap-3">
+                  <li key={f.label} className="flex items-center gap-2.5">
                     {f.done ? (
-                      <Check className="w-5 h-5 text-[#25D366]" />
+                      <Check className="w-4 h-4 text-[#25D366] shrink-0" />
                     ) : (
-                      <div className="w-5 h-5 rounded-full border-2 border-[#BBCBB9]" />
+                      <div className="w-4 h-4 rounded-full border-2 border-[#BBCBB9] shrink-0" />
                     )}
-                    <span className="text-sm text-[#191c1d]">{f.label}</span>
+                    <span className="text-xs text-[#191c1d]">{f.label}</span>
                   </li>
                 ))}
               </ul>
@@ -365,74 +322,58 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Right Column - full width when onboarding hidden */}
-        <div className={`${onboardingComplete ? "lg:col-span-12" : "lg:col-span-8"} space-y-6`}>
+        {/* Right Column */}
+        <div className={`${onboardingComplete ? "lg:col-span-12" : "lg:col-span-8"} space-y-4`}>
           {/* Stats Row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white border border-[#F0F0F0] p-6 rounded-[14px] flex flex-col justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[#555]">Today Orders</span>
-              <span className="text-[28px] font-bold text-black mt-2">{todayOrders}</span>
-              <span className={`text-xs font-medium mt-4 flex items-center gap-1 ${ordersTrend >= 0 ? "text-[#25D366]" : "text-[#DC2626]"}`}>
-                {ordersTrend >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-white border border-[#F0F0F0] p-4 rounded-2xl">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-[#555]">Today Orders</span>
+              <span className="text-2xl font-bold text-black mt-1 block">{todayOrders}</span>
+              <span className={`text-[10px] font-medium mt-2 flex items-center gap-1 ${ordersTrend >= 0 ? "text-[#25D366]" : "text-[#DC2626]"}`}>
+                {ordersTrend >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                 {ordersTrend === 0 && todayOrders === 0 ? "No data yet" : `${Math.abs(ordersTrend)}% vs yesterday`}
               </span>
             </div>
-            <div className="bg-white border border-[#F0F0F0] p-6 rounded-[14px] flex flex-col justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[#555]">Today Revenue</span>
-              <span className="text-[28px] font-bold text-black mt-2">{formatPrice(todayRevenue)}</span>
-              <span className={`text-xs font-medium mt-4 flex items-center gap-1 ${revenueTrend >= 0 ? "text-[#25D366]" : "text-[#DC2626]"}`}>
-                {revenueTrend >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+            <div className="bg-white border border-[#F0F0F0] p-4 rounded-2xl">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-[#555]">Today Revenue</span>
+              <span className="text-2xl font-bold text-black mt-1 block truncate">{formatPrice(todayRevenue)}</span>
+              <span className={`text-[10px] font-medium mt-2 flex items-center gap-1 ${revenueTrend >= 0 ? "text-[#25D366]" : "text-[#DC2626]"}`}>
+                {revenueTrend >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                 {revenueTrend === 0 && todayRevenue === 0 ? "No data yet" : `${Math.abs(revenueTrend)}% vs yesterday`}
               </span>
             </div>
-            <div className="bg-white border border-[#F0F0F0] p-6 rounded-[14px] flex flex-col justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[#555]">Monthly Orders</span>
-              <span className="text-[28px] font-bold text-black mt-2">{monthlyOrders}</span>
-              <span className="text-xs font-medium mt-4 text-[#999]">
-                This month
-              </span>
+            <div className="bg-white border border-[#F0F0F0] p-4 rounded-2xl">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-[#555]">Monthly Orders</span>
+              <span className="text-2xl font-bold text-black mt-1 block">{monthlyOrders}</span>
+              <span className="text-[10px] font-medium mt-2 text-[#999]">This month</span>
             </div>
-            <div className="bg-white border border-[#F0F0F0] p-6 rounded-[14px] flex flex-col justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[#555]">Monthly Revenue</span>
-              <span className="text-[28px] font-bold text-black mt-2">{formatPrice(monthlyRevenue)}</span>
-              <span className="text-xs font-medium mt-4 text-[#999]">
-                This month
-              </span>
+            <div className="bg-white border border-[#F0F0F0] p-4 rounded-2xl">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-[#555]">Monthly Revenue</span>
+              <span className="text-2xl font-bold text-black mt-1 block truncate">{formatPrice(monthlyRevenue)}</span>
+              <span className="text-[10px] font-medium mt-2 text-[#999]">This month</span>
             </div>
           </div>
 
-          {/* Orders Chart */}
-          {graph7d.length > 0 || graph30d.length > 0 ? (
-            <OrdersChart data7d={graph7d} data30d={graph30d} />
-          ) : (
-            <div className="bg-white border border-[#F0F0F0] rounded-[14px] p-6">
-              <h3 className="text-lg font-semibold text-black mb-6">Order Trends</h3>
-              <div className="h-48 flex items-center justify-center text-sm text-[#999]">
-                No order data yet
-              </div>
-            </div>
-          )}
-
           {/* Popular Dishes */}
           {topDishes.length > 0 && (
-            <div className="bg-white border border-[#F0F0F0] rounded-[14px] p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-black">Popular Dishes</h3>
-                <Link href="/dashboard/analytics" className="text-sm text-[#25D366] font-semibold hover:underline flex items-center gap-1">
-                  View All <ChevronRight className="w-4 h-4" />
+            <div className="bg-white border border-[#F0F0F0] rounded-2xl p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold text-black">Popular Dishes</h3>
+                <Link href="/dashboard/analytics" className="text-xs text-[#25D366] font-semibold hover:underline flex items-center gap-0.5">
+                  View All <ChevronRight className="w-3 h-3" />
                 </Link>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {topDishes.map((d, i) => (
                   <div
                     key={d.name}
-                    className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-xl border border-transparent hover:border-[#F0F0F0] transition-colors"
+                    className="flex items-center justify-between p-3 bg-[#F9FAFB] rounded-xl"
                   >
-                    <div className="flex items-center gap-4">
-                      <span className="font-bold text-[#555] w-5">{i + 1}.</span>
-                      <span className="text-sm font-semibold text-black">{d.name}</span>
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="font-bold text-[#555] text-xs w-4">{i + 1}.</span>
+                      <span className="text-xs font-semibold text-black truncate">{d.name}</span>
                     </div>
-                    <span className="text-xs text-[#555] font-medium">{d.count} orders</span>
+                    <span className="text-[10px] text-[#555] font-medium shrink-0 ml-2">{d.count} orders</span>
                   </div>
                 ))}
               </div>
@@ -441,75 +382,52 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Recent Orders Table */}
-      <section>
-        <div className="bg-white border border-[#F0F0F0] rounded-[14px] overflow-hidden">
-          <div className="p-6 border-b border-[#F0F0F0] flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-black">Recent Orders</h3>
-            <Link href="/dashboard/orders" className="text-sm text-[#25D366] font-semibold hover:underline flex items-center gap-1">
-              View All <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
-          {recentOrders.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-[#F9FAFB] text-[#555] text-xs font-semibold uppercase tracking-wider">
-                    <th className="px-6 py-4">Order #</th>
-                    <th className="px-6 py-4">Customer</th>
-                    <th className="px-6 py-4">Type</th>
-                    <th className="px-6 py-4">Price</th>
-                    <th className="px-6 py-4">Status</th>
-                    <th className="px-6 py-4">Time</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#F0F0F0]">
-                  {recentOrders.map((order) => (
-                    <tr
-                      key={order.id}
-                      className="hover:bg-[#F9FAFB]/50 transition-colors cursor-pointer group"
-                      onClick={() => router.push(`/dashboard/orders/${order.id}`)}
-                    >
-                      <td className="px-6 py-4 text-sm font-semibold text-black">
-                        {order.order_number || `#${order.id.slice(0, 4)}`}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-black">{order.customer_name || "Guest"}</td>
-                      <td className="px-6 py-4">
-                        <span className="flex items-center gap-1.5 text-xs font-semibold text-[#555]">
-                          {order.order_type === "dine_in" ? "Dine-in" : order.order_type === "delivery" ? "Delivery" : "Takeaway"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm font-semibold text-black">
-                        {formatPrice(order.total_price)}
-                      </td>
-                      <td className="px-6 py-4">
-                        <Badge variant={
-                          order.order_status === "completed" || order.order_status === "received"
-                            ? "available"
-                            : order.order_status === "preparing"
-                              ? "growth"
-                              : order.order_status === "cancelled"
-                                ? "unavailable"
-                                : "starter"
-                        }>
-                          {order.order_status}
-                        </Badge>
-                      </td>
-                      <td className="px-6 py-4 text-xs text-[#999]">
-                        {timeAgo(order.created_at)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="text-center py-12 text-sm text-[#999]">
-              No orders yet
-            </div>
-          )}
+      {/* Recent Orders */}
+      <div className="bg-white border border-[#F0F0F0] rounded-2xl overflow-hidden">
+        <div className="p-4 border-b border-[#F0F0F0] flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-black">Recent Orders</h3>
+          <Link href="/dashboard/orders" className="text-xs text-[#25D366] font-semibold hover:underline flex items-center gap-0.5">
+            View All <ChevronRight className="w-3 h-3" />
+          </Link>
         </div>
-      </section>
+        {recentOrders.length > 0 ? (
+          <div className="divide-y divide-[#F0F0F0]">
+            {recentOrders.slice(0, 5).map((order) => (
+              <div
+                key={order.id}
+                onClick={() => router.push(`/dashboard/orders/${order.id}`)}
+                className="flex items-center justify-between p-3 hover:bg-[#F9FAFB] transition-colors cursor-pointer active:bg-[#F0F0F0]"
+              >
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-black">#{order.order_number}</span>
+                      <Badge variant={
+                        order.order_status === "received" ? "growth" :
+                        order.order_status === "ready" ? "available" :
+                        order.order_status === "cancelled" ? "unavailable" : "starter"
+                      } className="text-[9px] px-1.5 py-0">
+                        {order.order_status}
+                      </Badge>
+                    </div>
+                    <p className="text-[10px] text-[#999] mt-0.5">
+                      {order.customer_name || "Guest"} &bull; {order.order_type.replace("_", " ")}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 shrink-0 ml-2">
+                  <span className="text-xs font-bold text-black">{formatPrice(order.total_price)}</span>
+                  <span className="text-[10px] text-[#999]">{timeAgo(order.created_at)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8 text-xs text-[#999]">
+            No orders yet
+          </div>
+        )}
+      </div>
 
       <DashboardFooter />
     </div>

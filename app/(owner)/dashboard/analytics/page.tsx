@@ -2,20 +2,11 @@
 
 import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
-import dynamic from "next/dynamic"
-import { Card } from "@/components/ui/card"
 import { formatPrice } from "@/lib/utils"
 import type { DailyStats } from "@/types"
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts"
 
 type DateRange = "7d" | "30d"
-
-const NAV_SECTIONS = [
-  { id: "overview", label: "Overview" },
-  { id: "revenue", label: "Revenue" },
-  { id: "popular", label: "Popular" },
-  { id: "order-types", label: "Order Types" },
-] as const
 
 export default function AnalyticsPage() {
   const [graph7d, setGraph7d] = useState<DailyStats[]>([])
@@ -65,9 +56,7 @@ export default function AnalyticsPage() {
 
       const grouped: Record<string, { total_orders: number; total_revenue: number }> = {}
       ordersRes.data.forEach((o: any) => {
-        const d = new Date(o.created_at)
-        const pkDate = new Date(d.getTime() + 5 * 60 * 60 * 1000).toISOString().split("T")[0]
-        const day = pkDate
+        const day = new Date(o.created_at).toISOString().split("T")[0]
         if (!grouped[day]) grouped[day] = { total_orders: 0, total_revenue: 0 }
         grouped[day].total_orders += 1
         grouped[day].total_revenue += o.total_price
@@ -124,51 +113,38 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="h-8 w-40 bg-[#F0F0F0] rounded animate-pulse" />
-        <div className="grid grid-cols-2 gap-4">
-          {[...Array(2)].map((_, i) => (
-            <div key={i} className="h-24 bg-[#F0F0F0] rounded-[14px] animate-pulse" />
-          ))}
+      <div className="space-y-4">
+        <div className="h-7 w-32 bg-[#F0F0F0] rounded-lg animate-pulse" />
+        <div className="grid grid-cols-2 gap-3">
+          <div className="h-24 bg-[#F0F0F0] rounded-2xl animate-pulse" />
+          <div className="h-24 bg-[#F0F0F0] rounded-2xl animate-pulse" />
         </div>
-        <div className="h-64 bg-[#F0F0F0] rounded-[14px] animate-pulse" />
+        <div className="h-48 bg-[#F0F0F0] rounded-2xl animate-pulse" />
+        <div className="h-48 bg-[#F0F0F0] rounded-2xl animate-pulse" />
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <h1 className="text-xl font-bold">Analytics</h1>
 
-      {/* Anchor Navigation */}
-      <nav className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
-        {NAV_SECTIONS.map((s) => (
-          <a
-            key={s.id}
-            href={`#${s.id}`}
-            className="px-4 py-1.5 rounded-full text-xs font-semibold bg-[#F0F0F0] text-[#555] hover:bg-[#E2E2E2] whitespace-nowrap transition-colors"
-          >
-            {s.label}
-          </a>
-        ))}
-      </nav>
-
       {/* Overview Stats */}
-      <section id="overview" className="grid grid-cols-2 gap-4">
-        <Card>
-          <p className="text-[28px] font-bold">{totalOrders}</p>
-          <p className="text-sm text-[#555]">Total Orders</p>
-        </Card>
-        <Card>
-          <p className="text-[28px] font-bold">{formatPrice(totalRevenue)}</p>
-          <p className="text-sm text-[#555]">Total Revenue</p>
-        </Card>
-      </section>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-white border border-[#F0F0F0] p-4 rounded-2xl">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-[#555]">Total Orders</p>
+          <p className="text-2xl font-bold text-black mt-1">{totalOrders}</p>
+        </div>
+        <div className="bg-white border border-[#F0F0F0] p-4 rounded-2xl">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-[#555]">Total Revenue</p>
+          <p className="text-2xl font-bold text-black mt-1 truncate">{formatPrice(totalRevenue)}</p>
+        </div>
+      </div>
 
-      {/* Revenue Over Time */}
-      <section id="revenue" className="bg-white rounded-[14px] border border-[#F0F0F0] p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold">Revenue Over Time</h3>
+      {/* Orders Over Time */}
+      <div className="bg-white border border-[#F0F0F0] rounded-2xl p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-black">Orders Over Time</h3>
           <div className="flex gap-1">
             {(["7d", "30d"] as const).map((r) => (
               <button
@@ -184,22 +160,64 @@ export default function AnalyticsPage() {
           </div>
         </div>
         {chartData.length > 0 ? (
-          <div className="h-64">
+          <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" />
                 <XAxis
                   dataKey="date"
-                  tick={{ fontSize: 11, fill: "#999" }}
+                  tick={{ fontSize: 10, fill: "#999" }}
                   tickFormatter={(v: string) => {
                     const d = new Date(v)
                     return `${d.getMonth() + 1}/${d.getDate()}`
                   }}
                 />
-                <YAxis tick={{ fontSize: 11, fill: "#999" }} />
+                <YAxis tick={{ fontSize: 10, fill: "#999" }} allowDecimals={false} />
                 <Tooltip
                   contentStyle={{ borderRadius: 10, border: "1px solid #F0F0F0", fontSize: 12 }}
-                  formatter={(value: number) => [`PKR ${formatPrice(value)}`, "Revenue"]}
+                  formatter={(value: number) => [value, "Orders"]}
+                  labelFormatter={(label: string) => new Date(label).toLocaleDateString()}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="orders"
+                  stroke="#000"
+                  strokeWidth={2}
+                  dot={{ r: 3, fill: "#000" }}
+                  activeDot={{ r: 5 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        ) : (
+          <div className="h-32 flex items-center justify-center text-xs text-[#999]">
+            No order data yet
+          </div>
+        )}
+      </div>
+
+      {/* Revenue Over Time */}
+      <div className="bg-white border border-[#F0F0F0] rounded-2xl p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-black">Revenue Over Time</h3>
+        </div>
+        {chartData.length > 0 ? (
+          <div className="h-48">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fontSize: 10, fill: "#999" }}
+                  tickFormatter={(v: string) => {
+                    const d = new Date(v)
+                    return `${d.getMonth() + 1}/${d.getDate()}`
+                  }}
+                />
+                <YAxis tick={{ fontSize: 10, fill: "#999" }} />
+                <Tooltip
+                  contentStyle={{ borderRadius: 10, border: "1px solid #F0F0F0", fontSize: 12 }}
+                  formatter={(value: number) => [`Rs ${value.toLocaleString("en-PK")}`, "Revenue"]}
                   labelFormatter={(label: string) => new Date(label).toLocaleDateString()}
                 />
                 <Line
@@ -214,41 +232,44 @@ export default function AnalyticsPage() {
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="h-48 flex items-center justify-center text-sm text-[#999]">
+          <div className="h-32 flex items-center justify-center text-xs text-[#999]">
             No revenue data yet
           </div>
         )}
-      </section>
+      </div>
 
       {/* Popular Dishes */}
       {topDishes.length > 0 && (
-        <section id="popular" className="bg-white rounded-[14px] border border-[#F0F0F0] p-5">
-          <h3 className="text-sm font-semibold mb-3">All Time Popular Dishes</h3>
-          <div className="space-y-2">
+        <div className="bg-white border border-[#F0F0F0] rounded-2xl p-4">
+          <h3 className="text-sm font-semibold text-black mb-3">Popular Dishes</h3>
+          <div className="space-y-2.5">
             {topDishes.map((d, i) => (
-              <div key={d.name} className="flex items-center justify-between text-sm gap-2">
-                <span className="truncate min-w-0">{i + 1}. {d.name}</span>
-                <span className="text-[#555] shrink-0">{d.count} orders</span>
+              <div key={d.name} className="flex items-center justify-between">
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="text-xs font-bold text-[#999] w-4">{i + 1}.</span>
+                  <span className="text-sm font-medium text-black truncate">{d.name}</span>
+                </div>
+                <span className="text-xs text-[#555] font-medium shrink-0 ml-3">{d.count} orders</span>
               </div>
             ))}
           </div>
-        </section>
+        </div>
       )}
 
       {/* Order Type Breakdown */}
       {Object.keys(orderTypeStats).length > 0 && (
-        <section id="order-types" className="bg-white rounded-[14px] border border-[#F0F0F0] p-5">
-          <h3 className="text-sm font-semibold mb-4">Order Type Breakdown</h3>
+        <div className="bg-white border border-[#F0F0F0] rounded-2xl p-4">
+          <h3 className="text-sm font-semibold text-black mb-3">Order Types</h3>
           <div className="space-y-3">
             {Object.entries(orderTypeStats)
               .sort(([, a], [, b]) => b - a)
               .map(([type, count]) => (
                 <div key={type}>
-                  <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center justify-between mb-1.5">
                     <span className="text-xs font-medium text-[#555]">{orderTypeLabels[type] || type}</span>
                     <span className="text-xs text-[#999]">{count} orders</span>
                   </div>
-                  <div className="h-2.5 w-full bg-[#F0F0F0] rounded-full overflow-hidden">
+                  <div className="h-2 w-full bg-[#F0F0F0] rounded-full overflow-hidden">
                     <div
                       className="h-full bg-black rounded-full transition-all duration-500"
                       style={{ width: `${(count / maxTypeCount) * 100}%` }}
@@ -257,7 +278,7 @@ export default function AnalyticsPage() {
                 </div>
               ))}
           </div>
-        </section>
+        </div>
       )}
     </div>
   )

@@ -35,10 +35,7 @@ export default function MenuManagementPage() {
   const [undoToast, setUndoToast] = useState<{ message: string; undo: () => void } | null>(null)
 
   const fetchData = useCallback(async () => {
-    if (!restaurant?.id) {
-      setLoading(false)
-      return
-    }
+    if (!restaurant?.id) return
     const supabase = createClient()
     try {
       const [catsRes, dishesRes] = await Promise.all([
@@ -416,26 +413,26 @@ export default function MenuManagementPage() {
 
   return (
     <div>
-      <div className="flex items-center gap-4 mb-6 p-4 bg-white rounded-xl border border-[#F0F0F0]">
-        <div className="w-14 h-14 rounded-full bg-[#F9FAFB] flex items-center justify-center overflow-hidden flex-shrink-0">
+      <div className="flex items-center gap-3 mb-4 p-3 bg-white rounded-2xl border border-[#F0F0F0]">
+        <div className="w-12 h-12 rounded-full bg-[#F9FAFB] flex items-center justify-center overflow-hidden flex-shrink-0">
           {restaurant?.logo_url && !logoError ? (
             <Image
               src={restaurant.logo_url}
               alt={restaurant.name}
-              width={56}
-              height={56}
+              width={48}
+              height={48}
               className="w-full h-full object-cover"
               onError={() => setLogoError(true)}
             />
           ) : (
-            <span className="text-2xl font-bold text-[#555]">
-              {restaurant?.name ? restaurant.name[0] : <Store className="w-6 h-6 text-[#999]" />}
+            <span className="text-xl font-bold text-[#555]">
+              {restaurant?.name ? restaurant.name[0] : <Store className="w-5 h-5 text-[#999]" />}
             </span>
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <h1 className="text-lg font-bold text-[#111] truncate">{restaurant?.name || "Menu Management"}</h1>
-          <p className="text-sm text-[#555]">{restaurant?.city}{restaurant?.cuisine_type ? ` \u2022 ${restaurant.cuisine_type}` : ""}</p>
+          <h1 className="text-base font-bold text-[#111] truncate">{restaurant?.name || "Menu Management"}</h1>
+          <p className="text-xs text-[#555]">{restaurant?.city}{restaurant?.cuisine_type ? ` \u2022 ${restaurant.cuisine_type}` : ""}</p>
         </div>
       </div>
 
@@ -473,34 +470,34 @@ export default function MenuManagementPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
-        <div className="bg-white rounded-xl border border-[#F0F0F0] p-3 md:p-4">
-          <div className="flex items-center gap-1.5 text-xs text-[#999] mb-1">
-            <UtensilsCrossed className="w-3.5 h-3.5" />
+      <div className="grid grid-cols-3 gap-3 mb-4">
+        <div className="bg-white rounded-2xl border border-[#F0F0F0] p-3">
+          <div className="flex items-center gap-1.5 text-[10px] text-[#999] mb-1">
+            <UtensilsCrossed className="w-3 h-3" />
             Dishes
           </div>
-          <p className="text-xl md:text-2xl font-bold text-[#111]">
+          <p className="text-lg font-bold text-[#111]">
             {totalDishes}
-            <span className="text-xs font-normal text-[#999] ml-1">
+            <span className="text-[10px] font-normal text-[#999] ml-0.5">
               / {planLimits.maxDishes === Infinity ? "8" : planLimits.maxDishes}
             </span>
           </p>
         </div>
-        <div className="bg-white rounded-xl border border-[#F0F0F0] p-3 md:p-4">
-          <div className="flex items-center gap-1.5 text-xs text-[#16A34A] mb-1">
-            <Eye className="w-3.5 h-3.5" />
+        <div className="bg-white rounded-2xl border border-[#F0F0F0] p-3">
+          <div className="flex items-center gap-1.5 text-[10px] text-[#16A34A] mb-1">
+            <Eye className="w-3 h-3" />
             Active
           </div>
-          <p className="text-xl md:text-2xl font-bold text-[#16A34A]">{activeDishes}</p>
+          <p className="text-lg font-bold text-[#16A34A]">{activeDishes}</p>
         </div>
-        <div className="bg-white rounded-xl border border-[#F0F0F0] p-3 md:p-4">
-          <div className="flex items-center gap-1.5 text-xs text-[#555] mb-1">
-            <ImageIcon className="w-3.5 h-3.5" />
+        <div className="bg-white rounded-2xl border border-[#F0F0F0] p-3">
+          <div className="flex items-center gap-1.5 text-[10px] text-[#555] mb-1">
+            <ImageIcon className="w-3 h-3" />
             Images
           </div>
-          <p className="text-xl md:text-2xl font-bold text-[#111]">
+          <p className="text-lg font-bold text-[#111]">
             {imageCount}
-            <span className="text-xs font-normal text-[#999] ml-1">
+            <span className="text-[10px] font-normal text-[#999] ml-0.5">
               / {planLimits.maxImages === Infinity ? "8" : planLimits.maxImages}
             </span>
           </p>
@@ -518,9 +515,8 @@ export default function MenuManagementPage() {
             className="w-full h-10 pl-9 pr-4 rounded-xl bg-white border border-[#F0F0F0] text-sm placeholder:text-[#999] focus:outline-none focus:border-black transition-colors"
           />
         </div>
-        <Button size="sm" variant="ghost" onClick={handleAddCategory}>
+        <Button size="sm" variant="ghost" onClick={handleAddCategory} className="shrink-0">
           <Plus className="w-4 h-4" />
-          <span className="hidden sm:inline ml-1">Category</span>
         </Button>
         <Button
           size="sm"
@@ -538,9 +534,9 @@ export default function MenuManagementPage() {
             }
             setShowAddModal(true)
           }}
+          className="shrink-0"
         >
           <Plus className="w-4 h-4" />
-          <span className="hidden sm:inline ml-1">Add Dish</span>
         </Button>
       </div>
 
@@ -616,13 +612,13 @@ export default function MenuManagementPage() {
 
       <div className="space-y-4">
         {filteredCategories.length === 0 ? (
-          <div className="bg-white rounded-xl border border-[#F0F0F0] p-10 text-center">
+          <div className="bg-white rounded-2xl border border-[#F0F0F0] p-8 text-center">
             <div className="w-12 h-12 rounded-xl bg-[#F9FAFB] flex items-center justify-center mx-auto mb-3">
               <UtensilsCrossed className="w-6 h-6 text-[#999]" />
             </div>
             <p className="text-sm text-[#555] mb-3">No categories yet</p>
             <Button size="sm" variant="primary" onClick={handleAddCategory}>
-              <Plus className="w-4 h-4 mr-1" /> Create your first category
+              <Plus className="w-4 h-4 mr-1" /> Create first category
             </Button>
           </div>
         ) : (
@@ -632,12 +628,12 @@ export default function MenuManagementPage() {
               : dishes.filter((d) => d.category_id === cat.id)
             if (catDishes.length === 0 && search) return null
             return (
-              <div key={cat.id} className="bg-white rounded-xl border border-[#F0F0F0] overflow-hidden">
+              <div key={cat.id} className="bg-white rounded-2xl border border-[#F0F0F0] overflow-hidden">
                 <div className="flex items-center justify-between px-4 py-3 bg-[#F9FAFB] border-b border-[#F0F0F0]">
                   <div className="flex items-center gap-2 min-w-0">
                     <h2 className="text-sm font-semibold text-[#111] truncate">{cat.name_en}</h2>
-                    {cat.name_ur && <span className="text-xs text-[#999] font-urdu flex-shrink-0">{cat.name_ur}</span>}
-                    <span className="text-xs text-[#BBB] flex-shrink-0">({catDishes.length})</span>
+                    {cat.name_ur && <span className="text-xs text-[#999] font-urdu shrink-0">{cat.name_ur}</span>}
+                    <span className="text-[10px] text-[#BBB] shrink-0">({catDishes.length})</span>
                   </div>
                   <button
                     onClick={() => handleDeleteCategory(cat.id)}

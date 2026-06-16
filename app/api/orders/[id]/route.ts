@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { rateLimit, getClientIp } from "@/lib/rate-limiter"
+import { csrfGuard } from "@/lib/csrf"
+import { logOwnerAction, getIpSimple } from "@/lib/owner-audit"
 
 const VALID_STATUSES = ["received", "preparing", "ready", "completed", "cancelled"] as const
 const VALID_PAYMENT_STATUSES = ["pending", "paid", "failed"] as const
@@ -45,6 +48,15 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const csrfResponse = csrfGuard(request)
+  if (csrfResponse) return csrfResponse
+
+  const ip = getClientIp(request)
+  const allowed = await rateLimit(ip, 10, 60)
+  if (!allowed) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 })
+  }
+
   const { id } = await params
   const supabase = await createClient()
 
@@ -108,6 +120,11 @@ export async function PATCH(
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 })
   }
+
+  logOwnerAction(restaurant.id, user.id, "order_updated", {
+    order_id: id,
+    changes: safeBody,
+  }, getIpSimple(request)).catch(() => {})
 
   return NextResponse.json({ order: data })
 }

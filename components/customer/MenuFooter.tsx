@@ -7,8 +7,6 @@ interface Props {
 }
 
 export function MenuFooter({ branding }: Props) {
-  if (branding.hasCustomBranding) return null
-
   return (
     <div className="px-4 py-8 text-center">
       <div className="border-t border-[#F0F0F0] pt-6">

@@ -21,86 +21,62 @@ interface Props {
 export function MenuHeader({ name, nameUr, logoUrl, coverUrl, city, cuisineType, description, lang = "en", branding }: Props) {
   const router = useRouter()
   const [logoError, setLogoError] = useState(false)
-  const [coverError, setCoverError] = useState(false)
   const displayName = lang === "ur" && nameUr ? nameUr : name
 
-  const primaryColor = branding?.hasCustomBranding ? branding.primaryColor : "#25D366"
-  const accentColor = branding?.hasCustomBranding ? branding.accentColor : "#000000"
-
   return (
-    <div className="pb-4 px-4">
-      {/* Cover Image */}
-      <div className="relative w-full h-48 rounded-3xl overflow-hidden mb-6 group">
+    <div className="pb-2">
+      {/* Top Bar with Back Button */}
+      <div className="flex items-center justify-between px-4 pt-3 pb-1">
         <button
           onClick={() => router.back()}
-          className="absolute top-3 left-3 z-30 w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
+          className="w-9 h-9 rounded-full bg-[#F0F0F0] flex items-center justify-center active:scale-95 transition-transform"
           aria-label="Go back"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-5 h-5 text-black" />
         </button>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10" />
-        <div
-          className="absolute inset-0 z-10"
-          style={{
-            background: `linear-gradient(135deg, ${primaryColor}20, transparent)`,
-          }}
-        />
-        {coverUrl && !coverError ? (
-          <Image
-            src={coverUrl}
-            alt={displayName}
-            fill
-            className="object-cover transition-transform duration-700 group-hover:scale-110"
-            sizes="(max-width: 768px) 100vw, 600px"
-            onError={() => setCoverError(true)}
-          />
+        <span className="text-xs font-semibold text-[#999]">QRMenu.pk</span>
+        <div className="w-9" />
+      </div>
+
+      {/* Logo + Name + Info */}
+      <div className="px-4 mt-3 flex items-start gap-3">
+        {logoUrl && !logoError ? (
+          <div className="w-16 h-16 rounded-2xl overflow-hidden relative flex-shrink-0 shadow-md">
+            <Image
+              src={logoUrl}
+              alt={displayName}
+              fill
+              className="object-cover"
+              sizes="64px"
+              priority
+              onError={() => setLogoError(true)}
+            />
+          </div>
         ) : (
-          <div
-            className="w-full h-full"
-            style={{
-              background: `linear-gradient(135deg, ${primaryColor}, ${accentColor})`,
-            }}
-          />
+          <div className="w-16 h-16 rounded-2xl bg-[#EDEEEF] flex items-center justify-center flex-shrink-0 shadow-md">
+            <span className="text-xl font-bold text-[#555]">
+              {displayName.charAt(0).toUpperCase()}
+            </span>
+          </div>
         )}
-        <div className="absolute bottom-4 left-4 z-20 flex items-end gap-4">
-          {logoUrl && !logoError ? (
-            <div className="w-14 h-14 rounded-2xl border-4 border-white shadow-sm overflow-hidden relative flex-shrink-0">
-              <Image
-                src={logoUrl}
-                alt={displayName}
-                fill
-                className="object-cover"
-                sizes="56px"
-                priority
-                onError={() => setLogoError(true)}
-              />
-            </div>
-          ) : (
-            <div className="w-14 h-14 rounded-2xl border-4 border-white shadow-sm bg-[#EDEEEF] flex items-center justify-center flex-shrink-0">
-              <span className="text-lg font-bold text-[#555]">
-                {displayName.charAt(0).toUpperCase()}
-              </span>
-            </div>
-          )}
-          <div>
-            <h1 className="text-white text-2xl font-bold leading-tight">{displayName}</h1>
-            <div className="flex items-center gap-3 text-white/90 text-xs mt-1">
+        <div className="flex-1 min-w-0 pt-0.5">
+          <h1 className="text-xl font-bold text-black leading-tight">{displayName}</h1>
+          <div className="flex items-center gap-3 text-[#999] text-xs mt-1.5">
+            <span className="flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5" /> {city}
+            </span>
+            {cuisineType && (
               <span className="flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5" /> {city}
+                <UtensilsCrossed className="w-3.5 h-3.5" /> {cuisineType}
               </span>
-              {cuisineType && (
-                <span className="flex items-center gap-1">
-                  <UtensilsCrossed className="w-3.5 h-3.5" /> {cuisineType}
-                </span>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* Description */}
       {description && (
-        <p className="text-sm text-[#555] leading-relaxed px-1">
+        <p className="text-sm text-[#555] leading-relaxed px-4 mt-3">
           {description}
         </p>
       )}

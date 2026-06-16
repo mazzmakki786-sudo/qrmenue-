@@ -17,7 +17,7 @@ const statusColors: Record<string, "available" | "unavailable" | "trial" | "star
 }
 
 const statusLabels: Record<string, string> = {
-  received: "Pending", preparing: "Preparing", ready: "Ready",
+  received: "Pending", ready: "Ready",
   completed: "Delivered", cancelled: "Cancelled",
 }
 
@@ -155,7 +155,6 @@ export default function AccountPage() {
                       </div>
                       <span className={`text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full ${
                         order.order_status === "received" ? "bg-[#25D366]/10 text-[#25D366]" :
-                        order.order_status === "preparing" ? "bg-blue-100 text-blue-600" :
                         order.order_status === "ready" ? "bg-purple-100 text-purple-600" :
                         "bg-gray-100 text-gray-500"
                       }`}>

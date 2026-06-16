@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { formatPrice, timeAgo } from "@/lib/utils"
+import { timeAgo } from "@/lib/utils"
 import type { Order } from "@/types"
 import { useSubscription } from "@/lib/hooks/useSubscription"
 import { Lock, Sparkles, ArrowRight, Receipt, ChevronRight, Clock, ClipboardList } from "lucide-react"
@@ -25,16 +25,6 @@ const orderTypeLabels: Record<string, string> = {
   delivery: "Delivery",
 }
 
-type StatusFilter = "all" | "received" | "preparing" | "ready" | "completed"
-
-const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "received", label: "Received" },
-  { value: "preparing", label: "Preparing" },
-  { value: "ready", label: "Ready" },
-  { value: "completed", label: "Completed" },
-]
-
 const PAGE_SIZE = 25
 
 export default function OrdersPage() {
@@ -43,7 +33,6 @@ export default function OrdersPage() {
   const { shouldBlurOrderDetails } = sub
   const [orders, setOrders] = useState<Order[]>([])
   const [filter, setFilter] = useState<"today" | "week" | "all">("today")
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all")
   const [currentPage, setCurrentPage] = useState(1)
   const [loading, setLoading] = useState(true)
   const [restaurantId, setRestaurantId] = useState<string | null>(null)
@@ -149,21 +138,12 @@ export default function OrdersPage() {
 
   const blur = (text: string) => "█".repeat(Math.max(4, Math.min(text?.length || 0, 14)))
 
-  const filteredOrders = statusFilter === "all"
-    ? orders
-    : orders.filter((o) => o.order_status === statusFilter)
-
-  const totalPages = Math.ceil(filteredOrders.length / PAGE_SIZE)
-  const paginatedOrders = filteredOrders.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+  const totalPages = Math.ceil(orders.length / PAGE_SIZE)
+  const paginatedOrders = orders.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
   useEffect(() => {
     setCurrentPage(1)
-  }, [statusFilter, filter])
-
-  const clearFilters = () => {
-    setStatusFilter("all")
-    setFilter("today")
-  }
+  }, [filter])
 
   return (
     <div className="max-w-4xl mx-auto flex flex-col gap-6">
@@ -210,22 +190,22 @@ export default function OrdersPage() {
         </div>
       </div>
 
-      {/* Status Filters */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
-        {STATUS_OPTIONS.map((opt) => (
-          <button
-            key={opt.value}
-            onClick={() => setStatusFilter(opt.value)}
-            className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
-              statusFilter === opt.value
-                ? "bg-black text-white"
-                : "bg-[#F0F0F0] text-[#555] hover:bg-[#E2E2E2]"
-            }`}
-          >
-            {opt.label}
-          </button>
-        ))}
-      </div>
+      {/* Order Count Widgets */}
+      {!loading && (
+        <div className="grid grid-cols-4 gap-2">
+          {[
+            { label: "Total", count: orders.length, color: "text-black" },
+            { label: "Pending", count: orders.filter(o => o.order_status === "received").length, color: "text-[#25D366]" },
+            { label: "Ready", count: orders.filter(o => o.order_status === "ready").length, color: "text-purple-600" },
+            { label: "Cancelled", count: orders.filter(o => o.order_status === "cancelled").length, color: "text-[#DC2626]" },
+          ].map((s) => (
+            <div key={s.label} className="bg-white border border-[#F0F0F0] rounded-xl p-3 text-center">
+              <p className={`text-lg font-bold ${s.color}`}>{s.count}</p>
+              <p className="text-[10px] text-[#999] font-medium">{s.label}</p>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Orders List */}
       {loading ? (
@@ -239,13 +219,7 @@ export default function OrdersPage() {
           <div className="w-16 h-16 bg-[#F0F0F0] rounded-2xl flex items-center justify-center">
             <ClipboardList className="w-8 h-8 text-[#999]" />
           </div>
-          <p className="text-sm text-[#555] text-center">No orders found for this filter</p>
-          <button
-            onClick={clearFilters}
-            className="text-sm text-[#25D366] font-semibold hover:underline"
-          >
-            Clear Filters
-          </button>
+          <p className="text-sm text-[#555] text-center">No orders found</p>
         </div>
       ) : (
         <>
@@ -253,81 +227,60 @@ export default function OrdersPage() {
             {paginatedOrders.map((order) => {
               const isLocked = shouldBlurOrderDetails
               return (
-                <div
+                <Link
                   key={order.id}
-                  className="bg-white border border-[#F0F0F0] rounded-xl p-4 hover:shadow-[0px_4px_20px_rgba(0,0,0,0.05)] transition-all active:scale-[0.995]"
+                  href={isLocked ? "#" : `/dashboard/orders/${order.id}`}
+                  className={`bg-white border border-[#F0F0F0] rounded-xl p-4 hover:shadow-[0px_4px_20px_rgba(0,0,0,0.05)] transition-all active:scale-[0.995] block ${isLocked ? "cursor-not-allowed" : ""}`}
                 >
-                  <div className="flex items-start md:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
-                      <div className="w-12 h-12 bg-[#F9FAFB] flex items-center justify-center rounded-lg border border-[#F0F0F0] text-[#555] shrink-0">
-                        {isLocked ? <Lock className="w-5 h-5 opacity-50" /> : <Receipt className="w-5 h-5" />}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="w-11 h-11 bg-[#F9FAFB] flex items-center justify-center rounded-xl border border-[#F0F0F0] text-[#555] shrink-0">
+                        {isLocked ? <Lock className="w-4 h-4 opacity-50" /> : <Receipt className="w-4 h-4" />}
                       </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-bold text-sm text-black">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-sm text-black truncate">
                             {isLocked ? (
                               <span className="blur-sm select-none">{order.order_number}</span>
                             ) : (
-                              <Link href={`/dashboard/orders/${order.id}`} className="hover:underline">
-                                #{order.order_number}
-                              </Link>
+                              `#${order.order_number}`
                             )}
                           </span>
-                          <span className="text-sm text-[#555]">&bull;</span>
-                          <span className="text-xs text-[#999] flex items-center gap-1">
-                            <Clock className="w-3.5 h-3.5" />
+                          <span className="text-[10px] text-[#999] flex items-center gap-1 shrink-0">
+                            <Clock className="w-3 h-3" />
                             {timeAgo(order.created_at)}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 mt-1">
                           {isLocked ? (
-                            <>
-                              <span className="font-mono text-sm tracking-tighter opacity-20 select-none">{blur(order.customer_name)}</span>
-                              <span className="text-xs px-2 py-0.5 bg-[#E1E3E4]/50 rounded-full text-transparent select-none blur-[2px]">{blur("dine_in")}</span>
-                            </>
+                            <span className="font-mono text-xs tracking-tighter opacity-20 select-none blur-[2px]">{blur(order.customer_name)}</span>
                           ) : (
-                            <>
-                              <Link href={`/dashboard/orders/${order.id}`} className="font-medium text-sm text-black hover:underline">
-                                {order.customer_name}
-                              </Link>
-                              <span className="text-xs px-2 py-0.5 bg-[#E1E3E4] rounded-full text-[#555]">
-                                {orderTypeLabels[order.order_type] || order.order_type.replace("_", " ")}
-                              </span>
-                            </>
+                            <span className="text-xs text-[#555] truncate">
+                              {order.customer_name} &bull; {orderTypeLabels[order.order_type] || order.order_type.replace("_", " ")}
+                            </span>
                           )}
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4 shrink-0">
-                      <div className="flex flex-col items-end">
-                        <span className="font-bold text-sm md:text-base text-black">
-                          {isLocked ? (
-                            <span className="blur-sm select-none">PKR {formatPrice(order.total_price)}</span>
-                          ) : (
-                            `PKR ${formatPrice(order.total_price)}`
-                          )}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className={`text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full ${statusStyles[order.order_status] || "bg-gray-100 text-gray-500"}`}>
+                    <div className="flex flex-col items-end gap-1.5 shrink-0">
+                      <span className="font-bold text-sm text-black whitespace-nowrap">
+                        {isLocked ? (
+                          <span className="blur-sm select-none">Rs XXX</span>
+                        ) : (
+                          `Rs ${order.total_price.toLocaleString("en-PK")}`
+                        )}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full ${statusStyles[order.order_status] || "bg-gray-100 text-gray-500"}`}>
                           {order.order_status}
                         </span>
-                        {isLocked ? (
-                          <div className="p-2 text-[#555] cursor-not-allowed">
-                            <Lock className="w-[18px] h-[18px]" />
-                          </div>
-                        ) : (
-                          <Link
-                            href={`/dashboard/orders/${order.id}`}
-                            className="p-2 hover:bg-[#F9FAFB] rounded-full transition-colors text-[#555]"
-                          >
-                            <ChevronRight className="w-5 h-5" />
-                          </Link>
+                        {!isLocked && (
+                          <ChevronRight className="w-4 h-4 text-[#999]" />
                         )}
                       </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               )
             })}
           </div>
@@ -336,7 +289,7 @@ export default function OrdersPage() {
           {totalPages > 1 && (
             <div className="flex items-center justify-between pt-2">
               <span className="text-xs text-[#999]">
-                Showing {(currentPage - 1) * PAGE_SIZE + 1}-{Math.min(currentPage * PAGE_SIZE, filteredOrders.length)} of {filteredOrders.length}
+                Showing {(currentPage - 1) * PAGE_SIZE + 1}-{Math.min(currentPage * PAGE_SIZE, orders.length)} of {orders.length}
               </span>
               <div className="flex items-center gap-2">
                 <button

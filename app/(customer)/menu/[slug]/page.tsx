@@ -2,7 +2,6 @@ import { createClient } from "@/lib/supabase/server"
 import { MenuHeader } from "@/components/customer/MenuHeader"
 import { MenuContent } from "@/components/customer/MenuContent"
 import { MenuFooter } from "@/components/customer/MenuFooter"
-import { PremiumBanner } from "@/components/customer/PremiumBanner"
 import { notFound } from "next/navigation"
 import { GRACE_PERIOD_DAYS, PLAN_LIMITS } from "@/lib/subscription"
 import { buildBrandingConfig, DEFAULT_BRANDING } from "@/lib/branding"
@@ -22,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const { data: restaurant } = await supabase
     .from("restaurants")
-    .select("name, name_ur, description, city, cuisine_type, logo_url, plan, brand_primary_color, brand_accent_color")
+    .select("name, name_ur, description, city, cuisine_type, logo_url, plan, banner_enabled, banner_image_url, banner_link_url")
     .eq("slug", slug)
     .eq("is_active", true)
     .single()
@@ -33,7 +32,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const planLimits = PLAN_LIMITS[restaurant.plan as keyof typeof PLAN_LIMITS]
   const branding = planLimits
-    ? buildBrandingConfig(restaurant.plan, planLimits, restaurant)
+    ? buildBrandingConfig(restaurant.plan, planLimits, {
+        banner_enabled: restaurant.banner_enabled,
+        banner_image_url: restaurant.banner_image_url,
+        banner_link_url: restaurant.banner_link_url,
+      })
     : DEFAULT_BRANDING
 
   const cityName = restaurant.city || "Pakistan"
@@ -120,7 +123,11 @@ export default async function MenuPage({ params }: Props) {
 
   const planLimits = PLAN_LIMITS[restaurant.plan as keyof typeof PLAN_LIMITS]
   const branding = planLimits
-    ? buildBrandingConfig(restaurant.plan, planLimits, restaurant)
+    ? buildBrandingConfig(restaurant.plan, planLimits, {
+        banner_enabled: restaurant.banner_enabled,
+        banner_image_url: restaurant.banner_image_url,
+        banner_link_url: restaurant.banner_link_url,
+      })
     : DEFAULT_BRANDING
 
   const categories: (Category & { dishes: Dish[] })[] = restaurant.categories || []
@@ -147,14 +154,6 @@ export default async function MenuPage({ params }: Props) {
       />
       <div
         className="max-w-[600px] mx-auto min-h-screen pb-32 bg-white px-4"
-        style={{
-          ...(branding.hasCustomBranding
-            ? {
-                "--brand-primary": branding.primaryColor,
-                "--brand-accent": branding.accentColor,
-              } as React.CSSProperties
-            : {}),
-        }}
       >
         <MenuHeader
           name={restaurant.name}
@@ -166,12 +165,6 @@ export default async function MenuPage({ params }: Props) {
           description={null}
           branding={branding}
         />
-        {branding.bannerEnabled && branding.bannerImageUrl && (
-          <PremiumBanner
-            imageUrl={branding.bannerImageUrl}
-            linkUrl={branding.bannerLinkUrl}
-          />
-        )}
         <MenuContent
           categories={categories}
           restaurantId={restaurant.id}

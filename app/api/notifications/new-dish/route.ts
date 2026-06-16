@@ -6,7 +6,7 @@ import { escapeHtml } from "@/lib/utils"
 
 export async function POST(request: Request) {
   const ip = getClientIp(request)
-  const allowed = await rateLimit(ip, 10, 60)
+  const allowed = await rateLimit(ip, 5, 60)
   if (!allowed) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 })
   }

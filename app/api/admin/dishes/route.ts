@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { z } from "zod"
+import { rateLimit, getClientIp } from "@/lib/rate-limiter"
+import { csrfGuard } from "@/lib/csrf"
+import { logOwnerAction, getIpSimple } from "@/lib/owner-audit"
 
 const dishSchema = z.object({
   restaurant_id: z.string().uuid(),
@@ -16,6 +19,15 @@ const dishSchema = z.object({
 })
 
 export async function POST(request: Request) {
+  const csrfResponse = csrfGuard(request)
+  if (csrfResponse) return csrfResponse
+
+  const ip = getClientIp(request)
+  const allowed = await rateLimit(ip, 15, 60)
+  if (!allowed) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 })
+  }
+
   const supabase = await createClient()
   const body = await request.json()
 
@@ -52,6 +64,11 @@ export async function POST(request: Request) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 })
   }
+
+  logOwnerAction(parsed.data.restaurant_id, user.id, "dish_created", {
+    dish_id: data.id,
+    name: parsed.data.name_en,
+  }, getIpSimple(request)).catch(() => {})
 
   return NextResponse.json({ dish: data })
 }

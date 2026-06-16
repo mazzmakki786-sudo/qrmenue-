@@ -314,7 +314,6 @@ export function getPlanFeatures(plan: Plan): string[] {
   if (limits.analytics) features.push("Analytics dashboard")
   if (limits.canHaveQR) features.push("QR code generation")
   if (limits.canHaveWhatsapp) features.push("WhatsApp orders")
-  if (limits.customBranding) features.push("Custom branding")
 
   return features
 }

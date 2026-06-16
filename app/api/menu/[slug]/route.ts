@@ -7,7 +7,7 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const ip = getClientIp(_request)
-  const allowed = await rateLimit(ip, 60, 60)
+  const allowed = await rateLimit(ip, 30, 60)
   if (!allowed) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 })
   }

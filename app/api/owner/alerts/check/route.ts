@@ -2,8 +2,18 @@ import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { checkAndSendOrderLimitAlert } from "@/lib/email/orderLimitAlert"
 import { checkAndSendPlanEndingAlert } from "@/lib/email/planEndingAlert"
+import { rateLimit, getClientIp } from "@/lib/rate-limiter"
+import { csrfGuard } from "@/lib/csrf"
 
-export async function POST() {
+export async function POST(request: Request) {
+  const csrfResponse = csrfGuard(request)
+  if (csrfResponse) return csrfResponse
+
+  const ip = getClientIp(request)
+  const allowed = await rateLimit(ip, 5, 60)
+  if (!allowed) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 })
+  }
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

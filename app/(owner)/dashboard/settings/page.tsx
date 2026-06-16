@@ -4,8 +4,7 @@ import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { QRCodeDisplay } from "@/components/shared/QRCodeDisplay"
-import { Camera, Copy, Check } from "lucide-react"
+import { Camera } from "lucide-react"
 import type { Restaurant } from "@/types"
 import Image from "next/image"
 
@@ -20,7 +19,6 @@ export default function SettingsPage() {
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [copied, setCopied] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const fetchRestaurant = async () => {
@@ -91,18 +89,6 @@ export default function SettingsPage() {
     setTimeout(() => setSaved(false), 3000)
   }
 
-  const menuUrl = restaurant
-    ? `${process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "")}/menu/${restaurant.slug}`
-    : ""
-
-  const handleCopyUrl = () => {
-    if (typeof navigator !== "undefined" && navigator.clipboard) {
-      navigator.clipboard.writeText(menuUrl).catch(() => {})
-    }
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
   if (!restaurant) {
     return <div className="text-center text-[#999] py-12">
       <div className="h-6 w-40 bg-[#F0F0F0] rounded animate-pulse mx-auto mb-4" />
@@ -117,8 +103,7 @@ export default function SettingsPage() {
         <p className="text-sm text-[#555] mt-1">Manage your restaurant profile and preferences</p>
       </div>
 
-      {/* Restaurant Info */}
-      <div className="bg-white rounded-[14px] border border-[#F0F0F0] p-5 space-y-4">
+      <div className="bg-white rounded-2xl border border-[#F0F0F0] p-5 space-y-4">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-black">Restaurant Info</h2>
 
         {/* Logo Upload */}
@@ -167,7 +152,7 @@ export default function SettingsPage() {
             id="language"
             value={form.language}
             onChange={(e) => setForm((p) => ({ ...p, language: e.target.value }))}
-            className="flex h-12 w-full rounded-[10px] bg-[#F8F8F8] border border-[#E8E8E8] px-4 text-base focus:outline-none focus:border-black transition-colors"
+            className="flex h-12 w-full rounded-xl bg-[#F8F8F8] border border-[#E8E8E8] px-4 text-base focus:outline-none focus:border-black transition-colors"
           >
             <option value="en">English</option>
             <option value="ur">Urdu</option>
@@ -176,30 +161,6 @@ export default function SettingsPage() {
         <Button onClick={handleSave} disabled={saving}>
           {saving ? "Saving..." : saved ? "Saved!" : "Save Changes"}
         </Button>
-      </div>
-
-      {/* Your URL */}
-      <div className="bg-white rounded-[14px] border border-[#F0F0F0] p-5">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-black mb-3">Your Restaurant URL</h2>
-        <div className="flex items-center gap-2 p-3 bg-[#F9FAFB] rounded-xl border border-[#F0F0F0]">
-          <code className="text-sm flex-1 break-all text-[#555] font-mono">{menuUrl}</code>
-          <button
-            onClick={handleCopyUrl}
-            className="flex-shrink-0 p-2 hover:bg-[#F0F0F0] rounded-lg transition-colors"
-          >
-            {copied ? <Check className="w-4 h-4 text-[#16A34A]" /> : <Copy className="w-4 h-4 text-[#555]" />}
-          </button>
-        </div>
-        <p className="text-xs text-[#999] mt-2">Share this link with your customers or generate a QR code below.</p>
-      </div>
-
-      {/* QR Code */}
-      <div className="bg-white rounded-[14px] border border-[#F0F0F0] p-5">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-black mb-4">Your QR Code</h2>
-        <QRCodeDisplay
-          restaurantSlug={restaurant.slug}
-          restaurantName={restaurant.name}
-        />
       </div>
     </div>
   )

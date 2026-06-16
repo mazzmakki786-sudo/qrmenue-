@@ -1,7 +1,14 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 
 export async function GET(request: Request) {
+  const ip = getClientIp(request)
+  const allowed = await rateLimit(ip, 15, 60)
+  if (!allowed) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 })
+  }
+
   const { searchParams } = new URL(request.url)
   const restaurantId = searchParams.get("restaurant_id")
 

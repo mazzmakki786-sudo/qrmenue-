@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server"
 import { z } from "zod"
 import { PLAN_LIMITS, type Plan } from "@/lib/subscription"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
+import { csrfGuard } from "@/lib/csrf"
+import { logOwnerAction, getIpSimple } from "@/lib/owner-audit"
 
 const createSchema = z.object({
   name_en: z.string().min(1, "Name is required"),
@@ -16,10 +18,13 @@ const deleteSchema = z.object({
 
 export async function POST(request: Request) {
   const ip = getClientIp(request)
-  const allowed = await rateLimit(ip, 20, 60)
+  const allowed = await rateLimit(ip, 15, 60)
   if (!allowed) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 })
   }
+
+  const csrfResponse = csrfGuard(request)
+  if (csrfResponse) return csrfResponse
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -77,10 +82,18 @@ export async function POST(request: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
 
+  logOwnerAction(restaurant.id, user.id, "category_created", {
+    category_id: data.id,
+    name: parsed.data.name_en,
+  }, getIpSimple(request)).catch(() => {})
+
   return NextResponse.json({ category: data })
 }
 
 export async function DELETE(request: Request) {
+  const csrfResponse = csrfGuard(request)
+  if (csrfResponse) return csrfResponse
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -133,6 +146,10 @@ export async function DELETE(request: Request) {
     .eq("id", parsed.data.id)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+
+  logOwnerAction(restaurant.id, user.id, "category_deleted", {
+    category_id: parsed.data.id,
+  }, getIpSimple(request)).catch(() => {})
 
   return NextResponse.json({ success: true })
 }
