@@ -10,7 +10,7 @@ import type { Order } from "@/types"
 import { useSubscription } from "@/lib/hooks/useSubscription"
 import { Badge } from "@/components/ui/badge"
 import { DashboardFooter } from "@/components/shared/DashboardFooter"
-import { BellNotification } from "@/components/owner/BellNotification"
+
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -201,7 +201,6 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-black">Dashboard</h1>
         <div className="flex items-center gap-2">
-          {restaurant?.id && <BellNotification restaurantId={restaurant.id} />}
           <Link
             href="/dashboard/orders"
             className="bg-black text-white px-5 py-2 rounded-full flex items-center gap-2 text-sm font-semibold hover:opacity-90 transition-all active:scale-95"

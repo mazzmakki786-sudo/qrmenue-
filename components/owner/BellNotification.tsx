@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
-import { Bell, X, ChevronRight, Clock, Megaphone } from "lucide-react"
+import { Bell, X, ChevronRight, Clock, Megaphone, BellRing } from "lucide-react"
 import Link from "next/link"
 import { formatPrice, timeAgo } from "@/lib/utils"
 
@@ -82,16 +82,23 @@ export function BellNotification({ restaurantId }: Props) {
   const [alerts, setAlerts] = useState<OrderAlert[]>([])
   const [todayOrders, setTodayOrders] = useState<TodayOrder[]>([])
   const [dropdownLoading, setDropdownLoading] = useState(false)
+  const [announcementQueue, setAnnouncementQueue] = useState<AnnouncementAlert[]>([])
   const [announcementModal, setAnnouncementModal] = useState<AnnouncementAlert | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  const dismissAnnouncement = useCallback((id: string) => {
-    setAnnouncementModal(null)
-    fetch("/api/owner/notifications", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ notification_id: id, is_read: true }),
-    }).catch(() => {})
+  const dismissAnnouncement = useCallback(() => {
+    setAnnouncementModal((current) => {
+      if (!current) return null
+      setAnnouncementQueue((prev) => {
+        const remaining = prev.filter((a) => a.id !== current.id)
+        if (remaining.length > 0) {
+          const next = remaining[0]
+          setTimeout(() => setAnnouncementModal(next), 100)
+        }
+        return remaining
+      })
+      return null
+    })
   }, [])
 
   useEffect(() => {
@@ -99,17 +106,26 @@ export function BellNotification({ restaurantId }: Props) {
 
     const fetchInitial = async () => {
       const today = new Date().toISOString().split("T")[0]
-      const { data } = await supabase
-        .from("orders")
-        .select("*")
-        .eq("restaurant_id", restaurantId)
-        .gte("created_at", today)
-        .eq("order_status", "received")
-        .order("created_at", { ascending: false })
-        .limit(20)
+      const [ordersRes, announcementsRes] = await Promise.all([
+        supabase
+          .from("orders")
+          .select("*")
+          .eq("restaurant_id", restaurantId)
+          .gte("created_at", today)
+          .eq("order_status", "received")
+          .order("created_at", { ascending: false })
+          .limit(20),
+        supabase
+          .from("owner_notifications")
+          .select("id", { count: "exact", head: true })
+          .eq("restaurant_id", restaurantId)
+          .eq("type", "announcement")
+          .eq("is_read", false),
+      ])
 
-      const pending = (data || []).filter((o: any) => o.order_status === "received")
-      setUnreadCount(pending.length)
+      const pending = (ordersRes.data || []).filter((o: any) => o.order_status === "received")
+      const announcementCount = announcementsRes.count ?? 0
+      setUnreadCount(pending.length + announcementCount)
     }
 
     fetchInitial()
@@ -159,13 +175,18 @@ export function BellNotification({ restaurantId }: Props) {
           const n = payload.new as any
           if (n.type === "announcement") {
             playNotificationSound()
-            setAnnouncementModal({
+            const alert: AnnouncementAlert = {
               id: n.id,
               title: n.title,
               body: n.body,
               created_at: n.created_at,
-            })
+            }
+            setAnnouncementQueue((prev) => [...prev, alert])
             setUnreadCount((prev) => prev + 1)
+            setAnnouncementModal((current) => {
+              if (!current) return alert
+              return current
+            })
           }
         }
       )
@@ -338,7 +359,7 @@ export function BellNotification({ restaurantId }: Props) {
       {/* Announcement Center Modal */}
       {announcementModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => dismissAnnouncement(announcementModal.id)} />
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={dismissAnnouncement} />
           <div className="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 animate-scale-up" style={{ maxHeight: "calc(100vh - 32px)", overflowY: "auto" }}>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-[#25D366]/10 flex items-center justify-center shrink-0">
@@ -353,20 +374,44 @@ export function BellNotification({ restaurantId }: Props) {
                 </p>
               </div>
               <button
-                onClick={() => dismissAnnouncement(announcementModal.id)}
+                onClick={dismissAnnouncement}
                 className="ml-auto p-2 hover:bg-[#F0F0F0] rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
               >
                 <X className="w-4 h-4 text-[#555]" />
               </button>
             </div>
+            {announcementQueue.length > 1 && (
+              <div className="flex items-center gap-1.5 mb-3">
+                {announcementQueue.map((a, i) => (
+                  <div
+                    key={a.id}
+                    className={`h-1 flex-1 rounded-full transition-colors ${
+                      i === 0 ? "bg-[#25D366]" : "bg-[#F0F0F0]"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
             <h4 className="text-base font-bold text-black mb-2">{announcementModal.title}</h4>
             <p className="text-sm text-[#555] leading-relaxed whitespace-pre-wrap">{announcementModal.body}</p>
-            <button
-              onClick={() => dismissAnnouncement(announcementModal.id)}
-              className="mt-5 w-full h-12 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 transition-opacity min-h-[44px]"
-            >
-              Got it
-            </button>
+            <div className="flex items-center gap-3 mt-5">
+              <button
+                onClick={dismissAnnouncement}
+                className="flex-1 h-12 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 transition-opacity min-h-[44px]"
+              >
+                {announcementQueue.length > 1
+                  ? `Next (${announcementQueue.length - 1} remaining)`
+                  : "Got it"}
+              </button>
+              <Link
+                href="/dashboard/announcements"
+                onClick={dismissAnnouncement}
+                className="shrink-0 h-12 px-4 rounded-xl border border-[#F0F0F0] text-sm font-medium text-[#555] hover:bg-[#F0F0F0] transition-colors flex items-center justify-center gap-1.5 min-h-[44px]"
+              >
+                <BellRing className="w-4 h-4" />
+                All
+              </Link>
+            </div>
           </div>
         </div>
       )}

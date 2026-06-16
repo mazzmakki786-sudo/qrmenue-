@@ -1,0 +1,101 @@
+import { NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase/server"
+import { rateLimit, getClientIp } from "@/lib/rate-limiter"
+
+export async function GET(request: Request) {
+  const ip = getClientIp(request)
+  const allowed = await rateLimit(ip, 30, 60)
+  if (!allowed) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 })
+  }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  const { data: restaurant } = await supabase
+    .from("restaurants")
+    .select("id")
+    .eq("owner_id", user.id)
+    .single()
+
+  if (!restaurant) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
+
+  const { searchParams } = new URL(request.url)
+  const filter = searchParams.get("filter") || "all"
+
+  let query = supabase
+    .from("owner_notifications")
+    .select("*")
+    .eq("restaurant_id", restaurant.id)
+    .eq("type", "announcement")
+
+  if (filter === "unread") {
+    query = query.eq("is_read", false)
+  } else if (filter === "read") {
+    query = query.eq("is_read", true)
+  }
+
+  const { data, error } = await query
+    .order("created_at", { ascending: false })
+    .limit(100)
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+
+  return NextResponse.json({ announcements: data || [] })
+}
+
+export async function PATCH(request: Request) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  const body = await request.json()
+  if (!body.announcement_id) {
+    return NextResponse.json({ error: "announcement_id required" }, { status: 400 })
+  }
+
+  const { data: restaurant } = await supabase
+    .from("restaurants")
+    .select("id")
+    .eq("owner_id", user.id)
+    .single()
+
+  if (!restaurant) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
+
+  const adminSupabase = (await import("@/lib/supabase/server")).createAdminClient()
+  const { error } = await adminSupabase
+    .from("owner_notifications")
+    .update({ is_read: true })
+    .eq("id", body.announcement_id)
+    .eq("restaurant_id", restaurant.id)
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+  return NextResponse.json({ success: true })
+}
+
+export async function POST(request: Request) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  const { data: restaurant } = await supabase
+    .from("restaurants")
+    .select("id")
+    .eq("owner_id", user.id)
+    .single()
+
+  if (!restaurant) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
+
+  const adminSupabase = (await import("@/lib/supabase/server")).createAdminClient()
+  const { data, error } = await adminSupabase
+    .from("owner_notifications")
+    .update({ is_read: true })
+    .eq("restaurant_id", restaurant.id)
+    .eq("type", "announcement")
+    .eq("is_read", false)
+    .select()
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+  return NextResponse.json({ success: true, count: data?.length || 0 })
+}

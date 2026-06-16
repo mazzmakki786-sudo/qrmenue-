@@ -2,7 +2,8 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { LayoutDashboard, UtensilsCrossed, ClipboardList, BarChart3, User, CreditCard, QrCode, Menu, X, LogOut } from "lucide-react"
+import { LayoutDashboard, UtensilsCrossed, ClipboardList, BarChart3, User, CreditCard, QrCode, Menu, X, LogOut, Megaphone } from "lucide-react"
+import { BellNotification } from "@/components/owner/BellNotification"
 import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary"
@@ -11,6 +12,7 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/menu", label: "Menu", icon: UtensilsCrossed },
   { href: "/dashboard/orders", label: "Orders", icon: ClipboardList },
+  { href: "/dashboard/announcements", label: "Announcements", icon: Megaphone },
   { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/dashboard/settings", label: "Profile", icon: User },
   { href: "/dashboard/subscription", label: "Subscription", icon: CreditCard },
@@ -95,6 +97,7 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
           </nav>
         </div>
         <div className="flex items-center gap-2">
+          {restaurantId && <BellNotification restaurantId={restaurantId} />}
           <button
             onClick={handleLogout}
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-[#555] hover:bg-[#F0F0F0] transition-colors"
@@ -114,6 +117,7 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
         </button>
         <Link href="/dashboard" className="font-semibold text-sm">QRMenu.pk</Link>
         <div className="flex items-center gap-1">
+          {restaurantId && <BellNotification restaurantId={restaurantId} />}
           <button
             onClick={handleLogout}
             className="p-2 -mr-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
