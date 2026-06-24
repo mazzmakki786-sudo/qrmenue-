@@ -1,11 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { MapPin, Phone, ArrowLeft, UtensilsCrossed, ImageOff } from "lucide-react"
+import { MapPin, Phone, ArrowLeft, UtensilsCrossed, ImageOff, Truck, Clock, Navigation } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useCartStore } from "@/stores/cartStore"
+import { CartBar } from "@/components/customer/CartBar"
 import type { Category, Dish } from "@/types"
 
 interface Restaurant {
@@ -19,6 +20,12 @@ interface Restaurant {
   description: string | null
   phone: string | null
   address: string | null
+  delivery_fee?: number
+  delivery_time_min?: number
+  is_open?: boolean
+  opening_hours?: Record<string, { open: string; close: string; closed: boolean }> | null
+  lat?: number | null
+  lng?: number | null
 }
 
 interface Props {
@@ -34,8 +41,8 @@ function DishCard({ dish }: { dish: Dish }) {
   const cartItem = items.find((item) => item.dish.id === dish.id)
 
   return (
-    <div className={`flex gap-3 p-3 bg-[#F9FAFB] rounded-xl border border-transparent hover:border-[#F0F0F0] transition-all ${!dish.is_available ? "opacity-50" : ""}`}>
-      <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded-lg">
+    <div className={`flex gap-3 p-3 bg-white rounded-2xl border border-border hover:border-[#E8E8E8] hover:shadow-[0_4px_20px_rgba(217,74,42,0.06)] transition-all ${!dish.is_available ? "opacity-50" : ""}`}>
+      <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded-xl">
         {dish.image_url && !imgError ? (
           <Image
             src={dish.image_url}
@@ -64,12 +71,13 @@ function DishCard({ dish }: { dish: Dish }) {
         {dish.description_en && (
           <p className="text-[11px] text-[#555] line-clamp-2 mt-0.5">{dish.description_en}</p>
         )}
+
         <div className="mt-auto flex justify-end pt-1">
           {cartItem ? (
-            <div className="flex items-center gap-2 bg-[#F0F0F0] px-2.5 py-1 rounded-full">
+            <div className="flex items-center gap-2 bg-[#F5F5F5] px-2.5 py-1 rounded-full">
               <button
                 onClick={() => updateQuantity(dish.id, cartItem.quantity - 1)}
-                className="w-6 h-6 flex items-center justify-center text-[14px] hover:opacity-70"
+                className="w-6 h-6 flex items-center justify-center text-[14px] text-primary hover:opacity-70"
                 aria-label="Decrease"
               >
                 −
@@ -77,7 +85,7 @@ function DishCard({ dish }: { dish: Dish }) {
               <span className="text-[12px] font-bold min-w-[16px] text-center">{cartItem.quantity}</span>
               <button
                 onClick={() => addItem(dish)}
-                className="w-6 h-6 flex items-center justify-center text-[14px] hover:opacity-70"
+                className="w-6 h-6 flex items-center justify-center text-[14px] text-primary hover:opacity-70"
                 aria-label="Increase"
               >
                 +
@@ -87,7 +95,7 @@ function DishCard({ dish }: { dish: Dish }) {
             <button
               onClick={() => addItem(dish)}
               disabled={!dish.is_available}
-              className="bg-black text-white px-3 py-1 rounded-full text-[11px] font-semibold active:scale-95 transition-all disabled:opacity-50"
+              className="bg-primary text-white rounded-full px-4 py-1.5 text-xs font-semibold hover:bg-primary-hover active:scale-95 transition-all disabled:opacity-50"
             >
               + Add
             </button>
@@ -101,6 +109,17 @@ function DishCard({ dish }: { dish: Dish }) {
 export function RestaurantDetailClient({ restaurant, categories }: Props) {
   const router = useRouter()
   const [logoError, setLogoError] = useState(false)
+  const setRestaurant = useCartStore((s) => s.setRestaurant)
+  const clearCart = useCartStore((s) => s.clearCart)
+  const currentRestaurantId = useCartStore((s) => s.restaurantId)
+
+  // Set restaurant in cart store on mount
+  useEffect(() => {
+    if (currentRestaurantId && currentRestaurantId !== restaurant.id) {
+      clearCart()
+    }
+    setRestaurant(restaurant.id, restaurant.name, restaurant.delivery_fee ?? 0)
+  }, [restaurant.id, restaurant.name])
 
   return (
     <div className="min-h-screen bg-white">
@@ -115,9 +134,9 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
             className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center active:scale-95 transition-transform"
             aria-label="Go back"
           >
-            <ArrowLeft className="w-4 h-4 text-black" />
+            <ArrowLeft className="w-4 h-4 text-text-primary" />
           </button>
-          <span className="text-[13px] font-semibold text-black">QRMenu.pk</span>
+          <span className="text-[13px] font-semibold text-text-primary">QRMenu.pk</span>
           <div className="w-8" />
         </div>
       </div>
@@ -137,25 +156,25 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
                 priority
                 onError={() => setLogoError(true)}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/70 via-primary/30 to-transparent" />
             </>
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-[#1a1a1a] to-[#333]" />
+            <div className="w-full h-full bg-gradient-to-br from-primary to-[#8F2E19]" />
           )}
           <div className="absolute bottom-3 left-3 right-3">
             <div className="flex items-end gap-3">
               {restaurant.logo_url && !logoError ? (
-                <div className="w-12 h-12 rounded-xl overflow-hidden border-3 border-white shadow-sm relative flex-shrink-0">
+                <div className="w-14 h-14 rounded-xl overflow-hidden border-4 border-white/80 shadow-sm relative flex-shrink-0">
                   <Image
                     src={restaurant.logo_url}
                     alt={restaurant.name}
                     fill
                     className="object-cover"
-                    sizes="48px"
+                    sizes="56px"
                   />
                 </div>
               ) : (
-                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 border-3 border-white/30">
+                <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 border-4 border-white/30">
                   <span className="text-lg font-bold text-white">
                     {restaurant.name.charAt(0).toUpperCase()}
                   </span>
@@ -165,7 +184,7 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
                 <h1 className="text-white text-[18px] font-semibold leading-tight">
                   {restaurant.name_ur || restaurant.name}
                 </h1>
-                <div className="flex items-center gap-2 text-white/80 text-[11px] font-medium mt-0.5">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-white/80 text-[11px] font-medium mt-0.5">
                   <span className="flex items-center gap-0.5">
                     <MapPin className="w-3 h-3" /> {restaurant.city}
                   </span>
@@ -174,6 +193,10 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
                       <UtensilsCrossed className="w-3 h-3" /> {restaurant.cuisine_type}
                     </span>
                   )}
+
+                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${restaurant.is_open !== false ? 'bg-accent/20 text-accent' : 'bg-error/20 text-error'}`}>
+                    {restaurant.is_open !== false ? '● Open' : '● Closed'}
+                  </span>
                 </div>
               </div>
             </div>
@@ -192,29 +215,86 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
           {restaurant.phone && (
             <a
               href={`tel:${restaurant.phone}`}
-              className="flex items-center gap-2 flex-1 min-w-0 p-2.5 border border-[#F0F0F0] rounded-lg hover:border-[#DDD] transition-all"
+              className="flex items-center gap-2 flex-1 min-w-0 p-2.5 bg-white rounded-xl hover:bg-[#F5F5F5] transition-all"
             >
               <div className="w-7 h-7 rounded-lg bg-[#F5F5F5] flex items-center justify-center shrink-0">
-                <Phone className="w-3.5 h-3.5 text-black" />
+                <Phone className="w-3.5 h-3.5 text-primary" />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] text-[#999]">Phone</p>
-                <p className="text-[12px] font-semibold text-black truncate">{restaurant.phone}</p>
+                <p className="text-[10px] text-text-muted">Phone</p>
+                <p className="text-[12px] font-semibold text-text-primary truncate">{restaurant.phone}</p>
               </div>
             </a>
           )}
           {restaurant.address && (
-            <div className="flex items-center gap-2 flex-1 min-w-0 p-2.5 border border-[#F0F0F0] rounded-lg">
+            <div className="flex items-center gap-2 flex-1 min-w-0 p-2.5 bg-white rounded-xl">
               <div className="w-7 h-7 rounded-lg bg-[#F5F5F5] flex items-center justify-center shrink-0">
-                <MapPin className="w-3.5 h-3.5 text-black" />
+                <MapPin className="w-3.5 h-3.5 text-primary" />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] text-[#999]">Address</p>
-                <p className="text-[12px] font-semibold text-black truncate">{restaurant.address}</p>
+                <p className="text-[10px] text-text-muted">Address</p>
+                <p className="text-[12px] font-semibold text-text-primary truncate">{restaurant.address}</p>
               </div>
             </div>
           )}
         </div>
+
+        {/* Opening Hours */}
+        {restaurant.opening_hours && (
+          <div className="border border-[#E8E8E8] rounded-xl p-4 mb-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Clock className="w-5 h-5 text-[#111111]" />
+              <h3 className="font-semibold text-[15px] text-[#111111]">Opening Hours</h3>
+            </div>
+            <div className="space-y-2">
+              {(["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const).map((day) => {
+                const hours = restaurant.opening_hours?.[day]
+                const today = new Date().toLocaleDateString("en-US", { weekday: "long" }).toLowerCase()
+                const isToday = day === today
+                if (!hours) return null
+                return (
+                  <div key={day} className={`flex justify-between items-center text-sm py-1 ${isToday ? "bg-[#F9FAFB] -mx-2 px-2 rounded-lg" : ""}`}>
+                    <span className={`capitalize ${isToday ? "font-semibold text-[#111111]" : "text-[#555555]"}`}>
+                      {day}
+                    </span>
+                    <span className={hours.closed ? "text-[#EF4444] font-medium" : "text-[#111111]"}>
+                      {hours.closed ? "Closed" : `${hours.open} — ${hours.close}`}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Map / Location */}
+        {restaurant.lat && restaurant.lng && (
+          <div className="border border-[#E8E8E8] rounded-xl overflow-hidden mb-4">
+            <div className="h-48 bg-[#F9FAFB] flex items-center justify-center relative">
+              <MapPin className="w-8 h-8 text-[#888888]" />
+              <a
+                href={`https://www.google.com/maps?q=${restaurant.lat},${restaurant.lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute bottom-3 left-3 bg-white px-3 py-1.5 rounded-lg text-xs font-medium border border-[#E8E8E8] flex items-center gap-1.5 hover:bg-[#F5F5F5] transition-colors"
+              >
+                <Navigation className="w-3.5 h-3.5" />
+                Get Directions
+              </a>
+            </div>
+          </div>
+        )}
+
+        {/* Delivery Info */}
+        {restaurant.delivery_fee !== undefined && (
+          <div className="flex items-center gap-2 p-3 bg-[#F5F5F5] rounded-xl mb-4">
+            <Truck className="w-4 h-4 text-primary" />
+            <span className="text-xs text-text-primary font-medium">
+              {restaurant.delivery_fee === 0 ? 'Free delivery' : `Rs ${restaurant.delivery_fee} delivery fee`}
+              {restaurant.delivery_time_min && ` • ${restaurant.delivery_time_min} min`}
+            </span>
+          </div>
+        )}
 
         {/* Menu Dishes */}
         {categories.length > 0 ? (
@@ -226,7 +306,7 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
 
               return (
                 <section key={category.id}>
-                  <h2 className="text-[14px] font-semibold text-black border-l-3 border-black pl-2.5 mb-3">
+                  <h2 className="text-sm font-bold text-text-primary border-l-4 border-primary pl-2.5 mb-3">
                     {category.name_en}
                   </h2>
                   <div className="space-y-2">
@@ -243,11 +323,14 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
           </div>
         ) : (
           <div className="py-12 text-center">
-            <UtensilsCrossed className="w-8 h-8 text-[#CCC] mx-auto mb-3" />
-            <p className="text-[14px] text-[#999]">No menu items available</p>
+            <div className="w-12 h-12 rounded-xl bg-[#F5F5F5] flex items-center justify-center mx-auto mb-3">
+              <UtensilsCrossed className="w-6 h-6 text-primary" />
+            </div>
+            <p className="text-sm text-text-muted font-medium">No menu items available</p>
           </div>
         )}
       </main>
+      <CartBar />
     </div>
   )
 }

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { MapPin, Clock } from "lucide-react"
+import { MapPin, Clock, Phone } from "lucide-react"
 import type { BrandingConfig } from "@/lib/branding"
 
 interface Props {
@@ -15,12 +15,19 @@ interface Props {
   description?: string | null
   lang?: "en" | "ur"
   branding?: BrandingConfig
+  address?: string | null
+  phone?: string | null
+  openingHours?: Record<string, { open: string; close: string; closed: boolean }> | null
 }
 
-export function MenuHeader({ name, nameUr, logoUrl, coverUrl, city, cuisineType, description, lang = "en", branding }: Props) {
+export function MenuHeader({ name, nameUr, logoUrl, coverUrl, city, cuisineType, description, lang = "en", branding, address, phone, openingHours }: Props) {
   const [logoError, setLogoError] = useState(false)
   const [coverError, setCoverError] = useState(false)
   const displayName = lang === "ur" && nameUr ? nameUr : name
+
+  const today = new Date().toLocaleDateString("en-US", { weekday: "long" }).toLowerCase()
+  const todayHours = openingHours?.[today]
+  const isOpen = todayHours && !todayHours.closed
 
   return (
     <div className="pt-2 pb-6">
@@ -37,10 +44,10 @@ export function MenuHeader({ name, nameUr, logoUrl, coverUrl, city, cuisineType,
               priority
               onError={() => setCoverError(true)}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10" />
+            <div className="absolute inset-0 bg-gradient-to-t from-primary/70 via-primary/30 to-transparent z-10" />
           </>
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-[#1a1a1a] to-[#333]" />
+          <div className="w-full h-full bg-gradient-to-br from-primary to-primary-hover" />
         )}
 
         {/* Logo + Name Overlay */}
@@ -79,9 +86,33 @@ export function MenuHeader({ name, nameUr, logoUrl, coverUrl, city, cuisineType,
         </div>
       </div>
 
+      {/* Compact Info Row */}
+      {(address || phone || openingHours) && (
+        <div className="flex flex-wrap items-center gap-3 text-xs text-[#555555] mt-2 mb-1">
+          {address && (
+            <div className="flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5 text-[#888888]" />
+              <span className="truncate max-w-[150px]">{address}</span>
+            </div>
+          )}
+          {phone && (
+            <div className="flex items-center gap-1">
+              <Phone className="w-3.5 h-3.5 text-[#888888]" />
+              <span>{phone}</span>
+            </div>
+          )}
+          {openingHours && (
+            <div className={`flex items-center gap-1 ${isOpen ? "text-green-600" : "text-red-500"}`}>
+              <Clock className="w-3.5 h-3.5" />
+              <span className="font-medium">{isOpen ? "Open Now" : "Closed"}</span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Description */}
       {description && (
-        <p className="text-[14px] text-[#555] leading-relaxed px-1">
+        <p className="text-[14px] text-text-secondary leading-relaxed px-1">
           {description}
         </p>
       )}

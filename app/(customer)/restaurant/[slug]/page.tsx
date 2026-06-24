@@ -81,6 +81,12 @@ export default async function RestaurantDetailPage({ params }: Props) {
         description: restaurant.description,
         phone: restaurant.phone,
         address: restaurant.address,
+        delivery_fee: restaurant.delivery_fee,
+        delivery_time_min: restaurant.delivery_time_min,
+        is_open: restaurant.is_open ?? true,
+        opening_hours: restaurant.opening_hours ?? null,
+        lat: restaurant.lat ?? null,
+        lng: restaurant.lng ?? null,
       }}
       categories={categories}
     />

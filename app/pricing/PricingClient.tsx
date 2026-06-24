@@ -7,16 +7,51 @@ import { useCompanySettings } from "@/lib/hooks/useCompanySettings"
 import { useEffect, useState } from "react"
 import { PLAN_LIMITS, PLAN_PRICES, PLAN_NAMES, DEFAULT_TRIAL_LIMITS, type Plan, getPlanFeatures } from "@/lib/subscription"
 
+interface DBPlan {
+  slug: string
+  name: string
+  price: number
+  limits: {
+    maxDishes: number
+    maxImages: number
+    maxOrders: number
+    maxCategories: number
+    analytics: boolean
+    customBranding: boolean
+    canHaveQR: boolean
+    canHaveWhatsapp: boolean
+  }
+  description: string
+}
+
 const planKeys: Plan[] = ["trial", "starter", "growth", "premium"]
 
-function buildPlanData(key: Plan): {
+function buildPlanData(key: Plan, dbPlan?: DBPlan): {
   key: Plan; name: string; price: number; badge?: string; badgeColor?: string; features: { label: string; inc: boolean }[]; cta: string; highlight?: boolean
 } {
-  const features = getPlanFeatures(key).map((f) => ({ label: f, inc: true }))
+  const name = dbPlan?.name || PLAN_NAMES[key]
+  const price = dbPlan?.price ?? PLAN_PRICES[key]
+
+  // Build features from DB limits if available, otherwise from hardcoded
+  const limits = dbPlan?.limits ? {
+    maxDishes: dbPlan.limits.maxDishes === -1 ? Infinity : dbPlan.limits.maxDishes,
+    maxImages: dbPlan.limits.maxImages === -1 ? Infinity : dbPlan.limits.maxImages,
+    maxOrders: dbPlan.limits.maxOrders === -1 ? Infinity : dbPlan.limits.maxOrders,
+    maxCategories: dbPlan.limits.maxCategories === -1 ? Infinity : dbPlan.limits.maxCategories,
+  } : null
+
+  const features: { label: string; inc: boolean }[] = []
+  if (limits) {
+    features.push({ label: `${limits.maxDishes === Infinity ? "Unlimited" : limits.maxDishes} dishes`, inc: true })
+    features.push({ label: `${limits.maxCategories === Infinity ? "Unlimited" : limits.maxCategories} categories`, inc: true })
+    features.push({ label: `${limits.maxOrders === Infinity ? "Unlimited" : limits.maxOrders} orders/mo`, inc: true })
+  } else {
+    features.push(...getPlanFeatures(key).map((f) => ({ label: f, inc: true })))
+  }
 
   if (key === "trial") {
     return {
-      key, name: PLAN_NAMES[key], price: 0,
+      key, name, price: 0,
       badge: `${DEFAULT_TRIAL_LIMITS.trialDurationDays} days`,
       badgeColor: "bg-[#FEF3C7] text-[#D97706]",
       features: [
@@ -28,17 +63,17 @@ function buildPlanData(key: Plan): {
   }
   if (key === "starter") {
     return {
-      key, name: PLAN_NAMES[key], price: PLAN_PRICES[key],
+      key, name, price,
       features: [
         ...features,
         { label: "Analytics dashboard", inc: true },
       ],
-      cta: `Choose ${PLAN_NAMES[key]}`,
+      cta: `Choose ${name}`,
     }
   }
   if (key === "growth") {
     return {
-      key, name: PLAN_NAMES[key], price: PLAN_PRICES[key],
+      key, name, price,
       badge: "⭐ Most Popular",
       badgeColor: "bg-black text-white",
       features: [
@@ -46,22 +81,20 @@ function buildPlanData(key: Plan): {
         { label: "Priority support", inc: true },
         { label: "Everything in Starter", inc: true },
       ],
-      cta: `Choose ${PLAN_NAMES[key]}`,
+      cta: `Choose ${name}`,
       highlight: true,
     }
   }
   return {
-    key, name: PLAN_NAMES[key], price: PLAN_PRICES[key],
+    key, name, price,
     features: [
       ...features,
       { label: "Priority support", inc: true },
       { label: "Everything in Growth", inc: true },
     ],
-    cta: `Choose ${PLAN_NAMES[key]}`,
+    cta: `Choose ${name}`,
   }
 }
-
-const plans: ReturnType<typeof buildPlanData>[] = planKeys.map(buildPlanData)
 
 const faqs = [
   {
@@ -91,12 +124,45 @@ export { faqs }
 export function PricingClient() {
   const { settings, loading } = useCompanySettings()
   const [scrolled, setScrolled] = useState(false)
+  const [dbPlans, setDbPlans] = useState<DBPlan[]>([])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 200)
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
+
+  // Fetch plans from database
+  useEffect(() => {
+    fetch("/api/plans")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.plans) {
+          setDbPlans(data.plans.map((p: any) => ({
+            slug: p.slug,
+            name: p.name,
+            price: p.price_pkr,
+            limits: {
+              maxDishes: p.max_dishes,
+              maxImages: p.max_images,
+              maxOrders: p.max_orders,
+              maxCategories: p.max_categories,
+              analytics: p.analytics,
+              customBranding: p.custom_branding,
+              canHaveQR: p.can_have_qr,
+              canHaveWhatsapp: p.can_have_whatsapp,
+            },
+            description: p.description,
+          })))
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  const plans: ReturnType<typeof buildPlanData>[] = planKeys.map((key) => {
+    const dbPlan = dbPlans.find((p) => p.slug === key)
+    return buildPlanData(key, dbPlan)
+  })
 
   const jazzcash = settings.jazzcash_number || "03001234567"
   const easypaisa = settings.easypaisa_number || "03001234567"
@@ -187,6 +253,58 @@ export function PricingClient() {
             </div>
           ))}
         </div>
+
+        {/* Plan Comparison Table */}
+        <section className="max-w-5xl mx-auto mb-12 md:mb-16">
+          <h2 className="text-xl md:text-2xl font-bold text-center mb-6 md:mb-8">
+            Compare All Features
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b-2 border-[#111111]">
+                  <th className="text-left py-3 pr-4 font-semibold text-[#111111] text-xs md:text-sm">Features</th>
+                  <th className="text-center py-3 px-2 font-medium text-[#555555] text-[10px] md:text-sm">Free Trial</th>
+                  <th className="text-center py-3 px-2 font-medium text-[#555555] text-[10px] md:text-sm">Starter</th>
+                  <th className="text-center py-3 px-2 font-semibold text-[#111111] bg-[#F9FAFB] rounded-t-lg text-[10px] md:text-sm">Growth</th>
+                  <th className="text-center py-3 px-2 font-medium text-[#555555] text-[10px] md:text-sm">Premium</th>
+                </tr>
+              </thead>
+              <tbody className="text-[10px] md:text-sm">
+                {[
+                  { feature: "Menu Items", values: ["20", "30", "50", "100"] },
+                  { feature: "Categories", values: ["20", "Unlimited", "Unlimited", "Unlimited"] },
+                  { feature: "Menu Images", values: ["20", "10", "20", "100"] },
+                  { feature: "Orders/mo", values: ["10", "Unlimited", "Unlimited", "Unlimited"] },
+                  { feature: "Custom Branding", values: [false, false, true, true] },
+                  { feature: "WhatsApp Orders", values: [true, true, true, true] },
+                  { feature: "QR Code", values: [true, true, true, true] },
+                  { feature: "Analytics", values: ["Basic", "Basic", "Advanced", "Advanced"] },
+                  { feature: "Priority Support", values: [false, false, false, true] },
+                ].map((row, i) => (
+                  <tr key={i} className="border-b border-[#E8E8E8] hover:bg-[#FAFAFA] transition-colors">
+                    <td className="py-2.5 md:py-3 pr-4 font-medium text-[#111111] text-[11px] md:text-sm">{row.feature}</td>
+                    {row.values.map((val, j) => (
+                      <td key={j} className={`py-2.5 md:py-3 px-2 text-center text-[10px] md:text-sm ${j === 2 ? "bg-[#F9FAFB]" : ""}`}>
+                        {typeof val === "boolean" ? (
+                          val ? (
+                            <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#16A34A] mx-auto" />
+                          ) : (
+                            <X className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#CCC] mx-auto" />
+                          )
+                        ) : (
+                          <span className={val === "Unlimited" || val === "Advanced" ? "font-semibold text-[#111111]" : "text-[#555555]"}>
+                            {val}
+                          </span>
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-12 md:mb-16 max-w-3xl mx-auto">
           <Benefit icon={<Zap className="w-4 h-4" />} text="Setup in 5 minutes" />

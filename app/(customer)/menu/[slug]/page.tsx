@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { MenuHeader } from "@/components/customer/MenuHeader"
 import { MenuContent } from "@/components/customer/MenuContent"
 import { MenuFooter } from "@/components/customer/MenuFooter"
+import { CartBar } from "@/components/customer/CartBar"
 import { notFound } from "next/navigation"
 import { GRACE_PERIOD_DAYS, PLAN_LIMITS } from "@/lib/subscription"
 import { buildBrandingConfig, DEFAULT_BRANDING } from "@/lib/branding"
@@ -153,9 +154,15 @@ export default async function MenuPage({ params }: Props) {
         }))}
       />
       <div
-        className="max-w-[600px] mx-auto min-h-screen pb-32 bg-white px-4"
+        className="max-w-[600px] mx-auto min-h-screen pb-32 bg-white px-4 relative"
       >
-        <MenuHeader
+        {/* Decorative food pattern background */}
+        <div
+          className="fixed inset-0 pointer-events-none z-0 opacity-[0.03]"
+          style={{ backgroundImage: "url('/food-pattern.png')", backgroundRepeat: "repeat", backgroundSize: "400px" }}
+        />
+        <div className="relative z-10">
+          <MenuHeader
           name={restaurant.name}
           nameUr={restaurant.name_ur}
           logoUrl={restaurant.logo_url}
@@ -164,6 +171,9 @@ export default async function MenuPage({ params }: Props) {
           cuisineType={restaurant.cuisine_type}
           description={null}
           branding={branding}
+          address={restaurant.address}
+          phone={restaurant.phone}
+          openingHours={restaurant.opening_hours}
         />
         <MenuContent
           categories={categories}
@@ -171,7 +181,9 @@ export default async function MenuPage({ params }: Props) {
           restaurantName={restaurant.name}
         />
         <MenuFooter branding={branding} />
+        </div>
       </div>
+      <CartBar />
     </>
   )
 }
