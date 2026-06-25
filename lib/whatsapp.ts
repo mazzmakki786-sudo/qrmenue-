@@ -1,45 +1,30 @@
-interface CartItem {
-  dish_id: string
-  name_en: string
-  name_ur?: string
-  price: number
-  quantity: number
-  subtotal: number
-}
-
-interface OrderDetails {
+// lib/whatsapp.ts
+interface WhatsAppOrder {
   orderNumber: string
-  items: CartItem[]
+  items: Array<{ name_en: string; quantity: number; subtotal: number }>
   totalPrice: number
   paymentMethod: string
   customerName: string
   customerPhone?: string
-  orderType: "dine_in" | "takeaway" | "delivery"
+  orderType: string
   tableNumber?: string
   deliveryAddress?: string
   restaurantPhone: string
 }
 
-export function buildWhatsAppURL(order: OrderDetails): string {
-  const itemsList = order.items
-    .map((item) => `• ${item.name_en} x${item.quantity} — Rs ${item.subtotal}`)
-    .join("\n")
+export function buildWhatsAppURL(order: WhatsAppOrder): string {
+  if (!order.restaurantPhone) return ""
 
-  const orderTypeLabel = {
-    dine_in: "Dine-in",
-    takeaway: "Takeaway",
-    delivery: "Delivery",
-  }[order.orderType]
+  const itemsList = order.items
+    .map((i) => `• ${i.name_en} x${i.quantity} — Rs ${i.subtotal}`)
+    .join("\n")
 
   const locationInfo =
     order.orderType === "dine_in"
       ? `Table: ${order.tableNumber}`
       : order.orderType === "delivery"
         ? `Address: ${order.deliveryAddress}`
-        : "Takeaway (will collect)"
-
-  const paymentLabel =
-    order.paymentMethod === "cod" ? "Cash on Delivery" : "Bank Transfer"
+        : "Takeaway"
 
   const message = [
     "New Order — QRMenu.pk",
@@ -49,19 +34,14 @@ export function buildWhatsAppURL(order: OrderDetails): string {
     itemsList,
     "",
     `Total: Rs ${order.totalPrice}`,
-    `Payment: ${paymentLabel}`,
+    `Payment: ${order.paymentMethod === "cod" ? "Cash on Delivery" : "Bank Transfer"}`,
     "",
     `Customer: ${order.customerName}`,
     `Phone: ${order.customerPhone || "Not provided"}`,
     locationInfo,
-    `Type: ${orderTypeLabel}`,
-    "",
-    `Time: ${new Date().toLocaleString("en-PK", { timeZone: "Asia/Karachi" })}`,
-    "",
-    "Sent via QRMenu.pk",
+    `Type: ${order.orderType.replace("_", " ")}`,
   ].join("\n")
 
-  const encodedMessage = encodeURIComponent(message)
-  const phone = order.restaurantPhone.replace(/[^0-9]/g, "")
-  return `https://wa.me/92${phone.slice(1)}?text=${encodedMessage}`
+  const phone = order.restaurantPhone.replace(/[^0-9+]/g, "")
+  return `https://wa.me/92${phone.slice(1)}?text=${encodeURIComponent(message)}`
 }

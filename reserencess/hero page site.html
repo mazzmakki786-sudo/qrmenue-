@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QRMenu.pk | Digitize Your Menu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-container": "#54647a",
+                        "tertiary": "#000000",
+                        "on-tertiary-container": "#848484",
+                        "text-charcoal": "#1A1A1A",
+                        "secondary-fixed": "#d3e4fe",
+                        "surface-dim": "#dadada",
+                        "outline": "#7e7576",
+                        "tertiary-fixed": "#e2e2e2",
+                        "inverse-surface": "#2f3131",
+                        "primary": "#000000",
+                        "primary-container": "#1b1b1b",
+                        "inverse-on-surface": "#f0f1f1",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#0b1c30",
+                        "primary-fixed": "#e2e2e2",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "tertiary-container": "#1b1b1b",
+                        "surface-container-high": "#e8e8e8",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#474747",
+                        "on-tertiary-fixed": "#1b1b1b",
+                        "surface-variant": "#e2e2e2",
+                        "surface-container": "#eeeeee",
+                        "on-primary-container": "#848484",
+                        "secondary-container": "#d0e1fb",
+                        "border-subtle": "#E2E8F0",
+                        "on-background": "#1a1c1c",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#5e5e5e",
+                        "secondary": "#505f76",
+                        "surface-muted": "#F8FAFC",
+                        "outline-variant": "#cfc4c5",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "on-error-container": "#93000a",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f3f3f4",
+                        "background": "#f9f9f9",
+                        "tertiary-fixed-dim": "#c6c6c6",
+                        "surface-bright": "#f9f9f9",
+                        "on-tertiary-fixed-variant": "#474747",
+                        "inverse-primary": "#c6c6c6",
+                        "on-error": "#ffffff",
+                        "on-surface-variant": "#4c4546",
+                        "on-surface": "#1a1c1c",
+                        "primary-fixed-dim": "#c6c6c6",
+                        "on-primary-fixed": "#1b1b1b",
+                        "surface": "#f9f9f9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "10px",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "margin": "32px",
+                        "2xl": "48px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "display": ["72px", {"lineHeight": "80px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-background text-text-charcoal selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface/80 backdrop-blur-md border-b border-border-subtle dark:border-outline-variant">
+<nav class="flex justify-between items-center max-w-7xl mx-auto px-margin h-16 w-full">
+<div class="font-headline-sm text-headline-sm font-bold text-tertiary dark:text-on-tertiary-fixed">
+                QRMenu.pk
+            </div>
+<div class="hidden md:flex items-center gap-xl">
+<a class="font-body-md text-body-md text-secondary dark:text-on-secondary-container hover:text-primary transition-colors duration-150 cursor-pointer" href="#">Pricing</a>
+<a class="font-body-md text-body-md text-secondary dark:text-on-secondary-container hover:text-primary transition-colors duration-150 cursor-pointer" href="#">Contact</a>
+<a class="font-body-md text-body-md text-secondary dark:text-on-secondary-container hover:text-primary transition-colors duration-150 cursor-pointer" href="#">Sign In</a>
+<button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md text-label-md hover:opacity-90 active:scale-95 transition-all duration-150">
+                    Get Started
+                </button>
+</div>
+<!-- Mobile Menu Toggle -->
+<button class="md:hidden p-sm material-symbols-outlined">menu</button>
+</nav>
+</header>
+<main class="pt-2xl">
+<!-- Hero Section -->
+<section class="max-w-7xl mx-auto px-margin pt-2xl pb-xl text-center md:text-left">
+<div class="max-w-4xl">
+<h1 class="font-display text-headline-lg-mobile md:text-display text-primary leading-tight mb-md">
+                    Digitize Your Menu. <br/>
+<span class="text-on-primary-container">Scale Your Restaurant.</span>
+</h1>
+<p class="font-body-lg text-body-lg text-secondary mb-xl max-w-2xl">
+                    The fastest QR menu platform for Pakistan. Purely functional, distraction-free. Build, update, and manage your digital catalog in minutes.
+                </p>
+<div class="flex flex-col md:flex-row gap-md">
+<button class="bg-primary text-on-primary px-2xl py-md rounded-lg font-label-md text-label-md hover:opacity-90 active:scale-95 transition-all duration-150">
+                        Start Free Trial
+                    </button>
+<button class="border border-border-subtle bg-surface px-2xl py-md rounded-lg font-label-md text-label-md hover:bg-surface-variant active:scale-95 transition-all duration-150">
+                        Browse Restaurants
+                    </button>
+</div>
+</div>
+</section>
+<!-- How It Works (Bento Inspired Numbers) -->
+<section class="max-w-7xl mx-auto px-margin py-2xl border-t border-border-subtle">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-xl">
+<div class="p-xl border border-border-subtle rounded-lg flex flex-col gap-md hover:border-primary transition-colors">
+<span class="font-display text-headline-lg text-surface-container-highest">01</span>
+<h3 class="font-headline-sm text-headline-sm">Upload Menu</h3>
+<p class="font-body-md text-body-md text-secondary">Simple CSV or manual entry. Add photos, descriptions, and regional pricing with zero friction.</p>
+</div>
+<div class="p-xl border border-border-subtle rounded-lg flex flex-col gap-md hover:border-primary transition-colors">
+<span class="font-display text-headline-lg text-surface-container-highest">02</span>
+<h3 class="font-headline-sm text-headline-sm">Generate QR</h3>
+<p class="font-body-md text-body-md text-secondary">Instant unique codes for every table or branch. Download high-res vector files for printing.</p>
+</div>
+<div class="p-xl border border-border-subtle rounded-lg flex flex-col gap-md hover:border-primary transition-colors">
+<span class="font-display text-headline-lg text-surface-container-highest">03</span>
+<h3 class="font-headline-sm text-headline-sm">Go Live</h3>
+<p class="font-body-md text-body-md text-secondary">Update specials in real-time. Customers scan, browse, and order without app downloads.</p>
+</div>
+</div>
+</section>
+<!-- Pricing Grid -->
+<section class="bg-surface-muted py-2xl">
+<div class="max-w-7xl mx-auto px-margin">
+<h2 class="font-headline-lg text-headline-lg text-center mb-2xl">Straightforward Pricing</h2>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-lg">
+<!-- Starter -->
+<div class="bg-white p-xl border border-border-subtle rounded-lg flex flex-col h-full">
+<div class="mb-lg">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-widest">Starter</span>
+<div class="font-headline-md text-headline-md mt-xs">PKR 0</div>
+<span class="text-on-secondary-container font-label-sm">Free Forever</span>
+</div>
+<ul class="flex-grow space-y-sm font-label-md text-label-md text-secondary mb-xl">
+<li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-[18px]">check</span> 1 Restaurant</li>
+<li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-[18px]">check</span> 50 Menu Items</li>
+<li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-[18px]">check</span> Basic QR Style</li>
+</ul>
+<button class="w-full py-sm border border-border-subtle rounded-lg font-label-md text-label-md hover:bg-surface-variant transition-colors">Get Started</button>
+</div>
+<!-- Pro -->
+<div class="bg-white p-xl border-2 border-primary rounded-lg flex flex-col h-full relative">
+<span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-on-primary px-md py-xs rounded-full text-[10px] font-bold uppercase tracking-tighter">Most Popular</span>
+<div class="mb-lg">
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-widest">Pro</span>
+<div class="font-headline-md text-headline-md mt-xs">PKR 4,999</div>
+<span class="text-on-secondary-container font-label-sm">Per month</span>
+</div>
+<ul class="flex-grow space-y-sm font-label-md text-label-md text-secondary mb-xl">
+<li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-[18px]">check</span> 5 Restaurants</li>
+<li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-[18px]">check</span> Unlimited Items</li>
+<li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-[18px]">check</span> Custom Branding</li>
+<li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-[18px]">check</span> Analytics Dashboard</li>
+</ul>
+<button class="w-full py-sm bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:opacity-90 transition-colors">Select Pro</button>
+</div>
+<!-- Business -->
+<div class="bg-white p-xl border border-border-subtle rounded-lg flex flex-col h-full">
+<div class="mb-lg">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-widest">Business</span>
+<div class="font-headline-md text-headline-md mt-xs">PKR 9,999</div>
+<span class="text-on-secondary-container font-label-sm">Per month</span>
+</div>
+<ul class="flex-grow space-y-sm font-label-md text-label-md text-secondary mb-xl">
+<li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-[18px]">check</span> 20 Restaurants</li>
+<li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-[18px]">check</span> Multi-user Access</li>
+<li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-[18px]">check</span> API Access</li>
+<li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-[18px]">check</span> Priority Support</li>
+</ul>
+<button class="w-full py-sm border border-border-subtle rounded-lg font-label-md text-label-md hover:bg-surface-variant transition-colors">Select Business</button>
+</div>
+<!-- Enterprise -->
+<div class="bg-white p-xl border border-border-subtle rounded-lg flex flex-col h-full">
+<div class="mb-lg">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-widest">Enterprise</span>
+<div class="font-headline-md text-headline-md mt-xs">Custom</div>
+<span class="text-on-secondary-container font-label-sm">Bespoke Solution</span>
+</div>
+<ul class="flex-grow space-y-sm font-label-md text-label-md text-secondary mb-xl">
+<li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-[18px]">check</span> Unlimited Scaling</li>
+<li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-[18px]">check</span> Dedicated Manager</li>
+<li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-[18px]">check</span> Custom Features</li>
+</ul>
+<button class="w-full py-sm border border-border-subtle rounded-lg font-label-md text-label-md hover:bg-surface-variant transition-colors">Contact Sales</button>
+</div>
+</div>
+</div>
+</section>
+<!-- SEO Content -->
+<section class="max-w-3xl mx-auto px-margin py-2xl">
+<h3 class="font-headline-sm text-headline-sm mb-lg">The Evolution of Dining in Pakistan</h3>
+<p class="font-body-md text-body-md text-secondary leading-relaxed mb-md">
+                In a rapidly digitizing economy, restaurants in Karachi, Lahore, and Islamabad are shifting towards contactless solutions. QRMenu.pk provides a robust infrastructure for eateries to present their menus beautifully on any smartphone. By eliminating physical menus, you reduce printing costs and ensure that price changes or out-of-stock items are reflected instantly.
+            </p>
+<p class="font-body-md text-body-md text-secondary leading-relaxed">
+                Our platform is engineered for high performance under low bandwidth conditions, ensuring your customers never wait for a menu to load. Join thousands of Pakistani businesses modernizing their customer experience today.
+            </p>
+</section>
+<!-- Comparison Table -->
+<section class="max-w-7xl mx-auto px-margin py-2xl">
+<div class="overflow-x-auto">
+<table class="w-full border-collapse">
+<thead>
+<tr class="border-b-2 border-primary">
+<th class="text-left py-md font-headline-sm pr-xl">Features</th>
+<th class="text-center py-md font-label-md text-secondary">Paper Menus</th>
+<th class="text-center py-md font-label-md text-primary bg-surface-muted rounded-t-lg">QRMenu.pk</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md">
+<tr class="border-b border-border-subtle">
+<td class="py-md pr-xl font-bold">Update Speed</td>
+<td class="text-center py-md text-secondary">Days (Printing)</td>
+<td class="text-center py-md text-primary font-bold">Instant</td>
+</tr>
+<tr class="border-b border-border-subtle">
+<td class="py-md pr-xl font-bold">Cost per Change</td>
+<td class="text-center py-md text-secondary">High</td>
+<td class="text-center py-md text-primary font-bold">Zero</td>
+</tr>
+<tr class="border-b border-border-subtle">
+<td class="py-md pr-xl font-bold">Hygiene Level</td>
+<td class="text-center py-md text-secondary">Low</td>
+<td class="text-center py-md text-primary font-bold">Absolute</td>
+</tr>
+<tr class="border-b border-border-subtle">
+<td class="py-md pr-xl font-bold">Analytics</td>
+<td class="text-center py-md text-secondary">None</td>
+<td class="text-center py-md text-primary font-bold">Advanced</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Contact Section -->
+<section class="bg-primary text-on-primary py-2xl">
+<div class="max-w-7xl mx-auto px-margin grid grid-cols-1 md:grid-cols-2 gap-xl items-center">
+<div>
+<h2 class="font-headline-lg text-headline-lg mb-md">Need a demo?</h2>
+<p class="font-body-lg text-body-lg opacity-80">Our team is available 24/7 to help you set up your restaurant profile. Reach out via WhatsApp or Email.</p>
+</div>
+<div class="space-y-md">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-[32px]">mail</span>
+<div>
+<p class="font-label-sm uppercase opacity-60">Email Us</p>
+<p class="font-headline-sm">hello@qrmenu.pk</p>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-[32px]">call</span>
+<div>
+<p class="font-label-sm uppercase opacity-60">Call Us</p>
+<p class="font-headline-sm">+92 300 123 4567</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="max-w-7xl mx-auto px-margin py-2xl text-center">
+<div class="bg-surface-container-high rounded-xl p-2xl">
+<h2 class="font-headline-lg text-headline-lg mb-md">Ready to scale?</h2>
+<p class="font-body-lg text-body-lg text-secondary mb-xl max-w-xl mx-auto">Join over 500+ restaurants across Pakistan who have already gone digital.</p>
+<button class="bg-primary text-on-primary px-2xl py-md rounded-lg font-label-md text-label-md hover:opacity-90 active:scale-95 transition-all duration-150">
+                    Get Started Now
+                </button>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-xl bg-background dark:bg-surface-dim border-t border-border-subtle dark:border-outline-variant">
+<div class="max-w-7xl mx-auto px-margin grid grid-cols-1 md:grid-cols-2 gap-lg items-center">
+<div class="flex flex-col gap-sm">
+<div class="font-headline-sm text-headline-sm font-bold text-tertiary dark:text-on-tertiary-fixed">
+                    QRMenu.pk
+                </div>
+<p class="font-label-sm text-label-sm text-secondary dark:text-on-secondary-container">
+                    © 2024 QRMenu.pk. Pure functionalism.
+                </p>
+</div>
+<div class="flex flex-wrap gap-lg md:justify-end">
+<a class="font-label-sm text-label-sm text-secondary-fixed-dim hover:text-primary transition-colors cursor-pointer" href="#">Terms</a>
+<a class="font-label-sm text-label-sm text-secondary-fixed-dim hover:text-primary transition-colors cursor-pointer" href="#">Privacy</a>
+<a class="font-label-sm text-label-sm text-secondary-fixed-dim hover:text-primary transition-colors cursor-pointer" href="#">Support</a>
+<a class="font-label-sm text-label-sm text-secondary-fixed-dim hover:text-primary transition-colors cursor-pointer" href="#">Twitter</a>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interactions and simple header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 20) {
+                header.classList.add('shadow-sm');
+            } else {
+                header.classList.remove('shadow-sm');
+            }
+        });
+
+        // Simple Intersection Observer for reveal effects
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section > div').forEach(el => {
+            el.style.opacity = '0.9';
+            el.style.transition = 'all 0.6s ease-out';
+            observer.observe(el);
+        });
+    </script>
+</body></html>

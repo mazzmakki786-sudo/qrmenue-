@@ -26,6 +26,12 @@
   banner_link_url: string | null
   created_at: string
   updated_at: string
+  rating?: number
+  review_count?: number
+  delivery_fee?: number
+  delivery_time_min?: number
+  is_open?: boolean
+  opening_hours?: string
 }
 
 export interface Category {
@@ -52,6 +58,8 @@ export interface Dish {
   tags: string[]
   created_at: string
   updated_at: string
+  rating?: number
+  review_count?: number
 }
 
 export interface Customer {

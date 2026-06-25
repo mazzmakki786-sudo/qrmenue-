@@ -18,6 +18,20 @@ const dishSchema = z.object({
   tags: z.array(z.string()).optional(),
 })
 
+const dishUpdateSchema = z.object({
+  id: z.string().uuid(),
+  name_en: z.string().min(1).optional(),
+  name_ur: z.string().nullable().optional(),
+  description_en: z.string().nullable().optional(),
+  description_ur: z.string().nullable().optional(),
+  price: z.number().int().positive().optional(),
+  image_url: z.string().url().nullable().optional(),
+  is_available: z.boolean().optional(),
+  sort_order: z.number().int().nonnegative().optional(),
+  tags: z.array(z.string()).optional(),
+  category_id: z.string().uuid().nullable().optional(),
+})
+
 export const POST = safeRoute(async (request) => {
   const ip = getClientIp(request)
   const allowed = await rateLimit(ip, 15, 60)
@@ -167,6 +181,24 @@ export const PATCH = safeRoute(async (request) => {
   const { id, ...updateData } = body
 
   if (!id) return NextResponse.json({ error: "Dish id required" }, { status: 400 })
+
+  const parsed = dishUpdateSchema.safeParse(body)
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.flatten().fieldErrors }, { status: 400 })
+  }
+
+  // Verify dish exists and belongs to user's restaurant
+  const { data: dish } = await supabase
+    .from("dishes")
+    .select("restaurant_id")
+    .eq("id", id)
+    .single()
+
+  if (!dish) return NextResponse.json({ error: "Dish not found" }, { status: 404 })
+
+  if (dish.restaurant_id !== restaurant.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
+  }
 
   if (updateData.image_url) {
     const { data: dishes } = await supabase

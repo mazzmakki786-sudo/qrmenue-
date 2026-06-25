@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server"
 import { safeRoute } from "@/lib/api-error"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
+import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 
-export const GET = safeRoute(async () => {
+export const GET = safeRoute(async (request) => {
+  const ip = getClientIp(request)
+  const allowed = await rateLimit(ip, 30, 60)
+  if (!allowed) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 })
+  }
+
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()

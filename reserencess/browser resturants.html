@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QRMenu.pk | Browse Restaurants</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-highest": "#e2e2e2",
+                    "inverse-on-surface": "#f0f1f1",
+                    "error": "#ba1a1a",
+                    "surface-muted": "#F8FAFC",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed-variant": "#474747",
+                    "outline-variant": "#cfc4c5",
+                    "on-secondary-fixed-variant": "#38485d",
+                    "primary-fixed-dim": "#c6c6c6",
+                    "on-secondary-fixed": "#0b1c30",
+                    "text-charcoal": "#1A1A1A",
+                    "on-surface-variant": "#4c4546",
+                    "surface-container": "#eeeeee",
+                    "on-tertiary-fixed": "#1b1b1b",
+                    "on-primary": "#ffffff",
+                    "surface-tint": "#5e5e5e",
+                    "on-primary-fixed": "#1b1b1b",
+                    "on-primary-container": "#848484",
+                    "secondary-container": "#d0e1fb",
+                    "on-secondary-container": "#54647a",
+                    "background": "#f9f9f9",
+                    "surface": "#f9f9f9",
+                    "secondary": "#505f76",
+                    "tertiary-fixed-dim": "#c6c6c6",
+                    "on-secondary": "#ffffff",
+                    "surface-variant": "#e2e2e2",
+                    "surface-bright": "#f9f9f9",
+                    "tertiary-container": "#1b1b1b",
+                    "on-tertiary": "#ffffff",
+                    "on-surface": "#1a1c1c",
+                    "secondary-fixed": "#d3e4fe",
+                    "tertiary-fixed": "#e2e2e2",
+                    "on-background": "#1a1c1c",
+                    "primary": "#000000",
+                    "surface-dim": "#dadada",
+                    "surface-container-high": "#e8e8e8",
+                    "secondary-fixed-dim": "#b7c8e1",
+                    "inverse-surface": "#2f3131",
+                    "outline": "#7e7576",
+                    "inverse-primary": "#c6c6c6",
+                    "tertiary": "#000000",
+                    "on-tertiary-container": "#848484",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed-variant": "#474747",
+                    "primary-container": "#1b1b1b",
+                    "surface-container-low": "#f3f3f4",
+                    "on-error": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "primary-fixed": "#e2e2e2",
+                    "border-subtle": "#E2E8F0"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "sm": "8px",
+                    "xl": "32px",
+                    "margin": "32px",
+                    "lg": "24px",
+                    "2xl": "48px",
+                    "md": "16px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "display": ["Inter"],
+                    "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "display": ["72px", {"lineHeight": "80px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #f9f9f9;
+            color: #1a1c1c;
+            -webkit-font-smoothing: antialiased;
+        }
+        .ultra-minimal-card {
+            transition: border-color 0.15s ease-in-out;
+        }
+        .ultra-minimal-card:hover {
+            border-color: #000000;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md min-h-screen flex flex-col">
+<!-- TopNavBar Component -->
+<header class="w-full sticky top-0 bg-surface-container-lowest dark:bg-surface border-b border-border-subtle dark:border-outline-variant z-50">
+<nav class="max-w-7xl mx-auto px-lg flex justify-between items-center h-16">
+<div class="text-headline-sm font-headline-sm font-bold text-primary dark:text-primary-fixed">
+                QRMenu.pk
+            </div>
+<div class="hidden md:flex items-center space-x-xl">
+<a class="text-primary dark:text-primary-fixed font-bold border-b-2 border-primary font-label-md text-label-md transition-colors duration-150" href="#">Directory</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed transition-colors duration-150 font-label-md text-label-md" href="#">Pricing</a>
+</div>
+<div class="flex items-center">
+<button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md text-label-md opacity-90 active:opacity-100 transition-all">
+                    Get Started
+                </button>
+</div>
+</nav>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow max-w-7xl mx-auto px-lg py-2xl w-full">
+<!-- Header Section -->
+<section class="mb-2xl">
+<h1 class="font-headline-lg text-headline-lg mb-xl md:text-headline-lg mobile:text-headline-lg-mobile text-primary">
+                Browse Restaurants
+            </h1>
+<!-- Search Bar -->
+<div class="max-w-2xl">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-secondary group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full pl-xl pr-md py-md bg-surface-muted border-none rounded-xl focus:ring-1 focus:ring-primary font-body-md text-body-md transition-all outline-none" placeholder="Search for names, cuisines, or locations..." type="text"/>
+</div>
+</div>
+</section>
+<!-- Filters (Contextual addition for high-end UI) -->
+<div class="flex flex-wrap gap-sm mb-xl">
+<span class="px-md py-xs bg-primary text-on-primary rounded-full font-label-sm text-label-sm cursor-pointer">All</span>
+<span class="px-md py-xs bg-surface-muted text-secondary rounded-full font-label-sm text-label-sm cursor-pointer hover:bg-surface-container transition-colors">European</span>
+<span class="px-md py-xs bg-surface-muted text-secondary rounded-full font-label-sm text-label-sm cursor-pointer hover:bg-surface-container transition-colors">Asian</span>
+<span class="px-md py-xs bg-surface-muted text-secondary rounded-full font-label-sm text-label-sm cursor-pointer hover:bg-surface-container transition-colors">Middle Eastern</span>
+<span class="px-md py-xs bg-surface-muted text-secondary rounded-full font-label-sm text-label-sm cursor-pointer hover:bg-surface-container transition-colors">American</span>
+</div>
+<!-- Restaurant Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-xl">
+<!-- Restaurant Card 1 -->
+<div class="ultra-minimal-card border border-border-subtle p-xl rounded-xl flex items-center justify-between bg-surface-container-lowest">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center font-bold text-primary">
+                        LB
+                    </div>
+<div>
+<h3 class="font-headline-sm text-[18px] text-primary">Le Bistro</h3>
+<p class="text-secondary font-label-sm text-label-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">location_on</span> Paris • French
+                        </p>
+</div>
+</div>
+<a class="text-primary font-label-md text-label-md hover:underline decoration-1 underline-offset-4" href="#">View Menu</a>
+</div>
+<!-- Restaurant Card 2 -->
+<div class="ultra-minimal-card border border-border-subtle p-xl rounded-xl flex items-center justify-between bg-surface-container-lowest">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center font-bold text-primary">
+                        SZ
+                    </div>
+<div>
+<h3 class="font-headline-sm text-[18px] text-primary">Sushi Zen</h3>
+<p class="text-secondary font-label-sm text-label-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">location_on</span> Tokyo • Japanese
+                        </p>
+</div>
+</div>
+<a class="text-primary font-label-md text-label-md hover:underline decoration-1 underline-offset-4" href="#">View Menu</a>
+</div>
+<!-- Restaurant Card 3 -->
+<div class="ultra-minimal-card border border-border-subtle p-xl rounded-xl flex items-center justify-between bg-surface-container-lowest">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center font-bold text-primary">
+                        OG
+                    </div>
+<div>
+<h3 class="font-headline-sm text-[18px] text-primary">Osteria Giulia</h3>
+<p class="text-secondary font-label-sm text-label-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">location_on</span> Rome • Italian
+                        </p>
+</div>
+</div>
+<a class="text-primary font-label-md text-label-md hover:underline decoration-1 underline-offset-4" href="#">View Menu</a>
+</div>
+<!-- Restaurant Card 4 -->
+<div class="ultra-minimal-card border border-border-subtle p-xl rounded-xl flex items-center justify-between bg-surface-container-lowest">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center font-bold text-primary">
+                        TM
+                    </div>
+<div>
+<h3 class="font-headline-sm text-[18px] text-primary">The Mezza</h3>
+<p class="text-secondary font-label-sm text-label-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">location_on</span> Beirut • Lebanese
+                        </p>
+</div>
+</div>
+<a class="text-primary font-label-md text-label-md hover:underline decoration-1 underline-offset-4" href="#">View Menu</a>
+</div>
+<!-- Restaurant Card 5 -->
+<div class="ultra-minimal-card border border-border-subtle p-xl rounded-xl flex items-center justify-between bg-surface-container-lowest">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center font-bold text-primary">
+                        RH
+                    </div>
+<div>
+<h3 class="font-headline-sm text-[18px] text-primary">Roast House</h3>
+<p class="text-secondary font-label-sm text-label-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">location_on</span> London • Grill
+                        </p>
+</div>
+</div>
+<a class="text-primary font-label-md text-label-md hover:underline decoration-1 underline-offset-4" href="#">View Menu</a>
+</div>
+<!-- Restaurant Card 6 -->
+<div class="ultra-minimal-card border border-border-subtle p-xl rounded-xl flex items-center justify-between bg-surface-container-lowest">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center font-bold text-primary">
+                        EC
+                    </div>
+<div>
+<h3 class="font-headline-sm text-[18px] text-primary">El Camino</h3>
+<p class="text-secondary font-label-sm text-label-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">location_on</span> Madrid • Spanish
+                        </p>
+</div>
+</div>
+<a class="text-primary font-label-md text-label-md hover:underline decoration-1 underline-offset-4" href="#">View Menu</a>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile only) -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface-container-lowest dark:bg-surface-container-highest border-t border-border-subtle dark:border-outline-variant flex justify-around items-center h-16 px-md md:hidden shadow-sm">
+<div class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed font-bold">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:text-primary transition-all">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="font-label-sm text-label-sm">Cart</span>
+</div>
+<div class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:text-primary transition-all">
+<span class="material-symbols-outlined">list_alt</span>
+<span class="font-label-sm text-label-sm">Orders</span>
+</div>
+</nav>
+<!-- Footer -->
+<footer class="w-full py-xl bg-surface-container-lowest dark:bg-surface border-t border-border-subtle dark:border-outline-variant mt-2xl">
+<div class="max-w-7xl mx-auto px-lg flex flex-col md:flex-row justify-between items-center gap-md">
+<div class="text-label-md font-bold text-primary">© 2024 QRMenu.pk</div>
+<div class="flex gap-xl opacity-80">
+<a class="font-label-sm text-label-sm text-secondary hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-secondary hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-secondary hover:text-primary transition-colors" href="#">Contact</a>
+</div>
+</div>
+</footer>
+<script>
+        // Simple search feedback interaction
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('input', (e) => {
+            const cards = document.querySelectorAll('.ultra-minimal-card');
+            const term = e.target.value.toLowerCase();
+            
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                if (text.includes(term)) {
+                    card.style.display = 'flex';
+                    card.style.opacity = '1';
+                } else {
+                    card.style.display = 'none';
+                    card.style.opacity = '0';
+                }
+            });
+        });
+
+        // Soft interaction for buttons
+        document.querySelectorAll('button, a').forEach(el => {
+            el.addEventListener('mousedown', () => el.style.transform = 'scale(0.98)');
+            el.addEventListener('mouseup', () => el.style.transform = 'scale(1)');
+            el.addEventListener('mouseleave', () => el.style.transform = 'scale(1)');
+        });
+    </script>
+</body></html>

@@ -6,12 +6,16 @@ interface CartState {
   items: CartItem[]
   restaurantId: string | null
   restaurantName: string | null
+  restaurantSlug: string | null
+  deliveryFee: number
   addItem: (dish: Dish) => void
   removeItem: (dishId: string) => void
   updateQuantity: (dishId: string, quantity: number) => void
   clearCart: () => void
-  setRestaurant: (id: string, name: string) => void
+  setRestaurant: (id: string, name: string, slug: string, deliveryFee?: number) => void
+  setDeliveryFee: (fee: number) => void
   getTotalItems: () => number
+  getSubtotal: () => number
   getTotalPrice: () => number
 }
 
@@ -22,6 +26,8 @@ export const useCartStore = create<CartState>()(
       items: [],
       restaurantId: null,
       restaurantName: null,
+      restaurantSlug: null,
+      deliveryFee: 0,
 
       addItem: (dish: Dish) => {
         const { items } = get()
@@ -55,15 +61,23 @@ export const useCartStore = create<CartState>()(
         })
       },
 
-      clearCart: () => set({ items: [], restaurantId: null, restaurantName: null }),
+      clearCart: () => set({ items: [], restaurantId: null, restaurantName: null, restaurantSlug: null, deliveryFee: 0 }),
 
-      setRestaurant: (id: string, name: string) =>
-        set({ restaurantId: id, restaurantName: name }),
+      setRestaurant: (id: string, name: string, slug: string, deliveryFee?: number) =>
+        set({ restaurantId: id, restaurantName: name, restaurantSlug: slug, deliveryFee: deliveryFee ?? 0 }),
+
+      setDeliveryFee: (fee: number) => set({ deliveryFee: fee }),
 
       getTotalItems: () => get().items.reduce((sum, item) => sum + item.quantity, 0),
 
-      getTotalPrice: () =>
+      getSubtotal: () =>
         get().items.reduce((sum, item) => sum + item.dish.price * item.quantity, 0),
+
+      getTotalPrice: () => {
+        const state = get()
+        const subtotal = state.items.reduce((sum, item) => sum + item.dish.price * item.quantity, 0)
+        return subtotal + state.deliveryFee
+      },
     }),
     { name: "qrmenu-cart" }
     )

@@ -29,20 +29,20 @@ export function CategoryTabs({ categories, activeCategory, onSelect }: Props) {
   return (
     <div className="relative overflow-hidden pb-2 pt-6 px-4">
       {/* Left fade */}
-      <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+      <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#F9FAFB] to-transparent z-10 pointer-events-none" />
       {/* Right fade */}
-      <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#F9FAFB] to-transparent z-10 pointer-events-none" />
       <div ref={scrollRef} className="flex gap-2 overflow-x-auto no-scrollbar">
         <button
           onClick={() => onSelect(null)}
           className={`relative flex-shrink-0 px-6 py-2 rounded-full text-[14px] font-semibold transition-colors ${
             !activeCategory
-              ? "bg-black text-white"
-              : "bg-[#F5F5F5] text-[#666] hover:bg-[#EEE]"
+              ? "bg-primary text-white"
+              : "bg-[#F9FAFB] border border-border text-text-secondary hover:bg-[#F5F5F5]"
           } ${lang === "ur" ? "font-urdu" : ""}`}
         >
           {lang === "ur" ? "تمام" : "All"}
-          <span className={`text-[10px] ml-2 ${!activeCategory ? "bg-white/20 text-white" : "bg-[#F0F0F0] text-[#666]"} px-1.5 rounded-full`}>
+          <span className={`text-[10px] ml-2 ${!activeCategory ? "bg-white/20 text-white" : "bg-[#F5F5F5] text-text-secondary"} px-1.5 rounded-full`}>
             {totalDishes}
           </span>
         </button>
@@ -57,12 +57,12 @@ export function CategoryTabs({ categories, activeCategory, onSelect }: Props) {
               onClick={() => onSelect(isActive ? null : cat.id)}
               className={`relative flex-shrink-0 px-6 py-2 rounded-full text-[14px] font-semibold transition-colors ${
                 isActive
-                  ? "bg-black text-white"
-                  : "bg-[#F5F5F5] text-[#666] hover:bg-[#EEE]"
+                  ? "bg-primary text-white"
+                  : "bg-[#F9FAFB] border border-border text-text-secondary hover:bg-[#F5F5F5]"
               } ${lang === "ur" ? "font-urdu" : ""}`}
             >
               {label}
-              <span className={`text-[10px] ml-2 ${isActive ? "bg-white/20 text-white" : "bg-[#F0F0F0] text-[#666]"} px-1.5 rounded-full`}>
+              <span className={`text-[10px] ml-2 ${isActive ? "bg-white/20 text-white" : "bg-[#F5F5F5] text-text-secondary"} px-1.5 rounded-full`}>
                 {count}
               </span>
             </button>

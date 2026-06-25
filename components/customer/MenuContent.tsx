@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import { CategoryTabs } from "./CategoryTabs"
 import { DishGrid } from "./DishGrid"
-import { CartBar } from "./CartBar"
 import { useCartStore } from "@/stores/cartStore"
 import { Search, X } from "lucide-react"
 import { useI18n } from "@/lib/i18n/context"
@@ -13,9 +12,11 @@ interface Props {
   categories: (Category & { dishes: Dish[] })[]
   restaurantId: string
   restaurantName: string
+  deliveryFee?: number
+  restaurantSlug?: string
 }
 
-export function MenuContent({ categories, restaurantId, restaurantName }: Props) {
+export function MenuContent({ categories, restaurantId, restaurantName, deliveryFee, restaurantSlug }: Props) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [searchInput, setSearchInput] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
@@ -29,8 +30,8 @@ export function MenuContent({ categories, restaurantId, restaurantName }: Props)
     if (currentRestaurantId && currentRestaurantId !== restaurantId) {
       clearCart()
     }
-    setRestaurant(restaurantId, restaurantName)
-  }, [restaurantId, restaurantName])
+    setRestaurant(restaurantId, restaurantName, restaurantSlug ?? '', deliveryFee ?? 0)
+  }, [restaurantId, restaurantName, restaurantSlug, deliveryFee])
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -72,32 +73,32 @@ export function MenuContent({ categories, restaurantId, restaurantName }: Props)
         <div className="pt-4 pb-0">
           <div className="flex gap-3">
             <div className="relative flex-1 group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#555] group-focus-within:text-black transition-colors" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted group-focus-within:text-primary transition-colors" />
               <input
                 ref={searchRef}
                 type="text"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder={t("customer.searchDishes")}
-                className="w-full bg-[#F9FAFB] border border-[#F0F0F0] rounded-xl py-3 pl-12 pr-4 text-[14px] text-black placeholder:text-[#999] focus:outline-none focus:border-black transition-all"
+                className="w-full bg-[#F9FAFB] border border-border rounded-xl py-3 pl-12 pr-4 text-[14px] text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary transition-all"
               />
               {searchInput && (
                 <button
                   onClick={handleClearSearch}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#DDD] flex items-center justify-center hover:bg-[#CCC] transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#F5F5F5] flex items-center justify-center hover:bg-[#E8E8E8] transition-colors"
                   aria-label="Clear search"
                 >
-                  <X className="w-3 h-3 text-[#555]" />
+                  <X className="w-3 h-3 text-primary" />
                 </button>
               )}
             </div>
             <button
               onClick={() => setLang(lang === "en" ? "ur" : "en")}
-              className="bg-[#F9FAFB] border border-[#F0F0F0] px-4 rounded-xl flex items-center gap-2 hover:bg-[#F0F0F0] transition-colors text-[14px] font-semibold"
+              className="bg-[#F9FAFB] border border-border px-4 rounded-xl flex items-center gap-2 hover:bg-[#F5F5F5] transition-colors text-[14px] font-semibold"
             >
-              <span className={lang === "en" ? "text-black" : "text-[#555]"}>EN</span>
-              <span className="w-px h-4 bg-[#F0F0F0]" />
-              <span className={lang === "ur" ? "text-black font-urdu" : "text-[#555]"}>اردو</span>
+              <span className={lang === "en" ? "text-primary" : "text-text-muted"}>EN</span>
+              <span className="w-px h-4 bg-border" />
+              <span className={lang === "ur" ? "text-primary font-urdu" : "text-text-muted"}>اردو</span>
             </button>
           </div>
         </div>
@@ -112,16 +113,14 @@ export function MenuContent({ categories, restaurantId, restaurantName }: Props)
       <div className="mt-4">
         {noResults ? (
           <div className="py-20 text-center">
-            <Search className="w-10 h-10 text-[#CCC] mx-auto mb-4" />
-            <h4 className="text-[16px] font-semibold text-black">No results found</h4>
-            <p className="text-[14px] text-[#555] mt-2">Try searching for something else or browse categories.</p>
+            <Search className="w-10 h-10 text-[#999] mx-auto mb-4" />
+            <h4 className="text-[16px] font-semibold text-text-primary">No results found</h4>
+            <p className="text-[14px] text-text-secondary mt-2">Try searching for something else or browse categories.</p>
           </div>
         ) : (
           <DishGrid categories={searched} />
         )}
       </div>
-
-      <CartBar />
     </div>
   )
 }

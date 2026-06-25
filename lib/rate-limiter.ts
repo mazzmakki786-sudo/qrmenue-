@@ -75,6 +75,10 @@ export async function rateLimit(
       return false
     }
 
+    // NOTE: This inserts a row per request. For high-traffic endpoints,
+    // consider a cleanup job or TTL-based partitioning to prevent unbounded
+    // growth of the rate_limits table. The table uses window_start for
+    // windowed lookups; rows older than the largest window (60s) can be pruned.
     const { error: insertError } = await supabase.from("rate_limits").insert({
       identifier,
       endpoint: "__generic__",

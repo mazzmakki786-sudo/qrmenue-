@@ -17,7 +17,7 @@ const options: { type: OrderType; label: string; desc: string; icon: typeof Uten
 export function OrderTypeSelector({ selected, onSelect }: Props) {
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-3">How would you like to receive it?</h2>
+      <h2 className="text-lg font-bold text-text-primary mb-3">How would you like to receive it?</h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {options.map(({ type, label, desc, icon: Icon }) => (
           <button
@@ -25,8 +25,8 @@ export function OrderTypeSelector({ selected, onSelect }: Props) {
             onClick={() => onSelect(type)}
             className={`flex flex-col items-center gap-1.5 p-3 sm:p-4 rounded-[12px] border transition-all ${
               selected === type
-                ? "border-black bg-black text-white"
-                : "border-[#F0F0F0] bg-white text-[#555] hover:border-[#CCC]"
+                ? "bg-primary text-white border-primary"
+                : "bg-white border-border text-text-secondary hover:border-primary/30 hover:bg-[#FAFAFA]"
             }`}
           >
             <Icon className="w-6 h-6" />

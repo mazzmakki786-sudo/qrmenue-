@@ -4,17 +4,17 @@ const badgeConfig: Record<string, { icon: typeof Flame; label: string; className
   popular: {
     icon: Flame,
     label: "Popular",
-    className: "text-[#25D366] bg-[#25D366]/10",
+    className: "bg-primary/10 text-primary",
   },
   chef_special: {
     icon: ChefHat,
     label: "Chef's Special",
-    className: "text-black bg-black/5",
+    className: "bg-[#F59E0B]/10 text-[#F59E0B]",
   },
   spicy: {
     icon: AlertTriangle,
     label: "Spicy",
-    className: "text-[#DC2626] bg-[#DC2626]/10",
+    className: "bg-error/10 text-error",
   },
 }
 

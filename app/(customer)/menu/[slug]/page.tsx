@@ -179,6 +179,8 @@ export default async function MenuPage({ params }: Props) {
           categories={categories}
           restaurantId={restaurant.id}
           restaurantName={restaurant.name}
+          restaurantSlug={restaurant.slug}
+          deliveryFee={restaurant.delivery_fee ?? 0}
         />
         <MenuFooter branding={branding} />
         </div>

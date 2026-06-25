@@ -227,6 +227,16 @@ CREATE TRIGGER refresh_daily_stats_trigger
   AFTER INSERT OR UPDATE OF order_status ON orders
   FOR EACH STATEMENT EXECUTE FUNCTION refresh_daily_stats();
 
+-- RPC-callable wrapper for Vercel cron (refresh_daily_stats is RETURNS trigger)
+CREATE OR REPLACE FUNCTION refresh_daily_stats_cron()
+RETURNS void
+LANGUAGE plpgsql
+AS $func$
+BEGIN
+  REFRESH MATERIALIZED VIEW CONCURRENTLY daily_order_stats;
+END;
+$func$;
+
 -- ============================================
 -- TRIGGERS: auto updated_at
 -- ============================================
@@ -260,9 +270,18 @@ CREATE POLICY "Public can view dish-images"
   ON storage.objects FOR SELECT
   USING (bucket_id = 'dish-images');
 
-CREATE POLICY "Authenticated users can upload to dish-images"
+-- Replace the permissive policy with ownership-checked one
+DROP POLICY IF EXISTS "Authenticated users can upload to dish-images" ON storage.objects;
+
+CREATE POLICY "Restaurant owners can upload dish images"
   ON storage.objects FOR INSERT
-  WITH CHECK (bucket_id = 'dish-images' AND auth.role() = 'authenticated');
+  WITH CHECK (
+    bucket_id = 'dish-images' AND
+    (auth.uid() IN (
+      SELECT owner_id FROM public.restaurants
+      WHERE id::text = (storage.foldername(name))[1]
+    ))
+  );
 
 CREATE POLICY "Owners can update/delete own dish-images"
   ON storage.objects FOR ALL
@@ -360,4 +379,26 @@ CREATE POLICY "Customer can update own profile"
 -- REALTIME: enable for orders table
 -- ============================================
 ALTER PUBLICATION supabase_realtime ADD TABLE orders;
+
+-- ============================================
+-- PERFORMANCE INDEXES
+-- ============================================
+CREATE INDEX IF NOT EXISTS idx_rate_limits_lookup
+ON rate_limits(identifier, endpoint, window_start DESC);
+
+CREATE INDEX IF NOT EXISTS idx_rate_limits_created
+ON rate_limits(created_at);
+
+CREATE INDEX IF NOT EXISTS idx_orders_restaurant_date
+ON orders(restaurant_id, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_dishes_restaurant_available
+ON dishes(restaurant_id, is_available);
+
+-- ============================================
+-- NOTE: Consider moving materialized view refresh from trigger to Vercel cron
+-- for better scalability. The trigger-based refresh runs on every order INSERT/UPDATE.
+-- A cron-based approach (app/api/cron/refresh-stats/route.ts) reduces DB load.
+-- To migrate: remove the trigger and schedule a Vercel Cron Job calling the cron endpoint.
+-- ============================================
 

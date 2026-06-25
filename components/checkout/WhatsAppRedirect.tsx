@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
+import { Check } from "lucide-react"
 import { buildWhatsAppURL } from "@/lib/whatsapp"
 
 interface Props {
@@ -30,17 +31,19 @@ export function WhatsAppRedirect({ order, restaurant, customerName, customerPhon
 
   return (
     <div className="text-center space-y-4">
-      <div className="w-16 h-16 rounded-full bg-[#DCFCE7] flex items-center justify-center mx-auto">
-        <span className="text-3xl">✅</span>
+      <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto">
+        <Check className="w-8 h-8 text-accent" />
       </div>
       <h2 className="text-2xl font-bold">Order Placed!</h2>
-      <p className="text-sm text-[#555]">#{order.order_number}</p>
-      <p className="text-sm">WhatsApp message sent to restaurant</p>
+      <p className="text-sm text-text-secondary">
+        Order #<span className="text-primary font-bold">{order.order_number}</span>
+      </p>
+      <p className="text-sm text-text-secondary">WhatsApp message sent to restaurant</p>
       <a
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center justify-center h-12 px-6 rounded-[10px] border border-[#F0F0F0] text-[#111] font-semibold hover:bg-[#F9FAFB] transition-colors"
+        className="inline-flex items-center justify-center h-12 px-6 rounded-[10px] border border-border text-text-secondary font-semibold hover:bg-brand-100 transition-colors"
       >
         Resend WhatsApp Message
       </a>

@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import Link from "next/link"
-import { MapPin, Phone, ArrowLeft, UtensilsCrossed, ImageOff, Truck, Clock, Navigation } from "lucide-react"
+import { MapPin, Phone, ArrowLeft, UtensilsCrossed, Truck, Clock, Navigation } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useCartStore } from "@/stores/cartStore"
 import { CartBar } from "@/components/customer/CartBar"
+import { Card as DishCard } from "@/components/customer/DishGrid"
 import type { Category, Dish } from "@/types"
 
 interface Restaurant {
@@ -33,79 +33,6 @@ interface Props {
   categories: (Category & { dishes: Dish[] })[]
 }
 
-function DishCard({ dish }: { dish: Dish }) {
-  const [imgError, setImgError] = useState(false)
-  const items = useCartStore((s) => s.items)
-  const addItem = useCartStore((s) => s.addItem)
-  const updateQuantity = useCartStore((s) => s.updateQuantity)
-  const cartItem = items.find((item) => item.dish.id === dish.id)
-
-  return (
-    <div className={`flex gap-3 p-3 bg-white rounded-2xl border border-border hover:border-[#E8E8E8] hover:shadow-[0_4px_20px_rgba(217,74,42,0.06)] transition-all ${!dish.is_available ? "opacity-50" : ""}`}>
-      <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded-xl">
-        {dish.image_url && !imgError ? (
-          <Image
-            src={dish.image_url}
-            alt={dish.name_en}
-            fill
-            className="object-cover"
-            sizes="80px"
-            onError={() => setImgError(true)}
-          />
-        ) : (
-          <div className="w-full h-full bg-[#E1E3E4] flex items-center justify-center">
-            <ImageOff className="w-5 h-5 text-[#BBB]" />
-          </div>
-        )}
-        {!dish.is_available && (
-          <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-lg">
-            <span className="text-white text-[9px] font-semibold bg-black/60 px-1.5 py-0.5 rounded-full">Unavailable</span>
-          </div>
-        )}
-      </div>
-      <div className="flex-1 flex flex-col min-w-0">
-        <div className="flex justify-between items-start gap-2">
-          <h4 className="text-[13px] font-semibold text-black line-clamp-1">{dish.name_en}</h4>
-          <span className="text-[13px] font-semibold text-black shrink-0">Rs {dish.price.toLocaleString("en-PK")}</span>
-        </div>
-        {dish.description_en && (
-          <p className="text-[11px] text-[#555] line-clamp-2 mt-0.5">{dish.description_en}</p>
-        )}
-
-        <div className="mt-auto flex justify-end pt-1">
-          {cartItem ? (
-            <div className="flex items-center gap-2 bg-[#F5F5F5] px-2.5 py-1 rounded-full">
-              <button
-                onClick={() => updateQuantity(dish.id, cartItem.quantity - 1)}
-                className="w-6 h-6 flex items-center justify-center text-[14px] text-primary hover:opacity-70"
-                aria-label="Decrease"
-              >
-                −
-              </button>
-              <span className="text-[12px] font-bold min-w-[16px] text-center">{cartItem.quantity}</span>
-              <button
-                onClick={() => addItem(dish)}
-                className="w-6 h-6 flex items-center justify-center text-[14px] text-primary hover:opacity-70"
-                aria-label="Increase"
-              >
-                +
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => addItem(dish)}
-              disabled={!dish.is_available}
-              className="bg-primary text-white rounded-full px-4 py-1.5 text-xs font-semibold hover:bg-primary-hover active:scale-95 transition-all disabled:opacity-50"
-            >
-              + Add
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export function RestaurantDetailClient({ restaurant, categories }: Props) {
   const router = useRouter()
   const [logoError, setLogoError] = useState(false)
@@ -118,14 +45,14 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
     if (currentRestaurantId && currentRestaurantId !== restaurant.id) {
       clearCart()
     }
-    setRestaurant(restaurant.id, restaurant.name, restaurant.delivery_fee ?? 0)
-  }, [restaurant.id, restaurant.name])
+    setRestaurant(restaurant.id, restaurant.name, restaurant.slug, restaurant.delivery_fee ?? 0)
+  }, [restaurant.id, restaurant.name, restaurant.slug])
 
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
       <div
-        className="fixed top-0 left-0 right-0 z-40 bg-white/80"
+        className="fixed top-0 left-0 right-0 z-40 bg-white/80 safe-top"
         style={{ backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}
       >
         <div className="flex items-center justify-between px-4 h-12 max-w-[600px] mx-auto">
@@ -142,7 +69,7 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
       </div>
 
       {/* Content */}
-      <main className="pt-12 pb-24 px-4 max-w-[600px] mx-auto">
+      <main className="pt-12 pb-[100px] px-4 max-w-[600px] mx-auto">
         {/* Hero */}
         <div className="relative w-full h-44 rounded-2xl overflow-hidden mb-4 mt-3">
           {restaurant.logo_url && !logoError ? (
@@ -314,7 +241,7 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
                       <DishCard key={dish.id} dish={dish} />
                     ))}
                     {unavailableDishes.map((dish) => (
-                      <DishCard key={dish.id} dish={dish} />
+                      <DishCard key={dish.id} dish={dish} unavailable />
                     ))}
                   </div>
                 </section>

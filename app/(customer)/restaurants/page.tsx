@@ -23,7 +23,7 @@ export default async function RestaurantsPage() {
   const supabase = await createClient()
   const { data: restaurants } = await supabase
     .from("restaurants")
-    .select("name, slug, description")
+    .select("id, name, slug, city, cuisine_type, logo_url, description, rating, delivery_time_min, delivery_fee, is_open")
     .eq("is_active", true)
     .eq("is_suspended", false)
     .order("name")
@@ -35,10 +35,15 @@ export default async function RestaurantsPage() {
       description: r.description || undefined,
     })) ?? []
 
+  const cities = [...new Set((restaurants ?? []).map((r) => r.city))].sort()
+
   return (
     <>
       <ItemListJsonLd items={items} />
-      <RestaurantsClient />
+      <RestaurantsClient
+        initialRestaurants={restaurants ?? []}
+        initialCities={cities}
+      />
     </>
   )
 }

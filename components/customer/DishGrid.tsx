@@ -35,7 +35,7 @@ export function DishGrid({ categories }: Props) {
 
         return (
           <section key={category.id} id={`cat-${category.id}`}>
-            <h2 className={`text-[20px] font-semibold mb-6 border-l-4 border-black pl-3 ${lang === "ur" ? "font-urdu" : ""}`}>
+            <h2 className={`text-lg font-bold text-text-primary mb-6 border-l-4 border-primary pl-3 ${lang === "ur" ? "font-urdu" : ""}`}>
               {categoryLabel}
             </h2>
             <div className="space-y-4">
@@ -47,7 +47,7 @@ export function DishGrid({ categories }: Props) {
               ))}
             </div>
             {availableDishes.length === 0 && unavailableDishes.length === 0 && (
-              <p className="text-sm text-[#999] py-8 text-center">{lang === "ur" ? "کوئی ڈش نہیں" : "No dishes in this category"}</p>
+              <p className="text-sm text-[#999] py-8 text-center"><span className="text-text-secondary">{lang === "ur" ? "کوئی ڈش نہیں" : "No dishes in this category"}</span></p>
             )}
           </section>
         )
@@ -56,7 +56,7 @@ export function DishGrid({ categories }: Props) {
   )
 }
 
-const Card = React.memo(function Card({ dish, unavailable = false }: { dish: Dish; unavailable?: boolean }) {
+export const Card = React.memo(function Card({ dish, unavailable = false }: { dish: Dish; unavailable?: boolean }) {
   const { lang } = useI18n()
   const [imgError, setImgError] = useState(false)
   const items = useCartStore((s) => s.items)
@@ -72,7 +72,7 @@ const Card = React.memo(function Card({ dish, unavailable = false }: { dish: Dis
   const badges = (dish.tags || []).filter((t) => recognizedTags.includes(t))
 
   return (
-    <div className={`group flex gap-4 p-4 bg-[#F9FAFB] rounded-2xl border border-transparent hover:border-[#F0F0F0] hover:bg-white hover:shadow-[0px_4px_20px_rgba(0,0,0,0.05)] transition-all duration-300 ${unavailable ? "opacity-50" : ""}`}>
+    <div className={`group flex gap-4 p-4 bg-white rounded-2xl border border-border hover:border-[#E8E8E8] hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-all duration-300 ${unavailable ? "opacity-50" : ""}`}>
       {/* Image */}
       <div className="relative w-24 h-24 flex-shrink-0 overflow-hidden rounded-xl">
         {dish.image_url && !imgError ? (
@@ -90,7 +90,7 @@ const Card = React.memo(function Card({ dish, unavailable = false }: { dish: Dis
           </div>
         )}
         {badges.length > 0 && (
-          <div className="absolute top-1 right-1 z-10">
+          <div className="absolute top-1 left-1 z-10">
             <DishBadges tags={badges} />
           </div>
         )}
@@ -105,40 +105,41 @@ const Card = React.memo(function Card({ dish, unavailable = false }: { dish: Dis
       <div className="flex-1 flex flex-col min-w-0">
         <div className="flex justify-between items-start mb-1 gap-2">
           <div className="min-w-0 flex-1">
-            <h3 className={`text-[14px] font-semibold text-black line-clamp-1 ${lang === "ur" ? "font-urdu" : ""}`}>
+            <h3 className={`text-sm font-semibold text-text-primary line-clamp-1 ${lang === "ur" ? "font-urdu" : ""}`}>
               {name}
             </h3>
             {nameSecondary && (
-              <p className={`text-[12px] text-[#555] line-clamp-1 ${lang !== "ur" ? "font-urdu" : ""}`}>
+              <p className={`text-xs text-text-secondary line-clamp-1 ${lang !== "ur" ? "font-urdu" : ""}`}>
                 {nameSecondary}
               </p>
             )}
+
           </div>
-          <span className="text-[14px] font-semibold text-black shrink-0">
+          <span className="text-sm font-bold text-text-primary shrink-0">
             Rs {dish.price.toLocaleString("en-PK")}
           </span>
         </div>
 
         {description && (
-          <p className="text-[12px] text-[#555] line-clamp-2 mb-2">
+          <p className="text-xs text-text-secondary line-clamp-2 mb-2">
             {description}
           </p>
         )}
 
         <div className="mt-auto flex justify-end">
           {cartItem ? (
-            <div className="flex items-center gap-3 bg-[#F0F0F0] px-3 py-1.5 rounded-full">
+            <div className="flex items-center gap-3 bg-[#F5F5F5] rounded-full px-3 py-1.5">
               <button
                 onClick={() => updateQuantity(dish.id, cartItem.quantity - 1)}
-                className="min-h-[32px] min-w-[32px] flex items-center justify-center hover:opacity-70 transition-opacity text-[16px]"
+                className="min-h-[32px] min-w-[32px] flex items-center justify-center hover:opacity-70 transition-opacity text-[16px] text-primary"
                 aria-label="Decrease quantity"
               >
                 −
               </button>
-              <span className="text-[14px] font-bold min-w-[20px] text-center">{cartItem.quantity}</span>
+              <span className="text-[14px] font-bold min-w-[20px] text-center text-text-primary">{cartItem.quantity}</span>
               <button
                 onClick={() => addItem(dish)}
-                className="min-h-[32px] min-w-[32px] flex items-center justify-center hover:opacity-70 transition-opacity text-[16px]"
+                className="min-h-[32px] min-w-[32px] flex items-center justify-center hover:opacity-70 transition-opacity text-[16px] text-primary"
                 aria-label="Increase quantity"
               >
                 +
@@ -148,7 +149,7 @@ const Card = React.memo(function Card({ dish, unavailable = false }: { dish: Dis
             <button
               onClick={() => addItem(dish)}
               disabled={unavailable}
-              className="bg-black text-white px-4 py-1.5 rounded-full text-[12px] font-semibold active:scale-95 transition-all disabled:opacity-50"
+              className="bg-primary text-white rounded-full px-4 py-1.5 text-xs font-semibold hover:bg-primary-hover active:scale-95 transition-all disabled:opacity-50"
             >
               + Add
             </button>

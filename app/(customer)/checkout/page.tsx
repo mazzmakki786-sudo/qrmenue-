@@ -9,8 +9,7 @@ import { OrderTypeSelector } from "@/components/checkout/OrderTypeSelector"
 import { DineInForm } from "@/components/checkout/DineInForm"
 import { TakeawayForm } from "@/components/checkout/TakeawayForm"
 import { DeliveryForm } from "@/components/checkout/DeliveryForm"
-import { Button } from "@/components/ui/button"
-import { ArrowLeft, ChevronDown, ChevronUp, ShoppingBag } from "lucide-react"
+import { ArrowLeft, ChevronDown, ChevronUp, ShoppingBag, AlertCircle } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { formatPrice } from "@/lib/utils"
@@ -38,6 +37,7 @@ export default function CheckoutPage() {
   const items = useCartStore((s) => s.items)
   const getTotalPrice = useCartStore((s) => s.getTotalPrice)
   const restaurantId = useCartStore((s) => s.restaurantId)
+  const restaurantName = useCartStore((s) => s.restaurantName)
   const clearCart = useCartStore((s) => s.clearCart)
   const {
     orderType, customerName, customerPhone, tableNumber,
@@ -147,10 +147,17 @@ export default function CheckoutPage() {
 
   if (items.length === 0 || !restaurantId) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen px-4">
-        <p className="text-lg font-medium mb-2">Your cart is empty</p>
-        <Link href="/restaurants">
-          <Button variant="primary">Browse Menu</Button>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-white px-6">
+        <div className="w-20 h-20 rounded-3xl bg-[#F5F5F5] flex items-center justify-center mb-5">
+          <ShoppingBag className="w-9 h-9 text-black/20" />
+        </div>
+        <h2 className="text-lg font-bold text-text-primary mb-1">Your cart is empty</h2>
+        <p className="text-sm text-text-secondary mb-8 text-center">Add items to get started</p>
+        <Link
+          href="/restaurants"
+          className="bg-primary text-white px-8 py-3 rounded-xl text-sm font-semibold hover:bg-primary-hover active:scale-[0.98] transition-all"
+        >
+          Browse Menu
         </Link>
       </div>
     )
@@ -165,76 +172,106 @@ export default function CheckoutPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-white pb-40">
-      <div className="flex items-center gap-3 px-4 h-14 border-b border-[#F0F0F0]">
-        <Link href="/cart">
-          <ArrowLeft className="w-5 h-5" />
-        </Link>
-        <h1 className="text-lg font-semibold">Your Order</h1>
+    <div className="min-h-screen bg-[#F9FAFB]">
+      {/* Header */}
+      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-border">
+        <div className="flex items-center gap-3 px-4 h-14 max-w-[600px] mx-auto">
+          <Link
+            href="/cart"
+            className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center active:scale-95 transition-transform"
+          >
+            <ArrowLeft className="w-4 h-4 text-text-primary" />
+          </Link>
+          <div>
+            <h1 className="text-[15px] font-bold text-text-primary">Checkout</h1>
+            <p className="text-[11px] text-text-muted">{restaurantName}</p>
+          </div>
+        </div>
       </div>
 
       {/* Step Indicators */}
-      <div className="flex items-center justify-center gap-2 px-4 py-3 border-b border-[#F0F0F0] bg-[#FAFAFA]">
-        {steps.map((step, i) => (
-          <React.Fragment key={step.label}>
-            <div className="flex items-center gap-1.5">
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold ${
-                step.done ? "bg-black text-white" : "bg-[#E8E8E8] text-[#999]"
-              }`}>
-                {i + 1}
+      <div className="bg-white border-b border-border">
+        <div className="flex items-center justify-center gap-2 px-4 py-3 max-w-[600px] mx-auto">
+          {steps.map((step, i) => (
+            <React.Fragment key={step.label}>
+              <div className="flex items-center gap-1.5">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold transition-colors ${
+                  step.done ? "bg-primary text-white" : "bg-[#F5F5F5] text-text-muted"
+                }`}>
+                  {i + 1}
+                </div>
+                <span className={`text-xs font-medium ${step.done ? "text-text-primary" : "text-text-muted"}`}>
+                  {step.label}
+                </span>
               </div>
-              <span className={`text-xs font-medium ${step.done ? "text-black" : "text-[#999]"}`}>
-                {step.label}
-              </span>
-            </div>
-            {i < steps.length - 1 && (
-              <div className={`w-6 h-px ${step.done ? "bg-black" : "bg-[#E8E8E8]"}`} />
-            )}
-          </React.Fragment>
-        ))}
+              {i < steps.length - 1 && (
+                <div className={`w-8 h-px ${step.done ? "bg-primary" : "bg-border"}`} />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
       </div>
 
       {/* Order Summary Collapsible */}
-      <button
-        onClick={() => setShowSummary(!showSummary)}
-        className="w-full flex items-center justify-between px-4 py-3 border-b border-[#F0F0F0] bg-[#F9FAFB]"
-      >
-        <div className="flex items-center gap-2">
-          <ShoppingBag className="w-4 h-4 text-[#555]" />
-          <span className="text-sm font-medium">{totalItems} items — {formatPrice(getTotalPrice())}</span>
-        </div>
-        {showSummary ? <ChevronUp className="w-4 h-4 text-[#999]" /> : <ChevronDown className="w-4 h-4 text-[#999]" />}
-      </button>
-      {showSummary && (
-        <div className="px-4 py-3 border-b border-[#F0F0F0] space-y-2 bg-white">
-          {items.map((item) => (
-            <div key={item.dish.id} className="flex items-center gap-3">
-              <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-[#F5F5F5]">
-                {item.dish.image_url ? (
-                  <Image src={item.dish.image_url} alt={item.dish.name_en} fill className="object-cover" sizes="40px" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <ShoppingBag className="w-4 h-4 text-[#CCC]" />
-                  </div>
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium truncate">{item.dish.name_en}</p>
-                <p className="text-[11px] text-[#999]">{item.quantity}x {formatPrice(item.dish.price)}</p>
-              </div>
-              <span className="text-xs font-semibold">{formatPrice(item.dish.price * item.quantity)}</span>
+      <div className="bg-white border-b border-border max-w-[600px] mx-auto">
+        <button
+          onClick={() => setShowSummary(!showSummary)}
+          className="w-full flex items-center justify-between px-4 py-3"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <ShoppingBag className="w-4 h-4 text-primary" />
             </div>
-          ))}
+            <div className="text-left">
+              <p className="text-[13px] font-semibold text-text-primary">{totalItems} item{totalItems !== 1 ? "s" : ""}</p>
+              <p className="text-[11px] text-text-muted">{formatPrice(getTotalPrice())}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 text-[12px] font-medium text-text-muted">
+            <span>{showSummary ? "Hide" : "View"} items</span>
+            {showSummary ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </div>
+        </button>
+        {showSummary && (
+          <div className="px-4 pb-3 space-y-2">
+            {items.map((item) => (
+              <div key={item.dish.id} className="flex items-center gap-3 py-2">
+                <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-[#F9FAFB]">
+                  {item.dish.image_url ? (
+                    <Image src={item.dish.image_url} alt={item.dish.name_en} fill className="object-cover" sizes="40px" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <ShoppingBag className="w-3.5 h-3.5 text-text-muted" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[12px] font-medium text-text-primary truncate">{item.dish.name_en}</p>
+                  <p className="text-[11px] text-text-muted">{item.quantity}x {formatPrice(item.dish.price)}</p>
+                </div>
+                <span className="text-[12px] font-semibold text-text-primary">{formatPrice(item.dish.price * item.quantity)}</span>
+              </div>
+            ))}
+            <div className="pt-2 border-t border-border flex items-center justify-between">
+              <span className="text-[13px] font-bold text-text-primary">Total</span>
+              <span className="text-[14px] font-bold text-text-primary">{formatPrice(getTotalPrice())}</span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Main Content */}
+      <div className="px-4 py-5 space-y-5 max-w-[600px] mx-auto">
+        {/* Order Type */}
+        <div className="bg-white rounded-2xl p-5 border border-border">
+          <OrderTypeSelector selected={orderType} onSelect={setOrderType} />
         </div>
-      )}
 
-      <div className="px-4 py-6 space-y-8">
-        <OrderTypeSelector selected={orderType} onSelect={setOrderType} />
-
+        {/* Forms */}
         {orderType && (
-          <div>
+          <div className="space-y-1">
             {orderType === "dine_in" && (
-              <div className="space-y-1">
+              <>
                 <DineInForm
                   name={customerName}
                   phone={customerPhone}
@@ -243,25 +280,25 @@ export default function CheckoutPage() {
                   onPhoneChange={setCustomerPhone}
                   onTableChange={setTableNumber}
                 />
-                {fieldErrors.name && <p className="text-xs text-[#DC2626] mt-1">{fieldErrors.name}</p>}
-                {fieldErrors.phone && <p className="text-xs text-[#DC2626] mt-1">{fieldErrors.phone}</p>}
-                {fieldErrors.table && <p className="text-xs text-[#DC2626] mt-1">{fieldErrors.table}</p>}
-              </div>
+                {fieldErrors.name && <FieldError message={fieldErrors.name} />}
+                {fieldErrors.phone && <FieldError message={fieldErrors.phone} />}
+                {fieldErrors.table && <FieldError message={fieldErrors.table} />}
+              </>
             )}
             {orderType === "takeaway" && (
-              <div className="space-y-1">
+              <>
                 <TakeawayForm
                   name={customerName}
                   phone={customerPhone}
                   onNameChange={setCustomerName}
                   onPhoneChange={setCustomerPhone}
                 />
-                {fieldErrors.name && <p className="text-xs text-[#DC2626] mt-1">{fieldErrors.name}</p>}
-                {fieldErrors.phone && <p className="text-xs text-[#DC2626] mt-1">{fieldErrors.phone}</p>}
-              </div>
+                {fieldErrors.name && <FieldError message={fieldErrors.name} />}
+                {fieldErrors.phone && <FieldError message={fieldErrors.phone} />}
+              </>
             )}
             {orderType === "delivery" && (
-              <div className="space-y-1">
+              <>
                 <DeliveryForm
                   name={customerName}
                   phone={customerPhone}
@@ -270,33 +307,34 @@ export default function CheckoutPage() {
                   onPhoneChange={setCustomerPhone}
                   onAddressChange={setDeliveryAddress}
                 />
-                {fieldErrors.name && <p className="text-xs text-[#DC2626] mt-1">{fieldErrors.name}</p>}
-                {fieldErrors.phone && <p className="text-xs text-[#DC2626] mt-1">{fieldErrors.phone}</p>}
-                {fieldErrors.address && <p className="text-xs text-[#DC2626] mt-1">{fieldErrors.address}</p>}
-              </div>
+                {fieldErrors.name && <FieldError message={fieldErrors.name} />}
+                {fieldErrors.phone && <FieldError message={fieldErrors.phone} />}
+                {fieldErrors.address && <FieldError message={fieldErrors.address} />}
+              </>
             )}
           </div>
         )}
 
-        <div>
-          <h3 className="text-sm font-semibold mb-3">Payment Method</h3>
+        {/* Payment Method */}
+        <div className="bg-white rounded-2xl p-5 border border-border">
+          <h3 className="text-[13px] font-semibold text-text-primary mb-3">Payment Method</h3>
           <div className="space-y-2">
             {["cod", "bank_transfer"].map((method) => (
               <button
                 key={method}
                 onClick={() => setPaymentMethod(method as PaymentMethod)}
-                className={`flex items-center gap-3 w-full p-4 rounded-[10px] border transition-colors ${
+                className={`flex items-center gap-3 w-full p-4 rounded-xl border transition-all ${
                   paymentMethod === method
-                    ? "border-black bg-black text-white"
-                    : "border-[#F0F0F0] text-[#555]"
+                    ? "bg-primary text-white border-primary"
+                    : "bg-white border-border text-text-secondary hover:border-primary/30"
                 }`}
               >
-                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                  paymentMethod === method ? "border-white" : "border-[#CCC]"
+                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                  paymentMethod === method ? "border-white" : "border-border"
                 }`}>
                   {paymentMethod === method && <div className="w-2 h-2 rounded-full bg-white" />}
                 </div>
-                <span className="text-sm font-medium">
+                <span className="text-[13px] font-medium">
                   {method === "cod" ? "Cash on Delivery" : "Bank Transfer"}
                 </span>
               </button>
@@ -304,24 +342,43 @@ export default function CheckoutPage() {
           </div>
         </div>
 
+        {/* Error */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-[10px] p-4">
-            <p className="text-sm text-[#DC2626]">{error}</p>
+          <div className="bg-error/10 border border-error/20 rounded-xl p-4 flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 text-error shrink-0 mt-0.5" />
+            <p className="text-[13px] text-error">{error}</p>
           </div>
         )}
       </div>
 
-      <div className="fixed bottom-[60px] left-0 right-0 bg-white border-t border-[#F0F0F0] p-4 z-40">
-        <Button
-          variant="primary"
-          fullWidth
-          size="lg"
-          onClick={handlePlaceOrder}
-          disabled={!orderType || !customerName || localLoading}
-        >
-          {localLoading ? "Placing Order..." : `Place Order — Rs ${getTotalPrice().toLocaleString("en-PK")}`}
-        </Button>
+      {/* Fixed Place Order Button */}
+      <div className="fixed bottom-[60px] left-0 right-0 bg-white border-t border-border p-4 z-40">
+        <div className="max-w-[600px] mx-auto">
+          <button
+            onClick={handlePlaceOrder}
+            disabled={!orderType || !customerName || localLoading}
+            className="w-full h-12 rounded-xl bg-primary text-white font-semibold text-[13px] hover:bg-primary-hover transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99]"
+          >
+            {localLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Placing Order...
+              </span>
+            ) : (
+              `Place Order — ${formatPrice(getTotalPrice())}`
+            )}
+          </button>
+        </div>
       </div>
+    </div>
+  )
+}
+
+function FieldError({ message }: { message: string }) {
+  return (
+    <div className="flex items-center gap-1.5 px-1">
+      <AlertCircle className="w-3 h-3 text-error" />
+      <p className="text-[11px] text-error">{message}</p>
     </div>
   )
 }

@@ -53,6 +53,16 @@ export const useOrderStore = create<OrderFormState>()(
       setError: (error) => set({ error: error }),
       resetForm: () => set({ ...initialFormState, error: null }),
     }),
-    { name: "order-form-storage" }
+    {
+      name: "order-form-storage",
+      partialize: (state) => ({
+        orderType: state.orderType,
+        customerName: state.customerName,
+        customerPhone: state.customerPhone,
+        tableNumber: state.tableNumber,
+        deliveryAddress: state.deliveryAddress,
+        paymentMethod: state.paymentMethod,
+      }),
+    }
   )
 )

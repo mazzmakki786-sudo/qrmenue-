@@ -11,7 +11,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
         <p className="text-[14px] text-[#999] mt-1">{error.message}</p>
         <button
           onClick={reset}
-          className="mt-4 px-5 py-2 bg-black text-white rounded-xl text-[14px] font-medium hover:opacity-90 transition-opacity"
+          className="mt-4 px-5 py-2 bg-primary text-white rounded-xl text-[14px] font-medium hover:opacity-90 transition-opacity"
         >
           Try again
         </button>

@@ -8,6 +8,7 @@ import { checkAndSendOrderLimitAlert } from "@/lib/email/orderLimitAlert"
 import { safeRoute } from "@/lib/api-error"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 import { csrfGuard } from "@/lib/csrf"
+import { buildWhatsAppURL } from "@/lib/whatsapp"
 
 const orderItemSchema = z.object({
   id: z.string(),
@@ -153,46 +154,3 @@ export const POST = safeRoute(async (request) => {
     whatsapp_url: whatsappUrl,
   })
 })
-
-function buildWhatsAppURL(order: {
-  orderNumber: string
-  items: any[]
-  totalPrice: number
-  paymentMethod: string
-  customerName: string
-  customerPhone?: string
-  orderType: string
-  tableNumber?: string
-  deliveryAddress?: string
-  restaurantPhone: string
-}): string {
-  const itemsList = order.items
-    .map((i: any) => `• ${i.name_en} x${i.quantity} — Rs ${i.subtotal}`)
-    .join("\n")
-
-  const locationInfo =
-    order.orderType === "dine_in"
-      ? `Table: ${order.tableNumber}`
-      : order.orderType === "delivery"
-        ? `Address: ${order.deliveryAddress}`
-        : "Takeaway"
-
-  const message = [
-    "New Order — QRMenu.pk",
-    `Order #${order.orderNumber}`,
-    "",
-    "Items:",
-    itemsList,
-    "",
-    `Total: Rs ${order.totalPrice}`,
-    `Payment: ${order.paymentMethod === "cod" ? "Cash on Delivery" : "Bank Transfer"}`,
-    "",
-    `Customer: ${order.customerName}`,
-    `Phone: ${order.customerPhone || "Not provided"}`,
-    locationInfo,
-    `Type: ${order.orderType.replace("_", " ")}`,
-  ].join("\n")
-
-  const phone = (order.restaurantPhone || "").replace(/[^0-9]/g, "")
-  return `https://wa.me/92${phone.slice(1)}?text=${encodeURIComponent(message)}`
-}

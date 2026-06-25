@@ -11,16 +11,20 @@ module.exports = {
         urdu: ["var(--font-urdu)", "serif"],
       },
       colors: {
+        // 60-30-10 Rule:
+        // 60% Dominant — White & Light Grays (backgrounds, spacious areas)
+        // 30% Secondary — Black & Dark (headers, text, primary buttons)
+        // 10% Accent    — Green #25D366 (CTAs, badges, highlights)
         primary: {
-          DEFAULT: "#000000",
+          DEFAULT: "#000000",   // 30% — Black
           hover: "#1A1A1A",
         },
         accent: {
-          DEFAULT: "#25D366",
+          DEFAULT: "#25D366",   // 10% — WhatsApp Green
           hover: "#1DA85C",
         },
         muted: {
-          DEFAULT: "#F9FAFB",
+          DEFAULT: "#F9FAFB",   // 60% — Light gray surfaces
           foreground: "#555555",
         },
         border: {
