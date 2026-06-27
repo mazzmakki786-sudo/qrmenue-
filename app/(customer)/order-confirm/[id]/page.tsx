@@ -221,20 +221,18 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
           </section>
         )}
 
-        {/* WhatsApp + Call Buttons */}
+        {/* WhatsApp + Call Buttons - Compact Pills */}
         {(whatsappUrl || restaurantPhone) && (
-          <div className="flex gap-3">
+          <div className="flex gap-2.5">
             {whatsappUrl && (
-              <section className={`bg-white border border-border rounded-2xl p-4 ${restaurantPhone ? "flex-1" : "w-full"}`}>
+              <div className="flex-1 min-w-0">
                 {whatsappSuccess && (
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-accent" style={{ strokeWidth: 3 }} />
-                      <span className="text-xs font-semibold text-text-primary">WhatsApp opened!</span>
-                    </div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Check className="w-3.5 h-3.5 text-accent" style={{ strokeWidth: 3 }} />
+                    <span className="text-[11px] text-text-secondary">Opened</span>
                     <button
                       onClick={() => { window.open(whatsappUrl, "_blank") }}
-                      className="text-xs font-semibold text-accent hover:underline"
+                      className="text-[11px] text-accent font-semibold ml-auto"
                     >
                       Resend
                     </button>
@@ -242,23 +240,19 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
                 )}
                 <button
                   onClick={() => { window.open(whatsappUrl, "_blank"); setWhatsappSuccess(true) }}
-                  className="w-full bg-accent text-white text-sm font-bold py-3 rounded-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all hover:bg-accent-hover"
+                  className="w-full bg-accent text-white text-[12px] font-bold py-2.5 rounded-xl flex items-center justify-center gap-1.5 active:scale-[0.97] transition-all"
                 >
-                  <MessageCircle className="w-4 h-4" />
+                  <MessageCircle className="w-3.5 h-3.5" />
                   Send on WhatsApp
                 </button>
-              </section>
+              </div>
             )}
             {restaurantPhone && (
               <a
                 href={`tel:${restaurantPhone}`}
-                className={`bg-white border border-border rounded-2xl p-4 flex flex-col items-center justify-center gap-1.5 active:scale-[0.98] transition-all hover:bg-[#FAFAFA] ${whatsappUrl ? "flex-1" : "w-full"}`}
+                className="w-14 h-11 rounded-xl border border-border flex items-center justify-center active:scale-[0.95] transition-all hover:bg-[#FAFAFA]"
               >
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Phone className="w-4 h-4 text-primary" />
-                </div>
-                <span className="text-[11px] font-semibold text-text-primary">Call</span>
-                <span className="text-[9px] text-text-muted">Restaurant</span>
+                <Phone className="w-4 h-4 text-primary" />
               </a>
             )}
           </div>

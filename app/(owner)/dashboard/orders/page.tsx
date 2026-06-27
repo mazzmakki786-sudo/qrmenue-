@@ -193,22 +193,7 @@ export default function OrdersPage() {
         </div>
       </div>
 
-      {/* Order Count Widgets */}
-      {!loading && (
-        <div className="grid grid-cols-4 gap-2">
-          {[
-            { label: "Total", count: orders.length, color: "text-black" },
-            { label: "Pending", count: orders.filter(o => o.order_status === "received").length, color: "text-[#25D366]" },
-            { label: "Ready", count: orders.filter(o => o.order_status === "ready").length, color: "text-purple-600" },
-            { label: "Cancelled", count: orders.filter(o => o.order_status === "cancelled").length, color: "text-[#DC2626]" },
-          ].map((s) => (
-            <div key={s.label} className="bg-white border border-[#F0F0F0] rounded-xl p-3 text-center">
-              <p className={`text-lg font-bold ${s.color}`}>{s.count}</p>
-              <p className="text-[10px] text-[#999] font-medium">{s.label}</p>
-            </div>
-          ))}
-        </div>
-      )}
+
 
       {/* Error State */}
       {error && (

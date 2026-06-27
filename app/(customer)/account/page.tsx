@@ -120,8 +120,13 @@ export default function AccountPage() {
     )
   }
 
-  const activeOrders = orders.filter((o) => o.order_status !== "completed" && o.order_status !== "cancelled")
-  const pastOrders = orders.filter((o) => o.order_status === "completed" || o.order_status === "cancelled")
+  // Group orders by restaurant
+  const ordersByRestaurant = orders.reduce<Record<string, typeof orders>>((acc, order) => {
+    const name = order.restaurants?.name || "Other"
+    if (!acc[name]) acc[name] = []
+    acc[name].push(order)
+    return acc
+  }, {})
 
   return (
     <div className="min-h-screen bg-white">
@@ -133,80 +138,8 @@ export default function AccountPage() {
       </header>
 
       <main className="pt-16 pb-8 px-4 max-w-[600px] mx-auto">
-        <div className="space-y-8 mt-4">
-          {/* Active Orders */}
-          {activeOrders.length > 0 && (
-            <div>
-              <h2 className="text-[12px] font-semibold text-[#999] uppercase tracking-wider mb-3">Active Orders</h2>
-              <div className="space-y-2">
-                {activeOrders.map((order) => (
-                  <Link
-                    key={order.id}
-                    href={`/order-confirm/${order.id}`}
-                    className="block p-4 rounded-xl border border-[#F0F0F0] hover:border-[#DDD] hover:shadow-sm transition-all active:scale-[0.99]"
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <p className="text-sm font-semibold">{order.order_number}</p>
-                        <div className="flex items-center gap-1.5 mt-1">
-                          <Store className="w-3 h-3 text-[#999]" />
-                          <span className="text-xs text-[#999]">{order.restaurants?.name || "Restaurant"}</span>
-                        </div>
-                      </div>
-                      <span className={`text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full ${
-                        order.order_status === "received" ? "bg-[#25D366]/10 text-[#25D366]" :
-                        order.order_status === "ready" ? "bg-purple-100 text-purple-600" :
-                        "bg-gray-100 text-gray-500"
-                      }`}>
-                        {statusLabels[order.order_status] || order.order_status}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs text-[#999]">
-                      <span>{order.items?.length || 0} items &bull; {formatPrice(order.total_price)}</span>
-                      <span>{new Date(order.created_at).toLocaleDateString("en-PK")}</span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Past Orders */}
-          {pastOrders.length > 0 && (
-            <div>
-              <h2 className="text-[12px] font-semibold text-[#999] uppercase tracking-wider mb-3">Past Orders</h2>
-              <div className="space-y-2">
-                {pastOrders.map((order) => (
-                  <Link
-                    key={order.id}
-                    href={`/order-confirm/${order.id}`}
-                    className="block p-4 rounded-xl border border-[#F0F0F0] hover:border-[#DDD] hover:shadow-sm transition-all active:scale-[0.99]"
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <p className="text-sm font-semibold">{order.order_number}</p>
-                        <div className="flex items-center gap-1.5 mt-1">
-                          <Store className="w-3 h-3 text-[#999]" />
-                          <span className="text-xs text-[#999]">{order.restaurants?.name || "Restaurant"}</span>
-                        </div>
-                      </div>
-                      <span className={`text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full ${
-                        order.order_status === "completed" ? "bg-emerald-100 text-emerald-600" : "bg-gray-100 text-gray-500"
-                      }`}>
-                        {statusLabels[order.order_status] || order.order_status}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs text-[#999]">
-                      <span className="font-medium text-[#555]">{formatPrice(order.total_price)}</span>
-                      <span>{new Date(order.created_at).toLocaleDateString("en-PK")}</span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {orders.length === 0 && (
+        <div className="space-y-6 mt-4">
+          {orders.length === 0 ? (
             <div className="text-center py-16">
               <Package className="w-10 h-10 text-[#999] mx-auto mb-3" />
               <p className="text-[#999]">No orders yet</p>
@@ -214,6 +147,45 @@ export default function AccountPage() {
                 <Button variant="primary">Browse Restaurants</Button>
               </Link>
             </div>
+          ) : (
+            Object.entries(ordersByRestaurant).map(([restaurantName, restaurantOrders]) => (
+              <div key={restaurantName}>
+                <div className="flex items-center gap-2 mb-3">
+                  <Store className="w-4 h-4 text-text-muted" />
+                  <h2 className="text-[13px] font-bold text-text-primary">{restaurantName}</h2>
+                  <span className="text-[10px] text-text-muted bg-[#F5F5F5] px-2 py-0.5 rounded-full">{restaurantOrders.length}</span>
+                </div>
+                <div className="space-y-2">
+                  {restaurantOrders.map((order) => (
+                    <Link
+                      key={order.id}
+                      href={`/order-confirm/${order.id}`}
+                      className="block p-3.5 rounded-xl border border-[#F0F0F0] hover:border-[#DDD] hover:shadow-sm transition-all active:scale-[0.99]"
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[13px] font-semibold text-text-primary">#{order.order_number}</span>
+                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                            order.order_status === "received" ? "bg-accent/10 text-accent" :
+                            order.order_status === "ready" ? "bg-purple-100 text-purple-600" :
+                            order.order_status === "completed" ? "bg-emerald-100 text-emerald-600" :
+                            order.order_status === "cancelled" ? "bg-gray-100 text-gray-500" :
+                            "bg-gray-100 text-gray-500"
+                          }`}>
+                            {statusLabels[order.order_status] || order.order_status}
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-text-muted">{new Date(order.created_at).toLocaleDateString("en-PK", { day: "numeric", month: "short" })}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-text-muted">
+                        <span>{order.items?.length || 0} items • {formatPrice(order.total_price)}</span>
+                        <span className="text-[10px] text-text-muted">{order.order_type?.replace("_", " ")}</span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))
           )}
         </div>
       </main>

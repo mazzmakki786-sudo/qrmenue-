@@ -36,7 +36,7 @@ export const POST = safeRoute(async (request) => {
   if (csrfResponse) return csrfResponse
 
   const ip = getClientIp(request)
-  const allowed = await rateLimit(ip, 5, 60)
+  const allowed = await rateLimit(ip, 10, 60)
   if (!allowed) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 })
   }

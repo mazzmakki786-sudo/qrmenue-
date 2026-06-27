@@ -10,7 +10,7 @@ const DEFAULTS: Record<string, RateLimitConfig> = {
   "login": { maxRequests: 10, windowSeconds: 60 },
   "superadmin:write": { maxRequests: 10, windowSeconds: 60 },
   "superadmin:read": { maxRequests: 30, windowSeconds: 60 },
-  "orders:create": { maxRequests: 5, windowSeconds: 60 },
+  "orders:create": { maxRequests: 10, windowSeconds: 60 },
   "orders:update": { maxRequests: 10, windowSeconds: 60 },
   "orders:check": { maxRequests: 15, windowSeconds: 60 },
   "owner:write": { maxRequests: 15, windowSeconds: 60 },
