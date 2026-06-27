@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ShoppingCart, Home, ClipboardList } from "lucide-react"
+import { ShoppingCart, Home, ClipboardList, Heart } from "lucide-react"
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary"
 import { useCartStore } from "@/stores/cartStore"
 
@@ -17,6 +17,7 @@ export default function CustomerLayout({
 
   const nav = [
     { href: "/restaurants", label: "Home", icon: Home, ariaLabel: "Home" },
+    { href: "/favorites", label: "Favs", icon: Heart, ariaLabel: "Favorites" },
     { href: "/cart", label: "Cart", icon: ShoppingCart, ariaLabel: "Cart" },
     { href: "/account", label: "Orders", icon: ClipboardList, ariaLabel: "Orders" },
   ]
