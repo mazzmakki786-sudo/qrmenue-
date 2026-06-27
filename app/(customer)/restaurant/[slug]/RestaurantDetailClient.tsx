@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
+import { createClient } from "@/lib/supabase/client"
+import { uid } from "@/lib/realtime"
 import { MapPin, Phone, ArrowLeft, UtensilsCrossed, Truck, Clock, Navigation } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useCartStore } from "@/stores/cartStore"
@@ -36,9 +38,32 @@ interface Props {
 export function RestaurantDetailClient({ restaurant, categories }: Props) {
   const router = useRouter()
   const [logoError, setLogoError] = useState(false)
+  const [liveIsOpen, setLiveIsOpen] = useState(restaurant.is_open ?? true)
   const setRestaurant = useCartStore((s) => s.setRestaurant)
   const clearCart = useCartStore((s) => s.clearCart)
   const currentRestaurantId = useCartStore((s) => s.restaurantId)
+
+  // Keep liveIsOpen in sync with SSR prop
+  useEffect(() => {
+    setLiveIsOpen(restaurant.is_open ?? true)
+  }, [restaurant.is_open])
+
+  // Realtime sync for is_open
+  useEffect(() => {
+    const supabase = createClient()
+    const channel = supabase
+      .channel(uid(`restaurant-open-${restaurant.id}`))
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "restaurants", filter: `id=eq.${restaurant.id}` },
+        (payload) => {
+          const r = payload.new as any
+          if (r.is_open !== undefined) setLiveIsOpen(r.is_open)
+        }
+      )
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [restaurant.id])
 
   // Set restaurant in cart store on mount
   useEffect(() => {
@@ -121,8 +146,8 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
                     </span>
                   )}
 
-                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${restaurant.is_open !== false ? 'bg-accent/20 text-accent' : 'bg-error/20 text-error'}`}>
-                    {restaurant.is_open !== false ? '● Open' : '● Closed'}
+                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${liveIsOpen ? 'bg-accent/20 text-accent' : 'bg-error/20 text-error'}`}>
+                    {liveIsOpen ? '● Open' : '● Closed'}
                   </span>
                 </div>
               </div>

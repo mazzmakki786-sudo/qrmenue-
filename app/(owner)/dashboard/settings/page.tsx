@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Camera } from "lucide-react"
+import { Camera, Clock, Power } from "lucide-react"
 import type { Restaurant } from "@/types"
 import Image from "next/image"
 
@@ -14,6 +14,13 @@ export default function SettingsPage() {
     name: "", name_ur: "", phone: "", city: "", address: "",
     cuisine_type: "", language: "en",
   })
+  const [timing, setTiming] = useState({
+    opening_time: "09:00",
+    closing_time: "23:00",
+    is_open: true,
+    delivery_fee: 0,
+    delivery_time_min: 30,
+  })
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [logoFile, setLogoFile] = useState<File | null>(null)
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
@@ -22,12 +29,12 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const supabase = createClient()
 
   const fetchRestaurant = async () => {
     setLoading(true)
     setError(null)
     try {
-      const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
@@ -40,13 +47,20 @@ export default function SettingsPage() {
       if (fetchError) throw new Error(fetchError.message)
 
       if (data) {
-        setRestaurant(data)
+        setRestaurant(data as any)
         setForm({
           name: data.name, name_ur: data.name_ur || "",
           phone: data.phone || "", city: data.city,
           address: data.address || "",
           cuisine_type: data.cuisine_type || "",
           language: data.language,
+        })
+        setTiming({
+          opening_time: (data as any).opening_time || "09:00",
+          closing_time: (data as any).closing_time || "23:00",
+          is_open: (data as any).is_open ?? true,
+          delivery_fee: (data as any).delivery_fee ?? 0,
+          delivery_time_min: (data as any).delivery_time_min ?? 30,
         })
         setLogoUrl(data.logo_url)
       }
@@ -66,10 +80,15 @@ export default function SettingsPage() {
     setLogoPreview(URL.createObjectURL(file))
   }
 
+  const handleSaveChanges = async (fields: Record<string, any>) => {
+    if (!restaurant) return
+    await supabase.from("restaurants").update(fields).eq("id", restaurant.id)
+  }
+
   const handleSave = async () => {
     if (!restaurant) return
     setSaving(true)
-    const supabase = createClient()
+    setSaved(false)
 
     let newLogoUrl = logoUrl
 
@@ -90,6 +109,7 @@ export default function SettingsPage() {
 
     await supabase.from("restaurants").update({
       ...form,
+      ...timing,
       logo_url: newLogoUrl,
     }).eq("id", restaurant.id)
 
@@ -101,6 +121,12 @@ export default function SettingsPage() {
     setTimeout(() => setSaved(false), 3000)
   }
 
+  const toggleOpen = () => {
+    const next = !timing.is_open
+    setTiming((p) => ({ ...p, is_open: next }))
+    handleSaveChanges({ is_open: next })
+  }
+
   if (loading) {
     return (
       <div className="max-w-lg mx-auto space-y-4">
@@ -109,15 +135,7 @@ export default function SettingsPage() {
           <div className="h-4 w-48 bg-[#F0F0F0] rounded animate-pulse mt-2" />
         </div>
         <div className="bg-white rounded-2xl border border-[#F0F0F0] p-5 space-y-4">
-          <div className="h-4 w-32 bg-[#F0F0F0] rounded animate-pulse" />
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-[#F0F0F0] animate-pulse" />
-            <div className="space-y-2">
-              <div className="h-4 w-36 bg-[#F0F0F0] rounded animate-pulse" />
-              <div className="h-3 w-24 bg-[#F0F0F0] rounded animate-pulse" />
-            </div>
-          </div>
-          {[...Array(6)].map((_, i) => (
+          {[...Array(8)].map((_, i) => (
             <div key={i} className="h-12 w-full bg-[#F0F0F0] rounded-xl animate-pulse" />
           ))}
         </div>
@@ -143,13 +161,42 @@ export default function SettingsPage() {
     <div className="max-w-lg mx-auto space-y-4">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-black">Profile</h1>
-        <p className="text-sm text-[#555] mt-1">Manage your restaurant profile and preferences</p>
+        <p className="text-sm text-[#555] mt-1">Manage your restaurant profile, timing, and preferences</p>
       </div>
 
+      {/* Open/Closed Toggle Card */}
+      <div className="bg-white rounded-2xl border border-[#F0F0F0] p-5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${timing.is_open ? "bg-[#25D366]/10" : "bg-red-50"}`}>
+              <Power className={`w-5 h-5 ${timing.is_open ? "text-[#25D366]" : "text-[#DC2626]"}`} />
+            </div>
+            <div>
+              <p className="font-semibold text-sm">Restaurant Status</p>
+              <p className={`text-xs ${timing.is_open ? "text-[#25D366]" : "text-[#DC2626]"}`}>
+                {timing.is_open ? "Open — accepting orders" : "Closed — no orders accepted"}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={toggleOpen}
+            className={`relative w-12 h-6 rounded-full transition-colors ${timing.is_open ? "bg-[#25D366]" : "bg-[#CCC]"}`}
+          >
+            <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${timing.is_open ? "translate-x-6" : "translate-x-0.5"}`} />
+          </button>
+        </div>
+        <div className="flex items-center gap-4 mt-4 pt-4 border-t border-[#F0F0F0]">
+          <div className="flex items-center gap-2 text-sm text-[#555]">
+            <Clock className="w-4 h-4" />
+            <span>{timing.opening_time} — {timing.closing_time}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Restaurant Info */}
       <div className="bg-white rounded-2xl border border-[#F0F0F0] p-5 space-y-4">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-black">Restaurant Info</h2>
 
-        {/* Logo Upload */}
         <div className="flex items-center gap-4">
           <div className="relative">
             <div className="w-16 h-16 rounded-full bg-[#F9FAFB] flex items-center justify-center overflow-hidden border border-[#F0F0F0]">
@@ -201,10 +248,52 @@ export default function SettingsPage() {
             <option value="ur">Urdu</option>
           </select>
         </div>
-        <Button onClick={handleSave} disabled={saving}>
-          {saving ? "Saving..." : saved ? "Saved!" : "Save Changes"}
-        </Button>
       </div>
+
+      {/* Operation Timing */}
+      <div className="bg-white rounded-2xl border border-[#F0F0F0] p-5 space-y-4">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-black">Operation Hours</h2>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            label="Opening Time"
+            id="opening_time"
+            type="time"
+            value={timing.opening_time}
+            onChange={(e) => setTiming((p) => ({ ...p, opening_time: e.target.value }))}
+          />
+          <Input
+            label="Closing Time"
+            id="closing_time"
+            type="time"
+            value={timing.closing_time}
+            onChange={(e) => setTiming((p) => ({ ...p, closing_time: e.target.value }))}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            label="Delivery Fee (Rs)"
+            id="delivery_fee"
+            type="number"
+            value={String(timing.delivery_fee)}
+            onChange={(e) => setTiming((p) => ({ ...p, delivery_fee: Number(e.target.value) }))}
+            placeholder="0"
+          />
+          <Input
+            label="Delivery Time (min)"
+            id="delivery_time_min"
+            type="number"
+            value={String(timing.delivery_time_min)}
+            onChange={(e) => setTiming((p) => ({ ...p, delivery_time_min: Number(e.target.value) }))}
+            placeholder="30"
+          />
+        </div>
+      </div>
+
+      <Button onClick={handleSave} disabled={saving} className="w-full">
+        {saving ? "Saving..." : saved ? "Saved!" : "Save Changes"}
+      </Button>
     </div>
   )
 }

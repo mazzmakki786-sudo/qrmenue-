@@ -1,15 +1,15 @@
 "use client"
 
 import { useState } from "react"
-import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { PasswordInput, validatePassword } from "@/components/ui/password-input"
 import Link from "next/link"
+import { ArrowLeft, User } from "lucide-react"
 
 export default function CustomerSignupPage() {
   const router = useRouter()
-  const supabase = createClient()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [name, setName] = useState("")
@@ -21,72 +21,85 @@ export default function CustomerSignupPage() {
     setLoading(true)
     setError(null)
 
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: name } },
-    })
-
-    if (authError) {
-      setError(authError.message)
+    const pwError = validatePassword(password)
+    if (pwError) {
+      setError(pwError)
       setLoading(false)
       return
     }
 
-    if (authData.user) {
-      const { error: insertError } = await supabase.from("customers").insert({
-        id: authData.user.id,
-        name: name || null,
-        email: email || null,
+    try {
+      const res = await fetch("/api/auth/signup/customer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
       })
-      if (insertError) {
-        console.error("Customer insert error:", insertError.message)
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || "Something went wrong. Please try again.")
+        setLoading(false)
+        return
       }
-    }
 
-    setLoading(false)
-
-    if (authData.session) {
-      router.push("/restaurants")
-    } else {
+      setLoading(false)
       router.push("/login?message=Check your email to verify your account")
+    } catch {
+      setError("Something went wrong. Please try again.")
+      setLoading(false)
     }
   }
 
   return (
-    <div className="w-full">
-      <div className="mb-6">
-        <Link href="/signup" className="text-sm text-[#555555] hover:text-black inline-flex items-center gap-1">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+    <div className="w-full flex flex-col items-center">
+      <div className="w-full mb-8">
+        <Link href="/signup" className="inline-flex items-center gap-1.5 text-sm text-[#555] hover:text-black transition-colors">
+          <ArrowLeft className="w-4 h-4" />
           Back
         </Link>
       </div>
-      <div className="text-center mb-8">
-        <div className="w-12 h-12 rounded-xl bg-black text-white flex items-center justify-center mx-auto mb-4">
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-          </svg>
+
+      <div className="flex flex-col items-center text-center mb-8">
+        <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center mb-4">
+          <User className="w-6 h-6 text-white" />
         </div>
-        <h1 className="text-2xl font-bold">Create Account</h1>
-        <p className="text-sm text-[#555555] mt-1">Join as a customer to browse and order</p>
+        <h1 className="text-2xl font-bold text-black mb-1">Create Account</h1>
+        <p className="text-sm text-[#555]">Join as a customer to browse and order</p>
       </div>
 
-      <form onSubmit={handleSignup} className="space-y-4">
+      <form onSubmit={handleSignup} className="w-full space-y-4">
         <Input label="Full Name" id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" required />
         <Input label="Email" id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" required />
-        <Input label="Password" id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 6 characters" required minLength={6} />
-        {error && <p className="text-xs text-[#DC2626]">{error}</p>}
+        <PasswordInput
+          label="Password"
+          id="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Create a strong password"
+          required
+          showRequirements
+        />
+
+        {error && (
+          <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3">
+            <p className="text-xs text-[#DC2626]">{error}</p>
+          </div>
+        )}
+
         <Button type="submit" variant="primary" fullWidth disabled={loading}>
           {loading ? "Creating account..." : "Sign Up"}
         </Button>
       </form>
 
-      <p className="text-sm text-[#555555] text-center mt-6">
-        Already have an account?{" "}
-        <Link href="/login" className="text-[#25D366] font-semibold hover:underline">
-          Sign in
+      <div className="flex flex-col items-center gap-3 mt-6 w-full">
+        <Link href="/login" className="text-sm text-[#555] hover:text-black transition-colors">
+          Already have an account? <span className="text-[#25D366] font-semibold">Sign in</span>
         </Link>
-      </p>
+        <Link href="/" className="text-xs text-[#999] hover:text-black transition-colors">
+          Back to home
+        </Link>
+      </div>
     </div>
   )
 }

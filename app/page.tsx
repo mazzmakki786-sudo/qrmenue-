@@ -110,7 +110,7 @@ export default async function LandingPage() {
             QRMenu.pk
           </Link>
           <div className="flex items-center gap-1 max-md:hidden">
-            <Link href="/pricing" className="text-sm text-[#555] font-medium px-3 py-1.5 hover:text-black transition-colors">
+            <Link href="#pricing" className="text-sm text-[#555] font-medium px-3 py-1.5 hover:text-black transition-colors">
               Pricing
             </Link>
             <Link href="#contact" className="text-sm text-[#555] font-medium px-3 py-1.5 hover:text-black transition-colors">
@@ -225,7 +225,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ─── Pricing ─── */}
-      <section className="bg-[#F9FAFB] py-16 md:py-24">
+      <section id="pricing" className="bg-[#F9FAFB] py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-5">
           <div className="text-center mb-12">
             <h2 className="text-2xl md:text-3xl font-bold mb-3">Simple, Transparent Pricing</h2>
@@ -273,14 +273,14 @@ export default async function LandingPage() {
                 </div>
 
                 <Link
-                  href={plan.key === "trial" ? "/signup" : "/signup/restaurant"}
+                  href="/pricing"
                   className={`block w-full py-1 md:py-2.5 rounded-lg md:rounded-xl text-[9px] md:text-sm font-semibold text-center transition-all ${
                     plan.popular
                       ? "bg-white text-black hover:bg-[#F0F0F0]"
                       : "border border-[#F0F0F0] text-[#555] hover:border-black hover:text-black"
                   }`}
                 >
-                  {plan.key === "trial" ? "Start Free Trial" : "Choose Plan"}
+                  {plan.key === "trial" ? "Start Free Trial" : "View Plan"}
                 </Link>
               </div>
             ))}
@@ -384,6 +384,44 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* ─── FAQs ─── */}
+      <section className="py-16 md:py-24">
+        <div className="max-w-3xl mx-auto px-5">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold mb-3">Frequently Asked Questions</h2>
+            <p className="text-sm text-[#888]">Everything you need to know about QRMenu.pk</p>
+          </div>
+          <div className="space-y-3">
+            {[
+              { q: "Is the Free Trial really free?", a: "Yes! No credit card required. You get 7 days with full access to test QRMenu for your restaurant." },
+              { q: "What happens after my Free Trial ends?", a: "Your data is safe. Pick any plan to keep your menu live. If you don't, you have a 3-day grace period before the menu goes offline." },
+              { q: "Can I change plans later?", a: "Yes, upgrade or downgrade anytime. Just contact us on WhatsApp and we'll switch you in minutes." },
+              { q: "How do I pay?", a: "JazzCash, Easypaisa, or bank transfer. After payment, message us on WhatsApp and we'll activate your plan within minutes." },
+              { q: "Is there a commission on orders?", a: "Never. We charge a flat monthly fee. You keep 100% of your revenue." },
+            ].map((faq, i) => (
+              <details
+                key={i}
+                className="group bg-white border border-[#E8E8E8] rounded-xl p-4 md:p-5 open:bg-[#FAFAFA] transition-colors"
+              >
+                <summary className="flex items-center justify-between cursor-pointer font-semibold text-sm md:text-base list-none">
+                  <span>{faq.q}</span>
+                  <span className="text-[#999] group-open:rotate-45 transition-transform text-xl leading-none">+</span>
+                </summary>
+                <p className="mt-3 text-sm text-[#555] leading-relaxed">{faq.a}</p>
+              </details>
+            ))}
+          </div>
+          <div className="text-center mt-6">
+            <p className="text-xs text-[#999]">
+              Still have questions?{" "}
+              <Link href="/pricing" className="text-black underline underline-offset-2 hover:no-underline font-medium">
+                View full pricing page →
+              </Link>
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ─── Contact ─── */}
       <ContactSection settings={settings} />
 
@@ -420,7 +458,7 @@ export default async function LandingPage() {
               <p className="text-xs text-[#999]">Made in Pakistan with 💚</p>
             </div>
             <div className="flex gap-6 text-xs text-[#555]">
-              <Link href="/pricing" className="hover:text-black transition-colors">Pricing</Link>
+              <Link href="#pricing" className="hover:text-black transition-colors">Pricing</Link>
               <Link href="/restaurants" className="hover:text-black transition-colors">Restaurants</Link>
               <Link href="#contact" className="hover:text-black transition-colors">Contact</Link>
             </div>

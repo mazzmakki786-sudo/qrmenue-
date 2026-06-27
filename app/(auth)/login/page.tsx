@@ -1,18 +1,17 @@
 "use client"
 
 import { Suspense, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import Link from "next/link"
-import { User } from "lucide-react"
+import { User, ArrowLeft } from "lucide-react"
 
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectParam = searchParams.get("redirect")
-  const supabase = createClient()
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -20,6 +19,7 @@ function LoginForm() {
   const [loading, setLoading] = useState(false)
 
   const handleGoogleLogin = async () => {
+    const supabase = (await import("@/lib/supabase/client")).createClient()
     const cb = redirectParam
       ? `${location.origin}/auth/callback?redirect=${redirectParam}`
       : `${location.origin}/auth/callback`
@@ -33,28 +33,54 @@ function LoginForm() {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    const { error, data } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) {
-      setError(error.message)
-    } else if (data.user) {
+
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || "Incorrect email or password")
+        setLoading(false)
+        return
+      }
+
       if (redirectParam) {
         router.push(redirectParam)
       } else {
-        const { data: restaurant } = await supabase
-          .from("restaurants")
-          .select("id")
-          .eq("owner_id", data.user.id)
-          .maybeSingle()
-        router.push(restaurant ? "/dashboard" : "/restaurants")
+        const supabase = (await import("@/lib/supabase/client")).createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          const { data: restaurant } = await supabase
+            .from("restaurants")
+            .select("id")
+            .eq("owner_id", user.id)
+            .maybeSingle()
+          router.push(restaurant ? "/dashboard" : "/restaurants")
+        } else {
+          router.push("/restaurants")
+        }
       }
+    } catch {
+      setError("Incorrect email or password")
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   return (
-    <div className="w-full max-w-[400px] mx-auto flex flex-col items-center">
-      {/* Header Icon Box */}
-      <div className="flex flex-col items-center mb-8">
+    <div className="w-full flex flex-col items-center">
+      <div className="w-full mb-8">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-[#555] hover:text-black transition-colors">
+          <ArrowLeft className="w-4 h-4" />
+          Home
+        </Link>
+      </div>
+
+      <div className="flex flex-col items-center text-center mb-8">
         <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center mb-4">
           <User className="w-6 h-6 text-white" />
         </div>
@@ -62,8 +88,7 @@ function LoginForm() {
         <p className="text-sm text-[#555]">Sign in to your account</p>
       </div>
 
-      {/* Google Auth Button */}
-      <Button variant="google" onClick={handleGoogleLogin} className="mb-6">
+      <Button variant="google" onClick={handleGoogleLogin} className="w-full mb-5">
         <svg className="w-[18px] h-[18px] mr-3" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
           <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -73,28 +98,36 @@ function LoginForm() {
         Continue with Google
       </Button>
 
-      {/* Divider */}
-      <div className="relative w-full flex items-center justify-center mb-6">
+      <div className="relative w-full flex items-center justify-center mb-5">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-[#F0F0F0]" />
         </div>
-        <span className="relative px-4 bg-white text-xs text-[#555] uppercase tracking-wider">or</span>
+        <span className="relative px-4 bg-white text-xs text-[#999] uppercase tracking-wider">or</span>
       </div>
 
-      {/* Form */}
       <form onSubmit={handleEmailLogin} className="w-full space-y-4">
         <Input label="Email" id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" required />
-        <Input label="Password" id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="xxxxxxxx" required />
-        {error && <p className="text-xs text-[#DC2626]">{error}</p>}
+        <PasswordInput label="Password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your password" required />
+
+        {error && (
+          <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3">
+            <p className="text-xs text-[#DC2626]">{error}</p>
+          </div>
+        )}
+
         <Button type="submit" variant="primary" fullWidth disabled={loading}>
           {loading ? "Signing in..." : "Sign In"}
         </Button>
       </form>
 
-      <p className="text-sm text-[#555] text-center mt-6">
-        Don't have an account?{" "}
-        <Link href="/signup" className="text-[#25D366] font-semibold hover:underline">Sign up</Link>
-      </p>
+      <div className="flex flex-col items-center gap-3 mt-6 w-full">
+        <Link href="/signup" className="text-sm text-[#555] hover:text-black transition-colors">
+          Don't have an account? <span className="text-[#25D366] font-semibold">Sign up</span>
+        </Link>
+        <Link href="/" className="text-xs text-[#999] hover:text-black transition-colors">
+          Back to home
+        </Link>
+      </div>
     </div>
   )
 }

@@ -1,7 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
+import { createClient } from "@/lib/supabase/client"
+import { uid } from "@/lib/realtime"
 import { MapPin, Clock, Phone } from "lucide-react"
 import type { BrandingConfig } from "@/lib/branding"
 
@@ -18,16 +20,44 @@ interface Props {
   address?: string | null
   phone?: string | null
   openingHours?: Record<string, { open: string; close: string; closed: boolean }> | null
+  isOpen?: boolean
+  openingTime?: string | null
+  closingTime?: string | null
+  restaurantId?: string
 }
 
-export function MenuHeader({ name, nameUr, logoUrl, coverUrl, city, cuisineType, description, lang = "en", branding, address, phone, openingHours }: Props) {
+export function MenuHeader({ name, nameUr, logoUrl, coverUrl, city, cuisineType, description, lang = "en", branding, address, phone, openingHours, isOpen, openingTime, closingTime, restaurantId }: Props) {
   const [logoError, setLogoError] = useState(false)
   const [coverError, setCoverError] = useState(false)
+  const [openStatus, setOpenStatus] = useState(isOpen ?? true)
+  const [openTime, setOpenTime] = useState(openingTime?.slice(0, 5))
+  const [closeTime, setCloseTime] = useState(closingTime?.slice(0, 5))
   const displayName = lang === "ur" && nameUr ? nameUr : name
 
-  const today = new Date().toLocaleDateString("en-US", { weekday: "long" }).toLowerCase()
-  const todayHours = openingHours?.[today]
-  const isOpen = todayHours && !todayHours.closed
+  useEffect(() => {
+    setOpenStatus(isOpen ?? true)
+    setOpenTime(openingTime?.slice(0, 5))
+    setCloseTime(closingTime?.slice(0, 5))
+  }, [isOpen, openingTime, closingTime])
+
+  useEffect(() => {
+    if (!restaurantId) return
+    const supabase = createClient()
+    const channel = supabase
+      .channel(uid(`menu-open-${restaurantId}`))
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "restaurants", filter: `id=eq.${restaurantId}` },
+        (payload) => {
+          const r = payload.new as any
+          if (r.is_open !== undefined) setOpenStatus(r.is_open)
+          if (r.opening_time) setOpenTime(r.opening_time.slice(0, 5))
+          if (r.closing_time) setCloseTime(r.closing_time.slice(0, 5))
+        }
+      )
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [restaurantId])
 
   return (
     <div className="pt-2 pb-6">
@@ -78,37 +108,35 @@ export function MenuHeader({ name, nameUr, logoUrl, coverUrl, city, cuisineType,
               <span className="flex items-center gap-1">
                 <MapPin className="w-4 h-4" /> {city}
               </span>
-              <span className="flex items-center gap-1">
-                <Clock className="w-4 h-4" /> 25-40 min
-              </span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Compact Info Row */}
-      {(address || phone || openingHours) && (
-        <div className="flex flex-wrap items-center gap-3 text-xs text-[#555555] mt-2 mb-1">
-          {address && (
-            <div className="flex items-center gap-1">
-              <MapPin className="w-3.5 h-3.5 text-[#888888]" />
-              <span className="truncate max-w-[150px]">{address}</span>
-            </div>
-          )}
-          {phone && (
-            <div className="flex items-center gap-1">
-              <Phone className="w-3.5 h-3.5 text-[#888888]" />
-              <span>{phone}</span>
-            </div>
-          )}
-          {openingHours && (
-            <div className={`flex items-center gap-1 ${isOpen ? "text-green-600" : "text-red-500"}`}>
-              <Clock className="w-3.5 h-3.5" />
-              <span className="font-medium">{isOpen ? "Open Now" : "Closed"}</span>
-            </div>
+      <div className="flex flex-wrap items-center gap-3 text-xs text-[#555555] mt-2 mb-1">
+        <div className={`flex items-center gap-1 font-medium ${openStatus ? "text-[#25D366]" : "text-[#DC2626]"}`}>
+          <span className={`w-2 h-2 rounded-full ${openStatus ? "bg-[#25D366]" : "bg-[#DC2626]"}`} />
+          <span>{openStatus ? "Open" : "Closed"}</span>
+          {(openTime && closeTime) && (
+            <span className="text-[#888] font-normal">
+              &middot; {openTime} — {closeTime}
+            </span>
           )}
         </div>
-      )}
+        {address && (
+          <div className="flex items-center gap-1">
+            <MapPin className="w-3.5 h-3.5 text-[#888888]" />
+            <span className="truncate max-w-[150px]">{address}</span>
+          </div>
+        )}
+        {phone && (
+          <div className="flex items-center gap-1">
+            <Phone className="w-3.5 h-3.5 text-[#888888]" />
+            <span>{phone}</span>
+          </div>
+        )}
+      </div>
 
       {/* Description */}
       {description && (

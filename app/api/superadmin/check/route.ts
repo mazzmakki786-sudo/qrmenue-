@@ -23,7 +23,6 @@ export const GET = safeRoute(async (request) => {
     return NextResponse.json({
       isSuperAdmin: false,
       locked: true,
-      message: "Account temporarily locked due to multiple failed attempts.",
     })
   }
 

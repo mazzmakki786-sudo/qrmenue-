@@ -23,7 +23,7 @@ export default async function RestaurantsPage() {
   const supabase = await createClient()
   const { data: restaurants } = await supabase
     .from("restaurants")
-    .select("id, name, slug, city, cuisine_type, logo_url, description, rating, delivery_time_min, delivery_fee, is_open")
+    .select("id, name, slug, city, cuisine_type, logo_url, description, delivery_time_min, delivery_fee, is_open")
     .eq("is_active", true)
     .eq("is_suspended", false)
     .order("name")

@@ -6,7 +6,10 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
   public: {
     Tables: {
       announcements: {
@@ -37,6 +40,7 @@ export interface Database {
           target_role?: Database["public"]["Enums"]["user_role"] | null
           title?: string
         }
+        Relationships: []
       }
       categories: {
         Row: {
@@ -63,6 +67,7 @@ export interface Database {
           restaurant_id?: string
           sort_order?: number | null
         }
+        Relationships: []
       }
       classes: {
         Row: {
@@ -83,6 +88,7 @@ export interface Database {
           name?: string
           section?: string | null
         }
+        Relationships: []
       }
       company_settings: {
         Row: {
@@ -103,6 +109,7 @@ export interface Database {
           updated_at?: string | null
           value?: string
         }
+        Relationships: []
       }
       customers: {
         Row: {
@@ -132,6 +139,7 @@ export interface Database {
           name?: string | null
           phone?: string | null
         }
+        Relationships: []
       }
       dishes: {
         Row: {
@@ -182,6 +190,7 @@ export interface Database {
           tags?: Json | null
           updated_at?: string | null
         }
+        Relationships: []
       }
       notification_logs: {
         Row: {
@@ -211,6 +220,7 @@ export interface Database {
           status?: string | null
           type?: string
         }
+        Relationships: []
       }
       orders: {
         Row: {
@@ -273,6 +283,7 @@ export interface Database {
           updated_at?: string | null
           whatsapp_sent?: boolean | null
         }
+        Relationships: []
       }
       owner_audit_log: {
         Row: {
@@ -302,6 +313,7 @@ export interface Database {
           owner_id?: string
           restaurant_id?: string
         }
+        Relationships: []
       }
       owner_notifications: {
         Row: {
@@ -334,6 +346,7 @@ export interface Database {
           title?: string
           type?: string
         }
+        Relationships: []
       }
       parent_students: {
         Row: {
@@ -363,6 +376,67 @@ export interface Database {
           status?: Database["public"]["Enums"]["link_status"]
           student_id?: string
         }
+        Relationships: []
+      }
+      plans: {
+        Row: {
+          analytics: boolean
+          can_have_qr: boolean
+          can_have_whatsapp: boolean
+          created_at: string
+          custom_branding: boolean
+          description: string | null
+          id: string
+          is_active: boolean
+          max_categories: number
+          max_dishes: number
+          max_images: number
+          max_orders: number
+          name: string
+          price_pkr: number
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          analytics?: boolean
+          can_have_qr?: boolean
+          can_have_whatsapp?: boolean
+          created_at?: string
+          custom_branding?: boolean
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          max_categories?: number
+          max_dishes?: number
+          max_images?: number
+          max_orders?: number
+          name: string
+          price_pkr?: number
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          analytics?: boolean
+          can_have_qr?: boolean
+          can_have_whatsapp?: boolean
+          created_at?: string
+          custom_branding?: boolean
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          max_categories?: number
+          max_dishes?: number
+          max_images?: number
+          max_orders?: number
+          name?: string
+          price_pkr?: number
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -401,6 +475,7 @@ export interface Database {
           unique_student_id?: string | null
           updated_at?: string | null
         }
+        Relationships: []
       }
       qr_announcements: {
         Row: {
@@ -430,6 +505,7 @@ export interface Database {
           title?: string
           updated_at?: string | null
         }
+        Relationships: []
       }
       rate_limits: {
         Row: {
@@ -456,6 +532,7 @@ export interface Database {
           request_count?: number
           window_start?: string
         }
+        Relationships: []
       }
       restaurants: {
         Row: {
@@ -466,22 +543,33 @@ export interface Database {
           brand_accent_color: string | null
           brand_primary_color: string | null
           city: string
+          closing_time: string | null
           created_at: string | null
           cuisine_type: string | null
+          delivery_fee: number | null
+          delivery_time_min: number | null
+          description: string | null
           id: string
           image_upload_allowed: boolean | null
           is_active: boolean | null
+          is_open: boolean
           is_suspended: boolean | null
           language: string | null
+          lat: number | null
+          lng: number | null
           logo_url: string | null
           name: string
           name_ur: string | null
+          opening_hours: Json | null
+          opening_time: string | null
           owner_id: string | null
           phone: string | null
           plan: string | null
           plan_end_date: string | null
           plan_limits_override: Json | null
           plan_start_date: string | null
+          rating: number | null
+          review_count: number | null
           slug: string
           trial_end: string | null
           trial_start: string | null
@@ -495,22 +583,33 @@ export interface Database {
           brand_accent_color?: string | null
           brand_primary_color?: string | null
           city: string
+          closing_time?: string | null
           created_at?: string | null
           cuisine_type?: string | null
+          delivery_fee?: number | null
+          delivery_time_min?: number | null
+          description?: string | null
           id?: string
           image_upload_allowed?: boolean | null
           is_active?: boolean | null
+          is_open?: boolean
           is_suspended?: boolean | null
           language?: string | null
+          lat?: number | null
+          lng?: number | null
           logo_url?: string | null
           name: string
           name_ur?: string | null
+          opening_hours?: Json | null
+          opening_time?: string | null
           owner_id?: string | null
           phone?: string | null
           plan?: string | null
           plan_end_date?: string | null
           plan_limits_override?: Json | null
           plan_start_date?: string | null
+          rating?: number | null
+          review_count?: number | null
           slug: string
           trial_end?: string | null
           trial_start?: string | null
@@ -524,27 +623,39 @@ export interface Database {
           brand_accent_color?: string | null
           brand_primary_color?: string | null
           city?: string
+          closing_time?: string | null
           created_at?: string | null
           cuisine_type?: string | null
+          delivery_fee?: number | null
+          delivery_time_min?: number | null
+          description?: string | null
           id?: string
           image_upload_allowed?: boolean | null
           is_active?: boolean | null
+          is_open?: boolean
           is_suspended?: boolean | null
           language?: string | null
+          lat?: number | null
+          lng?: number | null
           logo_url?: string | null
           name?: string
           name_ur?: string | null
+          opening_hours?: Json | null
+          opening_time?: string | null
           owner_id?: string | null
           phone?: string | null
           plan?: string | null
           plan_end_date?: string | null
           plan_limits_override?: Json | null
           plan_start_date?: string | null
+          rating?: number | null
+          review_count?: number | null
           slug?: string
           trial_end?: string | null
           trial_start?: string | null
           updated_at?: string | null
         }
+        Relationships: []
       }
       subjects: {
         Row: {
@@ -565,6 +676,7 @@ export interface Database {
           id?: string
           name?: string
         }
+        Relationships: []
       }
       subscriptions: {
         Row: {
@@ -606,6 +718,7 @@ export interface Database {
           restaurant_id?: string
           start_date?: string | null
         }
+        Relationships: []
       }
       superadmin_audit_log: {
         Row: {
@@ -632,6 +745,7 @@ export interface Database {
           id?: string
           ip_address?: string
         }
+        Relationships: []
       }
       superadmin_login_attempts: {
         Row: {
@@ -658,6 +772,7 @@ export interface Database {
           ip_address?: string
           success?: boolean
         }
+        Relationships: []
       }
     }
     Views: {
@@ -669,9 +784,11 @@ export interface Database {
           total_revenue: number | null
           unique_customers: number | null
         }
+        Relationships: []
       }
     }
     Functions: {
+      cleanup_rate_limits: { Args: never; Returns: undefined }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
     }
@@ -680,5 +797,118 @@ export interface Database {
       link_status: "pending" | "approved" | "rejected"
       user_role: "superadmin" | "admin" | "teacher" | "student" | "parent"
     }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
 }
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {
+      attendance_status: ["present", "absent", "late", "excused"],
+      link_status: ["pending", "approved", "rejected"],
+      user_role: ["superadmin", "admin", "teacher", "student", "parent"],
+    },
+  },
+} as const

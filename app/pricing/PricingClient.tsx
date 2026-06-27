@@ -1,11 +1,10 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { Check, X, Sparkles, Star, Shield, Zap, Heart } from "lucide-react"
+import { Check, X } from "lucide-react"
 import { useCompanySettings } from "@/lib/hooks/useCompanySettings"
 import { useEffect, useState } from "react"
-import { PLAN_LIMITS, PLAN_PRICES, PLAN_NAMES, DEFAULT_TRIAL_LIMITS, type Plan, getPlanFeatures } from "@/lib/subscription"
+import { PLAN_LIMITS, PLAN_PRICES, PLAN_NAMES, DEFAULT_TRIAL_LIMITS, type Plan } from "@/lib/subscription"
 
 interface DBPlan {
   slug: string
@@ -26,13 +25,20 @@ interface DBPlan {
 
 const planKeys: Plan[] = ["trial", "starter", "growth", "premium"]
 
-function buildPlanData(key: Plan, dbPlan?: DBPlan): {
-  key: Plan; name: string; price: number; badge?: string; badgeColor?: string; features: { label: string; inc: boolean }[]; cta: string; highlight?: boolean
-} {
+interface PlanCard {
+  key: string
+  name: string
+  price: string
+  period: string
+  badge: string | null
+  popular: boolean
+  features: { label: string; inc: boolean }[]
+}
+
+function buildPlanData(key: Plan, dbPlan?: DBPlan): PlanCard {
   const name = dbPlan?.name || PLAN_NAMES[key]
   const price = dbPlan?.price ?? PLAN_PRICES[key]
 
-  // Build features from DB limits if available, otherwise from hardcoded
   const limits = dbPlan?.limits ? {
     maxDishes: dbPlan.limits.maxDishes === -1 ? Infinity : dbPlan.limits.maxDishes,
     maxImages: dbPlan.limits.maxImages === -1 ? Infinity : dbPlan.limits.maxImages,
@@ -41,98 +47,88 @@ function buildPlanData(key: Plan, dbPlan?: DBPlan): {
   } : null
 
   const features: { label: string; inc: boolean }[] = []
-  if (limits) {
-    features.push({ label: `${limits.maxDishes === Infinity ? "Unlimited" : limits.maxDishes} dishes`, inc: true })
-    features.push({ label: `${limits.maxCategories === Infinity ? "Unlimited" : limits.maxCategories} categories`, inc: true })
-    features.push({ label: `${limits.maxOrders === Infinity ? "Unlimited" : limits.maxOrders} orders/mo`, inc: true })
-  } else {
-    features.push(...getPlanFeatures(key).map((f) => ({ label: f, inc: true })))
-  }
 
   if (key === "trial") {
+    features.push(
+      { label: `${limits?.maxDishes ?? DEFAULT_TRIAL_LIMITS.maxDishes} dishes`, inc: true },
+      { label: `${limits?.maxImages ?? 20} dish images`, inc: true },
+      { label: `${limits?.maxOrders ?? DEFAULT_TRIAL_LIMITS.maxOrders} orders`, inc: true },
+      { label: "QR code generation", inc: true },
+      { label: "WhatsApp orders", inc: true },
+      { label: "Analytics dashboard", inc: true },
+    )
     return {
-      key, name, price: 0,
-      badge: `${DEFAULT_TRIAL_LIMITS.trialDurationDays} days`,
-      badgeColor: "bg-[#FEF3C7] text-[#D97706]",
-      features: [
-        ...features,
-        { label: "Analytics dashboard", inc: true },
-      ],
-      cta: "Start Free Trial",
+      key, name, price: "0", period: "7 days",
+      badge: "7 days", popular: false, features,
     }
   }
+
   if (key === "starter") {
+    features.push(
+      { label: `${limits?.maxDishes ?? 30} dishes`, inc: true },
+      { label: `${limits?.maxImages ?? 10} dish images`, inc: true },
+      { label: "Unlimited orders", inc: true },
+      { label: "QR code generation", inc: true },
+      { label: "WhatsApp orders", inc: true },
+      { label: "Analytics dashboard", inc: true },
+    )
     return {
-      key, name, price,
-      features: [
-        ...features,
-        { label: "Analytics dashboard", inc: true },
-      ],
-      cta: `Choose ${name}`,
+      key, name, price: price.toLocaleString(), period: "month",
+      badge: null, popular: false, features,
     }
   }
+
   if (key === "growth") {
+    features.push(
+      { label: `${limits?.maxDishes ?? 50} dishes`, inc: true },
+      { label: `${limits?.maxImages ?? 20} dish images`, inc: true },
+      { label: "Unlimited orders", inc: true },
+      { label: "Priority support", inc: true },
+      { label: "Everything in Starter", inc: true },
+    )
     return {
-      key, name, price,
-      badge: "⭐ Most Popular",
-      badgeColor: "bg-black text-white",
-      features: [
-        ...features,
-        { label: "Priority support", inc: true },
-        { label: "Everything in Starter", inc: true },
-      ],
-      cta: `Choose ${name}`,
-      highlight: true,
+      key, name, price: price.toLocaleString(), period: "month",
+      badge: "Most Popular", popular: true, features,
     }
   }
+
+  features.push(
+    { label: `${limits?.maxDishes ?? 100} dishes`, inc: true },
+    { label: `${limits?.maxImages ?? 100} dish images`, inc: true },
+    { label: "Unlimited orders", inc: true },
+    { label: "Priority support", inc: true },
+    { label: "Everything in Growth", inc: true },
+  )
   return {
-    key, name, price,
-    features: [
-      ...features,
-      { label: "Priority support", inc: true },
-      { label: "Everything in Growth", inc: true },
-    ],
-    cta: `Choose ${name}`,
+    key, name, price: price.toLocaleString(), period: "month",
+    badge: null, popular: false, features,
   }
 }
 
-const faqs = [
-  {
-    q: "Is the Free Trial really free?",
-    a: "Yes! No credit card required. You get 7 days with full access to test QRMenu for your restaurant.",
-  },
-  {
-    q: "What happens after my Free Trial ends?",
-    a: "Your data is safe. Pick any plan to keep your menu live. If you don't, you have a 3-day grace period before the menu goes offline.",
-  },
-  {
-    q: "Can I change plans later?",
-    a: "Yes, upgrade or downgrade anytime. Just contact us on WhatsApp and we'll switch you in minutes.",
-  },
-  {
-    q: "How do I pay?",
-    a: "JazzCash, Easypaisa, or bank transfer. After payment, message us on WhatsApp and we'll activate your plan within minutes.",
-  },
-  {
-    q: "Is there a commission on orders?",
-    a: "Never. We charge a flat monthly fee. You keep 100% of your revenue.",
-  },
+const comparisonFeatures = [
+  { label: "Menu Items", trial: "20", starter: "30", growth: "50", premium: "100" },
+  { label: "Categories", trial: "20", starter: "Unlimited", growth: "Unlimited", premium: "Unlimited" },
+  { label: "Menu Images", trial: "20", starter: "10", growth: "20", premium: "100" },
+  { label: "Orders/mo", trial: "10", starter: "Unlimited", growth: "Unlimited", premium: "Unlimited" },
+  { label: "Custom Branding", trial: false, starter: false, growth: true, premium: true },
+  { label: "WhatsApp Orders", trial: true, starter: true, growth: true, premium: true },
+  { label: "QR Code", trial: true, starter: true, growth: true, premium: true },
+  { label: "Analytics", trial: "Basic", starter: "Basic", growth: "Advanced", premium: "Advanced" },
+  { label: "Priority Support", trial: false, starter: false, growth: false, premium: true },
 ]
 
-export { faqs }
+const faqs = [
+  { q: "Is the Free Trial really free?", a: "Yes! No credit card required. You get 7 days with full access to test QRMenu for your restaurant." },
+  { q: "What happens after my Free Trial ends?", a: "Your data is safe. Pick any plan to keep your menu live. If you don't, you have a 3-day grace period before the menu goes offline." },
+  { q: "Can I change plans later?", a: "Yes, upgrade or downgrade anytime. Just contact us on WhatsApp and we'll switch you in minutes." },
+  { q: "How do I pay?", a: "JazzCash, Easypaisa, or bank transfer. After payment, message us on WhatsApp and we'll activate your plan within minutes." },
+  { q: "Is there a commission on orders?", a: "Never. We charge a flat monthly fee. You keep 100% of your revenue." },
+]
 
 export function PricingClient() {
   const { settings, loading } = useCompanySettings()
-  const [scrolled, setScrolled] = useState(false)
   const [dbPlans, setDbPlans] = useState<DBPlan[]>([])
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 200)
-    window.addEventListener("scroll", onScroll, { passive: true })
-    return () => window.removeEventListener("scroll", onScroll)
-  }, [])
-
-  // Fetch plans from database
   useEffect(() => {
     fetch("/api/plans")
       .then((res) => res.json())
@@ -159,205 +155,202 @@ export function PricingClient() {
       .catch(() => {})
   }, [])
 
-  const plans: ReturnType<typeof buildPlanData>[] = planKeys.map((key) => {
+  const plans: PlanCard[] = planKeys.map((key) => {
     const dbPlan = dbPlans.find((p) => p.slug === key)
     return buildPlanData(key, dbPlan)
   })
 
-  const jazzcash = settings.jazzcash_number || "03001234567"
-  const easypaisa = settings.easypaisa_number || "03001234567"
-  const bankName = settings.bank_name || "Meezan Bank"
-  const accountTitle = settings.account_title || "QRMenu Pakistan"
-  const accountNumber = settings.account_number || "01234567890123"
   const whatsapp = settings.whatsapp_support || "03001234567"
-  const companyEmail = settings.company_email || "support@qrmenu.pk"
-
   const whatsappDigits = whatsapp.replace(/[^0-9]/g, "")
   const whatsappLink = `https://wa.me/${whatsappDigits.startsWith("0") ? "92" + whatsappDigits.slice(1) : whatsappDigits}`
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="flex items-center justify-between px-4 md:px-6 h-14 md:h-16 border-b border-[#F0F0F0] bg-white sticky top-0 z-40">
-        <Link href="/" className="font-bold text-base md:text-lg tracking-tight">
-          QRMenu.pk
-        </Link>
-        <Link href="/signup/restaurant">
-          <Button size="sm" variant="primary">Get Started</Button>
-        </Link>
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-[#F0F0F0]">
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-5 h-14">
+          <Link href="/" className="flex items-center gap-2 font-bold text-base">
+            <div className="w-7 h-7 rounded-lg bg-black text-white flex items-center justify-center text-xs">Q</div>
+            QRMenu.pk
+          </Link>
+          <div className="flex items-center gap-1 max-md:hidden">
+            <Link href="/pricing" className="text-sm text-[#555] font-medium px-3 py-1.5 hover:text-black transition-colors">
+              Pricing
+            </Link>
+            <Link href="/login" className="text-sm text-[#555] font-medium px-3 py-1.5 hover:text-black transition-colors">
+              Sign In
+            </Link>
+            <Link href="/signup" className="text-sm font-medium px-4 py-1.5 rounded-full bg-black text-white hover:bg-[#1A1A1A] transition-colors">
+              Get Started
+            </Link>
+          </div>
+          <div className="flex md:hidden items-center gap-1.5">
+            <Link href="/signup" className="text-sm font-medium px-3 py-1.5 rounded-full bg-black text-white">
+              Get Started
+            </Link>
+          </div>
+        </div>
       </header>
 
-      <section className="px-4 md:px-6 py-12 md:py-20 max-w-6xl mx-auto">
-        <div className="text-center mb-10 md:mb-16">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FEF3C7] text-[#D97706] rounded-full text-xs font-semibold mb-4">
-            <Sparkles className="w-3.5 h-3.5" />
-            7-day free trial — no credit card
-          </div>
-          <h1 className="text-3xl md:text-5xl font-bold mb-3 md:mb-4 tracking-tight">
-            Simple, transparent pricing
-          </h1>
-          <p className="text-[#555] text-base md:text-lg max-w-xl mx-auto">
-            Start free. Upgrade when you&apos;re ready. No commission on orders — ever.
-          </p>
-        </div>
+      {/* Hero */}
+      <section className="max-w-6xl mx-auto px-5 pt-12 md:pt-20 pb-8 md:pb-12 text-center">
+        <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-3 md:mb-4">
+          Simple, Transparent Pricing
+        </h1>
+        <p className="text-sm md:text-base text-[#888] max-w-md mx-auto">
+          No hidden fees. No commission on orders. Cancel anytime.
+        </p>
+      </section>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 mb-12">
+      {/* Plan Cards */}
+      <section className="max-w-6xl mx-auto px-5 pb-16 md:pb-24">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-6">
           {plans.map((plan) => (
             <div
               key={plan.key}
-              className={`rounded-xl md:rounded-2xl border p-2.5 md:p-6 flex flex-col relative transition-all duration-200 ${
-                plan.highlight
-                  ? "border-black bg-gradient-to-br from-white to-[#FAFAFA] shadow-xl sm:scale-[1.02] lg:scale-105"
-                  : "border-[#E8E8E8] bg-white hover:border-[#999] hover:shadow-md"
+              className={`relative rounded-xl md:rounded-2xl border p-2.5 md:p-6 flex flex-col transition-all hover:shadow-lg ${
+                plan.popular
+                  ? "bg-black text-white border-black shadow-xl scale-[1.02] md:scale-105 z-10"
+                  : "bg-white border-[#F0F0F0]"
               }`}
             >
               {plan.badge && (
-                <span
-                  className={`text-[8px] md:text-xs font-semibold px-1.5 md:px-2.5 py-0.5 md:py-1 rounded-full self-start mb-1.5 md:mb-3 ${plan.badgeColor}`}
-                >
-                  {plan.badge}
+                <span className={`absolute -top-2.5 left-1/2 -translate-x-1/2 text-[8px] md:text-[11px] font-bold px-2 md:px-4 py-0.5 md:py-1 rounded-full whitespace-nowrap uppercase tracking-wider ${
+                  plan.popular ? "bg-[#25D366] text-black" : "bg-black text-white"
+                }`}>
+                  {plan.popular ? "MOST POPULAR" : plan.badge}
                 </span>
               )}
-              <h3 className="text-[11px] md:text-xl font-bold">{plan.name}</h3>
-              <div className="mt-1 md:mt-2 mb-2 md:mb-5">
-                <span className="text-sm md:text-4xl font-bold tracking-tight">
-                  PKR {plan.price.toLocaleString()}
-                </span>
-                {plan.price > 0 && (
-                  <span className="text-[9px] md:text-sm text-[#555] ml-0.5 md:ml-1">/mo</span>
-                )}
+              <div className="mb-2 md:mb-6">
+                <h3 className="text-[11px] md:text-lg font-bold">{plan.name}</h3>
+                <div className="mt-0.5 md:mt-2 flex items-baseline gap-0.5 md:gap-1">
+                  <span className="text-sm md:text-3xl font-bold">PKR {plan.price}</span>
+                  <span className={`text-[9px] md:text-sm ${plan.popular ? "text-white/60" : "text-[#888]"}`}>/{plan.period}</span>
+                </div>
               </div>
-              <div className="space-y-1 md:space-y-2.5 flex-1 mb-2 md:mb-5">
-                {plan.features.map((f, i) => (
-                  <div key={i} className="flex items-start gap-1 md:gap-2.5 text-[9px] md:text-sm">
+
+              <div className="flex-1 space-y-1 md:space-y-3 mb-2 md:mb-6">
+                {plan.features.map((f) => (
+                  <div key={f.label} className="flex items-start gap-1 md:gap-2.5 text-[9px] md:text-sm">
                     {f.inc ? (
-                      <Check className="w-2.5 h-2.5 md:w-4 md:h-4 text-[#16A34A] flex-shrink-0 mt-0.5" />
+                      <Check className={`w-2.5 h-2.5 md:w-4 md:h-4 ${plan.popular ? "text-[#25D366]" : "text-[#16A34A]"} flex-shrink-0 mt-0.5`} />
                     ) : (
-                      <X className="w-2.5 h-2.5 md:w-4 md:h-4 text-[#CCC] flex-shrink-0 mt-0.5" />
+                      <X className={`w-2.5 h-2.5 md:w-4 md:h-4 ${plan.popular ? "text-white/30" : "text-[#CCC]"} flex-shrink-0 mt-0.5`} />
                     )}
-                    <span className={f.inc ? "text-[#222]" : "text-[#999]"}>
-                      {f.label}
-                    </span>
+                    <span className={f.inc ? (plan.popular ? "text-white/90" : "") : (plan.popular ? "text-white/40" : "text-[#BBB]")}>{f.label}</span>
                   </div>
                 ))}
               </div>
-              <Link href="/signup/restaurant" className="block">
-                <Button
-                  variant={plan.highlight ? "accent" : "primary"}
-                  fullWidth
-                  size={plan.highlight ? "default" : "sm"}
-                  className="!text-[9px] md:!text-sm !h-7 md:!h-12 !px-2 md:!px-6 !rounded-lg md:!rounded-xl"
-                >
-                  {plan.cta}
-                </Button>
+
+              <Link
+                href={plan.key === "trial" ? "/signup" : "/signup/restaurant"}
+                className={`block w-full py-1 md:py-2.5 rounded-lg md:rounded-xl text-[9px] md:text-sm font-semibold text-center transition-all ${
+                  plan.popular
+                    ? "bg-white text-black hover:bg-[#F0F0F0]"
+                    : "border border-[#F0F0F0] text-[#555] hover:border-black hover:text-black"
+                }`}
+              >
+                {plan.key === "trial" ? "Start Free Trial" : "Choose Plan"}
               </Link>
             </div>
           ))}
         </div>
+      </section>
 
-        {/* Plan Comparison Table */}
-        <section className="max-w-5xl mx-auto mb-12 md:mb-16">
-          <h2 className="text-xl md:text-2xl font-bold text-center mb-6 md:mb-8">
-            Compare All Features
-          </h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b-2 border-[#111111]">
-                  <th className="text-left py-3 pr-4 font-semibold text-[#111111] text-xs md:text-sm">Features</th>
-                  <th className="text-center py-3 px-2 font-medium text-[#555555] text-[10px] md:text-sm">Free Trial</th>
-                  <th className="text-center py-3 px-2 font-medium text-[#555555] text-[10px] md:text-sm">Starter</th>
-                  <th className="text-center py-3 px-2 font-semibold text-[#111111] bg-[#F9FAFB] rounded-t-lg text-[10px] md:text-sm">Growth</th>
-                  <th className="text-center py-3 px-2 font-medium text-[#555555] text-[10px] md:text-sm">Premium</th>
-                </tr>
-              </thead>
-              <tbody className="text-[10px] md:text-sm">
-                {[
-                  { feature: "Menu Items", values: ["20", "30", "50", "100"] },
-                  { feature: "Categories", values: ["20", "Unlimited", "Unlimited", "Unlimited"] },
-                  { feature: "Menu Images", values: ["20", "10", "20", "100"] },
-                  { feature: "Orders/mo", values: ["10", "Unlimited", "Unlimited", "Unlimited"] },
-                  { feature: "Custom Branding", values: [false, false, true, true] },
-                  { feature: "WhatsApp Orders", values: [true, true, true, true] },
-                  { feature: "QR Code", values: [true, true, true, true] },
-                  { feature: "Analytics", values: ["Basic", "Basic", "Advanced", "Advanced"] },
-                  { feature: "Priority Support", values: [false, false, false, true] },
-                ].map((row, i) => (
-                  <tr key={i} className="border-b border-[#E8E8E8] hover:bg-[#FAFAFA] transition-colors">
-                    <td className="py-2.5 md:py-3 pr-4 font-medium text-[#111111] text-[11px] md:text-sm">{row.feature}</td>
-                    {row.values.map((val, j) => (
-                      <td key={j} className={`py-2.5 md:py-3 px-2 text-center text-[10px] md:text-sm ${j === 2 ? "bg-[#F9FAFB]" : ""}`}>
-                        {typeof val === "boolean" ? (
-                          val ? (
-                            <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#16A34A] mx-auto" />
-                          ) : (
-                            <X className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#CCC] mx-auto" />
-                          )
-                        ) : (
-                          <span className={val === "Unlimited" || val === "Advanced" ? "font-semibold text-[#111111]" : "text-[#555555]"}>
-                            {val}
-                          </span>
-                        )}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* Comparison Table */}
+      <section className="py-16 md:py-24 bg-[#F9FAFB]">
+        <div className="max-w-6xl mx-auto px-5">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold mb-3">Compare Plans</h2>
+            <p className="text-sm text-[#888]">All plans include WhatsApp order integration</p>
           </div>
-        </section>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-12 md:mb-16 max-w-3xl mx-auto">
-          <Benefit icon={<Zap className="w-4 h-4" />} text="Setup in 5 minutes" />
-          <Benefit icon={<Shield className="w-4 h-4" />} text="No credit card" />
-          <Benefit icon={<Heart className="w-4 h-4" />} text="No commission" />
-          <Benefit icon={<Star className="w-4 h-4" />} text="Cancel anytime" />
-        </div>
-
-        <div className="bg-[#F8F8F8] rounded-2xl p-5 md:p-8 text-center mb-12 md:mb-16">
-          <h2 className="text-xl md:text-2xl font-bold mb-2">How to pay</h2>
-          <p className="text-sm text-[#555] mb-5 max-w-md mx-auto">
-            Send payment to any account below, then WhatsApp us to activate your plan.
-          </p>
-          {loading ? (
-            <div className="space-y-1 text-sm">
-              <div className="h-4 w-48 bg-[#E8E8E8] rounded animate-pulse mx-auto" />
-              <div className="h-4 w-48 bg-[#E8E8E8] rounded animate-pulse mx-auto" />
+          {/* Mobile */}
+          <div className="md:hidden overflow-x-auto -mx-5 px-5">
+            <div className="min-w-[280px] bg-white rounded-2xl border border-[#E8E8E8] overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-[#F0F0F0]">
+                    <th className="text-left px-4 py-3.5 font-semibold text-[#555] text-xs">Feature</th>
+                    <th className="text-center px-3 py-3.5 font-semibold text-xs">Free Trial</th>
+                    <th className="text-center px-3 py-3.5 font-semibold text-xs bg-[#FAFAFA] text-black">Starter</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {comparisonFeatures.slice(0, 5).map((f, i) => {
+                    const render = (val: boolean | string) => {
+                      if (typeof val === "boolean") {
+                        return val
+                          ? <Check className="w-3.5 h-3.5 text-[#16A34A] mx-auto" />
+                          : <X className="w-3.5 h-3.5 text-[#DDD] mx-auto" />
+                      }
+                      return <span className="font-medium text-[10px]">{val}</span>
+                    }
+                    return (
+                      <tr key={f.label} className={`border-b border-[#F0F0F0] last:border-0 ${i % 2 === 0 ? "bg-white" : "bg-[#FAFAFA]"}`}>
+                        <td className="px-4 py-3 text-[#111] text-[11px]">{f.label}</td>
+                        <td className="px-3 py-3 text-center">{render(f.trial)}</td>
+                        <td className="px-3 py-3 text-center bg-[#FAFAFA]">{render(f.starter)}</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
             </div>
-          ) : (
-            <div className="space-y-1.5 text-sm mb-5">
-              <p>
-                <strong>JazzCash:</strong> {jazzcash} ({accountTitle})
-              </p>
-              <p>
-                <strong>Easypaisa:</strong> {easypaisa}
-              </p>
-              <p>
-                <strong>Bank:</strong> {bankName} — {accountNumber}
-              </p>
-              <p>
-                <strong>Email:</strong>{" "}
-                <a
-                  href={`mailto:${companyEmail}`}
-                  className="text-[#25D366] hover:underline"
-                >
-                  {companyEmail}
-                </a>
-              </p>
-            </div>
-          )}
-          <a
-            href={whatsappLink}
-            target="_blank"
-            rel="noopener"
-            className="inline-block"
-          >
-            <Button variant="accent" size="lg">
-              Contact us on WhatsApp ({whatsapp})
-            </Button>
-          </a>
-        </div>
+          </div>
 
-        <div className="max-w-3xl mx-auto">
+          {/* Desktop */}
+          <div className="hidden md:block overflow-x-auto -mx-5 px-5 md:mx-0 md:px-0">
+            <div className="min-w-[640px] bg-white rounded-2xl border border-[#E8E8E8] overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-[#F0F0F0]">
+                    <th className="text-left px-5 py-4 font-semibold text-[#555]">Feature</th>
+                    <th className="text-center px-4 py-4 font-semibold w-[120px]">Free Trial</th>
+                    <th className="text-center px-4 py-4 font-semibold w-[120px]">Starter</th>
+                    <th className="text-center px-4 py-4 font-semibold w-[120px] bg-[#FAFAFA] text-black">Growth</th>
+                    <th className="text-center px-4 py-4 font-semibold w-[120px]">Premium</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {comparisonFeatures.map((f, i) => {
+                    const render = (val: boolean | string) => {
+                      if (typeof val === "boolean") {
+                        return val
+                          ? <Check className="w-4 h-4 text-[#16A34A] mx-auto" />
+                          : <X className="w-4 h-4 text-[#DDD] mx-auto" />
+                      }
+                      return <span className="font-medium text-xs">{val}</span>
+                    }
+                    return (
+                      <tr key={f.label} className={`border-b border-[#F0F0F0] last:border-0 ${i % 2 === 0 ? "bg-white" : "bg-[#FAFAFA]"}`}>
+                        <td className="px-5 py-3.5 text-[#111] text-xs md:text-sm">{f.label}</td>
+                        <td className="px-4 py-3.5 text-center">{render(f.trial)}</td>
+                        <td className="px-4 py-3.5 text-center">{render(f.starter)}</td>
+                        <td className="px-4 py-3.5 text-center bg-[#FAFAFA]">{render(f.growth)}</td>
+                        <td className="px-4 py-3.5 text-center">{render(f.premium)}</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="text-center mt-6">
+            <p className="text-xs text-[#999]">
+              All plans include free setup and basic support. Need help?{" "}
+              <a href={whatsappLink} target="_blank" rel="noopener" className="text-black underline underline-offset-2 hover:no-underline">
+                Contact us
+              </a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQs */}
+      <section className="py-16 md:py-24">
+        <div className="max-w-3xl mx-auto px-5">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
             Frequently asked questions
           </h2>
@@ -369,44 +362,57 @@ export function PricingClient() {
               >
                 <summary className="flex items-center justify-between cursor-pointer font-semibold text-sm md:text-base list-none">
                   <span>{faq.q}</span>
-                  <span className="text-[#999] group-open:rotate-45 transition-transform text-xl leading-none">
-                    +
-                  </span>
+                  <span className="text-[#999] group-open:rotate-45 transition-transform text-xl leading-none">+</span>
                 </summary>
-                <p className="mt-3 text-sm text-[#555] leading-relaxed">
-                  {faq.a}
-                </p>
+                <p className="mt-3 text-sm text-[#555] leading-relaxed">{faq.a}</p>
               </details>
             ))}
           </div>
         </div>
       </section>
 
-      <footer className="border-t border-[#F0F0F0] px-4 md:px-6 py-8 text-center text-xs text-[#999]">
-        © 2026 QRMenu.pk — Made for restaurants in Pakistan
+      {/* CTA */}
+      <section className="max-w-6xl mx-auto px-5 pb-16 md:pb-24">
+        <div className="bg-black rounded-3xl p-10 md:p-20 text-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#25D366]/10 to-transparent pointer-events-none" />
+          <h2 className="text-2xl md:text-4xl font-bold text-white mb-4 relative z-10">
+            Ready to go digital?
+          </h2>
+          <p className="text-sm md:text-base text-white/70 mb-8 max-w-md mx-auto relative z-10">
+            Join hundreds of restaurants in Pakistan using QRMenu.pk to streamline their ordering process.
+          </p>
+          <div className="relative z-10">
+            <Link
+              href="/signup"
+              className="inline-block px-10 py-3.5 rounded-xl bg-white text-black text-sm font-semibold hover:bg-[#25D366] hover:text-black transition-all"
+            >
+              Start Free Trial — No Credit Card
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-[#F0F0F0]">
+        <div className="max-w-6xl mx-auto px-5 py-10">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex flex-col items-center md:items-start gap-3">
+              <div className="flex items-center gap-2 font-bold text-base">
+                <div className="w-7 h-7 rounded-lg bg-black text-white flex items-center justify-center text-xs">Q</div>
+                QRMenu.pk
+              </div>
+              <p className="text-xs text-[#999]">Made in Pakistan</p>
+            </div>
+            <div className="flex gap-6 text-xs text-[#555]">
+              <Link href="/pricing" className="hover:text-black transition-colors">Pricing</Link>
+              <Link href="/restaurants" className="hover:text-black transition-colors">Restaurants</Link>
+            </div>
+          </div>
+          <div className="text-center mt-6 text-[10px] text-[#BBB]">
+            &copy; 2026 QRMenu.pk. All rights reserved.
+          </div>
+        </div>
       </footer>
-
-      <div
-        className={`fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/95 backdrop-blur border-t border-[#E8E8E8] p-3 transition-transform duration-300 ${
-          scrolled ? "translate-y-0" : "translate-y-full"
-        }`}
-        style={{ paddingBottom: "calc(12px + env(safe-area-inset-bottom))" }}
-      >
-        <Link href="/signup/restaurant" className="block">
-          <Button variant="accent" fullWidth size="lg">
-            Start Free Trial →
-          </Button>
-        </Link>
-      </div>
-    </div>
-  )
-}
-
-function Benefit({ icon, text }: { icon: React.ReactNode; text: string }) {
-  return (
-    <div className="flex items-center justify-center gap-2 text-xs md:text-sm text-[#555]">
-      <span className="text-[#16A34A]">{icon}</span>
-      <span className="font-medium">{text}</span>
     </div>
   )
 }

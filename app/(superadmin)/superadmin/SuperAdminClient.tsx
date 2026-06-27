@@ -34,7 +34,7 @@ function LoginForm({ onLogin, locked }: { onLogin: () => void; locked: boolean }
     const supabase = createClient()
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
     if (signInError) {
-      setError(signInError.message)
+      setError("Incorrect email or password")
     } else {
       onLogin()
     }
@@ -48,24 +48,16 @@ function LoginForm({ onLogin, locked }: { onLogin: () => void; locked: boolean }
           <div className="w-14 h-14 rounded-xl bg-red-50 text-[#DC2626] flex items-center justify-center mx-auto mb-4">
             <Shield className="w-7 h-7" />
           </div>
-          <h1 className="text-xl font-bold mb-2">Access Locked</h1>
+          <h1 className="text-xl font-bold mb-2">Access Denied</h1>
           <p className="text-sm text-[#555] mb-6">
-            Your account has been temporarily locked due to multiple failed login attempts.
-            For security reasons, this cannot be undone automatically.
+            You do not have permission to access this panel.
           </p>
           <div className="bg-[#F9FAFB] rounded-xl p-4 text-left space-y-2 mb-6">
-            <p className="text-xs font-medium text-[#555]">To regain access:</p>
+            <p className="text-xs font-medium text-[#555]">To request access:</p>
             <p className="text-xs text-[#555]">
-              1. Contact us via <strong className="text-black">WhatsApp</strong> at the support number provided during onboarding
-            </p>
-            <p className="text-xs text-[#555]">
-              2. Verify your identity with the recovery email on file
-            </p>
-            <p className="text-xs text-[#555]">
-              3. An administrator will reset your lockout status
+              Contact your system administrator for assistance.
             </p>
           </div>
-          <p className="text-[10px] text-[#999]">This is a security measure to protect the system.</p>
         </div>
       </div>
     )
@@ -106,7 +98,7 @@ function LoginForm({ onLogin, locked }: { onLogin: () => void; locked: boolean }
   )
 }
 
-function AccessDenied({ email, onLogout }: { email: string; onLogout: () => void }) {
+function AccessDenied({ onLogout }: { onLogout: () => void }) {
   return (
     <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="text-center max-w-sm">
@@ -115,7 +107,7 @@ function AccessDenied({ email, onLogout }: { email: string; onLogout: () => void
         </div>
         <h1 className="text-xl font-bold mb-2">Access Denied</h1>
         <p className="text-sm text-[#555] mb-6">
-          <strong>{email}</strong> is not authorized to access the Super Admin panel.
+          You do not have permission to access this panel.
         </p>
         <button onClick={onLogout} className="h-11 px-6 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 transition-opacity">Sign Out & Try Again</button>
       </div>
@@ -293,7 +285,7 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
     router.refresh()
   }} locked={isLocked} />
   if (isLocked) return <LoginForm onLogin={async () => {}} locked={true} />
-  if (!isSuperAdmin) return <AccessDenied email={user.email} onLogout={handleLogout} />
+  if (!isSuperAdmin) return <AccessDenied onLogout={handleLogout} />
 
   return (
     <div className="min-h-screen bg-[#F8F8F8]">

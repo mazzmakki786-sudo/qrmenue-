@@ -7,6 +7,7 @@ export interface RateLimitConfig {
 }
 
 const DEFAULTS: Record<string, RateLimitConfig> = {
+  "login": { maxRequests: 10, windowSeconds: 60 },
   "superadmin:write": { maxRequests: 10, windowSeconds: 60 },
   "superadmin:read": { maxRequests: 30, windowSeconds: 60 },
   "orders:create": { maxRequests: 5, windowSeconds: 60 },

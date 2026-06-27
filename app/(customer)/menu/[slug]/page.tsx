@@ -163,18 +163,22 @@ export default async function MenuPage({ params }: Props) {
         />
         <div className="relative z-10">
           <MenuHeader
-          name={restaurant.name}
-          nameUr={restaurant.name_ur}
-          logoUrl={restaurant.logo_url}
-          coverUrl={null}
-          city={restaurant.city}
-          cuisineType={restaurant.cuisine_type}
-          description={null}
-          branding={branding}
-          address={restaurant.address}
-          phone={restaurant.phone}
-          openingHours={restaurant.opening_hours}
-        />
+            name={restaurant.name}
+            nameUr={restaurant.name_ur}
+            logoUrl={restaurant.logo_url}
+            coverUrl={null}
+            city={restaurant.city}
+            cuisineType={restaurant.cuisine_type}
+            description={null}
+            branding={branding}
+            address={restaurant.address}
+            phone={restaurant.phone}
+            openingHours={restaurant.opening_hours}
+            isOpen={(restaurant as any).is_open}
+            openingTime={(restaurant as any).opening_time}
+            closingTime={(restaurant as any).closing_time}
+            restaurantId={restaurant.id}
+          />
         <MenuContent
           categories={categories}
           restaurantId={restaurant.id}

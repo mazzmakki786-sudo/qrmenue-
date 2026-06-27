@@ -74,9 +74,9 @@ export default function OrderDetailPage() {
         body: JSON.stringify({ order_status: newStatus }),
       })
       if (!res.ok) {
-        const err = await res.json()
-        console.error("Failed to update order status:", err.error)
-        setToast({ show: true, message: `Failed: ${err.error || "Something went wrong"}`, type: "error" })
+        const err = await res.json().catch(() => ({}))
+        console.error("Failed to update order status:", err.error || "unknown")
+        setToast({ show: true, message: "Something went wrong", type: "error" })
         setUpdating(false)
         return
       }
@@ -267,7 +267,7 @@ export default function OrderDetailPage() {
             </a>
           )}
           <Button variant="primary" fullWidth disabled={updating} onClick={() => updateStatus("ready")}>
-            {updating ? "Updating..." : <><Check className="w-4 h-4 mr-2" /> Confirm Order</>}
+            {updating ? "Confirming..." : <><Check className="w-4 h-4 mr-2" /> Confirm Order</>}
           </Button>
           <Button variant="ghost" fullWidth disabled={updating} onClick={() => updateStatus("cancelled")}>
             <X className="w-4 h-4 mr-2" /> Cancel Order

@@ -6,8 +6,8 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { slugify } from "@/lib/utils"
-import { ChevronLeft, Store } from "lucide-react"
+import { PasswordInput, validatePassword } from "@/components/ui/password-input"
+import { ArrowLeft, Store } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 
 export default function RestaurantSignupPage() {
@@ -46,52 +46,70 @@ export default function RestaurantSignupPage() {
     setLoading(true)
     setError(null)
 
-    const slug = `${slugify(form.name)}-${Date.now().toString(36)}`
+    if (!user) {
+      const pwError = validatePassword(form.password)
+      if (pwError) {
+        setError(pwError)
+        setLoading(false)
+        return
+      }
+    }
 
-    let ownerId = user?.id
-
-    if (!ownerId) {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: form.email,
-        password: form.password,
-        options: { data: { full_name: form.name, role: "owner" } },
+    if (user) {
+      // User already signed in via Google — create restaurant directly
+      const slug = `${form.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")}-${Date.now().toString(36)}`
+      const { error: dbError } = await (supabase.from("restaurants") as any).insert({
+        owner_id: user.id,
+        name: form.name,
+        slug,
+        phone: form.phone,
+        city: form.city,
+        plan: "trial",
+        trial_start: new Date().toISOString(),
+        trial_end: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        image_upload_allowed: true,
+        is_active: true,
       })
 
-      if (authError) {
-        setError(authError.message)
+      if (dbError) {
+        setError("Something went wrong. Please try again.")
         setLoading(false)
         return
       }
 
-      ownerId = authData.user?.id
-    }
-
-    if (!ownerId) {
       setLoading(false)
+      router.push("/dashboard/onboarding")
       return
     }
 
-    const { error: dbError } = await (supabase.from("restaurants") as any).insert({
-      owner_id: ownerId,
-      name: form.name,
-      slug,
-      phone: form.phone,
-      city: form.city,
-      plan: "trial",
-      trial_start: new Date().toISOString(),
-      trial_end: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-      image_upload_allowed: true,
-      is_active: true,
-    })
+    // Email/password signup via API
+    try {
+      const res = await fetch("/api/auth/signup/restaurant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          city: form.city,
+          phone: form.phone,
+          email: form.email,
+          password: form.password,
+        }),
+      })
 
-    if (dbError) {
-      setError(dbError.message)
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || "Something went wrong. Please try again.")
+        setLoading(false)
+        return
+      }
+
       setLoading(false)
-      return
+      router.push("/dashboard/onboarding")
+    } catch {
+      setError("Something went wrong. Please try again.")
+      setLoading(false)
     }
-
-    setLoading(false)
-    router.push("/dashboard/onboarding")
   }
 
   const restaurantFields = [
@@ -100,26 +118,19 @@ export default function RestaurantSignupPage() {
     { id: "phone", label: "Phone / WhatsApp *", placeholder: "0300-XXXXXXX", type: "tel" },
   ]
 
-  const authFields = [
-    { id: "email", label: "Email *", placeholder: "owner@restaurant.com", type: "email" },
-    { id: "password", label: "Password *", placeholder: "At least 6 characters", type: "password" },
-  ]
-
   if (checkingAuth) {
-    return <p className="text-center text-[#555555] text-sm py-8">Loading...</p>
+    return <div className="flex items-center justify-center py-12"><p className="text-sm text-[#999]">Loading...</p></div>
   }
 
   return (
-    <div className="w-full max-w-[400px] mx-auto flex flex-col items-center">
-      {/* Header / Back Navigation */}
-      <div className="w-full flex justify-between items-center mb-8">
-        <Link href="/signup" className="group flex items-center gap-1 text-[#555] hover:text-black transition-colors">
-          <ChevronLeft className="w-[18px] h-[18px]" />
-          <span className="text-sm font-semibold">Back</span>
+    <div className="w-full flex flex-col items-center">
+      <div className="w-full mb-8">
+        <Link href="/signup" className="inline-flex items-center gap-1.5 text-sm text-[#555] hover:text-black transition-colors">
+          <ArrowLeft className="w-4 h-4" />
+          Back
         </Link>
       </div>
 
-      {/* Identity Section */}
       <div className="flex flex-col items-center text-center mb-8">
         <div className="w-12 h-12 bg-[#25D366] rounded-xl flex items-center justify-center mb-4">
           <Store className="w-6 h-6 text-white" />
@@ -128,7 +139,6 @@ export default function RestaurantSignupPage() {
         <p className="text-sm text-[#555]">Start your 7-day free trial today</p>
       </div>
 
-      {/* Registration Form */}
       <form onSubmit={handleSubmit} className="w-full space-y-4">
         {restaurantFields.map((f) => (
           <Input
@@ -143,36 +153,50 @@ export default function RestaurantSignupPage() {
           />
         ))}
 
-        {!user && authFields.map((f) => (
-          <Input
-            key={f.id}
-            label={f.label}
-            id={f.id}
-            type={f.type}
-            value={(form as any)[f.id]}
-            onChange={handleChange(f.id)}
-            placeholder={f.placeholder}
-            required
-          />
-        ))}
+        {!user && (
+          <>
+            <Input
+              label="Email *"
+              id="email"
+              type="email"
+              value={form.email}
+              onChange={handleChange("email")}
+              placeholder="owner@restaurant.com"
+              required
+            />
+            <PasswordInput
+              label="Password *"
+              id="password"
+              value={form.password}
+              onChange={handleChange("password")}
+              placeholder="Create a strong password"
+              required
+              showRequirements
+            />
+          </>
+        )}
 
-        {error && <p className="text-xs text-[#DC2626]">{error}</p>}
+        {error && (
+          <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3">
+            <p className="text-xs text-[#DC2626]">{error}</p>
+          </div>
+        )}
 
         <Button type="submit" variant="primary" fullWidth disabled={loading}>
           {loading ? "Creating..." : "Create Restaurant & Start Trial"}
         </Button>
       </form>
 
-      {/* Divider */}
       {!user && (
         <>
-          <div className="w-full flex items-center gap-4 my-6">
-            <div className="flex-1 h-px bg-[#F0F0F0]" />
-            <span className="text-xs text-[#555] uppercase tracking-wider">or</span>
-            <div className="flex-1 h-px bg-[#F0F0F0]" />
+          <div className="relative w-full flex items-center justify-center my-5">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[#F0F0F0]" />
+            </div>
+            <span className="relative px-4 bg-white text-xs text-[#999] uppercase tracking-wider">or</span>
           </div>
 
-          <Button variant="google" onClick={handleGoogleSignup}>
+          <Button variant="google" onClick={handleGoogleSignup} className="w-full">
             <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -190,10 +214,14 @@ export default function RestaurantSignupPage() {
         </p>
       )}
 
-      <p className="text-sm text-[#555] text-center mt-6">
-        Already have an account?{" "}
-        <Link href="/login" className="text-[#25D366] font-semibold hover:underline">Sign in</Link>
-      </p>
+      <div className="flex flex-col items-center gap-3 mt-6 w-full">
+        <Link href="/login" className="text-sm text-[#555] hover:text-black transition-colors">
+          Already have an account? <span className="text-[#25D366] font-semibold">Sign in</span>
+        </Link>
+        <Link href="/" className="text-xs text-[#999] hover:text-black transition-colors">
+          Back to home
+        </Link>
+      </div>
     </div>
   )
 }

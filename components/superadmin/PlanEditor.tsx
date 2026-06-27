@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { PLAN_LIMITS, PLAN_PRICES, PLAN_NAMES, DEFAULT_TRIAL_LIMITS, type Plan, type PlanLimitsPartial, formatLimit } from "@/lib/subscription"
+import { PLAN_LIMITS, PLAN_PRICES, PLAN_NAMES, type Plan, type PlanLimitsPartial, formatLimit } from "@/lib/subscription"
 import { Info } from "lucide-react"
 
 interface Props {
@@ -15,23 +15,49 @@ interface Props {
 
 const plans: Plan[] = ["trial", "starter", "growth", "premium"]
 
+interface DBPlan {
+  slug: string
+  name: string
+  price_pkr: number
+  max_dishes: number
+  max_images: number
+  max_orders: number
+  max_categories: number
+  analytics: boolean
+  custom_branding: boolean
+  can_have_qr: boolean
+  can_have_whatsapp: boolean
+}
+
 export function PlanEditor({ currentPlan, currentTrialEnd, currentOverrides, onSave, onSaveOverrides }: Props) {
   const [plan, setPlan] = useState(currentPlan)
   const [endDate, setEndDate] = useState("")
   const [autoTrialEnd, setAutoTrialEnd] = useState<string>("")
+  const [dbPlans, setDbPlans] = useState<Record<string, DBPlan>>({})
 
   const [overrideDishes, setOverrideDishes] = useState(currentOverrides?.maxDishes?.toString() ?? "")
   const [overrideCategories, setOverrideCategories] = useState(currentOverrides?.maxCategories?.toString() ?? "")
   const [overrideOrders, setOverrideOrders] = useState(currentOverrides?.maxOrders?.toString() ?? "")
 
   useEffect(() => {
+    fetch("/api/superadmin/plans")
+      .then((r) => r.json())
+      .then((data) => {
+        const map: Record<string, DBPlan> = {}
+        for (const p of data.plans || []) {
+          map[p.slug] = p
+        }
+        setDbPlans(map)
+      })
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => {
     if (currentTrialEnd) {
       try {
         const d = new Date(currentTrialEnd).toISOString().slice(0, 10)
         setAutoTrialEnd(d)
-      } catch {
-        // ignore
-      }
+      } catch {}
     }
   }, [currentTrialEnd])
 
@@ -43,15 +69,37 @@ export function PlanEditor({ currentPlan, currentTrialEnd, currentOverrides, onS
 
   const handlePlanChange = (next: string) => {
     setPlan(next)
-    if (next === "trial" && !endDate) {
-      const today = new Date()
-      today.setDate(today.getDate() + 7)
-      setEndDate(today.toISOString().slice(0, 10))
-    }
   }
 
-  const limits = PLAN_LIMITS[plan as Plan]
-  const price = PLAN_PRICES[plan as Plan]
+  const getLimits = (slug: Plan) => {
+    const db = dbPlans[slug]
+    if (db) {
+      return {
+        maxDishes: db.max_dishes === -1 ? Infinity : db.max_dishes,
+        maxImages: db.max_images === -1 ? Infinity : db.max_images,
+        maxOrders: db.max_orders === -1 ? Infinity : db.max_orders,
+        maxCategories: db.max_categories === -1 ? Infinity : db.max_categories,
+        analytics: db.analytics,
+        customBranding: db.custom_branding,
+        canHaveQR: db.can_have_qr,
+        canHaveWhatsapp: db.can_have_whatsapp,
+      }
+    }
+    return PLAN_LIMITS[slug]
+  }
+
+  const getPrice = (slug: Plan) => {
+    const db = dbPlans[slug]
+    return db ? db.price_pkr : PLAN_PRICES[slug]
+  }
+
+  const getName = (slug: Plan) => {
+    const db = dbPlans[slug]
+    return db ? db.name : PLAN_NAMES[slug]
+  }
+
+  const limits = getLimits(plan as Plan)
+  const price = getPrice(plan as Plan)
 
   const handleSaveOverrides = () => {
     if (!onSaveOverrides) return
@@ -78,11 +126,15 @@ export function PlanEditor({ currentPlan, currentTrialEnd, currentOverrides, onS
           onChange={(e) => handlePlanChange(e.target.value)}
           className="flex h-12 w-full rounded-[10px] bg-[#F8F8F8] border border-[#E8E8E8] px-4 text-base focus:outline-none focus:border-black transition-colors"
         >
-          {plans.map((p) => (
-            <option key={p} value={p}>
-              {PLAN_NAMES[p]} {p !== "trial" && `(Rs ${PLAN_PRICES[p].toLocaleString()}/mo)`}
-            </option>
-          ))}
+          {plans.map((p) => {
+            const pName = getName(p)
+            const pPrice = getPrice(p)
+            return (
+              <option key={p} value={p}>
+                {pName} {p !== "trial" && `(Rs ${pPrice.toLocaleString()}/mo)`}
+              </option>
+            )
+          })}
         </select>
       </div>
 
@@ -144,7 +196,7 @@ export function PlanEditor({ currentPlan, currentTrialEnd, currentOverrides, onS
 
       <div>
         <label className="block text-sm font-medium mb-1">
-          {plan === "trial" ? "Trial End Date" : "Plan End Date"}
+          {plan === "trial" ? "Trial End Date" : "Plan End Date (optional)"}
         </label>
         <input
           type="date"
@@ -158,7 +210,7 @@ export function PlanEditor({ currentPlan, currentTrialEnd, currentOverrides, onS
           </p>
         )}
       </div>
-      <Button onClick={() => onSave(plan, endDate)} disabled={!endDate}>
+      <Button onClick={() => onSave(plan, endDate)}>
         Save Plan
       </Button>
     </div>

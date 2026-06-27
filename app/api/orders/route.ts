@@ -51,7 +51,7 @@ export const POST = safeRoute(async (request) => {
 
   const { data: restaurant } = await supabase
     .from("restaurants")
-    .select("id, phone, is_active, is_suspended, plan, trial_end")
+    .select("id, phone, is_active, is_suspended, is_open, plan, trial_end")
     .eq("id", parsed.data.restaurant_id)
     .single()
 
@@ -61,6 +61,10 @@ export const POST = safeRoute(async (request) => {
 
   if (restaurant.is_suspended) {
     return NextResponse.json({ error: "Restaurant is suspended. Cannot accept orders." }, { status: 403 })
+  }
+
+  if (!restaurant.is_open) {
+    return NextResponse.json({ error: "Restaurant is currently closed. Please try again later." }, { status: 403 })
   }
 
   if (restaurant.plan === "trial" && restaurant.trial_end) {

@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import { createClient } from "@/lib/supabase/client"
+import { uid } from "@/lib/realtime"
 import Link from "next/link"
-import { Search, X, UtensilsCrossed, Star, Clock, Bike } from "lucide-react"
+import { Search, X, UtensilsCrossed, Clock, Bike } from "lucide-react"
 
 interface RestaurantSummary {
   id: string
@@ -13,8 +14,6 @@ interface RestaurantSummary {
   city: string
   cuisine_type: string | null
   logo_url: string | null
-  description?: string | null
-  rating?: number
   delivery_time_min?: number
   delivery_fee?: number
   is_open?: boolean
@@ -43,8 +42,9 @@ export function RestaurantsClient({ initialRestaurants, initialCities }: Restaur
       const supabase = createClient()
       let query = supabase
         .from("restaurants")
-        .select("id, name, slug, city, cuisine_type, logo_url, description, rating, delivery_time_min, delivery_fee, is_open")
+        .select("id, name, slug, city, cuisine_type, logo_url, delivery_time_min, delivery_fee, is_open, opening_time, closing_time")
         .eq("is_active", true)
+        .eq("is_suspended", false)
 
       if (selectedCity) {
         query = query.eq("city", selectedCity)
@@ -56,6 +56,28 @@ export function RestaurantsClient({ initialRestaurants, initialCities }: Restaur
     }
     fetchRestaurants()
   }, [selectedCity]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const supabase = createClient()
+    const channel = supabase
+      .channel(uid("restaurants-open-status"))
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "restaurants" },
+        (payload) => {
+          const updated = payload.new as any
+          setRestaurants((prev) =>
+            prev.map((r) =>
+              r.id === updated.id
+                ? { ...r, is_open: updated.is_open, opening_time: updated.opening_time, closing_time: updated.closing_time }
+                : r
+            )
+          )
+        }
+      )
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [])
 
   const cities = [...new Set(restaurants.map((r) => r.city))].sort()
   const grouped = cities.reduce<Record<string, RestaurantSummary[]>>((acc, city) => {
@@ -236,12 +258,6 @@ export function RestaurantsClient({ initialRestaurants, initialCities }: Restaur
 
                         {/* Stats row */}
                         <div className="flex items-center gap-3 mt-2 text-[11px] text-text-secondary">
-                          {r.rating != null && (
-                            <span className="flex items-center gap-0.5">
-                              <Star className="w-3 h-3 fill-current text-yellow-500" />
-                              {r.rating.toFixed(1)}
-                            </span>
-                          )}
                           {r.delivery_time_min != null && (
                             <span className="flex items-center gap-0.5">
                               <Clock className="w-3 h-3" />

@@ -30,7 +30,7 @@ export default function CustomerLayout({
         <nav
           role="navigation"
           aria-label="Main navigation"
-          className="fixed bottom-0 left-0 right-0 h-[60px] bg-white border-t border-border flex items-center justify-around z-50 md:max-w-app md:mx-auto md:left-[calc(50%-240px)]"
+          className="fixed bottom-0 left-0 right-0 h-[60px] bg-white border-t border-border flex items-center justify-around z-50"
           style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
         >
           {nav.map((item) => {

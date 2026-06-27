@@ -28,9 +28,11 @@
   updated_at: string
   rating?: number
   review_count?: number
-  delivery_fee?: number
-  delivery_time_min?: number
-  is_open?: boolean
+  is_open: boolean
+  opening_time: string | null
+  closing_time: string | null
+  delivery_fee: number | null
+  delivery_time_min: number | null
   opening_hours?: string
 }
 
