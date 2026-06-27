@@ -3,8 +3,11 @@ import { createAdminClient } from "@/lib/supabase/server"
 export const runtime = "nodejs"
 
 export async function GET(request: Request) {
+  // Auth via header (Bearer token) or query param
   const authHeader = request.headers.get("authorization")
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const { searchParams } = new URL(request.url)
+  const token = searchParams.get("token") || authHeader?.replace("Bearer ", "")
+  if (process.env.CRON_SECRET && token !== process.env.CRON_SECRET) {
     return new Response("Unauthorized", { status: 401 })
   }
 

@@ -29,11 +29,8 @@
   },
   "crons": [
     {
-      "path": "/api/cron/cleanup-orders",
-      "schedule": "0 3 * * *",
-      "headers": {
-        "authorization": "Bearer ${CRON_SECRET}"
-      }
+      "path": "/api/cron/cleanup-orders?token=${CRON_SECRET}",
+      "schedule": "0 3 * * *"
     }
   ]
 }
