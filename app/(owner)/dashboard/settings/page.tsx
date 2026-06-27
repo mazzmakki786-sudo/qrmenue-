@@ -21,6 +21,7 @@ export default function SettingsPage() {
     delivery_fee: 0,
     delivery_time_min: 30,
   })
+  const [retentionDays, setRetentionDays] = useState(30)
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [logoFile, setLogoFile] = useState<File | null>(null)
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
@@ -28,6 +29,8 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [cleaning, setCleaning] = useState(false)
+  const [cleanResult, setCleanResult] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
 
@@ -62,6 +65,7 @@ export default function SettingsPage() {
           delivery_fee: (data as any).delivery_fee ?? 0,
           delivery_time_min: (data as any).delivery_time_min ?? 30,
         })
+        setRetentionDays((data as any).retention_days ?? 30)
         setLogoUrl(data.logo_url)
       }
     } catch (err) {
@@ -110,6 +114,7 @@ export default function SettingsPage() {
     await supabase.from("restaurants").update({
       ...form,
       ...timing,
+      retention_days: retentionDays,
       logo_url: newLogoUrl,
     }).eq("id", restaurant.id)
 
@@ -247,6 +252,59 @@ export default function SettingsPage() {
             <option value="en">English</option>
             <option value="ur">Urdu</option>
           </select>
+        </div>
+      </div>
+
+      {/* Data Retention Settings */}
+      <div className="bg-white rounded-2xl border border-[#F0F0F0] p-5 space-y-4">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-black">Data Retention</h2>
+        <p className="text-[11px] text-[#888]">Orders older than this many days are automatically deleted. You can choose 7–30 days.</p>
+        <div className="flex items-center gap-4">
+          <div className="flex-1">
+            <label htmlFor="retention_days" className="block text-sm font-medium text-black mb-1">Keep orders for</label>
+            <select
+              id="retention_days"
+              value={retentionDays}
+              onChange={(e) => setRetentionDays(Number(e.target.value))}
+              className="flex h-12 w-full rounded-xl bg-[#F8F8F8] border border-[#E8E8E8] px-4 text-base focus:outline-none focus:border-black transition-colors"
+            >
+              {[7, 14, 21, 30].map((days) => (
+                <option key={days} value={days}>{days} days</option>
+              ))}
+            </select>
+          </div>
+          <div className="pt-5">
+            <div className="h-12 flex items-center text-[11px] text-[#888]">
+              {retentionDays === 7 ? "Minimal storage" :
+               retentionDays === 30 ? "Maximum storage" :
+               "Balanced storage"}
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={async () => {
+              if (cleaning) return
+              setCleaning(true)
+              setCleanResult(null)
+              try {
+                const res = await fetch("/api/owner/retention/cleanup", { method: "POST" })
+                const data = await res.json()
+                setCleanResult(data.success ? `Cleaned up! ${data.deleted} old order(s) removed.` : "Cleanup failed.")
+              } catch {
+                setCleanResult("Cleanup request failed.")
+              } finally {
+                setCleaning(false)
+              }
+            }}
+            disabled={cleaning}
+            className="flex items-center gap-2 px-4 py-2.5 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold rounded-xl hover:bg-amber-100 transition-colors active:scale-[0.97] disabled:opacity-50"
+          >
+            {cleaning ? "Cleaning..." : "Clean up old orders now"}
+          </button>
+          {cleanResult && (
+            <span className="text-[11px] text-[#888]">{cleanResult}</span>
+          )}
         </div>
       </div>
 

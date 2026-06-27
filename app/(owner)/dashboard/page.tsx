@@ -28,6 +28,7 @@ export default function DashboardPage() {
   const [openingTime, setOpeningTime] = useState("09:00")
   const [closingTime, setClosingTime] = useState("23:00")
   const [toggling, setToggling] = useState(false)
+  const [cleanupNotifications, setCleanupNotifications] = useState<any[]>([])
 
   const supabase = createClient()
 
@@ -134,6 +135,18 @@ export default function DashboardPage() {
 
       setCategoryCount(catRes.count ?? 0)
       setDishCount(dishRes.count ?? 0)
+
+      // Fetch cleanup notifications
+      const { data: notifData } = await supabase
+        .from("owner_notifications")
+        .select("*")
+        .eq("restaurant_id", restaurant.id)
+        .eq("type", "cleanup")
+        .eq("is_read", false)
+        .order("created_at", { ascending: false })
+        .limit(3)
+      setCleanupNotifications(notifData || [])
+
       setError(null)
     } catch (err) {
       console.error("Dashboard data fetch error:", err)
@@ -334,6 +347,42 @@ export default function DashboardPage() {
           <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${isOpen ? "translate-x-6" : "translate-x-0.5"}`} />
         </button>
       </div>
+
+      {/* Cleanup Notifications */}
+      {cleanupNotifications.length > 0 && (
+        <div className="space-y-2">
+          {cleanupNotifications.map((notif) => (
+            <div
+              key={notif.id}
+              className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3"
+            >
+              <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0 mt-0.5">
+                <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-sm font-semibold text-amber-800">{notif.title}</h4>
+                <p className="text-xs text-amber-700 mt-1">{notif.body}</p>
+                <p className="text-[10px] text-amber-500 mt-1">
+                  {new Date(notif.created_at).toLocaleDateString("en-PK", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                </p>
+              </div>
+              <button
+                onClick={async () => {
+                  await supabase.from("owner_notifications").update({ is_read: true }).eq("id", notif.id)
+                  setCleanupNotifications((prev) => prev.filter((n) => n.id !== notif.id))
+                }}
+                className="text-amber-500 hover:text-amber-700 shrink-0"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Quick Action Cards */}
       <div className="grid grid-cols-2 gap-3">

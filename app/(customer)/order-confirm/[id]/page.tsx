@@ -221,23 +221,25 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
           </section>
         )}
 
-        {/* WhatsApp + Call Buttons - Side by Side */}
+        {/* WhatsApp + Call Buttons - Side by Side with stable alignment */}
         {(whatsappUrl || restaurantPhone) && (
-          <div className="flex items-stretch gap-2.5">
+          <div className="flex gap-2.5">
             {whatsappUrl && (
-              <div className="flex-1">
-                {whatsappSuccess && (
-                  <div className="flex items-center gap-2 mb-2">
-                    <Check className="w-3.5 h-3.5 text-accent" style={{ strokeWidth: 3 }} />
-                    <span className="text-[11px] text-text-secondary">Opened</span>
-                    <button
-                      onClick={() => { window.open(whatsappUrl, "_blank") }}
-                      className="text-[11px] text-accent font-semibold ml-auto"
-                    >
-                      Resend
-                    </button>
-                  </div>
-                )}
+              <div className="flex-1 min-w-0">
+                <div className="h-[28px]">
+                  {whatsappSuccess && (
+                    <div className="flex items-center gap-2">
+                      <Check className="w-3.5 h-3.5 text-accent" style={{ strokeWidth: 3 }} />
+                      <span className="text-[11px] text-text-secondary">Opened</span>
+                      <button
+                        onClick={() => { window.open(whatsappUrl, "_blank") }}
+                        className="text-[11px] text-accent font-semibold ml-auto"
+                      >
+                        Resend
+                      </button>
+                    </div>
+                  )}
+                </div>
                 <button
                   onClick={() => { window.open(whatsappUrl, "_blank"); setWhatsappSuccess(true) }}
                   className="w-full bg-accent text-white text-[12px] font-bold h-11 rounded-xl flex items-center justify-center gap-1.5 active:scale-[0.97] transition-all"
@@ -248,13 +250,16 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
               </div>
             )}
             {restaurantPhone && (
-              <a
-                href={`tel:${restaurantPhone}`}
-                className="flex items-center justify-center gap-1.5 h-11 px-4 rounded-xl border border-border text-[12px] font-semibold text-text-primary active:scale-[0.95] transition-all hover:bg-[#FAFAFA]"
-              >
-                <Phone className="w-3.5 h-3.5" />
-                Call
-              </a>
+              <div className="min-w-[0px]">
+                <div className="h-[28px]" />
+                <a
+                  href={`tel:${restaurantPhone}`}
+                  className="flex items-center justify-center gap-1.5 h-11 px-4 rounded-xl border border-border text-[12px] font-semibold text-text-primary active:scale-[0.95] transition-all hover:bg-[#FAFAFA]"
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  Call
+                </a>
+              </div>
             )}
           </div>
         )}

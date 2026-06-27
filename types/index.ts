@@ -33,6 +33,7 @@
   closing_time: string | null
   delivery_fee: number | null
   delivery_time_min: number | null
+  retention_days?: number
   opening_hours?: string
 }
 
