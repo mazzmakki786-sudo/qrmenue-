@@ -23,15 +23,14 @@ export default function CustomerLayout({
 
   return (
     <ErrorBoundary>
-      <div className="flex flex-col min-h-screen bg-white">
-        <main className="flex-1 pb-[60px] max-w-app w-full safe-top">
+      <div className="min-h-screen bg-white">
+        <main className="pb-12">
           {children}
         </main>
         <nav
           role="navigation"
           aria-label="Main navigation"
-          className="fixed bottom-0 left-0 right-0 h-[60px] bg-white border-t border-border flex items-center justify-around z-50"
-          style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+          className="fixed bottom-0 left-0 right-0 h-12 bg-white border-t border-border flex items-center justify-around z-50"
         >
           {nav.map((item) => {
             const isActive = item.href === "/restaurants"
@@ -42,21 +41,21 @@ export default function CustomerLayout({
                 key={item.href}
                 href={item.href}
                 aria-label={item.ariaLabel}
-                className={`relative flex flex-col items-center gap-0.5 transition-colors min-touch justify-center ${
-                  isActive ? "text-primary" : "text-text-muted"
+                className={`relative flex flex-col items-center justify-center min-w-[64px] h-full transition-colors ${
+                  isActive ? "text-primary" : "text-text-muted hover:text-text-secondary"
                 }`}
               >
                 <div className="relative">
-                  <item.icon className="w-5 h-5" />
+                  <item.icon className={`w-4 h-4 ${isActive ? "stroke-[2.5]" : "stroke-[1.5]"}`} />
                   {item.href === "/cart" && totalItems > 0 && (
-                    <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center px-1">
-                      {totalItems}
+                    <span className="absolute -top-1.5 -right-2 min-w-[14px] h-3.5 rounded-full bg-primary text-white text-[8px] font-bold flex items-center justify-center px-0.5 shadow-sm">
+                      {totalItems > 99 ? "99+" : totalItems}
                     </span>
                   )}
                 </div>
-                <span className="text-[10px] font-medium">{item.label}</span>
+                <span className={`text-[9px] mt-0.5 ${isActive ? "font-semibold" : "font-medium"}`}>{item.label}</span>
                 {isActive && (
-                  <span className="absolute -bottom-0.5 w-1 h-1 rounded-full bg-primary" />
+                  <span className="absolute top-0 w-8 h-0.5 rounded-full bg-primary" />
                 )}
               </Link>
             )

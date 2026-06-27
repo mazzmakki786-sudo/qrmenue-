@@ -27,22 +27,26 @@ export function CategoryTabs({ categories, activeCategory, onSelect }: Props) {
   }, [activeCategory])
 
   return (
-    <div className="relative overflow-hidden pb-2 pt-6 px-4">
+    <div className="relative overflow-hidden pb-2 pt-5 px-4">
       {/* Left fade */}
-      <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#F9FAFB] to-transparent z-10 pointer-events-none" />
+      <div className="absolute left-0 top-0 bottom-2 w-10 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
       {/* Right fade */}
-      <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#F9FAFB] to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-2 w-10 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
       <div ref={scrollRef} className="flex gap-2 overflow-x-auto no-scrollbar">
         <button
           onClick={() => onSelect(null)}
-          className={`relative flex-shrink-0 px-6 py-2 rounded-full text-[14px] font-semibold transition-colors ${
+          className={`relative flex-shrink-0 px-5 py-2.5 rounded-full text-[13px] font-semibold transition-all duration-200 min-h-[40px] ${
             !activeCategory
-              ? "bg-primary text-white"
-              : "bg-[#F9FAFB] border border-border text-text-secondary hover:bg-[#F5F5F5]"
+              ? "bg-primary text-white shadow-sm"
+              : "bg-surface border border-border text-text-secondary hover:bg-surface-dark hover:border-border-strong"
           } ${lang === "ur" ? "font-urdu" : ""}`}
         >
           {lang === "ur" ? "تمام" : "All"}
-          <span className={`text-[10px] ml-2 ${!activeCategory ? "bg-white/20 text-white" : "bg-[#F5F5F5] text-text-secondary"} px-1.5 rounded-full`}>
+          <span className={`text-[10px] ml-1.5 ${
+            !activeCategory
+              ? "bg-white/15 text-white"
+              : "bg-surface-dark text-text-secondary"
+          } px-1.5 py-0.5 rounded-full`}>
             {totalDishes}
           </span>
         </button>
@@ -50,19 +54,24 @@ export function CategoryTabs({ categories, activeCategory, onSelect }: Props) {
           const isActive = activeCategory === cat.id
           const label = lang === "ur" && cat.name_ur ? cat.name_ur : cat.name_en
           const count = cat.dishes.filter((d) => d.is_available).length
+          if (count === 0) return null // hide empty categories
           return (
             <button
               key={cat.id}
               ref={isActive ? activeRef : null}
               onClick={() => onSelect(isActive ? null : cat.id)}
-              className={`relative flex-shrink-0 px-6 py-2 rounded-full text-[14px] font-semibold transition-colors ${
+              className={`relative flex-shrink-0 px-5 py-2.5 rounded-full text-[13px] font-semibold transition-all duration-200 min-h-[40px] ${
                 isActive
-                  ? "bg-primary text-white"
-                  : "bg-[#F9FAFB] border border-border text-text-secondary hover:bg-[#F5F5F5]"
+                  ? "bg-primary text-white shadow-sm"
+                  : "bg-surface border border-border text-text-secondary hover:bg-surface-dark hover:border-border-strong"
               } ${lang === "ur" ? "font-urdu" : ""}`}
             >
               {label}
-              <span className={`text-[10px] ml-2 ${isActive ? "bg-white/20 text-white" : "bg-[#F5F5F5] text-text-secondary"} px-1.5 rounded-full`}>
+              <span className={`text-[10px] ml-1.5 ${
+                isActive
+                  ? "bg-white/15 text-white"
+                  : "bg-surface-dark text-text-secondary"
+              } px-1.5 py-0.5 rounded-full`}>
                 {count}
               </span>
             </button>

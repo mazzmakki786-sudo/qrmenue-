@@ -17,17 +17,17 @@ export function DishGrid({ categories }: Props) {
   const { lang, t } = useI18n()
   if (categories.length === 0) {
     return (
-      <div className="text-center py-12">
-        <div className="w-12 h-12 rounded-xl bg-[#F9FAFB] flex items-center justify-center mx-auto mb-3">
-          <UtensilsCrossed className="w-6 h-6 text-[#999]" />
+      <div className="text-center py-12 animate-fade-in">
+        <div className="w-12 h-12 rounded-xl bg-surface flex items-center justify-center mx-auto mb-3">
+          <UtensilsCrossed className="w-6 h-6 text-text-muted" />
         </div>
-        <p className="text-sm text-[#999]">No menu items available</p>
+        <p className="text-sm text-text-muted">No menu items available</p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       {categories.map((category) => {
         const categoryLabel = lang === "ur" && category.name_ur ? category.name_ur : category.name_en
         const availableDishes = category.dishes.filter((d) => d.is_available)
@@ -35,10 +35,10 @@ export function DishGrid({ categories }: Props) {
 
         return (
           <section key={category.id} id={`cat-${category.id}`}>
-            <h2 className={`text-lg font-bold text-text-primary mb-6 border-l-4 border-primary pl-3 ${lang === "ur" ? "font-urdu" : ""}`}>
+            <h2 className={`text-base font-bold text-text-primary mb-4 border-l-[3px] border-primary pl-3 leading-tight ${lang === "ur" ? "font-urdu" : ""}`}>
               {categoryLabel}
             </h2>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {availableDishes.map((dish) => (
                 <Card key={dish.id} dish={dish} />
               ))}
@@ -47,7 +47,7 @@ export function DishGrid({ categories }: Props) {
               ))}
             </div>
             {availableDishes.length === 0 && unavailableDishes.length === 0 && (
-              <p className="text-sm text-[#999] py-8 text-center"><span className="text-text-secondary">{lang === "ur" ? "کوئی ڈش نہیں" : "No dishes in this category"}</span></p>
+              <p className="text-sm text-text-muted py-6 text-center">{lang === "ur" ? "کوئی ڈش نہیں" : "No dishes in this category"}</p>
             )}
           </section>
         )
@@ -72,21 +72,21 @@ export const Card = React.memo(function Card({ dish, unavailable = false }: { di
   const badges = (dish.tags || []).filter((t) => recognizedTags.includes(t))
 
   return (
-    <div className={`group flex gap-4 p-4 bg-white rounded-2xl border border-border hover:border-[#E8E8E8] hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-all duration-300 ${unavailable ? "opacity-50" : ""}`}>
+    <div className={`group flex gap-3.5 p-3.5 bg-white rounded-2xl border border-border hover:border-border-strong hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] transition-all duration-300 ${unavailable ? "opacity-50" : ""}`}>
       {/* Image */}
-      <div className="relative w-24 h-24 flex-shrink-0 overflow-hidden rounded-xl">
+      <div className="relative w-24 h-24 flex-shrink-0 overflow-hidden rounded-xl bg-surface">
         {dish.image_url && !imgError ? (
           <Image
             src={dish.image_url}
             alt={dish.name_en}
             fill
-            className="object-cover"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
             sizes="96px"
             onError={() => setImgError(true)}
           />
         ) : (
-          <div className="w-full h-full bg-[#E1E3E4] flex items-center justify-center">
-            <ImageOff className="w-6 h-6 text-[#BBB]" />
+          <div className="w-full h-full flex items-center justify-center">
+            <ImageOff className="w-6 h-6 text-text-muted/40" />
           </div>
         )}
         {badges.length > 0 && (
@@ -95,8 +95,8 @@ export const Card = React.memo(function Card({ dish, unavailable = false }: { di
           </div>
         )}
         {unavailable && (
-          <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-xl">
-            <span className="text-white text-[10px] font-semibold bg-black/60 px-2 py-0.5 rounded-full">Unavailable</span>
+          <div className="absolute inset-0 bg-black/30 flex items-center justify-center rounded-xl backdrop-blur-[1px]">
+            <span className="text-white text-[10px] font-semibold bg-black/60 px-2.5 py-1 rounded-full">Unavailable</span>
           </div>
         )}
       </div>
@@ -109,37 +109,36 @@ export const Card = React.memo(function Card({ dish, unavailable = false }: { di
               {name}
             </h3>
             {nameSecondary && (
-              <p className={`text-xs text-text-secondary line-clamp-1 ${lang !== "ur" ? "font-urdu" : ""}`}>
+              <p className={`text-[11px] text-text-secondary line-clamp-1 mt-0.5 ${lang !== "ur" ? "font-urdu" : ""}`}>
                 {nameSecondary}
               </p>
             )}
-
           </div>
-          <span className="text-sm font-bold text-text-primary shrink-0">
+          <span className="text-sm font-bold text-text-primary shrink-0 mt-0.5">
             Rs {dish.price.toLocaleString("en-PK")}
           </span>
         </div>
 
         {description && (
-          <p className="text-xs text-text-secondary line-clamp-2 mb-2">
+          <p className="text-[12px] text-text-secondary leading-relaxed line-clamp-2 mb-2">
             {description}
           </p>
         )}
 
         <div className="mt-auto flex justify-end">
           {cartItem ? (
-            <div className="flex items-center gap-3 bg-[#F5F5F5] rounded-full px-3 py-1.5">
+            <div className="flex items-center gap-2 bg-surface-dark rounded-full px-2.5 py-1 min-h-[36px] animate-scale-up">
               <button
                 onClick={() => updateQuantity(dish.id, cartItem.quantity - 1)}
-                className="min-h-[32px] min-w-[32px] flex items-center justify-center hover:opacity-70 transition-opacity text-[16px] text-primary"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-primary font-bold hover:bg-white/50 transition-colors text-[18px]"
                 aria-label="Decrease quantity"
               >
                 −
               </button>
-              <span className="text-[14px] font-bold min-w-[20px] text-center text-text-primary">{cartItem.quantity}</span>
+              <span className="text-[14px] font-bold min-w-[22px] text-center text-text-primary">{cartItem.quantity}</span>
               <button
                 onClick={() => addItem(dish)}
-                className="min-h-[32px] min-w-[32px] flex items-center justify-center hover:opacity-70 transition-opacity text-[16px] text-primary"
+                className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-hover transition-colors text-[18px] font-bold"
                 aria-label="Increase quantity"
               >
                 +
@@ -149,7 +148,7 @@ export const Card = React.memo(function Card({ dish, unavailable = false }: { di
             <button
               onClick={() => addItem(dish)}
               disabled={unavailable}
-              className="bg-primary text-white rounded-full px-4 py-1.5 text-xs font-semibold hover:bg-primary-hover active:scale-95 transition-all disabled:opacity-50"
+              className="bg-primary text-white rounded-full px-4 py-1.5 text-xs font-semibold hover:bg-primary-hover active:scale-[0.95] transition-all duration-200 disabled:opacity-50 flex items-center gap-1 min-h-[36px]"
             >
               + Add
             </button>

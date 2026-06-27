@@ -140,3 +140,21 @@ img {
 .animate-scale-up {
   animation: scale-up 0.2s ease-out;
 }
+
+/* Shimmer loading effect */
+.shimmer {
+  position: relative;
+}
+.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer-move 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer-move {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}

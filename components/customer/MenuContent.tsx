@@ -46,6 +46,10 @@ export function MenuContent({ categories, restaurantId, restaurantName, delivery
     searchRef.current?.focus()
   }, [])
 
+  const handleLangToggle = useCallback(() => {
+    setLang(lang === "en" ? "ur" : "en")
+  }, [lang, setLang])
+
   const filtered = activeCategory
     ? categories.filter((c) => c.id === activeCategory)
     : categories
@@ -70,34 +74,34 @@ export function MenuContent({ categories, restaurantId, restaurantName, delivery
     <div>
       {/* Sticky Search & Filter */}
       <div className="sticky top-0 z-40 bg-white/90" style={{ backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}>
-        <div className="pt-4 pb-0">
-          <div className="flex gap-3">
+        <div className="pt-3 pb-0">
+          <div className="flex gap-2.5">
             <div className="relative flex-1 group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted group-focus-within:text-primary transition-colors" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted group-focus-within:text-primary transition-colors duration-200" />
               <input
                 ref={searchRef}
                 type="text"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder={t("customer.searchDishes")}
-                className="w-full bg-[#F9FAFB] border border-border rounded-xl py-3 pl-12 pr-4 text-[14px] text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary transition-all"
+                className="w-full bg-surface border border-border rounded-xl py-3 pl-12 pr-10 text-[14px] text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
               />
               {searchInput && (
                 <button
                   onClick={handleClearSearch}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#F5F5F5] flex items-center justify-center hover:bg-[#E8E8E8] transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-surface-dark flex items-center justify-center hover:bg-border transition-colors"
                   aria-label="Clear search"
                 >
-                  <X className="w-3 h-3 text-primary" />
+                  <X className="w-3 h-3 text-text-muted" />
                 </button>
               )}
             </div>
             <button
-              onClick={() => setLang(lang === "en" ? "ur" : "en")}
-              className="bg-[#F9FAFB] border border-border px-4 rounded-xl flex items-center gap-2 hover:bg-[#F5F5F5] transition-colors text-[14px] font-semibold"
+              onClick={handleLangToggle}
+              className="bg-surface border border-border px-3.5 rounded-xl flex items-center gap-1.5 hover:bg-surface-dark transition-colors text-[13px] font-semibold min-h-[44px]"
             >
               <span className={lang === "en" ? "text-primary" : "text-text-muted"}>EN</span>
-              <span className="w-px h-4 bg-border" />
+              <span className="w-px h-3.5 bg-border" />
               <span className={lang === "ur" ? "text-primary font-urdu" : "text-text-muted"}>اردو</span>
             </button>
           </div>
@@ -112,10 +116,20 @@ export function MenuContent({ categories, restaurantId, restaurantName, delivery
       {/* Dish List */}
       <div className="mt-4">
         {noResults ? (
-          <div className="py-20 text-center">
-            <Search className="w-10 h-10 text-[#999] mx-auto mb-4" />
+          <div className="py-20 text-center animate-fade-in">
+            <div className="w-14 h-14 rounded-2xl bg-surface mx-auto mb-4 flex items-center justify-center">
+              <Search className="w-6 h-6 text-text-muted" />
+            </div>
             <h4 className="text-[16px] font-semibold text-text-primary">No results found</h4>
-            <p className="text-[14px] text-text-secondary mt-2">Try searching for something else or browse categories.</p>
+            <p className="text-[13px] text-text-secondary mt-1.5 max-w-xs mx-auto">
+              Try searching for something else or browse categories.
+            </p>
+            <button
+              onClick={handleClearSearch}
+              className="mt-4 text-sm font-semibold text-primary bg-surface hover:bg-surface-dark px-5 py-2 rounded-xl transition-colors"
+            >
+              Clear search
+            </button>
           </div>
         ) : (
           <DishGrid categories={searched} />

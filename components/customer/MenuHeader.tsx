@@ -60,9 +60,9 @@ export function MenuHeader({ name, nameUr, logoUrl, coverUrl, city, cuisineType,
   }, [restaurantId])
 
   return (
-    <div className="pt-2 pb-6">
+    <div className="pt-2 pb-4">
       {/* Hero Section */}
-      <div className="relative w-full h-48 rounded-3xl overflow-hidden mb-6">
+      <div className="relative w-full h-48 rounded-3xl overflow-hidden mb-5 shadow-sm">
         {coverUrl && !coverError ? (
           <>
             <Image
@@ -74,73 +74,97 @@ export function MenuHeader({ name, nameUr, logoUrl, coverUrl, city, cuisineType,
               priority
               onError={() => setCoverError(true)}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary/70 via-primary/30 to-transparent z-10" />
+            <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/30 to-transparent z-10" />
           </>
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-primary to-primary-hover" />
+          <div className="w-full h-full bg-gradient-to-br from-primary via-primary-hover to-primary/80">
+            {/* Decorative pattern overlay */}
+            <div className="absolute inset-0 opacity-[0.06]"
+              style={{ backgroundImage: "radial-gradient(circle at 25% 50%, #fff 1px, transparent 1px)", backgroundSize: "32px 32px" }}
+            />
+          </div>
         )}
 
         {/* Logo + Name Overlay */}
-        <div className="absolute bottom-4 left-4 z-20 flex items-end gap-4">
-          {logoUrl && !logoError ? (
-            <div className="w-14 h-14 rounded-2xl overflow-hidden border-4 border-white shadow-sm relative flex-shrink-0">
-              <Image
-                src={logoUrl}
-                alt={displayName}
-                fill
-                className="object-cover"
-                sizes="56px"
-                onError={() => setLogoError(true)}
-              />
-            </div>
-          ) : (
-            <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 border-4 border-white/30">
-              <span className="text-xl font-bold text-white">
-                {displayName.charAt(0).toUpperCase()}
-              </span>
-            </div>
-          )}
-          <div>
-            <h1 className="text-white text-[24px] font-semibold leading-tight tracking-tight">
-              {displayName}
-            </h1>
-            <div className="flex items-center gap-3 text-white/90 text-[12px] font-medium mt-1">
-              <span className="flex items-center gap-1">
-                <MapPin className="w-4 h-4" /> {city}
-              </span>
+        <div className="absolute bottom-4 left-4 right-4 z-20">
+          <div className="flex items-end gap-4">
+            {logoUrl && !logoError ? (
+              <div className="w-14 h-14 rounded-2xl overflow-hidden border-[2.5px] border-white/90 shadow-md relative flex-shrink-0 ring-1 ring-black/10">
+                <Image
+                  src={logoUrl}
+                  alt={displayName}
+                  fill
+                  className="object-cover"
+                  sizes="56px"
+                  onError={() => setLogoError(true)}
+                />
+              </div>
+            ) : (
+              <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center flex-shrink-0 border-[2.5px] border-white/40 shadow-sm">
+                <span className="text-xl font-bold text-white">
+                  {displayName.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            )}
+            <div className="min-w-0">
+              <h1 className="text-white text-[24px] font-semibold leading-tight tracking-tight drop-shadow-sm">
+                {displayName}
+              </h1>
+              <div className="flex items-center gap-2 text-white/90 text-[12px] font-medium mt-0.5">
+                <span className="flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5" /> {city}
+                </span>
+                {cuisineType && (
+                  <>
+                    <span className="w-1 h-1 rounded-full bg-white/40" />
+                    <span>{cuisineType}</span>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Compact Info Row */}
-      <div className="flex flex-wrap items-center gap-3 text-xs text-[#555555] mt-2 mb-1">
-        <div className={`flex items-center gap-1 font-medium ${openStatus ? "text-[#25D366]" : "text-[#DC2626]"}`}>
-          <span className={`w-2 h-2 rounded-full ${openStatus ? "bg-[#25D366]" : "bg-[#DC2626]"}`} />
-          <span>{openStatus ? "Open" : "Closed"}</span>
+      {/* Status + Info Row — Structured */}
+      <div className="space-y-2.5">
+        {/* Status pill + hours */}
+        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
+          openStatus ? "bg-accent/8 text-accent" : "bg-error/8 text-error"
+        }`}>
+          <span className={`relative w-2 h-2 rounded-full ${openStatus ? "bg-accent" : "bg-error"}`}>
+            {openStatus && (
+              <span className="absolute inset-0 rounded-full bg-accent animate-ping opacity-30" />
+            )}
+          </span>
+          <span className="font-semibold">{openStatus ? "Open" : "Closed"}</span>
           {(openTime && closeTime) && (
-            <span className="text-[#888] font-normal">
+            <span className={`text-[11px] ${openStatus ? "text-accent/70" : "text-error/70"}`}>
               &middot; {openTime} — {closeTime}
             </span>
           )}
         </div>
-        {address && (
-          <div className="flex items-center gap-1">
-            <MapPin className="w-3.5 h-3.5 text-[#888888]" />
-            <span className="truncate max-w-[150px]">{address}</span>
-          </div>
-        )}
-        {phone && (
-          <div className="flex items-center gap-1">
-            <Phone className="w-3.5 h-3.5 text-[#888888]" />
-            <span>{phone}</span>
-          </div>
-        )}
+
+        {/* Info chips row */}
+        <div className="flex flex-wrap gap-2">
+          {address && (
+            <div className="flex items-center gap-1.5 text-[12px] text-text-secondary bg-surface px-2.5 py-1.5 rounded-lg">
+              <MapPin className="w-3.5 h-3.5 text-text-muted shrink-0" />
+              <span className="truncate max-w-[180px]">{address}</span>
+            </div>
+          )}
+          {phone && (
+            <a href={`tel:${phone}`} className="flex items-center gap-1.5 text-[12px] text-text-secondary bg-surface px-2.5 py-1.5 rounded-lg hover:bg-surface-dark transition-colors">
+              <Phone className="w-3.5 h-3.5 text-text-muted shrink-0" />
+              <span>{phone}</span>
+            </a>
+          )}
+        </div>
       </div>
 
       {/* Description */}
       {description && (
-        <p className="text-[14px] text-text-secondary leading-relaxed px-1">
+        <p className="text-[14px] text-text-secondary leading-relaxed mt-3 px-0.5">
           {description}
         </p>
       )}

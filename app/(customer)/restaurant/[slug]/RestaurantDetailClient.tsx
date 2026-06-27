@@ -75,12 +75,12 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
+      {/* Fixed Header */}
       <div
         className="fixed top-0 left-0 right-0 z-40 bg-white/80 safe-top"
         style={{ backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}
       >
-        <div className="flex items-center justify-between px-4 h-12 max-w-[600px] mx-auto">
+        <div className="flex items-center justify-between px-4 h-12 mx-auto">
           <button
             onClick={() => router.back()}
             className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center active:scale-95 transition-transform"
@@ -94,98 +94,95 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
       </div>
 
       {/* Content */}
-      <main className="pt-12 pb-[100px] px-4 max-w-[600px] mx-auto">
-        {/* Hero */}
-        <div className="relative w-full h-44 rounded-2xl overflow-hidden mb-4 mt-3">
+      <main className="pt-12 pb-[100px] px-4 mx-auto">
+        {/* Restaurant Header — Simple: Logo + Info */}
+        <div className="flex items-center gap-5 py-6 border-b border-border/50 mb-5">
+          {/* Logo */}
           {restaurant.logo_url && !logoError ? (
-            <>
+            <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-sm ring-1 ring-black/5 relative flex-shrink-0 bg-white">
               <Image
                 src={restaurant.logo_url}
                 alt={restaurant.name}
                 fill
                 className="object-cover"
-                sizes="600px"
-                priority
+                sizes="80px"
                 onError={() => setLogoError(true)}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-primary/70 via-primary/30 to-transparent" />
-            </>
+            </div>
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-primary to-[#8F2E19]" />
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-[#8F2E19] text-white flex items-center justify-center font-bold text-2xl flex-shrink-0 shadow-sm">
+              {restaurant.name.charAt(0).toUpperCase()}
+            </div>
           )}
-          <div className="absolute bottom-3 left-3 right-3">
-            <div className="flex items-end gap-3">
-              {restaurant.logo_url && !logoError ? (
-                <div className="w-14 h-14 rounded-xl overflow-hidden border-4 border-white/80 shadow-sm relative flex-shrink-0">
-                  <Image
-                    src={restaurant.logo_url}
-                    alt={restaurant.name}
-                    fill
-                    className="object-cover"
-                    sizes="56px"
-                  />
-                </div>
-              ) : (
-                <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 border-4 border-white/30">
-                  <span className="text-lg font-bold text-white">
-                    {restaurant.name.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-              )}
-              <div className="min-w-0 flex-1">
-                <h1 className="text-white text-[18px] font-semibold leading-tight">
-                  {restaurant.name_ur || restaurant.name}
-                </h1>
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-white/80 text-[11px] font-medium mt-0.5">
-                  <span className="flex items-center gap-0.5">
-                    <MapPin className="w-3 h-3" /> {restaurant.city}
-                  </span>
-                  {restaurant.cuisine_type && (
-                    <span className="flex items-center gap-0.5">
-                      <UtensilsCrossed className="w-3 h-3" /> {restaurant.cuisine_type}
-                    </span>
-                  )}
 
-                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${liveIsOpen ? 'bg-accent/20 text-accent' : 'bg-error/20 text-error'}`}>
-                    {liveIsOpen ? '● Open' : '● Closed'}
-                  </span>
-                </div>
-              </div>
+          {/* Info */}
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl font-bold text-text-primary leading-tight">
+              {restaurant.name_ur || restaurant.name}
+            </h1>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-text-secondary mt-1">
+              <span className="flex items-center gap-1">
+                <MapPin className="w-3.5 h-3.5" /> {restaurant.city}
+              </span>
+              {restaurant.cuisine_type && (
+                <span className="flex items-center gap-1">
+                  <UtensilsCrossed className="w-3.5 h-3.5" /> {restaurant.cuisine_type}
+                </span>
+              )}
+              <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${
+                liveIsOpen ? "bg-accent/10 text-accent" : "bg-error/10 text-error"
+              }`}>
+                {liveIsOpen ? "● Open" : "● Closed"}
+              </span>
             </div>
           </div>
         </div>
 
         {/* Description */}
         {restaurant.description && (
-          <p className="text-[13px] text-[#555] leading-relaxed mb-3">
+          <p className="text-sm text-[#555] leading-relaxed mb-4">
             {restaurant.description}
           </p>
         )}
 
-        {/* Contact Info — Compact Row */}
-        <div className="flex gap-2 mb-4">
+        {/* Contact & Delivery Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
           {restaurant.phone && (
             <a
               href={`tel:${restaurant.phone}`}
-              className="flex items-center gap-2 flex-1 min-w-0 p-2.5 bg-white rounded-xl hover:bg-[#F5F5F5] transition-all"
+              className="flex items-center gap-3 p-3 bg-white rounded-xl border border-border hover:border-border-strong hover:shadow-sm transition-all"
             >
-              <div className="w-7 h-7 rounded-lg bg-[#F5F5F5] flex items-center justify-center shrink-0">
-                <Phone className="w-3.5 h-3.5 text-primary" />
+              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                <Phone className="w-4 h-4 text-primary" />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] text-text-muted">Phone</p>
-                <p className="text-[12px] font-semibold text-text-primary truncate">{restaurant.phone}</p>
+                <p className="text-[10px] text-text-muted uppercase tracking-wider font-medium">Phone</p>
+                <p className="text-sm font-semibold text-text-primary">{restaurant.phone}</p>
               </div>
             </a>
           )}
           {restaurant.address && (
-            <div className="flex items-center gap-2 flex-1 min-w-0 p-2.5 bg-white rounded-xl">
-              <div className="w-7 h-7 rounded-lg bg-[#F5F5F5] flex items-center justify-center shrink-0">
-                <MapPin className="w-3.5 h-3.5 text-primary" />
+            <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-border">
+              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                <MapPin className="w-4 h-4 text-primary" />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] text-text-muted">Address</p>
-                <p className="text-[12px] font-semibold text-text-primary truncate">{restaurant.address}</p>
+                <p className="text-[10px] text-text-muted uppercase tracking-wider font-medium">Address</p>
+                <p className="text-sm font-semibold text-text-primary truncate">{restaurant.address}</p>
+              </div>
+            </div>
+          )}
+          {restaurant.delivery_fee !== undefined && (
+            <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-border sm:col-span-2">
+              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                <Truck className="w-4 h-4 text-primary" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] text-text-muted uppercase tracking-wider font-medium">Delivery</p>
+                <p className="text-sm font-semibold text-text-primary">
+                  {restaurant.delivery_fee === 0 ? "Free delivery" : `Rs ${restaurant.delivery_fee} delivery fee`}
+                  {restaurant.delivery_time_min && ` • ${restaurant.delivery_time_min} min`}
+                </p>
               </div>
             </div>
           )}
@@ -193,23 +190,23 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
 
         {/* Opening Hours */}
         {restaurant.opening_hours && (
-          <div className="border border-[#E8E8E8] rounded-xl p-4 mb-4">
+          <div className="border border-border rounded-xl p-4 mb-5">
             <div className="flex items-center gap-2 mb-3">
-              <Clock className="w-5 h-5 text-[#111111]" />
-              <h3 className="font-semibold text-[15px] text-[#111111]">Opening Hours</h3>
+              <Clock className="w-5 h-5 text-text-primary" />
+              <h3 className="font-semibold text-sm text-text-primary">Opening Hours</h3>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {(["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const).map((day) => {
                 const hours = restaurant.opening_hours?.[day]
                 const today = new Date().toLocaleDateString("en-US", { weekday: "long" }).toLowerCase()
                 const isToday = day === today
                 if (!hours) return null
                 return (
-                  <div key={day} className={`flex justify-between items-center text-sm py-1 ${isToday ? "bg-[#F9FAFB] -mx-2 px-2 rounded-lg" : ""}`}>
-                    <span className={`capitalize ${isToday ? "font-semibold text-[#111111]" : "text-[#555555]"}`}>
+                  <div key={day} className={`flex justify-between items-center text-sm py-1.5 px-2 rounded-lg ${isToday ? "bg-primary/5 font-medium" : ""}`}>
+                    <span className={`capitalize ${isToday ? "text-text-primary" : "text-text-secondary"}`}>
                       {day}
                     </span>
-                    <span className={hours.closed ? "text-[#EF4444] font-medium" : "text-[#111111]"}>
+                    <span className={hours.closed ? "text-error font-medium" : "text-text-primary"}>
                       {hours.closed ? "Closed" : `${hours.open} — ${hours.close}`}
                     </span>
                   </div>
@@ -221,30 +218,19 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
 
         {/* Map / Location */}
         {restaurant.lat && restaurant.lng && (
-          <div className="border border-[#E8E8E8] rounded-xl overflow-hidden mb-4">
+          <div className="border border-border rounded-xl overflow-hidden mb-5">
             <div className="h-48 bg-[#F9FAFB] flex items-center justify-center relative">
-              <MapPin className="w-8 h-8 text-[#888888]" />
+              <MapPin className="w-8 h-8 text-text-muted" />
               <a
                 href={`https://www.google.com/maps?q=${restaurant.lat},${restaurant.lng}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="absolute bottom-3 left-3 bg-white px-3 py-1.5 rounded-lg text-xs font-medium border border-[#E8E8E8] flex items-center gap-1.5 hover:bg-[#F5F5F5] transition-colors"
+                className="absolute bottom-3 left-3 bg-white px-3 py-1.5 rounded-lg text-xs font-medium border border-border flex items-center gap-1.5 hover:bg-surface transition-colors"
               >
                 <Navigation className="w-3.5 h-3.5" />
                 Get Directions
               </a>
             </div>
-          </div>
-        )}
-
-        {/* Delivery Info */}
-        {restaurant.delivery_fee !== undefined && (
-          <div className="flex items-center gap-2 p-3 bg-[#F5F5F5] rounded-xl mb-4">
-            <Truck className="w-4 h-4 text-primary" />
-            <span className="text-xs text-text-primary font-medium">
-              {restaurant.delivery_fee === 0 ? 'Free delivery' : `Rs ${restaurant.delivery_fee} delivery fee`}
-              {restaurant.delivery_time_min && ` • ${restaurant.delivery_time_min} min`}
-            </span>
           </div>
         )}
 
