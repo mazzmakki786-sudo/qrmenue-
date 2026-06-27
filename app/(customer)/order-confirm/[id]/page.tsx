@@ -221,11 +221,11 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
           </section>
         )}
 
-        {/* WhatsApp + Call Buttons - Compact Pills */}
+        {/* WhatsApp + Call Buttons - Side by Side */}
         {(whatsappUrl || restaurantPhone) && (
-          <div className="flex gap-2.5">
+          <div className="flex items-stretch gap-2.5">
             {whatsappUrl && (
-              <div className="flex-1 min-w-0">
+              <div className="flex-1">
                 {whatsappSuccess && (
                   <div className="flex items-center gap-2 mb-2">
                     <Check className="w-3.5 h-3.5 text-accent" style={{ strokeWidth: 3 }} />
@@ -240,7 +240,7 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
                 )}
                 <button
                   onClick={() => { window.open(whatsappUrl, "_blank"); setWhatsappSuccess(true) }}
-                  className="w-full bg-accent text-white text-[12px] font-bold py-2.5 rounded-xl flex items-center justify-center gap-1.5 active:scale-[0.97] transition-all"
+                  className="w-full bg-accent text-white text-[12px] font-bold h-11 rounded-xl flex items-center justify-center gap-1.5 active:scale-[0.97] transition-all"
                 >
                   <MessageCircle className="w-3.5 h-3.5" />
                   Send on WhatsApp
@@ -250,9 +250,10 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
             {restaurantPhone && (
               <a
                 href={`tel:${restaurantPhone}`}
-                className="w-14 h-11 rounded-xl border border-border flex items-center justify-center active:scale-[0.95] transition-all hover:bg-[#FAFAFA]"
+                className="flex items-center justify-center gap-1.5 h-11 px-4 rounded-xl border border-border text-[12px] font-semibold text-text-primary active:scale-[0.95] transition-all hover:bg-[#FAFAFA]"
               >
-                <Phone className="w-4 h-4 text-primary" />
+                <Phone className="w-3.5 h-3.5" />
+                Call
               </a>
             )}
           </div>

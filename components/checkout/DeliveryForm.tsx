@@ -36,18 +36,7 @@ export function DeliveryForm({ name, phone, address, onNameChange, onPhoneChange
       <Input label="Your Name *" id="name" value={name} onChange={(e) => onNameChange(e.target.value)} placeholder="Enter your name" />
       <Input label="Phone Number *" id="phone" value={phone} onChange={(e) => onPhoneChange(e.target.value)} placeholder="0300-XXXXXXX" />
       <div className="space-y-1.5">
-        <div className="flex items-center justify-between">
-          <label htmlFor="address" className="block text-sm font-medium text-text-primary">Delivery Address *</label>
-          <button
-            type="button"
-            onClick={openMapsForLocation}
-            className="flex items-center gap-1 text-[11px] font-semibold text-accent hover:underline"
-            title="Share your live location via Google Maps"
-          >
-            <MapPin className="w-3.5 h-3.5" />
-            Share Location
-          </button>
-        </div>
+        <label htmlFor="address" className="block text-sm font-medium text-text-primary">Delivery Address *</label>
         <textarea
           id="address"
           value={address}
@@ -55,9 +44,17 @@ export function DeliveryForm({ name, phone, address, onNameChange, onPhoneChange
           placeholder="House #, Street, Area, City"
           className="flex h-24 w-full rounded-[10px] bg-[#F9FAFB] border border-border px-4 py-3 text-base text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary transition-colors resize-none"
         />
-        <p className="text-[10px] text-text-muted flex items-center gap-1">
-          <MapPin className="w-3 h-3" />
-          Or tap &quot;Share Location&quot; to send your live location via Google Maps
+        <button
+          type="button"
+          onClick={openMapsForLocation}
+          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border-2 border-dashed border-accent/40 text-accent text-[12px] font-semibold hover:bg-accent/5 active:scale-[0.98] transition-all"
+          title="Share your live location via Google Maps"
+        >
+          <MapPin className="w-4 h-4" />
+          Share My Live Location via Google Maps
+        </button>
+        <p className="text-[10px] text-text-muted text-center">
+          Or type your address manually above
         </p>
       </div>
     </div>

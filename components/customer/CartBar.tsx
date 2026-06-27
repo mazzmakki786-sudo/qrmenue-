@@ -7,14 +7,10 @@ import { useMemo } from "react"
 
 export function CartBar() {
   const items = useCartStore((s) => s.items)
-  const deliveryFee = useCartStore((s) => s.deliveryFee)
   const restaurantId = useCartStore((s) => s.restaurantId)
 
   const totalItems = useMemo(() => items.reduce((sum, item) => sum + item.quantity, 0), [items])
-  const totalPrice = useMemo(() => {
-    const subtotal = items.reduce((sum, item) => sum + item.dish.price * item.quantity, 0)
-    return subtotal + deliveryFee
-  }, [items, deliveryFee])
+  const subtotal = useMemo(() => items.reduce((sum, item) => sum + item.dish.price * item.quantity, 0), [items])
 
   if (totalItems === 0 || !restaurantId) return null
 
@@ -38,7 +34,8 @@ export function CartBar() {
               <p className={`text-[11px] text-white/60 uppercase tracking-widest font-medium`}>
                 {totalItems === 1 ? "1 item" : `${totalItems} items`}
               </p>
-              <p className="text-[18px] font-bold leading-tight">Rs {totalPrice.toLocaleString("en-PK")}</p>
+              <p className="text-[18px] font-bold leading-tight">Rs {subtotal.toLocaleString("en-PK")}</p>
+              <p className="text-[9px] text-white/40">+ delivery at checkout</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
