@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Check, ArrowLeft, ClipboardList, Store, ExternalLink, Phone, RotateCcw, X, Clock } from "lucide-react"
+import { Check, ArrowLeft, ClipboardList, Store, ExternalLink, Phone, RotateCcw, X, Clock, MessageCircle } from "lucide-react"
 import { useCartStore } from "@/stores/cartStore"
 import { buildWhatsAppURL } from "@/lib/whatsapp"
 
@@ -221,30 +221,47 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
           </section>
         )}
 
-        {/* WhatsApp Button */}
-        {whatsappUrl && (
-          <section className="bg-white border border-border rounded-2xl p-5">
-            {whatsappSuccess && (
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <Check className="w-5 h-5 text-accent" style={{ strokeWidth: 3 }} />
-                  <span className="text-sm font-semibold text-text-primary">WhatsApp opened!</span>
-                </div>
+        {/* WhatsApp + Call Buttons */}
+        {(whatsappUrl || restaurantPhone) && (
+          <div className="flex gap-3">
+            {whatsappUrl && (
+              <section className={`bg-white border border-border rounded-2xl p-4 ${restaurantPhone ? "flex-1" : "w-full"}`}>
+                {whatsappSuccess && (
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-accent" style={{ strokeWidth: 3 }} />
+                      <span className="text-xs font-semibold text-text-primary">WhatsApp opened!</span>
+                    </div>
+                    <button
+                      onClick={() => { window.open(whatsappUrl, "_blank") }}
+                      className="text-xs font-semibold text-accent hover:underline"
+                    >
+                      Resend
+                    </button>
+                  </div>
+                )}
                 <button
-                  onClick={() => { window.open(whatsappUrl, "_blank") }}
-                  className="text-sm font-semibold text-accent hover:underline"
+                  onClick={() => { window.open(whatsappUrl, "_blank"); setWhatsappSuccess(true) }}
+                  className="w-full bg-accent text-white text-sm font-bold py-3 rounded-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all hover:bg-accent-hover"
                 >
-                  Resend
+                  <MessageCircle className="w-4 h-4" />
+                  Send on WhatsApp
                 </button>
-              </div>
+              </section>
             )}
-            <button
-              onClick={() => { window.open(whatsappUrl, "_blank"); setWhatsappSuccess(true) }}
-              className="w-full bg-accent text-white text-sm font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
-            >
-              Send on WhatsApp
-            </button>
-          </section>
+            {restaurantPhone && (
+              <a
+                href={`tel:${restaurantPhone}`}
+                className={`bg-white border border-border rounded-2xl p-4 flex flex-col items-center justify-center gap-1.5 active:scale-[0.98] transition-all hover:bg-[#FAFAFA] ${whatsappUrl ? "flex-1" : "w-full"}`}
+              >
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Phone className="w-4 h-4 text-primary" />
+                </div>
+                <span className="text-[11px] font-semibold text-text-primary">Call</span>
+                <span className="text-[9px] text-text-muted">Restaurant</span>
+              </a>
+            )}
+          </div>
         )}
 
         {/* Order Summary */}
@@ -328,15 +345,6 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
             <RotateCcw className="w-4 h-4" />
             Reorder
           </button>
-          {restaurantPhone && (
-            <a
-              href={`tel:${restaurantPhone}`}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm text-text-secondary font-semibold border border-border hover:bg-[#FAFAFA] transition-colors"
-            >
-              <Phone className="w-4 h-4" />
-              Call Restaurant
-            </a>
-          )}
           {user && (
             <Link
               href="/account"

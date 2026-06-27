@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Image from "next/image"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
-import { MapPin, Phone, ArrowLeft, UtensilsCrossed, Truck, Clock, Navigation } from "lucide-react"
+import { MapPin, Phone, ArrowLeft, UtensilsCrossed, Clock, Navigation } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useCartStore } from "@/stores/cartStore"
 import { CartBar } from "@/components/customer/CartBar"
@@ -95,41 +95,43 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
 
       {/* Content */}
       <main className="pt-12 pb-[100px] px-4 mx-auto">
-        {/* Restaurant Header — Simple: Logo + Info */}
-        <div className="flex items-center gap-5 py-6 border-b border-border/50 mb-5">
-          {/* Logo */}
+        {/* Compact Restaurant Header */}
+        <div className="flex items-start gap-3.5 py-5 border-b border-border/50 mb-4">
+          {/* Logo - smaller 56x56 */}
           {restaurant.logo_url && !logoError ? (
-            <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-sm ring-1 ring-black/5 relative flex-shrink-0 bg-white">
+            <div className="w-14 h-14 rounded-xl overflow-hidden shadow-sm ring-1 ring-black/5 relative flex-shrink-0 bg-white">
               <Image
                 src={restaurant.logo_url}
                 alt={restaurant.name}
                 fill
                 className="object-cover"
-                sizes="80px"
+                sizes="56px"
                 onError={() => setLogoError(true)}
               />
             </div>
           ) : (
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-[#8F2E19] text-white flex items-center justify-center font-bold text-2xl flex-shrink-0 shadow-sm">
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-[#8F2E19] text-white flex items-center justify-center font-bold text-lg flex-shrink-0 shadow-sm">
               {restaurant.name.charAt(0).toUpperCase()}
             </div>
           )}
 
-          {/* Info */}
-          <div className="min-w-0 flex-1">
-            <h1 className="text-xl font-bold text-text-primary leading-tight">
+          {/* Info - narrow lines */}
+          <div className="min-w-0 flex-1 pt-0.5">
+            <h1 className="text-base font-bold text-text-primary leading-tight truncate">
               {restaurant.name_ur || restaurant.name}
             </h1>
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-text-secondary mt-1">
-              <span className="flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5" /> {restaurant.city}
-              </span>
-              {restaurant.cuisine_type && (
-                <span className="flex items-center gap-1">
-                  <UtensilsCrossed className="w-3.5 h-3.5" /> {restaurant.cuisine_type}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-text-secondary mt-0.5">
+              {restaurant.city && (
+                <span className="flex items-center gap-0.5">
+                  <MapPin className="w-3 h-3" /> {restaurant.city}
                 </span>
               )}
-              <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${
+              {restaurant.cuisine_type && (
+                <span className="flex items-center gap-0.5">
+                  <UtensilsCrossed className="w-3 h-3" /> {restaurant.cuisine_type}
+                </span>
+              )}
+              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
                 liveIsOpen ? "bg-accent/10 text-accent" : "bg-error/10 text-error"
               }`}>
                 {liveIsOpen ? "● Open" : "● Closed"}
@@ -140,69 +142,67 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
 
         {/* Description */}
         {restaurant.description && (
-          <p className="text-sm text-[#555] leading-relaxed mb-4">
+          <p className="text-xs text-text-secondary leading-relaxed mb-4 line-clamp-2">
             {restaurant.description}
           </p>
         )}
 
-        {/* Contact & Delivery Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+        {/* Action Buttons Row - Call & Location */}
+        <div className="flex gap-2.5 mb-5">
           {restaurant.phone && (
             <a
               href={`tel:${restaurant.phone}`}
-              className="flex items-center gap-3 p-3 bg-white rounded-xl border border-border hover:border-border-strong hover:shadow-sm transition-all"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary text-white text-xs font-semibold active:scale-[0.97] transition-transform"
             >
-              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <Phone className="w-4 h-4 text-primary" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-text-muted uppercase tracking-wider font-medium">Phone</p>
-                <p className="text-sm font-semibold text-text-primary">{restaurant.phone}</p>
-              </div>
+              <Phone className="w-3.5 h-3.5" />
+              Call Now
             </a>
           )}
-          {restaurant.address && (
-            <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-border">
-              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <MapPin className="w-4 h-4 text-primary" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-text-muted uppercase tracking-wider font-medium">Address</p>
-                <p className="text-sm font-semibold text-text-primary truncate">{restaurant.address}</p>
-              </div>
-            </div>
-          )}
-          {restaurant.delivery_fee !== undefined && (
-            <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-border sm:col-span-2">
-              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <Truck className="w-4 h-4 text-primary" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-text-muted uppercase tracking-wider font-medium">Delivery</p>
-                <p className="text-sm font-semibold text-text-primary">
-                  {restaurant.delivery_fee === 0 ? "Free delivery" : `Rs ${restaurant.delivery_fee} delivery fee`}
-                  {restaurant.delivery_time_min && ` • ${restaurant.delivery_time_min} min`}
-                </p>
-              </div>
-            </div>
-          )}
+          {restaurant.lat && restaurant.lng ? (
+            <a
+              href={`https://www.google.com/maps?q=${restaurant.lat},${restaurant.lng}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-border text-text-secondary text-xs font-semibold active:scale-[0.97] transition-transform hover:bg-[#FAFAFA]"
+            >
+              <Navigation className="w-3.5 h-3.5" />
+              Directions
+            </a>
+          ) : restaurant.address ? (
+            <a
+              href={`https://www.google.com/maps/search/${encodeURIComponent(restaurant.address)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-border text-text-secondary text-xs font-semibold active:scale-[0.97] transition-transform hover:bg-[#FAFAFA]"
+            >
+              <MapPin className="w-3.5 h-3.5" />
+              Location
+            </a>
+          ) : null}
         </div>
 
-        {/* Opening Hours */}
+        {/* Opening Hours - Compact inline */}
         {restaurant.opening_hours && (
-          <div className="border border-border rounded-xl p-4 mb-5">
-            <div className="flex items-center gap-2 mb-3">
-              <Clock className="w-5 h-5 text-text-primary" />
-              <h3 className="font-semibold text-sm text-text-primary">Opening Hours</h3>
-            </div>
-            <div className="space-y-1.5">
+          <details className="group border border-border rounded-xl overflow-hidden mb-4">
+            <summary className="flex items-center justify-between px-4 py-3 cursor-pointer text-xs font-semibold text-text-primary hover:bg-[#FAFAFA] transition-colors list-none">
+              <span className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                Opening Hours
+              </span>
+              <span className="text-text-muted group-open:rotate-180 transition-transform">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </span>
+            </summary>
+            <div className="px-4 pb-3 space-y-1">
               {(["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const).map((day) => {
                 const hours = restaurant.opening_hours?.[day]
                 const today = new Date().toLocaleDateString("en-US", { weekday: "long" }).toLowerCase()
                 const isToday = day === today
                 if (!hours) return null
                 return (
-                  <div key={day} className={`flex justify-between items-center text-sm py-1.5 px-2 rounded-lg ${isToday ? "bg-primary/5 font-medium" : ""}`}>
+                  <div key={day} className={`flex justify-between items-center text-xs py-1.5 px-2 rounded-lg ${isToday ? "bg-primary/5 font-medium" : ""}`}>
                     <span className={`capitalize ${isToday ? "text-text-primary" : "text-text-secondary"}`}>
                       {day}
                     </span>
@@ -213,21 +213,21 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
                 )
               })}
             </div>
-          </div>
+          </details>
         )}
 
-        {/* Map / Location */}
+        {/* Map / Location - Compact */}
         {restaurant.lat && restaurant.lng && (
-          <div className="border border-border rounded-xl overflow-hidden mb-5">
-            <div className="h-48 bg-[#F9FAFB] flex items-center justify-center relative">
-              <MapPin className="w-8 h-8 text-text-muted" />
+          <div className="border border-border rounded-xl overflow-hidden mb-4">
+            <div className="h-32 bg-[#F9FAFB] flex items-center justify-center relative">
+              <MapPin className="w-6 h-6 text-text-muted" />
               <a
                 href={`https://www.google.com/maps?q=${restaurant.lat},${restaurant.lng}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="absolute bottom-3 left-3 bg-white px-3 py-1.5 rounded-lg text-xs font-medium border border-border flex items-center gap-1.5 hover:bg-surface transition-colors"
+                className="absolute bottom-2 left-2 bg-white px-2.5 py-1 rounded-lg text-[10px] font-medium border border-border flex items-center gap-1 hover:bg-surface transition-colors"
               >
-                <Navigation className="w-3.5 h-3.5" />
+                <Navigation className="w-3 h-3" />
                 Get Directions
               </a>
             </div>

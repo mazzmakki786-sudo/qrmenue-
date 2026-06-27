@@ -261,7 +261,7 @@ export default function CheckoutPage() {
       </div>
 
       {/* Main Content */}
-      <div className="px-4 py-5 space-y-5 max-w-[600px] mx-auto">
+      <div className="px-4 py-5 pb-32 space-y-5 max-w-[600px] mx-auto">
         {/* Order Type */}
         <div className="bg-white rounded-2xl p-5 border border-border">
           <OrderTypeSelector selected={orderType} onSelect={setOrderType} />
