@@ -290,9 +290,14 @@ export default function SettingsPage() {
               try {
                 const res = await fetch("/api/owner/retention/cleanup", { method: "POST" })
                 const data = await res.json()
-                setCleanResult(data.success ? `Cleaned up! ${data.deleted} old order(s) removed.` : "Cleanup failed.")
-              } catch {
-                setCleanResult("Cleanup request failed.")
+                if (data.success) {
+                  setCleanResult(`✅ ${data.deleted} old order(s) removed.`)
+                } else {
+                  setCleanResult(`❌ ${data.error || "Cleanup failed. Try again."}`)
+                }
+              } catch (err) {
+                setCleanResult("❌ Cleanup request failed. Check console.")
+                console.error("Cleanup error:", err)
               } finally {
                 setCleaning(false)
               }
@@ -303,7 +308,7 @@ export default function SettingsPage() {
             {cleaning ? "Cleaning..." : "Clean up old orders now"}
           </button>
           {cleanResult && (
-            <span className="text-[11px] text-[#888]">{cleanResult}</span>
+            <span className={`text-[11px] ${cleanResult.startsWith("✅") ? "text-emerald-600" : "text-red-500"}`}>{cleanResult}</span>
           )}
         </div>
       </div>

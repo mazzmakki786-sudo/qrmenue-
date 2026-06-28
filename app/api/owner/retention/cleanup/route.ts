@@ -18,47 +18,31 @@ export const POST = safeRoute(async (request) => {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
 
-  const { data: restaurant } = await supabase
+  const { data: restaurant, error: fetchError } = await supabase
     .from("restaurants")
     .select("id, retention_days")
     .eq("owner_id", user.id)
     .single()
 
-  if (!restaurant) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
+  if (!restaurant || fetchError) {
+    return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
+  }
 
   const admin = createAdminClient()
   const retentionDays = restaurant.retention_days ?? 30
 
-  // Delete completed/cancelled orders older than retention_days
-  const { data: deleted, error } = await admin
-    .from("orders")
-    .delete()
-    .eq("restaurant_id", restaurant.id)
-    .in("order_status", ["completed", "cancelled"])
-    .lt("created_at", new Date(Date.now() - retentionDays * 86400000).toISOString())
-    .select("id")
+  // Use the RPC function which handles FK constraints (notification_logs) properly
+  const { data, error } = await admin.rpc("cleanup_old_orders_for_restaurant", {
+    p_restaurant_id: restaurant.id,
+    p_retention_days: retentionDays,
+  })
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
-
-  const deletedCount = deleted?.length ?? 0
-
-  // Log the cleanup
-  if (deletedCount > 0) {
-    await admin.from("cleanup_log").insert({
-      restaurant_id: restaurant.id,
-      orders_deleted: deletedCount,
-      retention_days: retentionDays,
-    })
-
-    // Create notification for the owner
-    await admin.from("owner_notifications").insert({
-      restaurant_id: restaurant.id,
-      type: "cleanup",
-      title: "Manual Cleanup Completed",
-      body: `${deletedCount} order(s) older than ${retentionDays} days have been manually removed.`,
-      link_url: "/dashboard/orders",
-    })
+  if (error) {
+    console.error("Cleanup RPC error:", error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }
+
+  const deletedCount = data ?? 0
 
   return NextResponse.json({ success: true, deleted: deletedCount })
 })

@@ -13,8 +13,8 @@ export async function GET(request: Request) {
 
   const supabase = createAdminClient()
 
-  // Call the cleanup function
-  const { data, error } = await supabase.rpc("cleanup_old_orders")
+  // Call the full cleanup function for all restaurants
+  const { data, error } = await supabase.rpc("cleanup_all_restaurants")
 
   if (error) {
     console.error("Cleanup orders cron error:", error)
