@@ -53,10 +53,11 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const [dataReady, setDataReady] = useState(false)
+
   const fetchData = useCallback(async () => {
     if (!restaurant?.id) {
-      setLoading(false)
-      return
+      return // Keep loading=true — subscription hasn't resolved yet
     }
     const supabase = createClient()
     const today = new Date().toISOString().split("T")[0]
@@ -148,9 +149,11 @@ export default function DashboardPage() {
       setCleanupNotifications(notifData || [])
 
       setError(null)
+      setDataReady(true)
     } catch (err) {
       console.error("Dashboard data fetch error:", err)
       setError("Failed to load dashboard data. Please try again.")
+      setDataReady(true)
     } finally {
       setLoading(false)
     }
@@ -205,6 +208,14 @@ export default function DashboardPage() {
   const revenueTrend = yesterdayRevenue > 0
     ? Math.round(((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100)
     : todayRevenue > 0 ? 100 : 0
+
+  // Handle edge case: subscription finished but no restaurant exists
+  useEffect(() => {
+    if (!subLoading && !restaurant && !dataReady) {
+      setLoading(false)
+      setDataReady(true)
+    }
+  }, [subLoading, restaurant, dataReady])
 
   if (loading || subLoading) {
     return (
