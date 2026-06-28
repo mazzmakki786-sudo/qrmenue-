@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Camera, Clock, Power } from "lucide-react"
+import { Camera, Clock, Power, Check, Trash2, Loader2 } from "lucide-react"
 import type { Restaurant } from "@/types"
 import Image from "next/image"
 
@@ -30,7 +30,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [cleaning, setCleaning] = useState(false)
-  const [cleanResult, setCleanResult] = useState<string | null>(null)
+  const [cleanResult, setCleanResult] = useState<{ ok: boolean; msg: string } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
 
@@ -281,7 +281,7 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-3">
           <button
             onClick={async () => {
               if (cleaning) return
@@ -291,24 +291,47 @@ export default function SettingsPage() {
                 const res = await fetch("/api/owner/retention/cleanup", { method: "POST" })
                 const data = await res.json()
                 if (data.success) {
-                  setCleanResult(`✅ ${data.deleted} old order(s) removed.`)
+                  setCleanResult({
+                    ok: true,
+                    msg: `${data.deleted} old order(s) removed.`,
+                  })
                 } else {
-                  setCleanResult(`❌ ${data.error || "Cleanup failed. Try again."}`)
+                  setCleanResult({
+                    ok: false,
+                    msg: data.error || "Cleanup failed. Try again.",
+                  })
                 }
               } catch (err) {
-                setCleanResult("❌ Cleanup request failed. Check console.")
+                setCleanResult({ ok: false, msg: "Request failed. Check console." })
                 console.error("Cleanup error:", err)
               } finally {
                 setCleaning(false)
               }
             }}
             disabled={cleaning}
-            className="flex items-center gap-2 px-4 py-2.5 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold rounded-xl hover:bg-amber-100 transition-colors active:scale-[0.97] disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold rounded-xl hover:bg-amber-100 transition-all active:scale-[0.97] disabled:opacity-50"
           >
+            {cleaning ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Trash2 className="w-3.5 h-3.5" />
+            )}
             {cleaning ? "Cleaning..." : "Clean up old orders now"}
           </button>
           {cleanResult && (
-            <span className={`text-[11px] ${cleanResult.startsWith("✅") ? "text-emerald-600" : "text-red-500"}`}>{cleanResult}</span>
+            <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium ${
+              cleanResult.ok
+                ? "bg-accent/5 text-accent"
+                : "bg-red-50 text-red-600"
+            }`}>
+              {cleanResult.ok
+                ? <Check className="w-3.5 h-3.5 shrink-0" style={{ strokeWidth: 3 }} />
+                : <div className="w-3.5 h-3.5 shrink-0 rounded-full bg-red-500 flex items-center justify-center">
+                    <span className="text-white text-[8px] font-bold">!</span>
+                  </div>
+              }
+              {cleanResult.msg}
+            </div>
           )}
         </div>
       </div>
