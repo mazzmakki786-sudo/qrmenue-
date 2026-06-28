@@ -13,7 +13,7 @@ export function TakeawayForm({ name, phone, onNameChange, onPhoneChange }: Props
   return (
     <div className="bg-white rounded-2xl p-5 border border-border space-y-4">
       <Input label="Your Name *" id="name" value={name} onChange={(e) => onNameChange(e.target.value)} placeholder="Enter your name" />
-      <Input label="Phone Number" id="phone" value={phone} onChange={(e) => onPhoneChange(e.target.value)} placeholder="0300-XXXXXXX" />
+      <Input label="Phone Number *" id="phone" value={phone} onChange={(e) => onPhoneChange(e.target.value)} placeholder="0300-XXXXXXX" />
     </div>
   )
 }

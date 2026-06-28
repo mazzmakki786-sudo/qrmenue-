@@ -29,16 +29,46 @@ const createOrderSchema = z.object({
   table_number: z.string().nullable().optional(),
   delivery_address: z.string().nullable().optional(),
   payment_method: z.enum(["cod", "bank_transfer", "jazzcash", "easypaisa"]).optional(),
-})
+  deal_id: z.string().uuid().nullable().optional(),
+  discount_amount: z.number().int().nonnegative().optional(),
+}).refine(
+  (data) => {
+    // Takeaway & Delivery: phone is required
+    if (data.order_type === "takeaway" || data.order_type === "delivery") {
+      return !!data.customer_phone
+    }
+    return true
+  },
+  { message: "Phone number is required for takeaway and delivery orders", path: ["customer_phone"] }
+).refine(
+  (data) => {
+    // Dine In: table number is required
+    if (data.order_type === "dine_in") {
+      return !!data.table_number
+    }
+    return true
+  },
+  { message: "Table number is required for dine-in", path: ["table_number"] }
+).refine(
+  (data) => {
+    // Delivery: address is required
+    if (data.order_type === "delivery") {
+      return !!data.delivery_address
+    }
+    return true
+  },
+  { message: "Delivery address is required", path: ["delivery_address"] }
+)
 
 export const POST = safeRoute(async (request) => {
   const csrfResponse = csrfGuard(request)
   if (csrfResponse) return csrfResponse
 
   const ip = getClientIp(request)
-  const allowed = await rateLimit(ip, 10, 60)
+  // Dedicated rate limit bucket for orders (separate from other endpoints)
+  const allowed = await rateLimit(`orders:${ip}`, 20, 60)
   if (!allowed) {
-    return NextResponse.json({ error: "Too many requests" }, { status: 429 })
+    return NextResponse.json({ error: "Too many requests. Please wait a moment and try again." }, { status: 429 })
   }
 
   const supabase = await createClient()
@@ -123,6 +153,8 @@ export const POST = safeRoute(async (request) => {
       delivery_address: parsed.data.delivery_address || null,
       payment_method: parsed.data.payment_method || "cod",
       order_status: "received",
+      deal_id: parsed.data.deal_id || null,
+      discount_amount: parsed.data.discount_amount || 0,
     })
     .select()
     .single()

@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import { Bell, X, ChevronRight, Clock, Megaphone, BellRing } from "lucide-react"
-import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { formatPrice, timeAgo } from "@/lib/utils"
 
 interface Props {
@@ -77,6 +77,7 @@ function playNotificationSound() {
 }
 
 export function BellNotification({ restaurantId }: Props) {
+  const router = useRouter()
   const [unreadCount, setUnreadCount] = useState(0)
   const [showDropdown, setShowDropdown] = useState(false)
   const [alerts, setAlerts] = useState<OrderAlert[]>([])
@@ -130,7 +131,7 @@ export function BellNotification({ restaurantId }: Props) {
 
     fetchInitial()
 
-    const channel = supabase
+      const channel = supabase
       .channel(uid(`orders-${restaurantId}`))
       .on(
         "postgres_changes",
@@ -142,21 +143,45 @@ export function BellNotification({ restaurantId }: Props) {
         },
         (payload) => {
           const order = payload.new as any
-          playNotificationSound()
-          setUnreadCount((prev) => prev + 1)
-          setAlerts((prev) =>
-            [{
-              id: order.id,
-              order_number: order.order_number,
-              customer_name: order.customer_name,
-              total_price: order.total_price,
-              items: (order.items || []).map((i: any) => ({
-                name_en: i.name_en,
-                quantity: i.quantity,
-              })),
-              order_type: order.order_type,
-            } as OrderAlert, ...prev].slice(0, 5)
-          )
+          // Only count orders with "received" status
+          if (order.order_status === "received") {
+            playNotificationSound()
+            setUnreadCount((prev) => prev + 1)
+            setAlerts((prev) =>
+              [{
+                id: order.id,
+                order_number: order.order_number,
+                customer_name: order.customer_name,
+                total_price: order.total_price,
+                items: (order.items || []).map((i: any) => ({
+                  name_en: i.name_en,
+                  quantity: i.quantity,
+                })),
+                order_type: order.order_type,
+              } as OrderAlert, ...prev].slice(0, 5)
+            )
+          }
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "orders",
+          filter: `restaurant_id=eq.${restaurantId}`,
+        },
+        (payload) => {
+          const oldOrder = payload.old as any
+          const newOrder = payload.new as any
+          // If status changed away from "received", decrement the count
+          if (oldOrder.order_status === "received" && newOrder.order_status !== "received") {
+            setUnreadCount((prev) => Math.max(0, prev - 1))
+          }
+          // If order was reverted back to received (unlikely but handle)
+          if (oldOrder.order_status !== "received" && newOrder.order_status === "received") {
+            setUnreadCount((prev) => prev + 1)
+          }
         }
       )
       .subscribe()
@@ -251,12 +276,15 @@ export function BellNotification({ restaurantId }: Props) {
 
         {/* Toast notifications for orders - top right corner */}
         {alerts.length > 0 && (
-          <div className="fixed top-16 left-4 right-4 sm:top-16 sm:left-auto sm:right-4 z-[60] flex flex-col gap-3 sm:w-[340px] pointer-events-none">
+          <div className="fixed top-16 left-4 right-4 sm:top-16 sm:left-auto sm:right-4 z-[60] flex flex-col gap-3 sm:w-[340px]">
             {alerts.map((alert) => (
-              <Link
+              <div
                 key={alert.id}
-                href={`/dashboard/orders/${alert.id}`}
-                className="bg-black text-white rounded-2xl p-4 shadow-2xl animate-slide-up pointer-events-auto block"
+                role="button"
+                tabIndex={0}
+                onClick={() => { dismissAlert(alert.id); router.push(`/dashboard/orders/${alert.id}`) }}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); dismissAlert(alert.id); router.push(`/dashboard/orders/${alert.id}`) } }}
+                className="bg-black text-white rounded-2xl p-4 shadow-2xl animate-slide-up cursor-pointer active:scale-[0.98] transition-transform"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
@@ -280,13 +308,13 @@ export function BellNotification({ restaurantId }: Props) {
                     <p className="text-sm font-bold mt-2">{formatPrice(alert.total_price)}</p>
                   </div>
                   <button
-                    onClick={(e) => { e.preventDefault(); dismissAlert(alert.id) }}
+                    onClick={(e) => { e.stopPropagation(); dismissAlert(alert.id) }}
                     className="p-1.5 hover:bg-white/10 rounded-lg shrink-0"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         )}
@@ -320,11 +348,13 @@ export function BellNotification({ restaurantId }: Props) {
               ) : (
                 <div className="divide-y divide-[#F0F0F0]">
                   {todayOrders.map((order) => (
-                    <Link
+                    <div
                       key={order.id}
-                      href={`/dashboard/orders/${order.id}`}
-                      onClick={() => setShowDropdown(false)}
-                      className="flex items-center justify-between p-4 hover:bg-[#F9FAFB] active:bg-[#F0F0F0] transition-colors"
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => { setShowDropdown(false); router.push(`/dashboard/orders/${order.id}`) }}
+                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setShowDropdown(false); router.push(`/dashboard/orders/${order.id}`) } }}
+                      className="flex items-center justify-between p-4 hover:bg-[#F9FAFB] active:bg-[#F0F0F0] transition-colors cursor-pointer"
                     >
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
@@ -347,7 +377,7 @@ export function BellNotification({ restaurantId }: Props) {
                         <span className="text-sm font-bold text-black">{formatPrice(order.total_price)}</span>
                         <ChevronRight className="w-4 h-4 text-[#999]" />
                       </div>
-                    </Link>
+                    </div>
                   ))}
                 </div>
               )}
@@ -403,14 +433,13 @@ export function BellNotification({ restaurantId }: Props) {
                   ? `Next (${announcementQueue.length - 1} remaining)`
                   : "Got it"}
               </button>
-              <Link
-                href="/dashboard/announcements"
-                onClick={dismissAnnouncement}
+              <button
+                onClick={() => { dismissAnnouncement(); router.push("/dashboard/announcements") }}
                 className="shrink-0 h-12 px-4 rounded-xl border border-[#F0F0F0] text-sm font-medium text-[#555] hover:bg-[#F0F0F0] transition-colors flex items-center justify-center gap-1.5 min-h-[44px]"
               >
                 <BellRing className="w-4 h-4" />
                 All
-              </Link>
+              </button>
             </div>
           </div>
         </div>

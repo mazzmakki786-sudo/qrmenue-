@@ -11,14 +11,6 @@ import { useSubscription } from "@/lib/hooks/useSubscription"
 import { Lock, Sparkles, ArrowRight, Receipt, ChevronRight, Clock, ClipboardList } from "lucide-react"
 import { DashboardFooter } from "@/components/shared/DashboardFooter"
 
-const statusStyles: Record<string, string> = {
-  received: "bg-[#25D366]/10 text-[#25D366]",
-  preparing: "bg-blue-100 text-blue-600",
-  ready: "bg-purple-100 text-purple-600",
-  completed: "bg-emerald-100 text-emerald-600",
-  cancelled: "bg-gray-100 text-gray-500",
-}
-
 const orderTypeLabels: Record<string, string> = {
   dine_in: "Dine-in",
   takeaway: "Takeaway",
@@ -32,7 +24,7 @@ export default function OrdersPage() {
   const sub = useSubscription()
   const { shouldBlurOrderDetails } = sub
   const [orders, setOrders] = useState<Order[]>([])
-  const [filter, setFilter] = useState<"today" | "week" | "all">("today")
+  const [filter, setFilter] = useState<"today" | "week" | "month" | "all">("today")
   const [currentPage, setCurrentPage] = useState(1)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -67,6 +59,9 @@ export default function OrdersPage() {
       } else if (filter === "week") {
         const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
         query = query.gte("created_at", weekAgo)
+      } else if (filter === "month") {
+        const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
+        query = query.gte("created_at", monthAgo.toISOString())
       }
 
       const { data } = await query.limit(500)
@@ -173,11 +168,14 @@ export default function OrdersPage() {
         </section>
       )}
 
-      {/* Heading & Time Filters */}
+      {/* Heading & Order Count + Time Filters */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-black">Orders</h1>
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
-          {(["today", "week", "all"] as const).map((f) => (
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-black">Orders</h1>
+          <p className="text-sm text-[#999] mt-1">{orders.length} order{orders.length !== 1 ? "s" : ""}</p>
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          {(["today", "week", "month", "all"] as const).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
@@ -187,7 +185,7 @@ export default function OrdersPage() {
                   : "bg-[#F0F0F0] text-[#555] hover:bg-[#E2E2E2]"
               }`}
             >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
+              {f === "month" ? "Last Month" : f.charAt(0).toUpperCase() + f.slice(1)}
             </button>
           ))}
         </div>
@@ -265,14 +263,9 @@ export default function OrdersPage() {
                           `Rs ${order.total_price.toLocaleString("en-PK")}`
                         )}
                       </span>
-                      <div className="flex items-center gap-2">
-                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full ${statusStyles[order.order_status] || "bg-gray-100 text-gray-500"}`}>
-                          {order.order_status}
-                        </span>
-                        {!isLocked && (
-                          <ChevronRight className="w-4 h-4 text-[#999]" />
-                        )}
-                      </div>
+                      {!isLocked && (
+                        <ChevronRight className="w-4 h-4 text-[#999]" />
+                      )}
                     </div>
                   </div>
                 </Link>

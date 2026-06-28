@@ -1,9 +1,9 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { formatPrice, timeAgo } from "@/lib/utils"
-import { ChevronRight, ClipboardList, UtensilsCrossed, User, Check, TrendingUp, TrendingDown, AlertCircle, RefreshCw, Power, Clock } from "lucide-react"
+import { formatPrice, timeAgo, formatTo12Hour } from "@/lib/utils"
+import { ChevronRight, ClipboardList, QrCode, UtensilsCrossed, User, Check, TrendingUp, TrendingDown, AlertCircle, RefreshCw, Power, Clock, Sparkles } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import type { Order } from "@/types"
@@ -11,12 +11,15 @@ import { useSubscription } from "@/lib/hooks/useSubscription"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { DashboardFooter } from "@/components/shared/DashboardFooter"
+import { PageLoader } from "@/components/shared/PageLoader"
 
+type PageState = "loading" | "ready" | "error" | "offline"
 
 export default function DashboardPage() {
   const router = useRouter()
   const sub = useSubscription()
   const { restaurant, orderCount, loading: subLoading } = sub
+  const [pageState, setPageState] = useState<PageState>("loading")
   const [todayOrders, setTodayOrders] = useState(0)
   const [yesterdayOrders, setYesterdayOrders] = useState(0)
   const [todayRevenue, setTodayRevenue] = useState(0)
@@ -28,9 +31,8 @@ export default function DashboardPage() {
   const [openingTime, setOpeningTime] = useState("09:00")
   const [closingTime, setClosingTime] = useState("23:00")
   const [toggling, setToggling] = useState(false)
-  const [cleanupNotifications, setCleanupNotifications] = useState<any[]>([])
-
   const supabase = createClient()
+  const fetchedRef = useRef(false) // Prevent double-fetch in strict mode
 
   const handleToggleOpen = async () => {
     if (!restaurant?.id || toggling) return
@@ -50,22 +52,19 @@ export default function DashboardPage() {
   const [topDishes, setTopDishes] = useState<{ name: string; count: number }[]>([])
   const [categoryCount, setCategoryCount] = useState(0)
   const [dishCount, setDishCount] = useState(0)
-  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const [dataReady, setDataReady] = useState(false)
-
   const fetchData = useCallback(async () => {
-    if (!restaurant?.id) {
-      return // Keep loading=true — subscription hasn't resolved yet
-    }
+    // Wait until subscription provides a restaurant
+    if (!restaurant?.id) return
+
     const supabase = createClient()
     const today = new Date().toISOString().split("T")[0]
     const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0]
     const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split("T")[0]
 
     try {
-      const [todayRes, yesterdayRes, monthlyRes, ordersRes, catRes, dishRes] = await Promise.all([
+      const [todayRes, yesterdayRes, ordersRes, catRes, dishRes, monthlyStatsRes] = await Promise.all([
         supabase
           .from("orders")
           .select("total_price")
@@ -81,12 +80,6 @@ export default function DashboardPage() {
           .neq("order_status", "cancelled"),
         supabase
           .from("orders")
-          .select("total_price")
-          .eq("restaurant_id", restaurant.id)
-          .gte("created_at", monthStart)
-          .neq("order_status", "cancelled"),
-        supabase
-          .from("orders")
           .select("*")
           .eq("restaurant_id", restaurant.id)
           .order("created_at", { ascending: false })
@@ -99,6 +92,12 @@ export default function DashboardPage() {
           .from("dishes")
           .select("*", { count: "exact", head: true })
           .eq("restaurant_id", restaurant.id),
+        // Use daily_order_stats for monthly totals
+        supabase
+          .from("daily_order_stats")
+          .select("total_orders, total_revenue")
+          .eq("restaurant_id", restaurant.id)
+          .gte("order_date", monthStart),
       ])
 
       if (todayRes.error) throw new Error(todayRes.error.message)
@@ -113,9 +112,22 @@ export default function DashboardPage() {
         setYesterdayRevenue(yesterdayRes.data.reduce((sum, o) => sum + o.total_price, 0))
       }
 
-      if (monthlyRes.data) {
-        setMonthlyOrders(monthlyRes.data.length)
-        setMonthlyRevenue(monthlyRes.data.reduce((sum, o) => sum + o.total_price, 0))
+      // Monthly totals from daily_order_stats (persistent)
+      if (monthlyStatsRes.data && monthlyStatsRes.data.length > 0) {
+        setMonthlyOrders(monthlyStatsRes.data.reduce((s, d) => s + d.total_orders, 0))
+        setMonthlyRevenue(monthlyStatsRes.data.reduce((s, d) => s + d.total_revenue, 0))
+      } else {
+        // Fallback: query orders directly
+        const { data: monthlyFallback } = await supabase
+          .from("orders")
+          .select("total_price")
+          .eq("restaurant_id", restaurant.id)
+          .gte("created_at", monthStart)
+          .neq("order_status", "cancelled")
+        if (monthlyFallback) {
+          setMonthlyOrders(monthlyFallback.length)
+          setMonthlyRevenue(monthlyFallback.reduce((s, o) => s + o.total_price, 0))
+        }
       }
 
       if (ordersRes.data) {
@@ -137,37 +149,41 @@ export default function DashboardPage() {
       setCategoryCount(catRes.count ?? 0)
       setDishCount(dishRes.count ?? 0)
 
-      // Fetch cleanup notifications
-      const { data: notifData } = await supabase
-        .from("owner_notifications")
-        .select("*")
-        .eq("restaurant_id", restaurant.id)
-        .eq("type", "cleanup")
-        .eq("is_read", false)
-        .order("created_at", { ascending: false })
-        .limit(3)
-      setCleanupNotifications(notifData || [])
-
       setError(null)
-      setDataReady(true)
+      setPageState("ready")
     } catch (err) {
       console.error("Dashboard data fetch error:", err)
       setError("Failed to load dashboard data. Please try again.")
-      setDataReady(true)
-    } finally {
-      setLoading(false)
+      setPageState("error")
     }
   }, [restaurant?.id])
 
+  // Central loading orchestrator — waits for subscription + dashboard data
   useEffect(() => {
+    if (fetchedRef.current) return
+    if (subLoading) {
+      setPageState("loading")
+      return
+    }
+    // Subscription resolved
+    if (!restaurant) {
+      // User has no restaurant — show empty state
+      setPageState("ready")
+      return
+    }
+    // Restaurant exists — fetch dashboard data
+    setPageState("loading")
+    fetchedRef.current = true
     fetchData()
-  }, [fetchData])
+  }, [subLoading, restaurant, fetchData])
 
   useEffect(() => {
     if (restaurant) {
       setIsOpen((restaurant as any).is_open ?? true)
-      setOpeningTime((restaurant as any).opening_time || "09:00")
-      setClosingTime((restaurant as any).closing_time || "23:00")
+      const rawOpen: string = (restaurant as any).opening_time || "09:00"
+      const rawClose: string = (restaurant as any).closing_time || "23:00"
+      setOpeningTime(rawOpen.length > 5 ? rawOpen.slice(0, 5) : rawOpen)
+      setClosingTime(rawClose.length > 5 ? rawClose.slice(0, 5) : rawClose)
     }
   }, [restaurant])
 
@@ -199,6 +215,9 @@ export default function DashboardPage() {
   const trialDaysRemaining = isTrial && restaurant?.trial_end
     ? Math.max(0, Math.ceil((new Date(restaurant.trial_end).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : 0
+  const planDaysRemaining = !isTrial && restaurant?.plan_end_date
+    ? Math.max(0, Math.ceil((new Date(restaurant.plan_end_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : null
 
   const onboardingComplete = profilePercent === 100 && menuDone === 2
 
@@ -209,43 +228,31 @@ export default function DashboardPage() {
     ? Math.round(((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100)
     : todayRevenue > 0 ? 100 : 0
 
-  // Handle edge case: subscription finished but no restaurant exists
-  useEffect(() => {
-    if (!subLoading && !restaurant && !dataReady) {
-      setLoading(false)
-      setDataReady(true)
-    }
-  }, [subLoading, restaurant, dataReady])
-
-  if (loading || subLoading) {
+  // Show PageLoader while loading (covers: slow internet, offline, error)
+  if (pageState !== "ready") {
     return (
-      <div className="space-y-4 animate-pulse" aria-hidden="true">
-        <div className="h-7 w-32 bg-[#F0F0F0] rounded-lg" />
-        <div className="h-20 bg-[#F0F0F0] rounded-2xl" />
-        <div className="grid grid-cols-2 gap-3">
-          <div className="h-24 bg-[#F0F0F0] rounded-2xl" />
-          <div className="h-24 bg-[#F0F0F0] rounded-2xl" />
-          <div className="h-24 bg-[#F0F0F0] rounded-2xl" />
-          <div className="h-24 bg-[#F0F0F0] rounded-2xl" />
-        </div>
-        <div className="h-48 bg-[#F0F0F0] rounded-2xl" />
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 gap-4">
-        <AlertCircle className="w-10 h-10 text-[#DC2626]" />
-        <p className="text-sm text-[#555] text-center">{error}</p>
-        <button
-          onClick={() => { setError(null); setLoading(true); fetchData() }}
-          className="flex items-center gap-2 px-5 py-2.5 bg-black text-white text-sm font-semibold rounded-full hover:opacity-90 transition-all active:scale-95"
-        >
-          <RefreshCw className="w-4 h-4" />
-          Retry
-        </button>
-      </div>
+      <PageLoader
+        state={pageState}
+        error={error}
+        onRetry={() => {
+          fetchedRef.current = false
+          setPageState("loading")
+          fetchData()
+        }}
+        skeleton={
+          <div className="space-y-4 animate-pulse" aria-hidden="true">
+            <div className="h-7 w-32 bg-[#F0F0F0] rounded-lg" />
+            <div className="h-20 bg-[#F0F0F0] rounded-2xl" />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="h-24 bg-[#F0F0F0] rounded-2xl" />
+              <div className="h-24 bg-[#F0F0F0] rounded-2xl" />
+              <div className="h-24 bg-[#F0F0F0] rounded-2xl" />
+              <div className="h-24 bg-[#F0F0F0] rounded-2xl" />
+            </div>
+            <div className="h-48 bg-[#F0F0F0] rounded-2xl" />
+          </div>
+        }
+      />
     )
   }
 
@@ -256,6 +263,13 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-black">Dashboard</h1>
         <div className="flex items-center gap-2">
+          <Link
+            href="/dashboard/qr"
+            className="bg-white border border-[#E0E0E0] text-black px-4 py-2 rounded-full flex items-center gap-2 text-sm font-semibold hover:bg-[#F5F5F5] transition-all active:scale-95"
+          >
+            <QrCode className="w-4 h-4" />
+            <span className="hidden sm:inline">QR</span>
+          </Link>
           <Link
             href="/dashboard/orders"
             className="bg-black text-white px-5 py-2 rounded-full flex items-center gap-2 text-sm font-semibold hover:opacity-90 transition-all active:scale-95"
@@ -269,32 +283,39 @@ export default function DashboardPage() {
       {/* Subscription Banner */}
       {restaurant && (
         <div className="relative overflow-hidden bg-gradient-to-r from-[#0052D4] via-[#4364F7] to-[#6FB1FC] p-5 md:p-6 rounded-2xl text-white shadow-sm">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-white/[0.03] rounded-full -translate-y-1/2 translate-x-1/4" />
           <div className="relative z-10">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                  {isTrial ? "Trial Version" : `${restaurant.plan} Plan`}
-                </span>
-                <h2 className="text-lg font-semibold mt-2">
-                  {isTrial
-                    ? `${trialDaysRemaining} days left in trial`
-                    : "Plan Active"}
-                </h2>
-              </div>
-              {isTrial && (
-                <div className="w-full sm:w-56">
-                  <div className="flex justify-between text-xs font-medium mb-2">
-                    <span>Order usage</span>
-                    <span>{orderCount}/{10} orders used</span>
-                  </div>
-                  <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-white rounded-full transition-all duration-1000"
-                      style={{ width: `${Math.min(100, (orderCount / 10) * 100)}%` }}
-                    />
-                  </div>
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+                  <Sparkles className="w-5 h-5" />
                 </div>
-              )}
+                <div>
+                  <span className="bg-white/20 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                    {isTrial ? "Free Trial" : `${restaurant.plan} Plan`}
+                  </span>
+                  <h2 className="text-base font-semibold mt-1.5">
+                    {isTrial
+                      ? `${trialDaysRemaining} day${trialDaysRemaining === 1 ? "" : "s"} remaining in trial`
+                      : `${restaurant.plan.charAt(0).toUpperCase() + restaurant.plan.slice(1)} Plan — Active`}
+                  </h2>
+                  <p className="text-[11px] text-white/70 mt-0.5">
+                    {restaurant.trial_start && isTrial
+                      ? `Started ${new Date(restaurant.trial_start).toLocaleDateString("en-PK", { day: "numeric", month: "short" })}`
+                      : restaurant.plan_end_date
+                        ? `Renews ${new Date(restaurant.plan_end_date).toLocaleDateString("en-PK", { day: "numeric", month: "short", year: "numeric" })}`
+                        : ""}
+                  </p>
+                </div>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-2xl font-bold">
+                  {isTrial ? trialDaysRemaining : planDaysRemaining ?? "∞"}
+                </p>
+                <p className="text-[10px] text-white/70 font-medium">
+                  {isTrial ? "days left" : "days remaining"}
+                </p>
+              </div>
             </div>
           </div>
           <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 0)", backgroundSize: "24px 24px" }} />
@@ -325,75 +346,55 @@ export default function DashboardPage() {
       )}
 
       {/* Open/Close Toggle + Timing */}
-      <div className="bg-white border border-[#F0F0F0] rounded-2xl p-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isOpen ? "bg-[#25D366]/10" : "bg-red-50"}`}>
-            <Power className={`w-5 h-5 ${isOpen ? "text-[#25D366]" : "text-[#DC2626]"}`} />
+      <div className="bg-white border border-[#F0F0F0] rounded-2xl p-4 sm:p-5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isOpen ? "bg-[#25D366]/10" : "bg-red-50"}`}>
+              <Power className={`w-5 h-5 ${isOpen ? "text-[#25D366]" : "text-[#DC2626]"}`} />
+            </div>
+            <div>
+              <p className="text-sm font-semibold">{isOpen ? "Accepting Orders" : "Closed"}</p>
+              <p className="text-[11px] text-[#555] mt-0.5">
+                {isOpen ? "Customers can place orders" : "Customers cannot place orders"}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-semibold">{isOpen ? "Accepting Orders" : "Closed"}</p>
-            <div className="flex items-center gap-2 text-xs text-[#555] mt-0.5">
-              <Clock className="w-3 h-3" />
+          <button
+            onClick={handleToggleOpen}
+            disabled={toggling}
+            className={`relative w-12 h-6 rounded-full transition-colors shrink-0 ${isOpen ? "bg-[#25D366]" : "bg-[#CCC]"}`}
+          >
+            <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${isOpen ? "translate-x-6" : "translate-x-0.5"}`} />
+          </button>
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 pt-3 sm:pt-4 mt-3 sm:mt-4 border-t border-[#F0F0F0]">
+          <div className="flex items-center gap-2 text-[11px] text-[#555] font-medium shrink-0">
+            <Clock className="w-4 h-4 text-[#555]" />
+            <span>Business Hours</span>
+          </div>
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+            <div className="flex items-center gap-1.5">
               <input
                 type="time"
                 value={openingTime}
-                onChange={(e) => handleTimeChange("opening_time", e.target.value)}
-                className="w-16 bg-transparent border-none outline-none text-xs p-0 cursor-pointer"
+                onChange={(e) => handleTimeChange("opening_time", e.target.value.slice(0, 5))}
+                className="w-[88px] bg-[#F5F5F5] rounded-lg px-2 py-1.5 text-xs font-medium text-black border border-[#E0E0E0] focus:outline-none focus:border-black focus:ring-1 focus:ring-black/10 cursor-pointer transition-colors"
               />
-              <span>—</span>
+              <span className="text-[10px] text-[#888] font-medium w-12 text-left">{formatTo12Hour(openingTime)}</span>
+            </div>
+            <span className="text-[#BBB] text-xs">—</span>
+            <div className="flex items-center gap-1.5">
               <input
                 type="time"
                 value={closingTime}
-                onChange={(e) => handleTimeChange("closing_time", e.target.value)}
-                className="w-16 bg-transparent border-none outline-none text-xs p-0 cursor-pointer"
+                onChange={(e) => handleTimeChange("closing_time", e.target.value.slice(0, 5))}
+                className="w-[88px] bg-[#F5F5F5] rounded-lg px-2 py-1.5 text-xs font-medium text-black border border-[#E0E0E0] focus:outline-none focus:border-black focus:ring-1 focus:ring-black/10 cursor-pointer transition-colors"
               />
+              <span className="text-[10px] text-[#888] font-medium w-12 text-left">{formatTo12Hour(closingTime)}</span>
             </div>
           </div>
         </div>
-        <button
-          onClick={handleToggleOpen}
-          disabled={toggling}
-          className={`relative w-12 h-6 rounded-full transition-colors shrink-0 ${isOpen ? "bg-[#25D366]" : "bg-[#CCC]"}`}
-        >
-          <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${isOpen ? "translate-x-6" : "translate-x-0.5"}`} />
-        </button>
       </div>
-
-      {/* Cleanup Notifications */}
-      {cleanupNotifications.length > 0 && (
-        <div className="space-y-2">
-          {cleanupNotifications.map((notif) => (
-            <div
-              key={notif.id}
-              className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3"
-            >
-              <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0 mt-0.5">
-                <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-sm font-semibold text-amber-800">{notif.title}</h4>
-                <p className="text-xs text-amber-700 mt-1">{notif.body}</p>
-                <p className="text-[10px] text-amber-500 mt-1">
-                  {new Date(notif.created_at).toLocaleDateString("en-PK", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
-                </p>
-              </div>
-              <button
-                onClick={async () => {
-                  await supabase.from("owner_notifications").update({ is_read: true }).eq("id", notif.id)
-                  setCleanupNotifications((prev) => prev.filter((n) => n.id !== notif.id))
-                }}
-                className="text-amber-500 hover:text-amber-700 shrink-0"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
 
       {/* Quick Action Cards */}
       <div className="grid grid-cols-2 gap-3">
@@ -407,6 +408,18 @@ export default function DashboardPage() {
           <div className="min-w-0">
             <p className="text-sm font-semibold truncate">Menu</p>
             <p className="text-[10px] text-white/60">Categories & dishes</p>
+          </div>
+        </Link>
+        <Link
+          href="/dashboard/ai-posts"
+          className="bg-gradient-to-br from-[#7C3AED] to-[#2563EB] text-white p-4 rounded-2xl flex items-center gap-3 group cursor-pointer hover:shadow-lg transition-shadow"
+        >
+          <div className="bg-white/10 p-2.5 rounded-xl shrink-0">
+            <Sparkles className="w-5 h-5" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold truncate">AI Posts</p>
+            <p className="text-[10px] text-white/60">Generate with AI</p>
           </div>
         </Link>
         <Link

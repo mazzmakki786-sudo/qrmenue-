@@ -9,6 +9,7 @@ export interface PlanLimits {
   customBranding: boolean
   canHaveQR: boolean
   canHaveWhatsapp: boolean
+  aiPostsPerMonth: number
 }
 
 export interface TrialLimitConfig {
@@ -75,6 +76,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     customBranding: false,
     canHaveQR: true,
     canHaveWhatsapp: true,
+    aiPostsPerMonth: 0,
   },
   starter: {
     maxDishes: 30,
@@ -85,6 +87,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     customBranding: false,
     canHaveQR: true,
     canHaveWhatsapp: true,
+    aiPostsPerMonth: 0,
   },
   growth: {
     maxDishes: 50,
@@ -95,6 +98,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     customBranding: true,
     canHaveQR: true,
     canHaveWhatsapp: true,
+    aiPostsPerMonth: 6,
   },
   premium: {
     maxDishes: 100,
@@ -105,6 +109,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     customBranding: true,
     canHaveQR: true,
     canHaveWhatsapp: true,
+    aiPostsPerMonth: 12,
   },
 }
 
@@ -142,6 +147,7 @@ export interface PlanLimitsPartial {
   maxImages?: number
   maxOrders?: number
   maxCategories?: number
+  aiPostsPerMonth?: number
 }
 
 export interface StatusCounts {
@@ -161,6 +167,7 @@ export function getEffectiveLimits(
     if (override.maxImages !== undefined) base.maxImages = override.maxImages
     if (override.maxOrders !== undefined) base.maxOrders = override.maxOrders
     if (override.maxCategories !== undefined) base.maxCategories = override.maxCategories
+    if (override.aiPostsPerMonth !== undefined) base.aiPostsPerMonth = override.aiPostsPerMonth
   }
   return base
 }
@@ -314,6 +321,7 @@ export function getPlanFeatures(plan: Plan): string[] {
   if (limits.analytics) features.push("Analytics dashboard")
   if (limits.canHaveQR) features.push("QR code generation")
   if (limits.canHaveWhatsapp) features.push("WhatsApp orders")
+  if (limits.aiPostsPerMonth > 0) features.push(`${limits.aiPostsPerMonth} AI posts per month`)
 
   return features
 }

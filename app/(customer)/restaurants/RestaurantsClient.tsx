@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import { useFavorites } from "@/lib/hooks/useFavorites"
 import Link from "next/link"
-import { Clock, Bike } from "lucide-react"
+import { Clock, Truck, Heart } from "lucide-react"
 
 interface RestaurantSummary {
   id: string
@@ -66,19 +66,19 @@ function RestaurantCard({
           {/* Delivery + Status row */}
           <div className="flex items-center gap-2 sm:gap-3 mt-1.5 text-[11px] sm:text-xs text-gray-400">
             {r.delivery_time_min != null && (
-              <span className="flex items-center gap-1">
+              <span className="inline-flex items-center gap-1 whitespace-nowrap shrink-0">
                 <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                {r.delivery_time_min} min
+                {r.delivery_time_min}min
               </span>
             )}
             {r.delivery_fee != null && (
-              <span className="flex items-center gap-1">
-                <Bike className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                {r.delivery_fee === 0 ? "Free" : `Rs. ${r.delivery_fee}`}
+              <span className="inline-flex items-center gap-1 whitespace-nowrap shrink-0">
+                <Truck className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                {r.delivery_fee === 0 ? "Free" : `Rs\xa0${r.delivery_fee}`}
               </span>
             )}
             {r.is_open !== undefined && (
-              <span className={`ml-auto text-[10px] sm:text-[11px] font-medium ${r.is_open ? "text-green-600" : "text-red-500"}`}>
+              <span className={`ml-auto text-[10px] sm:text-[11px] font-medium shrink-0 ${r.is_open ? "text-green-600" : "text-red-500"}`}>
                 {r.is_open ? "Open" : "Closed"}
               </span>
             )}
@@ -86,7 +86,7 @@ function RestaurantCard({
         </div>
       </Link>
 
-      {/* Right side: Favorite star + View Menu */}
+      {/* Right side: Favorite heart + View Menu button */}
       <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
         <button
           onClick={(e) => {
@@ -96,24 +96,18 @@ function RestaurantCard({
           className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
           aria-label={isFav ? "Remove from favorites" : "Add to favorites"}
         >
-          <svg
-            className={`w-5 h-5 sm:w-5.5 sm:h-5.5 transition-colors ${isFav ? "text-yellow-500" : "text-gray-300 hover:text-yellow-400"}`}
-            viewBox="0 0 24 24"
-            fill={isFav ? "currentColor" : "none"}
-            stroke="currentColor"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-          </svg>
+          <Heart
+            className={`w-4 h-4 sm:w-4.5 sm:h-4.5 transition-colors ${
+              isFav ? "fill-red-500 text-red-500" : "text-gray-300 hover:text-red-400"
+            }`}
+          />
         </button>
 
         <Link
           href={`/restaurant/${r.slug}`}
-          className="text-xs font-medium text-black/60 hover:text-black hover:underline decoration-1 underline-offset-2 whitespace-nowrap transition-colors"
+          className="inline-flex items-center px-3 py-1.5 rounded-lg bg-black text-white text-[11px] sm:text-xs font-semibold hover:bg-gray-800 active:scale-[0.97] transition-all shadow-sm"
         >
-          View Menu
+          Menu
         </Link>
       </div>
     </div>
@@ -203,13 +197,8 @@ export function RestaurantsClient({ initialRestaurants, initialCities }: Restaur
     <div className="min-h-screen bg-[#f9f9f9]">
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 pb-24">
-        {/* Header Section */}
+        {/* Search Section */}
         <section className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-4xl font-bold text-black mb-4 sm:mb-6 tracking-tight">
-            Browse Restaurants
-          </h1>
-
-          {/* Search */}
           <div className="max-w-xl">
             <div className="relative group">
               <svg

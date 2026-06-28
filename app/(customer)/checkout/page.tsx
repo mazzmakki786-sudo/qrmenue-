@@ -9,7 +9,7 @@ import { OrderTypeSelector } from "@/components/checkout/OrderTypeSelector"
 import { DineInForm } from "@/components/checkout/DineInForm"
 import { TakeawayForm } from "@/components/checkout/TakeawayForm"
 import { DeliveryForm } from "@/components/checkout/DeliveryForm"
-import { ArrowLeft, ChevronDown, ChevronUp, ShoppingBag, AlertCircle } from "lucide-react"
+import { ArrowLeft, ChevronDown, ChevronUp, ShoppingBag, AlertCircle, Tag, X } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { formatPrice } from "@/lib/utils"
@@ -36,8 +36,12 @@ export default function CheckoutPage() {
   const router = useRouter()
   const items = useCartStore((s) => s.items)
   const getTotalPrice = useCartStore((s) => s.getTotalPrice)
+  const getDiscount = useCartStore((s) => s.getDiscount)
   const restaurantId = useCartStore((s) => s.restaurantId)
   const restaurantName = useCartStore((s) => s.restaurantName)
+  const selectedDeal = useCartStore((s) => s.selectedDeal)
+  const discountAmount = useCartStore((s) => s.discountAmount)
+  const clearDeal = useCartStore((s) => s.clearDeal)
   const clearCart = useCartStore((s) => s.clearCart)
   const {
     orderType, customerName, customerPhone, tableNumber,
@@ -81,15 +85,34 @@ export default function CheckoutPage() {
   const validateForm = useCallback((): boolean => {
     const errors: Record<string, string> = {}
     if (!customerName.trim()) errors.name = "Name is required"
-    if (customerPhone && !PHONE_REGEX.test(customerPhone)) {
-      errors.phone = "Enter a valid phone (e.g. 0300-1234567)"
+
+    if (orderType === "dine_in") {
+      // Dine In: phone is optional, table is required
+      if (customerPhone && !PHONE_REGEX.test(customerPhone)) {
+        errors.phone = "Enter a valid phone (e.g. 0300-1234567)"
+      }
+      if (!tableNumber.trim()) {
+        errors.table = "Table number is required"
+      }
+    } else if (orderType === "takeaway") {
+      // Take Away: phone is required
+      if (!customerPhone.trim()) {
+        errors.phone = "Phone number is required"
+      } else if (!PHONE_REGEX.test(customerPhone)) {
+        errors.phone = "Enter a valid phone (e.g. 0300-1234567)"
+      }
+    } else if (orderType === "delivery") {
+      // Delivery: phone is required, address is required
+      if (!customerPhone.trim()) {
+        errors.phone = "Phone number is required"
+      } else if (!PHONE_REGEX.test(customerPhone)) {
+        errors.phone = "Enter a valid phone (e.g. 0300-1234567)"
+      }
+      if (!deliveryAddress.trim()) {
+        errors.address = "Delivery address is required"
+      }
     }
-    if (orderType === "dine_in" && !tableNumber.trim()) {
-      errors.table = "Table number is required"
-    }
-    if (orderType === "delivery" && !deliveryAddress.trim()) {
-      errors.address = "Delivery address is required"
-    }
+
     setFieldErrors(errors)
     return Object.keys(errors).length === 0
   }, [customerName, customerPhone, orderType, tableNumber, deliveryAddress])
@@ -108,24 +131,26 @@ export default function CheckoutPage() {
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          restaurant_id: restaurantId,
-          customer_id: user?.id || null,
-          items: items.map((i) => ({
-            id: i.dish.id,
-            name_en: i.dish.name_en,
-            price: i.dish.price,
-            quantity: i.quantity,
-            subtotal: i.dish.price * i.quantity,
-          })),
-          total_price: getTotalPrice(),
-          order_type: orderType,
-          customer_name: customerName,
-          customer_phone: customerPhone || null,
-          table_number: orderType === "dine_in" ? tableNumber : null,
-          delivery_address: orderType === "delivery" ? deliveryAddress : null,
-          payment_method: paymentMethod,
-        }),
+          body: JSON.stringify({
+            restaurant_id: restaurantId,
+            customer_id: user?.id || null,
+            items: items.map((i) => ({
+              id: i.dish.id,
+              name_en: i.dish.name_en,
+              price: i.dish.price,
+              quantity: i.quantity,
+              subtotal: i.dish.price * i.quantity,
+            })),
+            total_price: getTotalPrice(),
+            order_type: orderType,
+            customer_name: customerName,
+            customer_phone: customerPhone || null,
+            table_number: orderType === "dine_in" ? tableNumber : null,
+            delivery_address: orderType === "delivery" ? deliveryAddress : null,
+            payment_method: paymentMethod,
+            deal_id: selectedDeal?.id || null,
+            discount_amount: discountAmount,
+          }),
       })
 
       const data = await res.json()
@@ -143,7 +168,7 @@ export default function CheckoutPage() {
     } finally {
       setLocalLoading(false)
     }
-  }, [orderType, customerName, customerPhone, tableNumber, deliveryAddress, paymentMethod, items, restaurantId, getTotalPrice, router, setCurrentOrder, setError, validateForm])
+  }, [orderType, customerName, customerPhone, tableNumber, deliveryAddress, paymentMethod, items, restaurantId, getTotalPrice, selectedDeal, discountAmount, router, setCurrentOrder, setError, validateForm])
 
   if (items.length === 0 || !restaurantId) {
     return (
@@ -252,7 +277,25 @@ export default function CheckoutPage() {
                 <span className="text-[12px] font-semibold text-text-primary">{formatPrice(item.dish.price * item.quantity)}</span>
               </div>
             ))}
-            <div className="pt-2 border-t border-border flex items-center justify-between">
+            {discountAmount > 0 && selectedDeal && (
+              <div className="pt-2 border-t border-border space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] text-text-secondary">Subtotal</span>
+                  <span className="text-[11px] text-text-primary">{formatPrice(items.reduce((s, i) => s + i.dish.price * i.quantity, 0))}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1 text-[11px] text-primary font-medium">
+                    <Tag className="w-3 h-3" />
+                    {selectedDeal.title_en}
+                    <button onClick={clearDeal} className="p-0.5 rounded-full hover:bg-primary/10">
+                      <X className="w-2.5 h-2.5" />
+                    </button>
+                  </div>
+                  <span className="text-[11px] text-primary font-semibold">-{formatPrice(discountAmount)}</span>
+                </div>
+              </div>
+            )}
+            <div className={`flex items-center justify-between ${discountAmount > 0 ? "border-t border-border pt-2" : "pt-2 border-t border-border"}`}>
               <span className="text-[13px] font-bold text-text-primary">Total</span>
               <span className="text-[14px] font-bold text-text-primary">{formatPrice(getTotalPrice())}</span>
             </div>

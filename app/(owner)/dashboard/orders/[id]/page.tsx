@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { OrderReceipt } from "@/components/shared/OrderReceipt"
 import { formatPrice } from "@/lib/utils"
-import { ArrowLeft, Check, Printer, X, Lock, Sparkles, ArrowRight, Download, Phone } from "lucide-react"
+import { ArrowLeft, Printer, X, Lock, Sparkles, ArrowRight, Download, Phone } from "lucide-react"
 import Link from "next/link"
 import type { Order } from "@/types"
 import { useSubscription } from "@/lib/hooks/useSubscription"
@@ -20,25 +20,34 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState<Order | null>(null)
   const [restaurant, setRestaurant] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [updating, setUpdating] = useState(false)
   const [toast, setToast] = useState<{ show: boolean; message: string; type: "success" | "error" }>({ show: false, message: "", type: "success" })
   const receiptRef = useRef<HTMLDivElement>(null)
 
   const fetchData = async () => {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setLoading(false); return }
 
-    const { data: restaurantData } = await supabase
-      .from("restaurants")
-      .select("*")
-      .eq("owner_id", user.id)
-      .single()
+      const { data: restaurantData } = await supabase
+        .from("restaurants")
+        .select("*")
+        .eq("owner_id", user.id)
+        .maybeSingle()
 
-    if (restaurantData) setRestaurant(restaurantData)
+      if (restaurantData) setRestaurant(restaurantData)
 
-    const { data } = await supabase.from("orders").select("*").eq("id", id).single()
-    setOrder(data)
+      const { data } = await supabase
+        .from("orders")
+        .select("*")
+        .eq("id", id)
+        .eq("restaurant_id", restaurantData?.id ?? "")
+        .maybeSingle()
+
+      setOrder(data)
+    } catch (err) {
+      console.error("Order fetch error:", err)
+    }
     setLoading(false)
   }
 
@@ -63,32 +72,6 @@ export default function OrderDetailPage() {
       .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [id])
-
-  const updateStatus = async (newStatus: string) => {
-    if (updating) return
-    setUpdating(true)
-    try {
-      const res = await fetch(`/api/orders/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ order_status: newStatus }),
-      })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        console.error("Failed to update order status:", err.error || "unknown")
-        setToast({ show: true, message: "Something went wrong", type: "error" })
-        setUpdating(false)
-        return
-      }
-      await fetchData()
-      setToast({ show: true, message: newStatus === "ready" ? "Order confirmed successfully" : "Order cancelled", type: "success" })
-    } catch (e) {
-      console.error("Failed to update order status:", e)
-      setToast({ show: true, message: "Network error — please try again", type: "error" })
-    } finally {
-      setUpdating(false)
-    }
-  }
 
   const handlePrint = () => {
     const content = receiptRef.current
@@ -255,23 +238,15 @@ export default function OrderDetailPage() {
         )}
       </div>
 
-      {order.order_status === "received" && (
-        <div className="space-y-3 mt-6">
-          {order.customer_phone && !shouldBlurOrderDetails && (
-            <a
-              href={`tel:${order.customer_phone.replace(/[^0-9+]/g, "")}`}
-              className="flex items-center justify-center gap-2 w-full h-12 rounded-xl border-2 border-[#25D366] text-[#25D366] text-sm font-semibold hover:bg-[#25D366] hover:text-white transition-all active:scale-[0.98]"
-            >
-              <Phone className="w-4 h-4" />
-              Call {order.customer_name} — {order.customer_phone}
-            </a>
-          )}
-          <Button variant="primary" fullWidth disabled={updating} onClick={() => updateStatus("ready")}>
-            {updating ? "Confirming..." : <><Check className="w-4 h-4 mr-2" /> Confirm Order</>}
-          </Button>
-          <Button variant="ghost" fullWidth disabled={updating} onClick={() => updateStatus("cancelled")}>
-            <X className="w-4 h-4 mr-2" /> Cancel Order
-          </Button>
+      {order.order_status === "received" && order.customer_phone && !shouldBlurOrderDetails && (
+        <div className="mt-6">
+          <a
+            href={`tel:${order.customer_phone.replace(/[^0-9+]/g, "")}`}
+            className="flex items-center justify-center gap-2 w-full h-12 rounded-xl border-2 border-[#25D366] text-[#25D366] text-sm font-semibold hover:bg-[#25D366] hover:text-white transition-all active:scale-[0.98]"
+          >
+            <Phone className="w-4 h-4" />
+            Call {order.customer_name} — {order.customer_phone}
+          </a>
         </div>
       )}
 

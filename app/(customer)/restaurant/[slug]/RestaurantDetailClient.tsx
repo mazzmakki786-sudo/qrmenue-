@@ -2,14 +2,17 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
-import { MapPin, Phone, ArrowLeft, UtensilsCrossed, Clock, Navigation } from "lucide-react"
+import { MapPin, Phone, ArrowLeft, UtensilsCrossed, Clock, Navigation, Truck, Timer } from "lucide-react"
+import { formatTo12Hour } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { useCartStore } from "@/stores/cartStore"
 import { CartBar } from "@/components/customer/CartBar"
 import { Card as DishCard } from "@/components/customer/DishGrid"
-import type { Category, Dish } from "@/types"
+import { DealBanner } from "@/components/customer/DealBanner"
+import type { Category, Deal, Dish } from "@/types"
 
 interface Restaurant {
   id: string
@@ -25,6 +28,8 @@ interface Restaurant {
   delivery_fee?: number
   delivery_time_min?: number
   is_open?: boolean
+  opening_time?: string | null
+  closing_time?: string | null
   opening_hours?: Record<string, { open: string; close: string; closed: boolean }> | null
   lat?: number | null
   lng?: number | null
@@ -39,14 +44,19 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
   const router = useRouter()
   const [logoError, setLogoError] = useState(false)
   const [liveIsOpen, setLiveIsOpen] = useState(restaurant.is_open ?? true)
+  const [liveOpenTime, setLiveOpenTime] = useState(restaurant.opening_time ? restaurant.opening_time.slice(0, 5) : undefined)
+  const [liveCloseTime, setLiveCloseTime] = useState(restaurant.closing_time ? restaurant.closing_time.slice(0, 5) : undefined)
+  const [deals, setDeals] = useState<(Deal & { dish?: { id: string; name_en: string; name_ur: string | null; image_url: string | null; price: number } | null })[]>([])
   const setRestaurant = useCartStore((s) => s.setRestaurant)
   const clearCart = useCartStore((s) => s.clearCart)
   const currentRestaurantId = useCartStore((s) => s.restaurantId)
 
-  // Keep liveIsOpen in sync with SSR prop
+  // Keep liveIsOpen & times in sync with SSR prop
   useEffect(() => {
     setLiveIsOpen(restaurant.is_open ?? true)
-  }, [restaurant.is_open])
+    setLiveOpenTime(restaurant.opening_time ? restaurant.opening_time.slice(0, 5) : undefined)
+    setLiveCloseTime(restaurant.closing_time ? restaurant.closing_time.slice(0, 5) : undefined)
+  }, [restaurant.is_open, restaurant.opening_time, restaurant.closing_time])
 
   // Realtime sync for is_open
   useEffect(() => {
@@ -59,10 +69,25 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
         (payload) => {
           const r = payload.new as any
           if (r.is_open !== undefined) setLiveIsOpen(r.is_open)
+          if (r.opening_time) setLiveOpenTime(r.opening_time.slice(0, 5))
+          if (r.closing_time) setLiveCloseTime(r.closing_time.slice(0, 5))
         }
       )
       .subscribe()
     return () => { supabase.removeChannel(channel) }
+  }, [restaurant.id])
+
+  // Fetch active deals
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.from("deals")
+      .select("*, dish:dishes!dish_id(id, name_en, name_ur, image_url, price)")
+      .eq("restaurant_id", restaurant.id)
+      .eq("is_active", true)
+      .or(`start_date.is.null,start_date.lte.${new Date().toISOString()}`)
+      .or(`end_date.is.null,end_date.gte.${new Date().toISOString()}`)
+      .order("created_at", { ascending: false })
+      .then(({ data }) => { if (data) setDeals(data) })
   }, [restaurant.id])
 
   // Set restaurant in cart store on mount
@@ -88,7 +113,7 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
           >
             <ArrowLeft className="w-4 h-4 text-text-primary" />
           </button>
-          <span className="text-[13px] font-semibold text-text-primary">QRMenu.pk</span>
+          <Link href="/restaurants" className="text-[13px] font-semibold text-text-primary hover:opacity-70 transition-opacity">QRMenu.pk</Link>
           <div className="w-8" />
         </div>
       </div>
@@ -131,11 +156,21 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
                   <UtensilsCrossed className="w-3 h-3" /> {restaurant.cuisine_type}
                 </span>
               )}
-              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+            </div>
+            {/* Open/Closed + Timing — prominently spaced below */}
+            <div className="flex items-center gap-2 mt-2">
+              <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full ${
                 liveIsOpen ? "bg-accent/10 text-accent" : "bg-error/10 text-error"
               }`}>
-                {liveIsOpen ? "● Open" : "● Closed"}
+                <span className={`w-2 h-2 rounded-full ${liveIsOpen ? "bg-accent" : "bg-error"}`} />
+                {liveIsOpen ? "Accepting Orders" : "Currently Closed"}
               </span>
+              {liveOpenTime && liveCloseTime && (
+                <span className="text-xs text-text-secondary font-medium flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5 text-text-muted" />
+                  {formatTo12Hour(liveOpenTime)} — {formatTo12Hour(liveCloseTime)}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -207,13 +242,32 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
                       {day}
                     </span>
                     <span className={hours.closed ? "text-error font-medium" : "text-text-primary"}>
-                      {hours.closed ? "Closed" : `${hours.open} — ${hours.close}`}
+                      {hours.closed ? "Closed" : `${formatTo12Hour(hours.open)} — ${formatTo12Hour(hours.close)}`}
                     </span>
                   </div>
                 )
               })}
             </div>
           </details>
+        )}
+
+        {/* Delivery Info - Time & Charges (highlighted) */}
+        {(restaurant.delivery_time_min != null || restaurant.delivery_fee != null) && (
+          <div className="bg-accent/5 border border-accent/20 rounded-xl px-4 py-3 mb-4 flex items-center justify-between gap-3">
+            {restaurant.delivery_time_min != null && (
+              <div className="flex items-center gap-2 text-sm font-semibold text-text-primary">
+                <Timer className="w-4 h-4 text-accent" />
+                <span>Delivery in <span className="text-accent">{restaurant.delivery_time_min} min</span></span>
+              </div>
+            )}
+            {restaurant.delivery_fee != null && (
+              <div className="text-sm font-semibold text-text-primary whitespace-nowrap">
+                <span className={restaurant.delivery_fee === 0 ? "text-accent" : ""}>
+                  {restaurant.delivery_fee === 0 ? "Free delivery" : `Delivery: Rs\xa0${restaurant.delivery_fee}`}
+                </span>
+              </div>
+            )}
+          </div>
         )}
 
         {/* Map / Location - Compact */}
@@ -234,6 +288,9 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
           </div>
         )}
 
+        {/* Deals */}
+        {deals.length > 0 && <DealBanner restaurantId={restaurant.id} slug={restaurant.slug} />}
+
         {/* Menu Dishes */}
         {categories.length > 0 ? (
           <div className="space-y-6">
@@ -249,10 +306,10 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
                   </h2>
                   <div className="space-y-2">
                     {availableDishes.map((dish) => (
-                      <DishCard key={dish.id} dish={dish} />
+                      <DishCard key={dish.id} dish={dish} deals={deals} />
                     ))}
                     {unavailableDishes.map((dish) => (
-                      <DishCard key={dish.id} dish={dish} unavailable />
+                      <DishCard key={dish.id} dish={dish} unavailable deals={deals} />
                     ))}
                   </div>
                 </section>

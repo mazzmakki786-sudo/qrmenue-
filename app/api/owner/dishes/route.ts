@@ -9,27 +9,27 @@ import { logOwnerAction, getIpSimple } from "@/lib/owner-audit"
 
 const dishSchema = z.object({
   name_en: z.string().min(1, "Name is required"),
-  name_ur: z.string().optional(),
-  description_en: z.string().optional(),
-  description_ur: z.string().optional(),
+  name_ur: z.string().nullish(),
+  description_en: z.string().nullish(),
+  description_ur: z.string().nullish(),
   price: z.coerce.number().int().positive("Price must be greater than 0"),
   category_id: z.string().min(1, "Category is required"),
-  image_url: z.string().nullable().optional(),
+  image_url: z.string().nullish(),
   tags: z.array(z.string()).optional(),
 })
 
 const dishUpdateSchema = z.object({
   id: z.string().uuid(),
   name_en: z.string().min(1).optional(),
-  name_ur: z.string().nullable().optional(),
-  description_en: z.string().nullable().optional(),
-  description_ur: z.string().nullable().optional(),
+  name_ur: z.string().nullish(),
+  description_en: z.string().nullish(),
+  description_ur: z.string().nullish(),
   price: z.number().int().positive().optional(),
-  image_url: z.string().url().nullable().optional(),
+  image_url: z.string().url().nullish(),
   is_available: z.boolean().optional(),
   sort_order: z.number().int().nonnegative().optional(),
   tags: z.array(z.string()).optional(),
-  category_id: z.string().uuid().nullable().optional(),
+  category_id: z.string().uuid().nullish(),
 })
 
 export const POST = safeRoute(async (request) => {
@@ -68,7 +68,9 @@ export const POST = safeRoute(async (request) => {
 
   const parsed = dishSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten().fieldErrors }, { status: 400 })
+    const fields = parsed.error.flatten().fieldErrors
+    const firstMsg = Object.values(fields).flat().filter(Boolean)[0] || "Invalid input"
+    return NextResponse.json({ error: firstMsg, fields }, { status: 400 })
   }
 
   const { count: dishCount } = await supabase
@@ -184,7 +186,9 @@ export const PATCH = safeRoute(async (request) => {
 
   const parsed = dishUpdateSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten().fieldErrors }, { status: 400 })
+    const fields = parsed.error.flatten().fieldErrors
+    const firstMsg = Object.values(fields).flat().filter(Boolean)[0] || "Invalid input"
+    return NextResponse.json({ error: firstMsg, fields }, { status: 400 })
   }
 
   // Verify dish exists and belongs to user's restaurant

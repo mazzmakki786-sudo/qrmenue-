@@ -6,7 +6,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { useFavorites } from "@/lib/hooks/useFavorites"
-import { Clock, Bike, Heart, ArrowLeft } from "lucide-react"
+import { Clock, Truck, Heart, ArrowLeft } from "lucide-react"
 
 interface RestaurantSummary {
   id: string
@@ -129,7 +129,7 @@ export function FavoritesClient() {
             </div>
             <h3 className="text-lg font-semibold text-black mb-1">No favorites yet</h3>
             <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto leading-relaxed">
-              Save your favorite restaurants by tapping the star icon on any restaurant card.
+              Save your favorite restaurants by tapping the heart icon on any restaurant card.
             </p>
             <Link
               href="/restaurants"
@@ -171,15 +171,15 @@ export function FavoritesClient() {
                     </p>
                     <div className="flex items-center gap-2 sm:gap-3 mt-1.5 text-[11px] sm:text-xs text-gray-400">
                       {r.delivery_time_min != null && (
-                        <span className="flex items-center gap-1">
+                        <span className="inline-flex items-center gap-1 whitespace-nowrap shrink-0">
                           <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                          {r.delivery_time_min} min
+                          {r.delivery_time_min}min
                         </span>
                       )}
                       {r.delivery_fee != null && (
-                        <span className="flex items-center gap-1">
-                          <Bike className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                          {r.delivery_fee === 0 ? "Free" : `Rs. ${r.delivery_fee}`}
+                        <span className="inline-flex items-center gap-1 whitespace-nowrap shrink-0">
+                          <Truck className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                          {r.delivery_fee === 0 ? "Free" : `Rs\xa0${r.delivery_fee}`}
                         </span>
                       )}
                       {r.is_open !== undefined && (

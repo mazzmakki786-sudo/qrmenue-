@@ -26,9 +26,7 @@ export default function AccountPage() {
   const [user, setUser] = useState<any>(null)
   const [orders, setOrders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [expandedRestaurants, setExpandedRestaurants] = useState<Set<string>>(new Set())
-
-  const CUSTOMER_RETENTION_DAYS = 7
+  const [expandedRestaurants, setExpandedRestaurants] = useState<Set<string>>(new Set()) // All minimized by default
 
   const fetchOrders = useCallback(async () => {
     const supabase = createClient()
@@ -37,12 +35,10 @@ export default function AccountPage() {
 
     setUser(user)
     try {
-      const sevenDaysAgo = new Date(Date.now() - CUSTOMER_RETENTION_DAYS * 86400000).toISOString()
       const { data } = await supabase
         .from("orders")
         .select("*, restaurants(name, slug)")
         .eq("customer_id", user.id)
-        .gte("created_at", sevenDaysAgo)
         .order("created_at", { ascending: false })
         .limit(50)
 
@@ -72,11 +68,7 @@ export default function AccountPage() {
           filter: `customer_id=eq.${user.id}`,
         },
         (payload) => {
-          const sevenDaysAgo = Date.now() - CUSTOMER_RETENTION_DAYS * 86400000
-          const orderTime = new Date((payload.new as Order).created_at).getTime()
-          if (orderTime >= sevenDaysAgo) {
-            setOrders((prev) => [payload.new as Order, ...prev.slice(0, 49)])
-          }
+          setOrders((prev) => [payload.new as Order, ...prev.slice(0, 49)])
         }
       )
       .on(
@@ -106,13 +98,7 @@ export default function AccountPage() {
     })
   }
 
-  // Auto-expand restaurants that have orders
-  useEffect(() => {
-    if (orders.length > 0) {
-      const uniqueNames = [...new Set(orders.map((o) => o.restaurants?.name || "Other"))]
-      setExpandedRestaurants(new Set(uniqueNames))
-    }
-  }, [orders.length])
+  // All restaurants collapsed (minimized) by default — user clicks to expand
 
   const handleLogout = async () => {
     const supabase = createClient()
@@ -168,7 +154,7 @@ export default function AccountPage() {
           {orders.length === 0 ? (
             <div className="text-center py-16">
               <Package className="w-10 h-10 text-[#999] mx-auto mb-3" />
-              <p className="text-[#999]">No orders in the last 7 days</p>
+              <p className="text-[#999]">No orders yet</p>
               <Link href="/restaurants" className="block mt-4">
                 <Button variant="primary">Browse Restaurants</Button>
               </Link>

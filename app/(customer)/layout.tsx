@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ShoppingCart, Home, ClipboardList, Heart } from "lucide-react"
+import { ShoppingCart, Home, ClipboardList, Heart, Menu } from "lucide-react"
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary"
 import { useCartStore } from "@/stores/cartStore"
 
@@ -22,40 +22,84 @@ export default function CustomerLayout({
     { href: "/account", label: "Orders", icon: ClipboardList, ariaLabel: "Orders" },
   ]
 
+  const isActive = (href: string) =>
+    href === "/restaurants"
+      ? pathname === "/restaurants" || pathname.startsWith("/restaurant")
+      : pathname === href || (href !== "/" && pathname.startsWith(href))
+
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-white">
-        <main className="pb-12">
+        {/* Desktop Top Navbar */}
+        <header className="hidden md:block sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-border">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+            <Link href="/restaurants" className="flex items-center gap-2.5 group">
+              <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white text-xs font-bold">
+                Q
+              </div>
+              <span className="text-base font-bold text-black group-hover:opacity-70 transition-opacity">
+                QRMenu.pk
+              </span>
+            </Link>
+            <nav className="flex items-center gap-1">
+              {nav.map((item) => {
+                const active = isActive(item.href)
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    aria-label={item.ariaLabel}
+                    className={`relative flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      active
+                        ? "bg-black text-white"
+                        : "text-text-secondary hover:bg-[#F5F5F5]"
+                    }`}
+                  >
+                    <item.icon className={`w-4 h-4 ${active ? "stroke-[2.5]" : "stroke-[1.5]"}`} />
+                    {item.label}
+                    {item.href === "/cart" && totalItems > 0 && (
+                      <span className="min-w-[18px] h-4 rounded-full bg-primary text-white text-[9px] font-bold flex items-center justify-center px-1 shadow-sm">
+                        {totalItems > 99 ? "99+" : totalItems}
+                      </span>
+                    )}
+                  </Link>
+                )
+              })}
+            </nav>
+          </div>
+        </header>
+
+        <main className="pb-16 md:pb-8">
           {children}
         </main>
+
+        {/* Mobile Bottom Nav */}
         <nav
           role="navigation"
           aria-label="Main navigation"
-          className="fixed bottom-0 left-0 right-0 h-12 bg-white border-t border-border flex items-center justify-around z-50"
+          className="md:hidden fixed bottom-0 left-0 right-0 h-14 bg-white border-t border-border flex items-center justify-around z-50"
         >
           {nav.map((item) => {
-            const isActive = item.href === "/restaurants"
-              ? pathname === "/restaurants" || pathname.startsWith("/restaurant")
-              : pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))
+            const active = isActive(item.href)
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 aria-label={item.ariaLabel}
                 className={`relative flex flex-col items-center justify-center min-w-[64px] h-full transition-colors ${
-                  isActive ? "text-primary" : "text-text-muted hover:text-text-secondary"
+                  active ? "text-primary" : "text-text-muted hover:text-text-secondary"
                 }`}
               >
                 <div className="relative">
-                  <item.icon className={`w-4 h-4 ${isActive ? "stroke-[2.5]" : "stroke-[1.5]"}`} />
+                  <item.icon className={`w-4 h-4 ${active ? "stroke-[2.5]" : "stroke-[1.5]"}`} />
                   {item.href === "/cart" && totalItems > 0 && (
                     <span className="absolute -top-1.5 -right-2 min-w-[14px] h-3.5 rounded-full bg-primary text-white text-[8px] font-bold flex items-center justify-center px-0.5 shadow-sm">
                       {totalItems > 99 ? "99+" : totalItems}
                     </span>
                   )}
                 </div>
-                <span className={`text-[9px] mt-0.5 ${isActive ? "font-semibold" : "font-medium"}`}>{item.label}</span>
-                {isActive && (
+                <span className={`text-[9px] mt-0.5 ${active ? "font-semibold" : "font-medium"}`}>{item.label}</span>
+                {active && (
                   <span className="absolute top-0 w-8 h-0.5 rounded-full bg-primary" />
                 )}
               </Link>

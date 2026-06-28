@@ -250,11 +250,11 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
               </div>
             )}
             {restaurantPhone && (
-              <div className="min-w-[0px]">
+              <div className="shrink-0">
                 <div className="h-[28px]" />
                 <a
                   href={`tel:${restaurantPhone}`}
-                  className="flex items-center justify-center gap-1.5 h-11 px-4 rounded-xl border border-border text-[12px] font-semibold text-text-primary active:scale-[0.95] transition-all hover:bg-[#FAFAFA]"
+                  className="flex items-center justify-center gap-1.5 h-11 min-w-[88px] px-4 rounded-xl border border-border text-[12px] font-semibold text-text-primary active:scale-[0.95] transition-all hover:bg-[#FAFAFA]"
                 >
                   <Phone className="w-3.5 h-3.5" />
                   Call

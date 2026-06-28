@@ -18,6 +18,7 @@ const DEFAULTS: Record<string, RateLimitConfig> = {
   "admin:write": { maxRequests: 10, windowSeconds: 60 },
   "menu:read": { maxRequests: 30, windowSeconds: 60 },
   "notifications:send": { maxRequests: 5, windowSeconds: 60 },
+  "ai:generate": { maxRequests: 5, windowSeconds: 60 },
   "settings:read": { maxRequests: 20, windowSeconds: 60 },
   default: { maxRequests: 20, windowSeconds: 60 },
 }

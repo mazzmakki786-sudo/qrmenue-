@@ -84,6 +84,8 @@ export default async function RestaurantDetailPage({ params }: Props) {
         delivery_fee: restaurant.delivery_fee,
         delivery_time_min: restaurant.delivery_time_min,
         is_open: restaurant.is_open ?? true,
+        opening_time: restaurant.opening_time,
+        closing_time: restaurant.closing_time,
         opening_hours: restaurant.opening_hours ?? null,
         lat: restaurant.lat ?? null,
         lng: restaurant.lng ?? null,

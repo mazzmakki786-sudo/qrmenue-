@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import { formatPrice } from "@/lib/utils"
-import { Shield, LogOut, Eye, EyeOff, Users, Building2, BarChart3, Settings as SettingsIcon, Store, Megaphone, Clock, CreditCard } from "lucide-react"
+import { Shield, LogOut, Eye, EyeOff, Users, Building2, BarChart3, Settings as SettingsIcon, Store, Megaphone, Clock, CreditCard, Sparkles } from "lucide-react"
 import { RestaurantTable } from "@/components/superadmin/RestaurantTable"
 import { CustomerTable } from "@/components/superadmin/CustomerTable"
 import { AnalyticsView } from "@/components/superadmin/AnalyticsView"
@@ -14,8 +14,9 @@ import { TrialLimitsEditor } from "@/components/superadmin/TrialLimitsEditor"
 import { AnnouncementsPanel } from "@/components/superadmin/AnnouncementsPanel"
 import { ActivityLogView } from "@/components/superadmin/ActivityLogView"
 import { PlanManager } from "@/components/superadmin/PlanManager"
+import { AiControls } from "@/components/superadmin/AiControls"
 
-type Tab = "restaurants" | "customers" | "analytics" | "announcements" | "plans" | "settings"
+type Tab = "restaurants" | "customers" | "analytics" | "announcements" | "plans" | "settings" | "ai"
 
 const SESSION_TIMEOUT_MS = 15 * 60 * 1000
 
@@ -121,6 +122,7 @@ const TABS: { id: Tab; label: string; icon: any }[] = [
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "announcements", label: "Announcements", icon: Megaphone },
   { id: "plans", label: "Plans", icon: CreditCard },
+  { id: "ai", label: "AI Management", icon: Sparkles },
   { id: "settings", label: "Settings", icon: SettingsIcon },
 ]
 
@@ -342,6 +344,7 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
             {activeTab === "analytics" && <AnalyticsView />}
             {activeTab === "announcements" && <AnnouncementsPanel />}
             {activeTab === "plans" && <PlanManager />}
+            {activeTab === "ai" && <AiControls />}
             {activeTab === "settings" && (
               <div className="space-y-6">
                 <TrialLimitsEditor />

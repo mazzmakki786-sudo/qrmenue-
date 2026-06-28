@@ -1,12 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
-import { MenuHeader } from "@/components/customer/MenuHeader"
-import { MenuContent } from "@/components/customer/MenuContent"
-import { MenuFooter } from "@/components/customer/MenuFooter"
-import { CartBar } from "@/components/customer/CartBar"
 import { notFound } from "next/navigation"
-import { GRACE_PERIOD_DAYS, PLAN_LIMITS } from "@/lib/subscription"
-import { buildBrandingConfig, DEFAULT_BRANDING } from "@/lib/branding"
-import { RestaurantJsonLd } from "@/components/JsonLd"
+import { GRACE_PERIOD_DAYS } from "@/lib/subscription"
+import { RestaurantDetailClient } from "@/app/(customer)/restaurant/[slug]/RestaurantDetailClient"
 import type { Category, Dish } from "@/types"
 import type { Metadata } from "next"
 
@@ -22,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const { data: restaurant } = await supabase
     .from("restaurants")
-    .select("name, name_ur, description, city, cuisine_type, logo_url, plan, banner_enabled, banner_image_url, banner_link_url")
+    .select("name, description, city, cuisine_type, logo_url")
     .eq("slug", slug)
     .eq("is_active", true)
     .single()
@@ -31,52 +26,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Menu Not Found" }
   }
 
-  const planLimits = PLAN_LIMITS[restaurant.plan as keyof typeof PLAN_LIMITS]
-  const branding = planLimits
-    ? buildBrandingConfig(restaurant.plan, planLimits, {
-        banner_enabled: restaurant.banner_enabled,
-        banner_image_url: restaurant.banner_image_url,
-        banner_link_url: restaurant.banner_link_url,
-      })
-    : DEFAULT_BRANDING
-
-  const cityName = restaurant.city || "Pakistan"
-  const cuisine = restaurant.cuisine_type || "Restaurant"
-  const siteName = branding.hasCustomBranding ? restaurant.name : "QRMenu.pk"
-
-  const title = branding.hasCustomBranding
-    ? `${restaurant.name} Menu — ${cuisine} in ${cityName}`
-    : `${restaurant.name} Menu — ${cuisine} in ${cityName} | QRMenu.pk`
-
-  const description =
-    restaurant.description ||
-    (branding.hasCustomBranding
-      ? `View ${restaurant.name}'s digital menu. Browse dishes, prices, and order directly via WhatsApp.`
-      : `View ${restaurant.name}'s digital menu. Browse dishes, prices, and order directly via WhatsApp. Powered by QRMenu.pk — Pakistan's #1 QR menu platform.`)
+  const title = `${restaurant.name} — ${restaurant.cuisine_type || "Restaurant"} in ${restaurant.city} | QRMenu.pk`
 
   return {
     title,
-    description,
+    description: restaurant.description || `View ${restaurant.name}'s digital menu. Browse dishes, prices, and order directly via WhatsApp. Powered by QRMenu.pk — Pakistan's #1 QR menu platform.`,
     openGraph: {
       title,
-      description,
+      description: restaurant.description || `View ${restaurant.name}'s digital menu. Browse dishes, prices, and order directly via WhatsApp.`,
       type: "website",
       url: `https://qrmenu.pk/menu/${slug}`,
-      siteName,
+      siteName: "QRMenu.pk",
       images: [
         {
           url: restaurant.logo_url || "https://qrmenu.pk/og-image.svg",
           width: 1200,
           height: 630,
-          alt: `${restaurant.name} menu`,
+          alt: restaurant.name,
         },
       ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [restaurant.logo_url || "https://qrmenu.pk/og-image.svg"],
     },
     alternates: {
       canonical: `https://qrmenu.pk/menu/${slug}`,
@@ -98,6 +66,7 @@ export default async function MenuPage({ params }: Props) {
 
   if (!restaurant) notFound()
 
+  // Trial grace period check
   const isTrial = restaurant.plan === "trial"
   if (isTrial && restaurant.trial_end) {
     const trialEnd = new Date(restaurant.trial_end)
@@ -122,74 +91,31 @@ export default async function MenuPage({ params }: Props) {
     }
   }
 
-  const planLimits = PLAN_LIMITS[restaurant.plan as keyof typeof PLAN_LIMITS]
-  const branding = planLimits
-    ? buildBrandingConfig(restaurant.plan, planLimits, {
-        banner_enabled: restaurant.banner_enabled,
-        banner_image_url: restaurant.banner_image_url,
-        banner_link_url: restaurant.banner_link_url,
-      })
-    : DEFAULT_BRANDING
-
   const categories: (Category & { dishes: Dish[] })[] = restaurant.categories || []
 
   return (
-    <>
-      <RestaurantJsonLd
-        name={restaurant.name}
-        description={restaurant.description}
-        logoUrl={restaurant.logo_url}
-        city={restaurant.city}
-        cuisineType={restaurant.cuisine_type}
-        slug={slug}
-        categories={categories.map((cat) => ({
-          name_en: cat.name_en,
-          dishes: cat.dishes.map((d) => ({
-            name_en: d.name_en,
-            description_en: d.description_en,
-            price: d.price,
-            image_url: d.image_url,
-            is_available: d.is_available,
-          })),
-        }))}
-      />
-      <div
-        className="max-w-[600px] mx-auto min-h-screen pb-32 bg-white px-4 relative"
-      >
-        {/* Decorative food pattern background */}
-        <div
-          className="fixed inset-0 pointer-events-none z-0 opacity-[0.03]"
-          style={{ backgroundImage: "url('/food-pattern.png')", backgroundRepeat: "repeat", backgroundSize: "400px" }}
-        />
-        <div className="relative z-10">
-          <MenuHeader
-            name={restaurant.name}
-            nameUr={restaurant.name_ur}
-            logoUrl={restaurant.logo_url}
-            coverUrl={null}
-            city={restaurant.city}
-            cuisineType={restaurant.cuisine_type}
-            description={null}
-            branding={branding}
-            address={restaurant.address}
-            phone={restaurant.phone}
-            openingHours={restaurant.opening_hours}
-            isOpen={(restaurant as any).is_open}
-            openingTime={(restaurant as any).opening_time}
-            closingTime={(restaurant as any).closing_time}
-            restaurantId={restaurant.id}
-          />
-        <MenuContent
-          categories={categories}
-          restaurantId={restaurant.id}
-          restaurantName={restaurant.name}
-          restaurantSlug={restaurant.slug}
-          deliveryFee={restaurant.delivery_fee ?? 0}
-        />
-        <MenuFooter branding={branding} />
-        </div>
-      </div>
-      <CartBar />
-    </>
+    <RestaurantDetailClient
+      restaurant={{
+        id: restaurant.id,
+        name: restaurant.name,
+        name_ur: restaurant.name_ur,
+        slug: restaurant.slug,
+        city: restaurant.city,
+        cuisine_type: restaurant.cuisine_type,
+        logo_url: restaurant.logo_url,
+        description: restaurant.description,
+        phone: restaurant.phone,
+        address: restaurant.address,
+        delivery_fee: restaurant.delivery_fee,
+        delivery_time_min: restaurant.delivery_time_min,
+        is_open: restaurant.is_open ?? true,
+        opening_time: restaurant.opening_time,
+        closing_time: restaurant.closing_time,
+        opening_hours: restaurant.opening_hours ?? null,
+        lat: restaurant.lat ?? null,
+        lng: restaurant.lng ?? null,
+      }}
+      categories={categories}
+    />
   )
 }

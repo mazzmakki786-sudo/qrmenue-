@@ -33,7 +33,6 @@
   closing_time: string | null
   delivery_fee: number | null
   delivery_time_min: number | null
-  retention_days?: number
   opening_hours?: string
 }
 
@@ -106,6 +105,8 @@ export interface Order {
   order_status: OrderStatus
   whatsapp_sent: boolean
   email_sent: boolean
+  deal_id: string | null
+  discount_amount: number
   created_at: string
   updated_at: string
 }
@@ -156,4 +157,65 @@ export interface DashboardStats {
   graph_30day: DailyStats[]
   top_dishes: { name: string; count: number }[]
   recent_orders: Order[]
+}
+
+export type DealType = "percentage" | "flat" | "bundle"
+
+export interface Deal {
+  id: string
+  restaurant_id: string
+  dish_id: string | null
+  title_en: string
+  title_ur: string | null
+  description_en: string | null
+  description_ur: string | null
+  deal_type: DealType
+  deal_value: number
+  start_date: string | null
+  end_date: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface DealFormData {
+  title_en: string
+  title_ur?: string
+  description_en?: string
+  description_ur?: string
+  dish_id?: string
+  deal_type: DealType
+  deal_value: number
+  start_date?: string
+  end_date?: string
+  is_active?: boolean
+}
+
+export interface AiPost {
+  id: string
+  restaurant_id: string
+  prompt: string
+  language: string
+  ratio: string
+  caption: string | null
+  image_url: string | null
+  template_used: string | null
+  settings: Record<string, unknown>
+  created_at: string
+  images?: AiPostImage[]
+}
+
+export interface AiPostImage {
+  id: string
+  ai_post_id: string
+  dish_id: string
+  image_url: string
+  position: number
+}
+
+export interface AiUsage {
+  id: string
+  restaurant_id: string
+  month: string
+  count: number
 }

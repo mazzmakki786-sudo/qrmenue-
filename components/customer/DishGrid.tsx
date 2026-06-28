@@ -1,8 +1,9 @@
 "use client"
 
 import React from "react"
-import type { Category, Dish } from "@/types"
-import { UtensilsCrossed, ImageOff } from "lucide-react"
+import type { Category, Deal, Dish } from "@/types"
+import { UtensilsCrossed, ImageOff, Percent } from "lucide-react"
+import { formatPrice } from "@/lib/utils"
 import { useState } from "react"
 import Image from "next/image"
 import { useCartStore } from "@/stores/cartStore"
@@ -11,9 +12,10 @@ import { DishBadges } from "@/components/customer/DishBadges"
 
 interface Props {
   categories: (Category & { dishes: Dish[] })[]
+  deals?: (Deal & { dish?: { id: string; name_en: string; name_ur: string | null; image_url: string | null; price: number } | null })[]
 }
 
-export function DishGrid({ categories }: Props) {
+export function DishGrid({ categories, deals }: Props) {
   const { lang, t } = useI18n()
   if (categories.length === 0) {
     return (
@@ -40,10 +42,10 @@ export function DishGrid({ categories }: Props) {
             </h2>
             <div className="space-y-3">
               {availableDishes.map((dish) => (
-                <Card key={dish.id} dish={dish} />
+                <Card key={dish.id} dish={dish} deals={deals} />
               ))}
               {unavailableDishes.map((dish) => (
-                <Card key={dish.id} dish={dish} unavailable />
+                <Card key={dish.id} dish={dish} unavailable deals={deals} />
               ))}
             </div>
             {availableDishes.length === 0 && unavailableDishes.length === 0 && (
@@ -56,7 +58,7 @@ export function DishGrid({ categories }: Props) {
   )
 }
 
-export const Card = React.memo(function Card({ dish, unavailable = false }: { dish: Dish; unavailable?: boolean }) {
+export const Card = React.memo(function Card({ dish, unavailable = false, deals }: { dish: Dish; unavailable?: boolean; deals?: (Deal & { dish?: { id: string; name_en: string; name_ur: string | null; image_url: string | null; price: number } | null })[] }) {
   const { lang } = useI18n()
   const [imgError, setImgError] = useState(false)
   const items = useCartStore((s) => s.items)
@@ -70,6 +72,12 @@ export const Card = React.memo(function Card({ dish, unavailable = false }: { di
 
   const recognizedTags = ["popular", "chef_special", "spicy"]
   const badges = (dish.tags || []).filter((t) => recognizedTags.includes(t))
+  const dishDeal = deals?.find((d) => d.dish_id === dish.id && d.deal_type !== "bundle")
+  const dealPrice = dishDeal
+    ? dishDeal.deal_type === "percentage"
+      ? Math.round(dish.price * (1 - dishDeal.deal_value / 100))
+      : Math.max(0, dish.price - dishDeal.deal_value)
+    : null
 
   return (
     <div className={`group flex gap-3.5 p-3.5 bg-white rounded-2xl border border-border hover:border-border-strong hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] transition-all duration-300 ${unavailable ? "opacity-50" : ""}`}>
@@ -89,11 +97,15 @@ export const Card = React.memo(function Card({ dish, unavailable = false }: { di
             <ImageOff className="w-6 h-6 text-text-muted/40" />
           </div>
         )}
-        {badges.length > 0 && (
-          <div className="absolute top-1 left-1 z-10">
-            <DishBadges tags={badges} />
-          </div>
-        )}
+        <div className="absolute top-1 left-1 z-10 space-y-0.5">
+          <DishBadges tags={badges} />
+          {dishDeal && (
+            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-primary/10 text-primary">
+              <Percent className="w-2 h-2" />
+              {dishDeal.deal_type === "percentage" ? `${dishDeal.deal_value}%` : `Rs ${dishDeal.deal_value}`} OFF
+            </span>
+          )}
+        </div>
         {unavailable && (
           <div className="absolute inset-0 bg-black/30 flex items-center justify-center rounded-xl backdrop-blur-[1px]">
             <span className="text-white text-[10px] font-semibold bg-black/60 px-2.5 py-1 rounded-full">Unavailable</span>
@@ -114,9 +126,16 @@ export const Card = React.memo(function Card({ dish, unavailable = false }: { di
               </p>
             )}
           </div>
-          <span className="text-sm font-bold text-text-primary shrink-0 mt-0.5">
-            Rs {dish.price.toLocaleString("en-PK")}
-          </span>
+          <div className="text-right shrink-0 mt-0.5">
+            {dealPrice !== null ? (
+              <>
+                <span className="text-sm font-bold text-primary">{formatPrice(dealPrice)}</span>
+                <p className="text-[10px] text-text-muted line-through">Rs {dish.price.toLocaleString("en-PK")}</p>
+              </>
+            ) : (
+              <span className="text-sm font-bold text-text-primary">Rs {dish.price.toLocaleString("en-PK")}</span>
+            )}
+          </div>
         </div>
 
         {description && (
