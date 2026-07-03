@@ -1,7 +1,9 @@
 import type { Metadata } from "next"
 import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
+import { GRACE_PERIOD_DAYS } from "@/lib/subscription"
 import { RestaurantDetailClient } from "./RestaurantDetailClient"
+import { RestaurantUnavailable } from "@/components/shared/RestaurantUnavailable"
 import type { Category, Dish } from "@/types"
 
 interface Props {
@@ -65,6 +67,23 @@ export default async function RestaurantDetailPage({ params }: Props) {
     .single()
 
   if (!restaurant) notFound()
+
+  // Plan expiry check
+  const isTrial = restaurant.plan === "trial"
+  if (isTrial && restaurant.trial_end) {
+    const trialEnd = new Date(restaurant.trial_end)
+    const graceEnd = new Date(trialEnd.getTime() + GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000)
+    if (new Date() > graceEnd) {
+      return <RestaurantUnavailable restaurantName={restaurant.name} />
+    }
+  }
+
+  if (!isTrial && restaurant.plan_end_date) {
+    const planEnd = new Date(restaurant.plan_end_date)
+    if (new Date() > planEnd) {
+      return <RestaurantUnavailable restaurantName={restaurant.name} />
+    }
+  }
 
   const categories: (Category & { dishes: Dish[] })[] = restaurant.categories || []
 

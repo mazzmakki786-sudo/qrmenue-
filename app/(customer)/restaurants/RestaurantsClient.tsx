@@ -36,7 +36,7 @@ function RestaurantCard({
 }) {
   return (
     <div className="flex items-center justify-between gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-black/30 transition-all duration-200 group">
-      <Link href={`/restaurant/${r.slug}`} className="flex items-center gap-3 min-w-0 flex-1">
+      <Link href={`/menu/${r.slug}`} className="flex items-center gap-3 min-w-0 flex-1">
         {/* Logo */}
         {r.logo_url ? (
           <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 ring-1 ring-black/5 lg:w-16 lg:h-16">
@@ -88,7 +88,7 @@ function RestaurantCard({
           <Heart className={`w-4 h-4 transition-colors ${isFav ? "fill-red-500 text-red-500" : "text-gray-300 hover:text-red-400"}`} />
         </button>
         <Link
-          href={`/restaurant/${r.slug}`}
+          href={`/menu/${r.slug}`}
           className="inline-flex items-center px-3 py-1.5 rounded-lg bg-black text-white text-[11px] font-semibold hover:bg-gray-800 active:scale-[0.97] transition-all shadow-sm lg:px-4 lg:py-2 lg:text-xs"
         >
           Menu
