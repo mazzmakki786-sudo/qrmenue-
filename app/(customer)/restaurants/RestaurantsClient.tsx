@@ -35,50 +35,42 @@ function RestaurantCard({
   onToggleFav: (id: string) => void
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 p-4 sm:p-5 bg-white border border-gray-200 rounded-xl hover:border-black/30 hover:shadow-sm transition-all duration-200 group">
-      <Link href={`/restaurant/${r.slug}`} className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+    <div className="flex items-center justify-between gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-black/30 transition-all duration-200 group">
+      <Link href={`/restaurant/${r.slug}`} className="flex items-center gap-3 min-w-0 flex-1">
         {/* Logo */}
         {r.logo_url ? (
-          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden flex-shrink-0 ring-1 ring-black/5">
-            <Image
-              src={r.logo_url}
-              alt={r.name}
-              width={56}
-              height={56}
-              className="w-full h-full object-cover"
-            />
+          <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 ring-1 ring-black/5 lg:w-16 lg:h-16">
+            <Image src={r.logo_url} alt={r.name} width={64} height={64} className="w-full h-full object-cover" />
           </div>
         ) : (
-          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-gray-50 to-gray-100 text-black flex items-center justify-center font-bold text-sm sm:text-base flex-shrink-0 ring-1 ring-black/5">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gray-50 to-gray-100 text-black flex items-center justify-center font-bold text-sm flex-shrink-0 ring-1 ring-black/5 lg:w-16 lg:h-16 lg:text-lg">
             {r.name.charAt(0).toUpperCase()}
           </div>
         )}
 
         {/* Info */}
         <div className="min-w-0 flex-1">
-          <h3 className="text-[15px] sm:text-base font-semibold text-black truncate group-hover:underline decoration-1 underline-offset-2 decoration-black/30">
+          <h3 className="text-sm font-semibold text-black truncate group-hover:underline decoration-1 underline-offset-2 decoration-black/30 lg:text-base">
             {r.name}
           </h3>
-          <p className="text-xs sm:text-[13px] text-gray-500 mt-0.5 truncate">
-            {r.city}{r.cuisine_type ? ` • ${r.cuisine_type}` : ""}
+          <p className="text-xs text-gray-500 mt-0.5 truncate">
+            {r.city.trim()}{r.cuisine_type ? ` • ${r.cuisine_type}` : ""}
           </p>
-
-          {/* Delivery + Status row */}
-          <div className="flex items-center gap-2 sm:gap-3 mt-1.5 text-[11px] sm:text-xs text-gray-400">
+          <div className="flex items-center gap-2 mt-1.5 text-[11px] text-gray-400">
             {r.delivery_time_min != null && (
               <span className="inline-flex items-center gap-1 whitespace-nowrap shrink-0">
-                <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <Clock className="w-3 h-3" />
                 {r.delivery_time_min}min
               </span>
             )}
             {r.delivery_fee != null && (
               <span className="inline-flex items-center gap-1 whitespace-nowrap shrink-0">
-                <Truck className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <Truck className="w-3 h-3" />
                 {r.delivery_fee === 0 ? "Free" : `Rs\xa0${r.delivery_fee}`}
               </span>
             )}
             {r.is_open !== undefined && (
-              <span className={`ml-auto text-[10px] sm:text-[11px] font-medium shrink-0 ${r.is_open ? "text-green-600" : "text-red-500"}`}>
+              <span className={`ml-auto text-[10px] font-medium shrink-0 ${r.is_open ? "text-green-600" : "text-red-500"}`}>
                 {r.is_open ? "Open" : "Closed"}
               </span>
             )}
@@ -87,25 +79,17 @@ function RestaurantCard({
       </Link>
 
       {/* Right side: Favorite heart + View Menu button */}
-      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+      <div className="flex items-center gap-1 flex-shrink-0">
         <button
-          onClick={(e) => {
-            e.preventDefault()
-            onToggleFav(r.id)
-          }}
-          className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+          onClick={(e) => { e.preventDefault(); onToggleFav(r.id) }}
+          className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
           aria-label={isFav ? "Remove from favorites" : "Add to favorites"}
         >
-          <Heart
-            className={`w-4 h-4 sm:w-4.5 sm:h-4.5 transition-colors ${
-              isFav ? "fill-red-500 text-red-500" : "text-gray-300 hover:text-red-400"
-            }`}
-          />
+          <Heart className={`w-4 h-4 transition-colors ${isFav ? "fill-red-500 text-red-500" : "text-gray-300 hover:text-red-400"}`} />
         </button>
-
         <Link
           href={`/restaurant/${r.slug}`}
-          className="inline-flex items-center px-3 py-1.5 rounded-lg bg-black text-white text-[11px] sm:text-xs font-semibold hover:bg-gray-800 active:scale-[0.97] transition-all shadow-sm"
+          className="inline-flex items-center px-3 py-1.5 rounded-lg bg-black text-white text-[11px] font-semibold hover:bg-gray-800 active:scale-[0.97] transition-all shadow-sm lg:px-4 lg:py-2 lg:text-xs"
         >
           Menu
         </Link>
@@ -116,7 +100,7 @@ function RestaurantCard({
 
 export function RestaurantsClient({ initialRestaurants, initialCities }: RestaurantsClientProps) {
   const [restaurants, setRestaurants] = useState<RestaurantSummary[]>(initialRestaurants)
-  const allCities = useMemo(() => [...new Set(initialCities)].sort(), [initialCities])
+  const allCities = useMemo(() => [...new Set(initialCities.map((c) => c.trim()))].sort(), [initialCities])
   const [selectedCity, setSelectedCity] = useState<string>("")
   const [searchQuery, setSearchQuery] = useState("")
   const [loading, setLoading] = useState(false)
@@ -138,7 +122,7 @@ export function RestaurantsClient({ initialRestaurants, initialCities }: Restaur
         .eq("is_suspended", false)
 
       if (selectedCity) {
-        query = query.eq("city", selectedCity)
+        query = query.eq("city", selectedCity.trim())
       }
 
       const { data } = await query.order("name")
@@ -177,16 +161,17 @@ export function RestaurantsClient({ initialRestaurants, initialCities }: Restaur
       (r) =>
         r.name.toLowerCase().includes(q) ||
         (r.cuisine_type || "").toLowerCase().includes(q) ||
-        r.city.toLowerCase().includes(q)
+        r.city.trim().toLowerCase().includes(q)
     )
   }, [searchQuery, restaurants])
 
   const groupedByCity = useMemo(() => {
     const map = new Map<string, RestaurantSummary[]>()
     for (const r of filteredRestaurants) {
-      const list = map.get(r.city) || []
+      const city = r.city.trim()
+      const list = map.get(city) || []
       list.push(r)
-      map.set(r.city, list)
+      map.set(city, list)
     }
     return map
   }, [filteredRestaurants])

@@ -94,10 +94,10 @@ export function FavoritesClient() {
         <div className="flex items-center gap-3 mb-6 sm:mb-8">
           <Link
             href="/restaurants"
-            className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors flex-shrink-0"
+            className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center hover:bg-[#EBEBEB] active:scale-95 transition-all shrink-0"
             aria-label="Back to restaurants"
           >
-            <ArrowLeft className="w-4 h-4 text-gray-600" />
+            <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-black tracking-tight">

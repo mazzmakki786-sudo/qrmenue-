@@ -157,14 +157,18 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
   const isPending = order.order_status === "received"
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] pb-20">
+    <>
+    <div className="min-h-screen bg-[#F9FAFB] pb-20 md:hidden">
 
       {/* Top AppBar */}
       <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-border">
         <div className="flex items-center justify-between px-4 h-16 max-w-[500px] mx-auto">
           <div className="flex items-center gap-4">
-            <Link href={user ? "/account" : "/restaurants"} className="active:scale-95 transition-transform">
-              <ArrowLeft className="w-5 h-5" />
+            <Link
+              href={user ? "/account" : "/restaurants"}
+              className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center active:scale-95 transition-transform shrink-0"
+            >
+              <ArrowLeft className="w-4 h-4" />
             </Link>
             <h1 className="text-lg font-bold text-text-primary">
               {isReady ? "Order Ready" : isCancelled ? "Order Cancelled" : "Order Placed"}
@@ -364,5 +368,161 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
         </div>
       </main>
     </div>
+
+      {/* ===== DESKTOP LAYOUT ===== */}
+      <div className="hidden md:block min-h-screen bg-[#F9FAFB]">
+        <header className="bg-white border-b border-border">
+          <div className="max-w-2xl mx-auto px-6 h-16 flex items-center gap-3">
+            <Link href={user ? "/account" : "/restaurants"} className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center active:scale-95 transition-transform shrink-0">
+              <ArrowLeft className="w-4 h-4" />
+            </Link>
+            <h1 className="text-lg font-bold text-text-primary">
+              {isReady ? "Order Ready" : isCancelled ? "Order Cancelled" : "Order Placed"}
+            </h1>
+          </div>
+        </header>
+
+        <main className="max-w-2xl mx-auto px-6 py-8 space-y-6">
+          {/* Status Card */}
+          {isReady && (
+            <section className="bg-accent/5 border border-accent/10 rounded-2xl p-8 text-center shadow-sm">
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center">
+                  <Check className="w-8 h-8 text-white" style={{ strokeWidth: 3 }} />
+                </div>
+              </div>
+              <h2 className="text-xl font-bold text-accent mb-1">Order Ready!</h2>
+              <p className="text-base font-semibold text-accent mb-3">#{order.order_number}</p>
+              <p className="text-sm text-text-secondary">Your order from <span className="font-semibold text-text-primary">{restaurant?.name || "the restaurant"}</span> is ready for pickup</p>
+            </section>
+          )}
+
+          {isCancelled && (
+            <section className="bg-error/5 border border-error/10 rounded-2xl p-8 text-center shadow-sm">
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 bg-error rounded-full flex items-center justify-center">
+                  <X className="w-8 h-8 text-white" style={{ strokeWidth: 3 }} />
+                </div>
+              </div>
+              <h2 className="text-xl font-bold text-error mb-1">Order Cancelled</h2>
+              <p className="text-base font-semibold text-error mb-3">#{order.order_number}</p>
+              <p className="text-sm text-text-secondary">Your order from <span className="font-semibold text-text-primary">{restaurant?.name || "the restaurant"}</span> has been cancelled</p>
+            </section>
+          )}
+
+          {isPending && (
+            <section className="bg-warning/5 border border-warning/10 rounded-2xl p-8 text-center shadow-sm">
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 bg-warning rounded-full flex items-center justify-center">
+                  <Clock className="w-8 h-8 text-white" style={{ strokeWidth: 3 }} />
+                </div>
+              </div>
+              <h2 className="text-xl font-bold text-warning mb-1">Order Placed!</h2>
+              <p className="text-base font-semibold text-warning mb-3">#{order.order_number}</p>
+              <p className="text-sm text-text-secondary">Waiting for <span className="font-semibold text-text-primary">{restaurant?.name || "the restaurant"}</span> to confirm your order</p>
+            </section>
+          )}
+
+          {/* WhatsApp + Call */}
+          {(whatsappUrl || restaurantPhone) && (
+            <div className="flex gap-3 justify-center">
+              {whatsappUrl && (
+                <button onClick={() => { window.open(whatsappUrl, "_blank"); setWhatsappSuccess(true) }} className="flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-white text-sm font-bold hover:opacity-90 transition-all">
+                  <MessageCircle className="w-4 h-4" />
+                  {whatsappSuccess ? "Resend on WhatsApp" : "Send on WhatsApp"}
+                </button>
+              )}
+              {restaurantPhone && (
+                <a href={`tel:${restaurantPhone}`} className="flex items-center gap-2 px-6 py-3 rounded-xl border border-border text-sm font-semibold text-text-primary hover:bg-[#FAFAFA] transition-all">
+                  <Phone className="w-4 h-4" />
+                  Call Restaurant
+                </a>
+              )}
+            </div>
+          )}
+
+          {/* Order Summary */}
+          <section className="bg-white border border-border rounded-2xl p-6">
+            <div className="flex items-center gap-2 mb-5">
+              <span className="text-primary">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0l-3-3m3 3l3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+                </svg>
+              </span>
+              <h3 className="text-lg font-bold text-text-primary">Order Summary</h3>
+            </div>
+            <div className="space-y-3 mb-6">
+              {(order.items || []).map((item: any, i: number) => (
+                <div key={i} className="flex items-center justify-between py-2">
+                  <span className="text-sm text-text-primary">{item.name_en} <span className="text-text-secondary">x{item.quantity}</span></span>
+                  <span className="text-sm text-text-primary font-medium">Rs. {item.subtotal}</span>
+                </div>
+              ))}
+              <div className="pt-4 border-t border-border flex items-center justify-between">
+                <span className="text-lg font-bold text-text-primary">Total</span>
+                <span className="text-lg font-bold text-text-primary">Rs. {order.total_price}</span>
+              </div>
+            </div>
+            <div className="bg-[#F5F5F5] rounded-xl p-5 space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-text-secondary">Customer</span>
+                <span className="font-semibold text-text-primary">{order.customer_name}</span>
+              </div>
+              {order.customer_phone && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-text-secondary">Phone</span>
+                  <span className="font-semibold text-text-primary">{order.customer_phone}</span>
+                </div>
+              )}
+              {order.table_number && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-text-secondary">Table</span>
+                  <span className="font-semibold text-text-primary">Table {order.table_number}</span>
+                </div>
+              )}
+              <div className="flex justify-between text-sm">
+                <span className="text-text-secondary">Type</span>
+                <span className="font-semibold text-text-primary capitalize">{order.order_type?.replace("_", " ")}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-text-secondary">Payment</span>
+                <span className="font-semibold text-text-primary capitalize">{order.payment_method === "cod" ? "Cash" : "Bank Transfer"}</span>
+              </div>
+            </div>
+          </section>
+
+          {/* Sign-in Prompt */}
+          {!user && (
+            <section className="bg-white border border-border rounded-2xl p-5 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#F5F5F5] rounded-lg flex items-center justify-center">
+                  <ExternalLink className="w-5 h-5 text-primary" />
+                </div>
+                <span className="text-sm font-medium text-text-primary">Track your order</span>
+              </div>
+              <Link href={`/login?redirect=/order-confirm/${order.id}`} className="text-sm font-bold text-accent hover:underline">Sign in</Link>
+            </section>
+          )}
+
+          {/* Bottom Actions */}
+          <div className="flex items-center gap-3 pt-2">
+            <button onClick={handleReorder} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm text-white font-semibold bg-primary hover:opacity-90 transition-all">
+              <RotateCcw className="w-4 h-4" />
+              Reorder
+            </button>
+            {user && (
+              <Link href="/account" className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm text-text-secondary font-semibold border border-border hover:bg-[#FAFAFA] transition-colors">
+                <ClipboardList className="w-4 h-4" />
+                My Orders
+              </Link>
+            )}
+            <Link href="/restaurants" className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm text-text-secondary font-semibold border border-border hover:bg-[#FAFAFA] transition-colors">
+              <Store className="w-4 h-4" />
+              Browse
+            </Link>
+          </div>
+        </main>
+      </div>
+    </>
   )
 }

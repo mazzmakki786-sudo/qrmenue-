@@ -197,7 +197,8 @@ export default function CheckoutPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB]">
+    <>
+    <div className="min-h-screen bg-[#F9FAFB] md:hidden">
       {/* Header */}
       <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-border">
         <div className="flex items-center gap-3 px-4 h-14 max-w-[600px] mx-auto">
@@ -414,6 +415,180 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+
+      {/* ===== DESKTOP LAYOUT ===== */}
+      <div className="hidden md:block min-h-screen bg-[#F9FAFB]">
+        <header className="bg-white border-b border-border">
+          <div className="max-w-5xl mx-auto px-6 h-16 flex items-center gap-3">
+            <Link href="/cart" className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center active:scale-95 transition-transform">
+              <ArrowLeft className="w-4 h-4 text-text-primary" />
+            </Link>
+            <div>
+              <h1 className="text-lg font-bold text-text-primary">Checkout</h1>
+              <p className="text-xs text-text-muted">{restaurantName}</p>
+            </div>
+          </div>
+        </header>
+
+        {/* Step Indicators */}
+        <div className="bg-white border-b border-border">
+          <div className="flex items-center justify-center gap-3 px-6 py-4 max-w-5xl mx-auto">
+            {steps.map((step, i) => (
+              <React.Fragment key={step.label}>
+                <div className="flex items-center gap-2">
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${step.done ? "bg-primary text-white" : "bg-[#F5F5F5] text-text-muted"}`}>
+                    {i + 1}
+                  </div>
+                  <span className={`text-sm font-medium ${step.done ? "text-text-primary" : "text-text-muted"}`}>{step.label}</span>
+                </div>
+                {i < steps.length - 1 && <div className={`w-12 h-0.5 ${step.done ? "bg-primary" : "bg-border"}`} />}
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+
+        <div className="max-w-5xl mx-auto px-6 py-8">
+          <div className="flex gap-8">
+            {/* Left: Forms */}
+            <div className="flex-1 min-w-0 space-y-6">
+              {/* Order Type */}
+              <div className="bg-white rounded-xl border border-border p-6">
+                <h2 className="text-sm font-bold text-text-primary mb-4">1. Order Type</h2>
+                <OrderTypeSelector selected={orderType} onSelect={setOrderType} />
+              </div>
+
+              {/* Details Form */}
+              {orderType && (
+                <div className="bg-white rounded-xl border border-border p-6">
+                  <h2 className="text-sm font-bold text-text-primary mb-4">2. Your Details</h2>
+                  <div className="space-y-1">
+                    {orderType === "dine_in" && (
+                      <>
+                        <DineInForm name={customerName} phone={customerPhone} tableNumber={tableNumber} onNameChange={setCustomerName} onPhoneChange={setCustomerPhone} onTableChange={setTableNumber} />
+                        {fieldErrors.name && <FieldError message={fieldErrors.name} />}
+                        {fieldErrors.phone && <FieldError message={fieldErrors.phone} />}
+                        {fieldErrors.table && <FieldError message={fieldErrors.table} />}
+                      </>
+                    )}
+                    {orderType === "takeaway" && (
+                      <>
+                        <TakeawayForm name={customerName} phone={customerPhone} onNameChange={setCustomerName} onPhoneChange={setCustomerPhone} />
+                        {fieldErrors.name && <FieldError message={fieldErrors.name} />}
+                        {fieldErrors.phone && <FieldError message={fieldErrors.phone} />}
+                      </>
+                    )}
+                    {orderType === "delivery" && (
+                      <>
+                        <DeliveryForm name={customerName} phone={customerPhone} address={deliveryAddress} onNameChange={setCustomerName} onPhoneChange={setCustomerPhone} onAddressChange={setDeliveryAddress} />
+                        {fieldErrors.name && <FieldError message={fieldErrors.name} />}
+                        {fieldErrors.phone && <FieldError message={fieldErrors.phone} />}
+                        {fieldErrors.address && <FieldError message={fieldErrors.address} />}
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Payment Method */}
+              <div className="bg-white rounded-xl border border-border p-6">
+                <h2 className="text-sm font-bold text-text-primary mb-4">3. Payment Method</h2>
+                <div className="space-y-2">
+                  {["cod", "bank_transfer"].map((method) => (
+                    <button
+                      key={method}
+                      onClick={() => setPaymentMethod(method as PaymentMethod)}
+                      className={`flex items-center gap-3 w-full p-4 rounded-xl border transition-all ${
+                        paymentMethod === method ? "bg-primary text-white border-primary" : "bg-white border-border text-text-secondary hover:border-primary/30"
+                      }`}
+                    >
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${paymentMethod === method ? "border-white" : "border-border"}`}>
+                        {paymentMethod === method && <div className="w-2.5 h-2.5 rounded-full bg-white" />}
+                      </div>
+                      <span className="text-sm font-medium">{method === "cod" ? "Cash on Delivery" : "Bank Transfer"}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {error && (
+                <div className="bg-error/10 border border-error/20 rounded-xl p-4 flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 text-error shrink-0 mt-0.5" />
+                  <p className="text-sm text-error">{error}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Right: Order Summary */}
+            <div className="w-80 shrink-0">
+              <div className="sticky top-24 space-y-4">
+                <div className="bg-white rounded-xl border border-border overflow-hidden">
+                  <div className="p-4 border-b border-border flex items-center justify-between">
+                    <h3 className="text-sm font-bold text-text-primary">Order Summary</h3>
+                    <span className="text-xs text-text-muted">{totalItems} item{totalItems !== 1 ? "s" : ""}</span>
+                  </div>
+                  <div className="p-4 space-y-3 max-h-60 overflow-y-auto">
+                    {items.map((item) => (
+                      <div key={item.dish.id} className="flex items-center gap-3">
+                        {item.dish.image_url && (
+                          <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 relative bg-[#F9FAFB]">
+                            <Image src={item.dish.image_url} alt={item.dish.name_en} fill className="object-cover" sizes="40px" />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold text-text-primary truncate">{item.dish.name_en}</p>
+                          <p className="text-[11px] text-text-muted">{item.quantity}x {formatPrice(item.dish.price)}</p>
+                        </div>
+                        <span className="text-xs font-semibold text-text-primary">{formatPrice(item.dish.price * item.quantity)}</span>
+                      </div>
+                    ))}
+                    {discountAmount > 0 && selectedDeal && (
+                      <>
+                        <div className="pt-2 border-t border-border space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] text-text-secondary">Subtotal</span>
+                            <span className="text-[11px] text-text-primary">{formatPrice(items.reduce((s, i) => s + i.dish.price * i.quantity, 0))}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1 text-[11px] text-primary font-medium">
+                              <Tag className="w-3 h-3" />
+                              {selectedDeal.title_en}
+                              <button onClick={clearDeal} className="p-0.5 rounded-full hover:bg-primary/10">
+                                <X className="w-2.5 h-2.5" />
+                              </button>
+                            </div>
+                            <span className="text-[11px] text-primary font-semibold">-{formatPrice(discountAmount)}</span>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  <div className="px-4 pb-4 pt-2 border-t border-border mx-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm text-text-secondary">Total</span>
+                      <span className="text-lg font-bold text-text-primary">{formatPrice(getTotalPrice())}</span>
+                    </div>
+                    <button
+                      onClick={handlePlaceOrder}
+                      disabled={!orderType || !customerName || localLoading}
+                      className="w-full h-12 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-hover transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {localLoading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Placing Order...
+                        </span>
+                      ) : (
+                        `Place Order — ${formatPrice(getTotalPrice())}`
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   )
 }
 

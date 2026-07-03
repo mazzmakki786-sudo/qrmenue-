@@ -35,7 +35,7 @@ export default async function RestaurantsPage() {
       description: r.description || undefined,
     })) ?? []
 
-  const cities = [...new Set((restaurants ?? []).map((r) => r.city))].sort()
+  const cities = [...new Set((restaurants ?? []).map((r) => r.city.trim()))].sort()
 
   return (
     <>

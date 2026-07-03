@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { PasswordInput, validatePassword } from "@/components/ui/password-input"
+import CityAutocomplete from "@/components/shared/CityAutocomplete"
 import { ArrowLeft, Store } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 
@@ -125,8 +126,10 @@ export default function RestaurantSignupPage() {
   return (
     <div className="w-full flex flex-col items-center">
       <div className="w-full mb-8">
-        <Link href="/signup" className="inline-flex items-center gap-1.5 text-sm text-[#555] hover:text-black transition-colors">
-          <ArrowLeft className="w-4 h-4" />
+        <Link href="/signup" className="inline-flex items-center gap-2 text-sm text-[#555] hover:text-black transition-colors">
+          <div className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center shrink-0">
+            <ArrowLeft className="w-4 h-4" />
+          </div>
           Back
         </Link>
       </div>
@@ -140,18 +143,30 @@ export default function RestaurantSignupPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="w-full space-y-4">
-        {restaurantFields.map((f) => (
-          <Input
-            key={f.id}
-            label={f.label}
-            id={f.id}
-            type={f.type}
-            value={(form as any)[f.id]}
-            onChange={handleChange(f.id)}
-            placeholder={f.placeholder}
-            required
-          />
-        ))}
+        {restaurantFields.map((f) =>
+          f.id === "city" ? (
+            <CityAutocomplete
+              key={f.id}
+              label={f.label}
+              id={f.id}
+              value={form.city}
+              onChange={(val) => setForm((prev) => ({ ...prev, city: val }))}
+              placeholder={f.placeholder}
+              required
+            />
+          ) : (
+            <Input
+              key={f.id}
+              label={f.label}
+              id={f.id}
+              type={f.type}
+              value={(form as any)[f.id]}
+              onChange={handleChange(f.id)}
+              placeholder={f.placeholder}
+              required
+            />
+          )
+        )}
 
         {!user && (
           <>

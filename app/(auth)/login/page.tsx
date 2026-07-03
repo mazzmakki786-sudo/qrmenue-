@@ -74,8 +74,10 @@ function LoginForm() {
   return (
     <div className="w-full flex flex-col items-center">
       <div className="w-full mb-8">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-[#555] hover:text-black transition-colors">
-          <ArrowLeft className="w-4 h-4" />
+        <Link href="/" className="inline-flex items-center gap-2 text-sm text-[#555] hover:text-black transition-colors">
+          <div className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center shrink-0">
+            <ArrowLeft className="w-4 h-4" />
+          </div>
           Home
         </Link>
       </div>

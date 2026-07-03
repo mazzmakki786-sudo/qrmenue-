@@ -367,30 +367,30 @@ export default function DashboardPage() {
             <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${isOpen ? "translate-x-6" : "translate-x-0.5"}`} />
           </button>
         </div>
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 pt-3 sm:pt-4 mt-3 sm:mt-4 border-t border-[#F0F0F0]">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-4 mt-4 border-t border-[#F0F0F0]">
           <div className="flex items-center gap-2 text-[11px] text-[#555] font-medium shrink-0">
             <Clock className="w-4 h-4 text-[#555]" />
             <span>Business Hours</span>
           </div>
-          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-            <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 bg-[#F5F5F5] rounded-lg px-2.5 py-1.5 border border-[#E0E0E0]">
               <input
                 type="time"
                 value={openingTime}
                 onChange={(e) => handleTimeChange("opening_time", e.target.value.slice(0, 5))}
-                className="w-[88px] bg-[#F5F5F5] rounded-lg px-2 py-1.5 text-xs font-medium text-black border border-[#E0E0E0] focus:outline-none focus:border-black focus:ring-1 focus:ring-black/10 cursor-pointer transition-colors"
+                className="w-[80px] bg-transparent text-xs font-medium text-black focus:outline-none cursor-pointer"
               />
-              <span className="text-[10px] text-[#888] font-medium w-12 text-left">{formatTo12Hour(openingTime)}</span>
+              <span className="text-[10px] text-[#888] font-medium whitespace-nowrap">{formatTo12Hour(openingTime)}</span>
             </div>
             <span className="text-[#BBB] text-xs">—</span>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 bg-[#F5F5F5] rounded-lg px-2.5 py-1.5 border border-[#E0E0E0]">
               <input
                 type="time"
                 value={closingTime}
                 onChange={(e) => handleTimeChange("closing_time", e.target.value.slice(0, 5))}
-                className="w-[88px] bg-[#F5F5F5] rounded-lg px-2 py-1.5 text-xs font-medium text-black border border-[#E0E0E0] focus:outline-none focus:border-black focus:ring-1 focus:ring-black/10 cursor-pointer transition-colors"
+                className="w-[80px] bg-transparent text-xs font-medium text-black focus:outline-none cursor-pointer"
               />
-              <span className="text-[10px] text-[#888] font-medium w-12 text-left">{formatTo12Hour(closingTime)}</span>
+              <span className="text-[10px] text-[#888] font-medium whitespace-nowrap">{formatTo12Hour(closingTime)}</span>
             </div>
           </div>
         </div>

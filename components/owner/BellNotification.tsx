@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import { Bell, X, ChevronRight, Clock, Megaphone, BellRing } from "lucide-react"
-import { useRouter } from "next/navigation"
 import { formatPrice, timeAgo } from "@/lib/utils"
 
 interface Props {
@@ -77,7 +76,6 @@ function playNotificationSound() {
 }
 
 export function BellNotification({ restaurantId }: Props) {
-  const router = useRouter()
   const [unreadCount, setUnreadCount] = useState(0)
   const [showDropdown, setShowDropdown] = useState(false)
   const [alerts, setAlerts] = useState<OrderAlert[]>([])
@@ -143,23 +141,22 @@ export function BellNotification({ restaurantId }: Props) {
         },
         (payload) => {
           const order = payload.new as any
-          // Only count orders with "received" status
           if (order.order_status === "received") {
             playNotificationSound()
             setUnreadCount((prev) => prev + 1)
-            setAlerts((prev) =>
-              [{
-                id: order.id,
-                order_number: order.order_number,
-                customer_name: order.customer_name,
-                total_price: order.total_price,
-                items: (order.items || []).map((i: any) => ({
-                  name_en: i.name_en,
-                  quantity: i.quantity,
-                })),
-                order_type: order.order_type,
-              } as OrderAlert, ...prev].slice(0, 5)
-            )
+            const newAlert: OrderAlert = {
+              id: order.id,
+              order_number: order.order_number,
+              customer_name: order.customer_name,
+              total_price: order.total_price,
+              items: (order.items || []).map((i: any) => ({
+                name_en: i.name_en,
+                quantity: i.quantity,
+              })),
+              order_type: order.order_type,
+            }
+            setAlerts((prev) => [newAlert, ...prev].slice(0, 5))
+            setTimeout(() => dismissAlert(order.id), 7000)
           }
         }
       )
@@ -261,6 +258,13 @@ export function BellNotification({ restaurantId }: Props) {
     setAlerts((prev) => prev.filter((a) => a.id !== id))
   }
 
+  const navigateToOrder = (orderId: string) => {
+    setShowDropdown(false)
+    window.location.href = `/dashboard/orders/${orderId}`
+  }
+
+
+
   return (
     <>
       {/* Bell Icon */}
@@ -276,14 +280,14 @@ export function BellNotification({ restaurantId }: Props) {
 
         {/* Toast notifications for orders - top right corner */}
         {alerts.length > 0 && (
-          <div className="fixed top-16 left-4 right-4 sm:top-16 sm:left-auto sm:right-4 z-[60] flex flex-col gap-3 sm:w-[340px]">
+          <div className="fixed top-16 left-4 right-4 sm:top-16 sm:left-auto sm:right-4 z-[60] flex flex-col gap-3 sm:w-[360px]">
             {alerts.map((alert) => (
               <div
                 key={alert.id}
                 role="button"
                 tabIndex={0}
-                onClick={() => { dismissAlert(alert.id); router.push(`/dashboard/orders/${alert.id}`) }}
-                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); dismissAlert(alert.id); router.push(`/dashboard/orders/${alert.id}`) } }}
+                onClick={() => { dismissAlert(alert.id); window.location.href = `/dashboard/orders/${alert.id}` }}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); dismissAlert(alert.id); window.location.href = `/dashboard/orders/${alert.id}` } }}
                 className="bg-black text-white rounded-2xl p-4 shadow-2xl animate-slide-up cursor-pointer active:scale-[0.98] transition-transform"
               >
                 <div className="flex items-start justify-between gap-3">
@@ -352,8 +356,8 @@ export function BellNotification({ restaurantId }: Props) {
                       key={order.id}
                       role="button"
                       tabIndex={0}
-                      onClick={() => { setShowDropdown(false); router.push(`/dashboard/orders/${order.id}`) }}
-                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setShowDropdown(false); router.push(`/dashboard/orders/${order.id}`) } }}
+                      onClick={() => navigateToOrder(order.id)}
+                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); navigateToOrder(order.id) } }}
                       className="flex items-center justify-between p-4 hover:bg-[#F9FAFB] active:bg-[#F0F0F0] transition-colors cursor-pointer"
                     >
                       <div className="min-w-0 flex-1">
@@ -434,7 +438,7 @@ export function BellNotification({ restaurantId }: Props) {
                   : "Got it"}
               </button>
               <button
-                onClick={() => { dismissAnnouncement(); router.push("/dashboard/announcements") }}
+                onClick={() => { dismissAnnouncement(); window.location.href = "/dashboard/announcements" }}
                 className="shrink-0 h-12 px-4 rounded-xl border border-[#F0F0F0] text-sm font-medium text-[#555] hover:bg-[#F0F0F0] transition-colors flex items-center justify-center gap-1.5 min-h-[44px]"
               >
                 <BellRing className="w-4 h-4" />

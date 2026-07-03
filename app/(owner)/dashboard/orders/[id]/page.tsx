@@ -118,8 +118,11 @@ export default function OrderDetailPage() {
         </div>
       )}
       <div className="flex items-center gap-3 mb-6">
-        <Link href="/dashboard/orders" className="p-2 -ml-2 hover:bg-[#F0F0F0] rounded-lg transition-colors">
-          <ArrowLeft className="w-5 h-5" />
+        <Link
+          href="/dashboard/orders"
+          className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center hover:bg-[#EBEBEB] active:scale-95 transition-all shrink-0"
+        >
+          <ArrowLeft className="w-4 h-4" />
         </Link>
         <h1 className="text-xl font-bold">{order.order_number}</h1>
       </div>

@@ -41,7 +41,8 @@ export default function CartPage() {
   const totalItems = items.reduce((s, i) => s + i.quantity, 0)
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB]">
+    <>
+    <div className="min-h-screen bg-[#F9FAFB] md:hidden">
       {/* Header */}
       <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-border">
         <div className="flex items-center justify-between px-4 h-14 max-w-[600px] mx-auto">
@@ -196,5 +197,100 @@ export default function CartPage() {
         </div>
       </div>
     </div>
+
+      {/* ===== DESKTOP LAYOUT ===== */}
+      <div className="hidden md:block min-h-screen bg-[#F9FAFB]">
+        <header className="bg-white border-b border-border">
+          <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button onClick={() => router.back()} className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center">
+                <ArrowLeft className="w-4 h-4 text-text-primary" />
+              </button>
+              <div>
+                <h1 className="text-lg font-bold text-text-primary">Your Cart</h1>
+                <p className="text-xs text-text-muted">{restaurantName}</p>
+              </div>
+            </div>
+            {showClearConfirm ? (
+              <div className="flex items-center gap-2">
+                <button onClick={() => { clearCart(); setShowClearConfirm(false) }} className="text-xs text-error font-semibold px-3 py-1.5 rounded-lg bg-error/10 hover:bg-error/20">Confirm Clear</button>
+                <button onClick={() => setShowClearConfirm(false)} className="text-xs text-text-muted font-medium px-3 py-1.5 rounded-lg hover:bg-[#F5F5F5]">Cancel</button>
+              </div>
+            ) : (
+              <button onClick={() => setShowClearConfirm(true)} className="text-xs text-text-muted font-medium px-3 py-1.5 rounded-lg hover:bg-[#F5F5F5]">Clear All</button>
+            )}
+          </div>
+        </header>
+
+        <div className="max-w-6xl mx-auto px-6 py-8">
+          <div className="flex gap-8">
+            <div className="flex-1 min-w-0">
+              <div className="space-y-3">
+                {items.map((item) => (
+                  <div key={item.dish.id} className="bg-white rounded-xl border border-border p-4 flex items-center gap-4">
+                    <div className="relative w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-[#F9FAFB]">
+                      {item.dish.image_url ? (
+                        <Image src={item.dish.image_url} alt={item.dish.name_en} fill className="object-cover" sizes="80px" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <ShoppingBag className="w-6 h-6 text-text-muted" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-text-primary">{item.dish.name_en}</p>
+                      <p className="text-xs text-text-muted mt-0.5">{formatPrice(item.dish.price)} each</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1 bg-[#F5F5F5] rounded-full px-1">
+                        <button onClick={() => updateQuantity(item.dish.id, item.quantity - 1)} className="w-8 h-8 rounded-full flex items-center justify-center text-text-primary hover:bg-black/5">
+                          <Minus className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="text-sm font-bold min-w-[22px] text-center text-text-primary">{item.quantity}</span>
+                        <button onClick={() => updateQuantity(item.dish.id, item.quantity + 1)} className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-hover">
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <button onClick={() => removeItem(item.dish.id)} className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted hover:text-error hover:bg-error/5">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <p className="text-sm font-bold text-text-primary w-24 text-right">{formatPrice(item.dish.price * item.quantity)}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-80 shrink-0">
+              <div className="sticky top-24 bg-white rounded-xl border border-border p-5 space-y-4">
+                <h3 className="text-sm font-bold text-text-primary">Order Summary</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-text-secondary">Subtotal ({totalItems} items)</span>
+                    <span className="font-medium text-text-primary">{formatPrice(getSubtotal())}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-text-secondary">Delivery Fee</span>
+                    <span className={`font-medium ${deliveryFee === 0 ? "text-accent" : "text-text-primary"}`}>
+                      {deliveryFee === 0 ? "Free" : formatPrice(deliveryFee)}
+                    </span>
+                  </div>
+                  <div className="pt-3 border-t border-border flex items-center justify-between">
+                    <span className="text-base font-bold text-text-primary">Total</span>
+                    <span className="text-lg font-bold text-text-primary">{formatPrice(getTotalPrice())}</span>
+                  </div>
+                </div>
+                <Link href="/checkout" className="block w-full bg-primary text-white text-center py-3 rounded-xl text-sm font-semibold hover:bg-primary-hover active:scale-[0.98] transition-all">
+                  Proceed to Checkout
+                </Link>
+                <Link href="/restaurants" className="block w-full text-center py-2 rounded-xl text-xs text-text-secondary font-medium hover:bg-[#F5F5F5] transition-colors">
+                  Continue Browsing
+                </Link>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+    </>
   )
 }
