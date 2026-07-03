@@ -267,19 +267,21 @@ export function getSubscriptionStatus(
       )
     : 999
 
+  const isExpired = planEnd ? now > planEnd : false
+
   return {
     plan: restaurant.plan,
     daysRemaining,
     trialDaysRemaining: 0,
-    isExpired: planEnd ? now > planEnd : false,
+    isExpired,
     isInGracePeriod: false,
     isSuspended,
-    blockMenu: false,
-    blockOrders: false,
-    canUploadImages,
-    canAddDish,
-    canAddCategory,
-    canAcceptOrder,
+    blockMenu: isExpired,
+    blockOrders: isExpired,
+    canUploadImages: isExpired ? false : canUploadImages,
+    canAddDish: isExpired ? false : canAddDish,
+    canAddCategory: isExpired ? false : canAddCategory,
+    canAcceptOrder: isExpired ? false : canAcceptOrder,
     shouldBlurOrderDetails: false,
     orderCount,
     dishCount,

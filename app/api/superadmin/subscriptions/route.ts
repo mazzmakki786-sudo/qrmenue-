@@ -16,7 +16,7 @@ export const POST = safeRoute(async (request) => {
   }
 
   const body = await request.json()
-  const { restaurant_id, plan_type, price, status } = body
+  const { restaurant_id, plan_type, price } = body
 
   if (!restaurant_id || !plan_type) {
     return NextResponse.json({ error: "restaurant_id and plan_type are required" }, { status: 400 })
@@ -28,7 +28,7 @@ export const POST = safeRoute(async (request) => {
     plan: plan_type,
     amount_pkr: price ?? 0,
     start_date: new Date().toISOString(),
-    end_date: status === "active" ? null : new Date(Date.now() + 30 * 86400000).toISOString(),
+    end_date: null,
   })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })

@@ -22,6 +22,7 @@ export const PATCH = safeRoute(async (
   if (typeof body.is_suspended === "boolean") allowed.is_suspended = body.is_suspended
   if (body.plan && ["trial", "starter", "growth", "premium"].includes(body.plan)) {
     allowed.plan = body.plan
+    allowed.plan_start_date = new Date().toISOString()
   }
   if (body.plan_end_date !== undefined) {
     allowed.plan_end_date = body.plan_end_date ? new Date(body.plan_end_date).toISOString() : null

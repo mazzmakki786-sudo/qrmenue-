@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { z } from "zod"
-import { PLAN_LIMITS, type Plan } from "@/lib/subscription"
+import { getEffectiveLimits, type Plan } from "@/lib/subscription"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 import { csrfGuard } from "@/lib/csrf"
 import { safeRoute } from "@/lib/api-error"
@@ -48,7 +48,7 @@ export const POST = safeRoute(async (request) => {
 
   const { data: restaurant } = await supabase
     .from("restaurants")
-    .select("id, plan, is_active, is_suspended")
+    .select("id, plan, is_active, is_suspended, plan_limits_override")
     .eq("owner_id", user.id)
     .maybeSingle()
 
@@ -57,7 +57,7 @@ export const POST = safeRoute(async (request) => {
   if (restaurant.is_suspended) return NextResponse.json({ error: "Restaurant is suspended" }, { status: 403 })
 
   const plan = restaurant.plan as Plan
-  const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.trial
+  const limits = getEffectiveLimits(plan, restaurant.plan_limits_override)
 
   let body: any
   try {
@@ -164,14 +164,14 @@ export const PATCH = safeRoute(async (request) => {
 
   const { data: restaurant } = await supabase
     .from("restaurants")
-    .select("id, plan")
+    .select("id, plan, plan_limits_override")
     .eq("owner_id", user.id)
     .maybeSingle()
 
   if (!restaurant) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
 
   const plan = restaurant.plan as Plan
-  const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.trial
+  const limits = getEffectiveLimits(plan, restaurant.plan_limits_override)
 
   let body: any
   try {

@@ -67,6 +67,9 @@ export function SubscriptionBanner({ restaurant, orderCount = 0 }: Props) {
     orderLimit !== Infinity && orderCount >= orderLimit * 0.7
 
   if (isExpired) {
+    const expiredText = plan === "trial"
+      ? "Trial expired — upgrade to continue"
+      : "Your subscription has ended — renew to restore your menu"
     return (
       <div className="bg-[#DC2626]/10 border border-[#DC2626]/30 rounded-[14px] p-4">
         <div className="flex items-start gap-3">
@@ -75,7 +78,7 @@ export function SubscriptionBanner({ restaurant, orderCount = 0 }: Props) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-[#DC2626]">
-              Trial expired — upgrade to continue
+              {expiredText}
             </p>
             <p className="text-xs text-[#555] mt-1">
               Your data is saved. Pick a plan to restore your menu.
@@ -84,7 +87,7 @@ export function SubscriptionBanner({ restaurant, orderCount = 0 }: Props) {
               href="/dashboard/subscription"
               className="inline-flex items-center gap-1.5 mt-3 px-4 py-2 bg-[#DC2626] text-white text-xs font-semibold rounded-lg hover:opacity-90 transition-opacity"
             >
-              Upgrade Now <ArrowRight className="w-3.5 h-3.5" />
+              {plan === "trial" ? "Upgrade Now" : "Renew Plan"} <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>

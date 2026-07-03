@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import {
   getSubscriptionStatus,
+  getEffectiveLimits,
   PLAN_LIMITS,
   type Plan,
   type PlanLimits,
@@ -172,7 +173,9 @@ export function useSubscription(): UseSubscriptionReturn {
   const status = restaurant
     ? getSubscriptionStatus(restaurant, { dishCount, imageCount, orderCount, categoryCount })
     : null
-  const planLimits = PLAN_LIMITS[plan] || EMPTY_LIMITS
+  const planLimits = restaurant
+    ? getEffectiveLimits(plan, restaurant.plan_limits_override)
+    : EMPTY_LIMITS
 
   return {
     restaurant,

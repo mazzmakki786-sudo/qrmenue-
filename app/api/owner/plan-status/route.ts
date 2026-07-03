@@ -45,8 +45,8 @@ export const GET = safeRoute(async (request) => {
       images: imageCount,
       categories: categoryCount,
     },
-    canAddDish: dishCount < limits.maxDishes,
-    canAddImage: imageCount < limits.maxImages,
-    canAddCategory: categoryCount < limits.maxCategories,
+    canAddDish: dishCount < limits.maxDishes && restaurant.is_active && !restaurant.is_suspended,
+    canAddImage: imageCount < limits.maxImages && restaurant.is_active && !restaurant.is_suspended,
+    canAddCategory: categoryCount < limits.maxCategories && restaurant.is_active && !restaurant.is_suspended,
   })
 })

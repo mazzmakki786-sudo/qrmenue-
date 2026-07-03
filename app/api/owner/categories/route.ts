@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { z } from "zod"
-import { PLAN_LIMITS, type Plan } from "@/lib/subscription"
+import { getEffectiveLimits, type Plan } from "@/lib/subscription"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 import { csrfGuard } from "@/lib/csrf"
 import { safeRoute } from "@/lib/api-error"
@@ -54,7 +54,7 @@ export const POST = safeRoute(async (request) => {
   }
 
   const plan = restaurant.plan as Plan
-  const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.trial
+  const limits = getEffectiveLimits(plan, restaurant.plan_limits_override)
 
   const { count: categoryCount } = await supabase
     .from("categories")

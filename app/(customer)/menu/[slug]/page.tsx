@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
+import Link from "next/link"
+import { Store, ChevronRight } from "lucide-react"
 import { GRACE_PERIOD_DAYS } from "@/lib/subscription"
 import { RestaurantDetailClient } from "@/app/(customer)/restaurant/[slug]/RestaurantDetailClient"
 import type { Category, Dish } from "@/types"
@@ -52,6 +54,30 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
+function RestaurantUnavailable({ restaurantName }: { restaurantName: string }) {
+  return (
+    <div className="min-h-[80vh] flex items-center justify-center px-4">
+      <div className="text-center max-w-sm w-full">
+        <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-[#F5F5F5] flex items-center justify-center">
+          <Store className="w-7 h-7 text-[#999]" />
+        </div>
+        <h1 className="text-lg font-bold text-[#333] mb-2">{restaurantName}</h1>
+        <p className="text-sm text-[#777] mb-6 leading-relaxed">
+          This restaurant is not accepting orders right now. Please try again later.
+        </p>
+        <Link
+          href="/restaurants"
+          className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-[#333] text-white text-sm font-medium rounded-xl hover:bg-black transition-colors"
+        >
+          <Store className="w-4 h-4" />
+          Browse Other Restaurants
+          <ChevronRight className="w-4 h-4" />
+        </Link>
+      </div>
+    </div>
+  )
+}
+
 export default async function MenuPage({ params }: Props) {
   const { slug } = await params
   const supabase = await createClient()
@@ -72,22 +98,14 @@ export default async function MenuPage({ params }: Props) {
     const trialEnd = new Date(restaurant.trial_end)
     const graceEnd = new Date(trialEnd.getTime() + GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000)
     if (new Date() > graceEnd) {
-      return (
-        <div className="min-h-[60vh] flex items-center justify-center px-4">
-          <div className="text-center max-w-md">
-            <div className="w-16 h-16 rounded-2xl bg-[#FEF3C7] flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">⏰</span>
-            </div>
-            <h1 className="text-xl font-bold mb-2">Menu Unavailable</h1>
-            <p className="text-sm text-[#555] mb-6">
-              This restaurant&apos;s trial period has ended. The menu is temporarily offline.
-            </p>
-            <p className="text-xs text-[#555]">
-              Please check back later or contact the restaurant directly.
-            </p>
-          </div>
-        </div>
-      )
+      return <RestaurantUnavailable restaurantName={restaurant.name} />
+    }
+  }
+
+  if (!isTrial && restaurant.plan_end_date) {
+    const planEnd = new Date(restaurant.plan_end_date)
+    if (new Date() > planEnd) {
+      return <RestaurantUnavailable restaurantName={restaurant.name} />
     }
   }
 

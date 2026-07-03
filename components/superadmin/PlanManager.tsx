@@ -12,6 +12,7 @@ interface Plan {
   max_images: number
   max_orders: number
   max_categories: number
+  ai_posts_per_month: number
   analytics: boolean
   custom_branding: boolean
   can_have_qr: boolean
@@ -28,6 +29,7 @@ const defaultLimits: Omit<Plan, "id" | "slug" | "sort_order" | "is_active"> = {
   max_images: 10,
   max_orders: 10,
   max_categories: 20,
+  ai_posts_per_month: 0,
   analytics: true,
   custom_branding: false,
   can_have_qr: true,
@@ -182,6 +184,7 @@ function PlanCard({ plan, saving, onSave }: { plan: Plan; saving: boolean; onSav
             <Field label="Max Images" type="number" value={current.max_images} onChange={(v) => handleChange("max_images", Number(v))} hint="-1 for unlimited" />
             <Field label="Max Orders/mo" type="number" value={current.max_orders} onChange={(v) => handleChange("max_orders", Number(v))} hint="-1 for unlimited" />
             <Field label="Max Categories" type="number" value={current.max_categories} onChange={(v) => handleChange("max_categories", Number(v))} hint="-1 for unlimited" />
+            <Field label="AI Posts/mo" type="number" value={current.ai_posts_per_month} onChange={(v) => handleChange("ai_posts_per_month", Number(v))} hint="0 to disable" />
             <Field label="Sort Order" type="number" value={current.sort_order} onChange={(v) => handleChange("sort_order", Number(v))} />
           </div>
 

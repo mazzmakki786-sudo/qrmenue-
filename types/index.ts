@@ -114,7 +114,7 @@ export interface Order {
 export interface Subscription {
   id: string
   restaurant_id: string
-  plan: string
+  plan: "trial" | "starter" | "growth" | "premium"
   amount_pkr: number
   payment_method: string | null
   payment_ref: string | null

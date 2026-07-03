@@ -3,7 +3,7 @@ import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { generateOrderNumber } from "@/lib/utils"
 import { z } from "zod"
 import { loadTrialLimitsFromDB } from "@/lib/subscription-server"
-import { DEFAULT_TRIAL_LIMITS, GRACE_PERIOD_DAYS } from "@/lib/subscription"
+import { getEffectiveLimits, DEFAULT_TRIAL_LIMITS, GRACE_PERIOD_DAYS, type Plan } from "@/lib/subscription"
 import { checkAndSendOrderLimitAlert } from "@/lib/email/orderLimitAlert"
 import { safeRoute } from "@/lib/api-error"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
@@ -81,7 +81,7 @@ export const POST = safeRoute(async (request) => {
 
   const { data: restaurant } = await supabase
     .from("restaurants")
-    .select("id, phone, is_active, is_suspended, is_open, plan, trial_end")
+    .select("id, phone, is_active, is_suspended, is_open, plan, plan_end_date, trial_end")
     .eq("id", parsed.data.restaurant_id)
     .single()
 
@@ -106,24 +106,31 @@ export const POST = safeRoute(async (request) => {
         message: "This restaurant's trial has ended. Cannot accept orders.",
       }, { status: 403 })
     }
-  }
-
-  if (restaurant.plan === "trial") {
-    const trialLimits = await loadTrialLimitsFromDB()
-    const maxOrders = trialLimits.maxOrders ?? DEFAULT_TRIAL_LIMITS.maxOrders
-
-    const { count: orderCount } = await supabase
-      .from("orders")
-      .select("id", { count: "exact", head: true })
-      .eq("restaurant_id", parsed.data.restaurant_id)
-      .neq("order_status", "cancelled")
-
-    if ((orderCount ?? 0) >= maxOrders) {
+  } else if (restaurant.plan !== "trial" && restaurant.plan_end_date) {
+    const planEnd = new Date(restaurant.plan_end_date)
+    if (new Date() > planEnd) {
       return NextResponse.json({
-        error: "ORDER_LIMIT_REACHED",
-        message: `Trial plan allows ${maxOrders} orders. Upgrade to accept more.`,
+        error: "PLAN_EXPIRED",
+        message: "This restaurant's plan has expired. Please renew to accept orders.",
       }, { status: 403 })
     }
+  }
+
+  const { count: orderCount } = await supabase
+    .from("orders")
+    .select("id", { count: "exact", head: true })
+    .eq("restaurant_id", parsed.data.restaurant_id)
+    .neq("order_status", "cancelled")
+
+  const orderLimit = restaurant.plan === "trial"
+    ? (await loadTrialLimitsFromDB()).maxOrders ?? DEFAULT_TRIAL_LIMITS.maxOrders
+    : getEffectiveLimits(restaurant.plan as Plan, null).maxOrders
+
+  if ((orderCount ?? 0) >= orderLimit) {
+    return NextResponse.json({
+      error: "ORDER_LIMIT_REACHED",
+      message: `Your plan allows ${orderLimit} orders. Upgrade to accept more.`,
+    }, { status: 403 })
   }
 
   const orderNumber = generateOrderNumber()

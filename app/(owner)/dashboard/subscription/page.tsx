@@ -6,22 +6,43 @@ import { Button } from "@/components/ui/button"
 import { SubscriptionBanner } from "@/components/shared/SubscriptionBanner"
 import { useCompanySettings } from "@/lib/hooks/useCompanySettings"
 import { useSubscription } from "@/lib/hooks/useSubscription"
-import { PLAN_LIMITS, PLAN_NAMES, PLAN_PRICES, type Plan, formatLimit } from "@/lib/subscription"
+import { PLAN_NAMES, type Plan, formatLimit } from "@/lib/subscription"
 import { Check, X, MessageCircle, Clock, ShoppingBag, Image as ImageIcon, Utensils, AlertTriangle, HelpCircle, Calendar, Sparkles, TrendingUp, ShieldCheck } from "lucide-react"
 
 const planOrder: Plan[] = ["trial", "starter", "growth", "premium"]
+
+interface PlanFromAPI {
+  slug: string
+  name: string
+  price_pkr: number
+  max_dishes: number
+  max_images: number
+  max_orders: number
+  max_categories: number
+  ai_posts_per_month: number
+  analytics: boolean
+  custom_branding: boolean
+}
 
 export default function SubscriptionPage() {
   const sub = useSubscription()
   const { restaurant, orderCount, planLimits, loading } = sub
   const { settings, loading: settingsLoading } = useCompanySettings()
   const [error, setError] = useState<string | null>(null)
+  const [plansFromAPI, setPlansFromAPI] = useState<PlanFromAPI[]>([])
 
   useEffect(() => {
     if (!loading && !restaurant) {
       setError("Failed to load subscription data.")
     }
   }, [loading, restaurant])
+
+  useEffect(() => {
+    fetch("/api/plans")
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data?.plans) setPlansFromAPI(data.plans) })
+      .catch(() => {})
+  }, [])
 
   if (loading || settingsLoading) {
     return (
@@ -50,17 +71,22 @@ export default function SubscriptionPage() {
   const isSuspended = "is_suspended" in restaurant ? (restaurant as any).is_suspended : false
   const currentPlan = restaurant.plan as Plan
   const currentPlanIndex = planOrder.indexOf(currentPlan)
-  const upgradePlans = planOrder.filter((p) => p !== "trial" && planOrder.indexOf(p) > currentPlanIndex)
+  const isExpired = sub.isExpired
+  const upgradePlans = isExpired
+    ? planOrder.filter((p) => p !== "trial")
+    : planOrder.filter((p) => p !== "trial" && planOrder.indexOf(p) > currentPlanIndex)
 
-  const jazzcash = settings.jazzcash_number || "03001234567"
-  const easypaisa = settings.easypaisa_number || "03001234567"
-  const bankName = settings.bank_name || "Meezan Bank"
-  const accountTitle = settings.account_title || "QRMenu Pakistan"
-  const accountNumber = settings.account_number || "01234567890123"
-  const whatsapp = settings.whatsapp_support || "03001234567"
+  const jazzcash = settings.jazzcash_number || ""
+  const easypaisa = settings.easypaisa_number || ""
+  const bankName = settings.bank_name || ""
+  const accountTitle = settings.account_title || ""
+  const accountNumber = settings.account_number || ""
+  const whatsapp = settings.whatsapp_support || ""
 
   const whatsappDigits = whatsapp.replace(/[^0-9]/g, "")
-  const whatsappLink = `https://wa.me/${whatsappDigits.startsWith("0") ? "92" + whatsappDigits.slice(1) : whatsappDigits}`
+  const whatsappLink = whatsappDigits
+    ? `https://wa.me/${whatsappDigits.startsWith("0") ? "92" + whatsappDigits.slice(1) : whatsappDigits}`
+    : ""
 
   const trialEnd = restaurant.trial_end ? new Date(restaurant.trial_end) : null
   const planEnd = restaurant.plan_end_date ? new Date(restaurant.plan_end_date) : null
@@ -97,69 +123,72 @@ export default function SubscriptionPage() {
       <SubscriptionBanner restaurant={restaurant} orderCount={orderCount} />
 
       {/* Current Plan Card */}
-      <div className="relative overflow-hidden bg-white border border-[#F0F0F0] rounded-2xl shadow-sm">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-black/[0.02] to-transparent rounded-bl-full" />
+      <div className={`relative overflow-hidden bg-white border rounded-2xl shadow-sm ${isExpired ? "border-[#DC2626]/30" : "border-[#F0F0F0]"}`}>
+        <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl rounded-bl-full ${isExpired ? "from-[#DC2626]/[0.04]" : "from-black/[0.02]"}`} />
         <div className="p-5 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-5">
             <div className="flex items-center gap-3">
-              <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
-                currentPlan === "trial"
-                  ? "bg-[#2563EB]/10"
-                  : currentPlan === "starter"
-                    ? "bg-[#8B5CF6]/10"
-                    : currentPlan === "growth"
-                      ? "bg-black/10"
-                      : "bg-[#25D366]/10"
-              }`}>
-                <Sparkles className={`w-5 h-5 ${
-                  currentPlan === "trial" ? "text-[#2563EB]"
-                    : currentPlan === "starter" ? "text-[#8B5CF6]"
-                      : currentPlan === "growth" ? "text-black"
-                        : "text-[#25D366]"
-                }`} />
+              <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${isExpired ? "bg-[#DC2626]/10" : currentPlan === "trial" ? "bg-[#2563EB]/10" : currentPlan === "starter" ? "bg-[#8B5CF6]/10" : currentPlan === "growth" ? "bg-black/10" : "bg-[#25D366]/10"}`}>
+                {isExpired ? (
+                  <AlertTriangle className="w-5 h-5 text-[#DC2626]" />
+                ) : (
+                  <Sparkles className={`w-5 h-5 ${currentPlan === "trial" ? "text-[#2563EB]" : currentPlan === "starter" ? "text-[#8B5CF6]" : currentPlan === "growth" ? "text-black" : "text-[#25D366]"}`} />
+                )}
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-semibold text-[#555] uppercase tracking-wider">Current Plan</span>
-                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase ${
-                    currentPlan === "trial"
-                      ? "bg-[#2563EB]/10 text-[#2563EB]"
-                      : currentPlan === "starter"
-                        ? "bg-[#8B5CF6]/10 text-[#8B5CF6]"
-                        : currentPlan === "growth"
-                          ? "bg-black/10 text-black"
-                          : "bg-[#25D366]/10 text-[#25D366]"
-                  }`}>
+                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase ${isExpired ? "bg-[#DC2626]/10 text-[#DC2626]" : currentPlan === "trial" ? "bg-[#2563EB]/10 text-[#2563EB]" : currentPlan === "starter" ? "bg-[#8B5CF6]/10 text-[#8B5CF6]" : currentPlan === "growth" ? "bg-black/10 text-black" : "bg-[#25D366]/10 text-[#25D366]"}`}>
                     {PLAN_NAMES[currentPlan]}
                   </span>
+                  {isExpired && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase bg-[#DC2626]/10 text-[#DC2626]">Expired</span>
+                  )}
                 </div>
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5">
-                  <span className="text-xs text-[#999] flex items-center gap-1">
-                    <Calendar className="w-3 h-3" />
-                    {currentPlan === "trial"
-                      ? `Started ${restaurant.trial_start ? formatDate(new Date(restaurant.trial_start)) : "recently"}`
-                      : "Active plan"}
-                  </span>
-                  {currentPlan !== "trial" && planEnd && (
+                  {!isExpired && (
+                    <span className="text-xs text-[#999] flex items-center gap-1">
+                      <Calendar className="w-3 h-3" />
+                      {currentPlan === "trial"
+                        ? `Started ${restaurant.trial_start ? formatDate(new Date(restaurant.trial_start)) : "recently"}`
+                        : planEnd ? `Started ${restaurant.plan_start_date ? formatDate(new Date(restaurant.plan_start_date)) : "recently"}` : "Active plan"}
+                    </span>
+                  )}
+                  {currentPlan !== "trial" && planEnd && !isExpired && (
                     <span className="text-xs text-[#999] flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       Ends {formatDate(planEnd)}
+                    </span>
+                  )}
+                  {isExpired && planEnd && (
+                    <span className="text-xs text-[#DC2626] flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      Expired on {formatDate(planEnd)}
                     </span>
                   )}
                 </div>
               </div>
             </div>
             <div className="text-right shrink-0">
-              <p className="text-lg font-bold text-black">
-                {currentPlan === "trial"
-                  ? `${trialDaysRemaining} day${trialDaysRemaining === 1 ? "" : "s"}`
-                  : planDaysRemaining !== null
-                    ? `${planDaysRemaining} day${planDaysRemaining === 1 ? "" : "s"}`
-                    : "Active"}
-              </p>
-              <p className="text-[10px] text-[#999] font-medium">
-                {currentPlan === "trial" ? "remaining in trial" : "remaining"}
-              </p>
+              {isExpired ? (
+                <>
+                  <p className="text-lg font-bold text-[#DC2626]">Expired</p>
+                  <p className="text-[10px] text-[#DC2626] font-medium">renew to continue</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-lg font-bold text-black">
+                    {currentPlan === "trial"
+                      ? `${trialDaysRemaining} day${trialDaysRemaining === 1 ? "" : "s"}`
+                      : planDaysRemaining !== null
+                        ? `${planDaysRemaining} day${planDaysRemaining === 1 ? "" : "s"}`
+                        : "Active"}
+                  </p>
+                  <p className="text-[10px] text-[#999] font-medium">
+                    {currentPlan === "trial" ? "remaining in trial" : "remaining"}
+                  </p>
+                </>
+              )}
             </div>
           </div>
 
@@ -181,8 +210,8 @@ export default function SubscriptionPage() {
             <div className="h-px flex-1 bg-[#F0F0F0]" />
           </div>
           {upgradePlans.map((planKey) => {
-            const price = PLAN_PRICES[planKey]
-            const limits = PLAN_LIMITS[planKey]
+            const planAPI = plansFromAPI.find(p => p.slug === planKey)
+            const price = planAPI?.price_pkr ?? 0
             const isRecommended = planKey === "growth"
 
             return (
@@ -211,10 +240,10 @@ export default function SubscriptionPage() {
                         : "Complete enterprise solution with priority support"}
                     </p>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
-                      <FeatureRow label={`${formatLimit(limits.maxDishes)} dishes`} included />
-                      <FeatureRow label={limits.maxImages === 0 ? "No images" : `${formatLimit(limits.maxImages)} images`} included={limits.maxImages > 0} />
-                      <FeatureRow label={limits.maxOrders === Infinity ? "Unlimited orders" : `${limits.maxOrders} orders/mo`} included />
-                      <FeatureRow label={limits.analytics ? "Analytics dashboard" : "No analytics"} included={limits.analytics} />
+                      <FeatureRow label={`${formatLimit(planLimits.maxDishes)} dishes`} included />
+                      <FeatureRow label={planLimits.maxImages === 0 ? "No images" : `${formatLimit(planLimits.maxImages)} images`} included={planLimits.maxImages > 0} />
+                      <FeatureRow label={planLimits.maxOrders === Infinity ? "Unlimited orders" : `${planLimits.maxOrders} orders/mo`} included />
+                      <FeatureRow label={planLimits.analytics ? "Analytics dashboard" : "No analytics"} included={planLimits.analytics} />
                       <FeatureRow label="QR code generation" included />
                       <FeatureRow label="WhatsApp orders" included />
                       <FeatureRow label="Priority support" included={planKey !== "starter"} />
@@ -235,8 +264,8 @@ export default function SubscriptionPage() {
         </div>
       )}
 
-      {/* Paid user - contact for changes */}
-      {currentPlan !== "trial" && upgradePlans.length === 0 && (
+      {/* Paid user - contact for changes (only when NOT expired) */}
+      {currentPlan !== "trial" && upgradePlans.length === 0 && !isExpired && (
         <div className="bg-white border border-[#F0F0F0] rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-center sm:text-left">
             <div className="flex items-center gap-2 mb-1 justify-center sm:justify-start">
@@ -254,29 +283,47 @@ export default function SubscriptionPage() {
         </div>
       )}
 
-      {/* How to Pay */}
+      {/* How to Pay / Renew */}
       <div className="bg-[#F9FAFB] border border-[#F0F0F0] rounded-2xl p-5 sm:p-6 space-y-4">
         <h3 className="text-sm font-bold text-black flex items-center gap-2">
-          <Clock className="w-4 h-4" /> How to Pay
+          {isExpired ? <AlertTriangle className="w-4 h-4 text-[#DC2626]" /> : <Clock className="w-4 h-4" />}
+          {isExpired ? "Renew Your Plan" : "How to Pay"}
         </h3>
-        <p className="text-xs text-[#555] leading-relaxed">
-          We accept manual payments via JazzCash, Easypaisa, and Bank Transfer. Send the amount and share the screenshot with our support team.
-        </p>
+        {isExpired ? (
+          <>
+            <p className="text-xs text-[#555] leading-relaxed">
+              Your plan has expired. To restore your menu and start accepting orders again, choose a plan above and send the payment to one of the options below. We will activate your plan within minutes.
+            </p>
+            <div className="bg-[#F0F0F0] rounded-xl p-4 space-y-2">
+              <p className="text-xs font-semibold text-[#333]">Steps to Renew:</p>
+              <ol className="text-xs text-[#555] space-y-1.5 list-decimal list-inside">
+                <li>Choose a plan from the options above</li>
+                <li>Send the payment via JazzCash, Easypaisa, or Bank Transfer</li>
+                <li>Share the payment screenshot on our WhatsApp</li>
+                <li>We activate your plan within minutes</li>
+              </ol>
+            </div>
+          </>
+        ) : (
+          <p className="text-xs text-[#555] leading-relaxed">
+            We accept manual payments via JazzCash, Easypaisa, and Bank Transfer. Send the amount and share the screenshot with our support team.
+          </p>
+        )}
         <div className="grid sm:grid-cols-3 gap-3">
           <div className="bg-white p-3.5 rounded-xl border border-[#F0F0F0]">
             <p className="text-[10px] text-[#999] font-medium mb-0.5">JazzCash</p>
-            <p className="text-sm font-bold text-black">{jazzcash}</p>
-            <p className="text-[10px] text-[#555]">{accountTitle}</p>
+            <p className="text-sm font-bold text-black">{jazzcash || "—"}</p>
+            {accountTitle && <p className="text-[10px] text-[#555]">{accountTitle}</p>}
           </div>
           <div className="bg-white p-3.5 rounded-xl border border-[#F0F0F0]">
             <p className="text-[10px] text-[#999] font-medium mb-0.5">Easypaisa</p>
-            <p className="text-sm font-bold text-black">{easypaisa}</p>
-            <p className="text-[10px] text-[#555]">{accountTitle}</p>
+            <p className="text-sm font-bold text-black">{easypaisa || "—"}</p>
+            {accountTitle && <p className="text-[10px] text-[#555]">{accountTitle}</p>}
           </div>
           <div className="bg-white p-3.5 rounded-xl border border-[#F0F0F0]">
             <p className="text-[10px] text-[#999] font-medium mb-0.5">Bank Transfer</p>
-            <p className="text-sm font-bold text-black">{accountNumber}</p>
-            <p className="text-[10px] text-[#555]">{bankName}</p>
+            <p className="text-sm font-bold text-black">{accountNumber || "—"}</p>
+            {bankName && <p className="text-[10px] text-[#555]">{bankName}</p>}
           </div>
         </div>
         <div className="bg-[#25D366]/5 border border-[#25D366]/10 rounded-xl px-4 py-3 flex items-center gap-3">
