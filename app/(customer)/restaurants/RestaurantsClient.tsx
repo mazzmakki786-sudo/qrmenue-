@@ -54,7 +54,7 @@ function RestaurantCard({
             {r.name}
           </h3>
           <p className="text-xs text-gray-500 mt-0.5 truncate">
-            {r.city.trim()}{r.cuisine_type ? ` • ${r.cuisine_type}` : ""}
+            {r.cuisine_type || ""}
           </p>
           <div className="flex items-center gap-2 mt-1.5 text-[11px] text-gray-400">
             {r.delivery_time_min != null && (
@@ -164,17 +164,6 @@ export function RestaurantsClient({ initialRestaurants, initialCities }: Restaur
         r.city.trim().toLowerCase().includes(q)
     )
   }, [searchQuery, restaurants])
-
-  const groupedByCity = useMemo(() => {
-    const map = new Map<string, RestaurantSummary[]>()
-    for (const r of filteredRestaurants) {
-      const city = r.city.trim()
-      const list = map.get(city) || []
-      list.push(r)
-      map.set(city, list)
-    }
-    return map
-  }, [filteredRestaurants])
 
   const handleSearchClear = useCallback(() => setSearchQuery(""), [])
 
@@ -290,27 +279,14 @@ export function RestaurantsClient({ initialRestaurants, initialCities }: Restaur
             )}
           </div>
         ) : (
-          <div className="space-y-8 sm:space-y-10">
-            {Array.from(groupedByCity.entries()).map(([city, items]) => (
-              <section key={city}>
-                <div className="flex items-center gap-3 mb-4">
-                  <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    {city}
-                  </h2>
-                  <div className="h-px flex-1 bg-gray-200" />
-                  <span className="text-[10px] text-gray-400 font-medium tabular-nums">{items.length} {items.length === 1 ? "place" : "places"}</span>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                  {items.map((r) => (
-                    <RestaurantCard
-                      key={r.id}
-                      r={r}
-                      isFav={isFavorited(r.id)}
-                      onToggleFav={toggleFavorite}
-                    />
-                  ))}
-                </div>
-              </section>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+            {filteredRestaurants.map((r) => (
+              <RestaurantCard
+                key={r.id}
+                r={r}
+                isFav={isFavorited(r.id)}
+                onToggleFav={toggleFavorite}
+              />
             ))}
           </div>
         )}

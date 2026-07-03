@@ -282,7 +282,7 @@ export function getSubscriptionStatus(
     canAddDish: isExpired ? false : canAddDish,
     canAddCategory: isExpired ? false : canAddCategory,
     canAcceptOrder: isExpired ? false : canAcceptOrder,
-    shouldBlurOrderDetails: false,
+    shouldBlurOrderDetails: isExpired,
     orderCount,
     dishCount,
     categoryCount,

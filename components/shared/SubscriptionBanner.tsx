@@ -126,6 +126,44 @@ export function SubscriptionBanner({ restaurant, orderCount = 0 }: Props) {
   }
 
   if (plan === "trial") {
+    if (trialDaysRemaining > 0 && trialDaysRemaining <= 5) {
+      return (
+        <div className="bg-[#FEF3C7] border border-[#D97706]/30 rounded-[14px] p-4">
+          <div className="flex items-start gap-3 mb-3">
+            <div className="w-9 h-9 rounded-full bg-[#D97706] text-white flex items-center justify-center flex-shrink-0">
+              <AlertTriangle className="w-5 h-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-[#92400E]">
+                Trial ends in {trialDaysRemaining} day{trialDaysRemaining === 1 ? "" : "s"}
+              </p>
+              <p className="text-xs text-[#555] mt-0.5">
+                {trialDaysRemaining <= 3
+                  ? "After expiry, order details will be hidden and your menu will become unavailable. Renew now to avoid interruption."
+                  : "Upgrade before your trial ends to keep your menu live and avoid service interruption."}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Link
+              href="/dashboard/subscription"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#D97706] text-white text-xs font-semibold rounded-lg hover:opacity-90 transition-opacity"
+            >
+              <TrendingUp className="w-3.5 h-3.5" /> Choose Plan
+            </Link>
+            <span className="text-xs text-[#D97706] font-medium flex items-center gap-1">
+              <Lock className="w-3 h-3" />
+              Details will blur
+            </span>
+            <span className="text-xs text-[#D97706] font-medium flex items-center gap-1">
+              <Eye className="w-3 h-3" />
+              Menu hidden
+            </span>
+          </div>
+        </div>
+      )
+    }
+
     const showOrderWarning = isOrderLimitNear || isOrderLimitWarning
 
     return (
@@ -195,6 +233,44 @@ export function SubscriptionBanner({ restaurant, orderCount = 0 }: Props) {
   const remainingDays = planEnd
     ? Math.max(0, Math.ceil((planEnd.getTime() - now.getTime()) / msPerDay))
     : 999
+
+  if (remainingDays <= 5 && remainingDays < 999) {
+    return (
+      <div className="bg-[#FEF3C7] border border-[#D97706]/30 rounded-[14px] p-4">
+        <div className="flex items-start gap-3 mb-3">
+          <div className="w-9 h-9 rounded-full bg-[#D97706] text-white flex items-center justify-center flex-shrink-0">
+            <AlertTriangle className="w-5 h-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-[#92400E]">
+              {plan.charAt(0).toUpperCase() + plan.slice(1)} Plan ends in {remainingDays} day{remainingDays === 1 ? "" : "s"}
+            </p>
+            <p className="text-xs text-[#555] mt-0.5">
+              {remainingDays <= 3
+                ? "After expiry, order details will be hidden and your menu will become unavailable. Renew now to avoid interruption."
+                : "Renew before your plan ends to keep your menu live and avoid service interruption."}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Link
+            href="/dashboard/subscription"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#D97706] text-white text-xs font-semibold rounded-lg hover:opacity-90 transition-opacity"
+          >
+            <TrendingUp className="w-3.5 h-3.5" /> Renew Now
+          </Link>
+          <span className="text-xs text-[#D97706] font-medium flex items-center gap-1">
+            <Lock className="w-3 h-3" />
+            Details will blur
+          </span>
+          <span className="text-xs text-[#D97706] font-medium flex items-center gap-1">
+            <Eye className="w-3 h-3" />
+            Menu hidden
+          </span>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="bg-[#DCFCE7]/50 border border-[#22C55E]/20 rounded-[14px] p-4 flex items-center gap-3">
