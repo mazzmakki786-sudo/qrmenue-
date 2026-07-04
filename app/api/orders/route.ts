@@ -9,6 +9,7 @@ import { safeRoute } from "@/lib/api-error"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 import { csrfGuard } from "@/lib/csrf"
 import { buildWhatsAppURL } from "@/lib/whatsapp"
+import { isRestaurantOpen } from "@/lib/restaurant-hours"
 
 const orderItemSchema = z.object({
   id: z.string(),
@@ -81,7 +82,7 @@ export const POST = safeRoute(async (request) => {
 
   const { data: restaurant } = await supabase
     .from("restaurants")
-    .select("id, phone, is_active, is_suspended, is_open, plan, plan_end_date, trial_end")
+    .select("id, phone, is_active, is_suspended, is_open, plan, plan_end_date, trial_end, opening_time, closing_time, opening_hours")
     .eq("id", parsed.data.restaurant_id)
     .single()
 
@@ -95,6 +96,13 @@ export const POST = safeRoute(async (request) => {
 
   if (!restaurant.is_open) {
     return NextResponse.json({ error: "Restaurant is currently closed. Please try again later." }, { status: 403 })
+  }
+
+  if (!isRestaurantOpen(restaurant.opening_time, restaurant.closing_time, restaurant.opening_hours)) {
+    return NextResponse.json({
+      error: "RESTAURANT_CLOSED",
+      message: "Restaurant is currently closed. Orders are accepted only during operating hours.",
+    }, { status: 403 })
   }
 
   if (restaurant.plan === "trial" && restaurant.trial_end) {

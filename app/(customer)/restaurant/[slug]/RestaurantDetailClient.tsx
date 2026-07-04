@@ -5,8 +5,9 @@ import Image from "next/image"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
-import { MapPin, Phone, ArrowLeft, UtensilsCrossed, Clock, Navigation, Truck, Timer, ShoppingCart, Minus, Plus, Trash2, Percent, ImageOff, ChevronDown } from "lucide-react"
+import { MapPin, Phone, ArrowLeft, UtensilsCrossed, Clock, Navigation, Truck, Timer, ShoppingCart, Minus, Plus, Trash2, Percent, ImageOff, ChevronDown, Store } from "lucide-react"
 import { formatTo12Hour, formatPrice } from "@/lib/utils"
+import { isRestaurantOpen } from "@/lib/restaurant-hours"
 import { useRouter } from "next/navigation"
 import { useCartStore } from "@/stores/cartStore"
 import { CartBar } from "@/components/customer/CartBar"
@@ -41,13 +42,14 @@ interface Props {
   categories: (Category & { dishes: Dish[] })[]
 }
 
-function DesktopCartPanel() {
+function DesktopCartPanel({ effectivelyClosed, liveOpenTime, liveCloseTime }: { effectivelyClosed?: boolean; liveOpenTime?: string; liveCloseTime?: string }) {
   const items = useCartStore((s) => s.items)
   const getTotalPrice = useCartStore((s) => s.getTotalPrice)
   const updateQuantity = useCartStore((s) => s.updateQuantity)
   const removeItem = useCartStore((s) => s.removeItem)
   const restaurantName = useCartStore((s) => s.restaurantName)
   const restaurantId = useCartStore((s) => s.restaurantId)
+  const addItem = useCartStore((s) => s.addItem)
   const totalItems = useMemo(() => items.reduce((sum, i) => sum + i.quantity, 0), [items])
 
   if (totalItems === 0 || !restaurantId) {
@@ -89,8 +91,9 @@ function DesktopCartPanel() {
               </button>
               <span className="text-xs font-bold min-w-[18px] text-center text-text-primary">{item.quantity}</span>
               <button
-                onClick={() => updateQuantity(item.dish.id, item.quantity + 1)}
-                className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-hover transition-colors"
+                onClick={() => addItem(item.dish)}
+                disabled={effectivelyClosed}
+                className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-hover transition-colors disabled:opacity-30"
               >
                 <Plus className="w-3 h-3" />
               </button>
@@ -114,18 +117,29 @@ function DesktopCartPanel() {
           <span className="text-sm text-text-secondary">Total</span>
           <span className="text-lg font-bold text-text-primary">Rs {getTotalPrice().toLocaleString("en-PK")}</span>
         </div>
-        <Link
-          href="/checkout"
-          className="block w-full bg-primary text-white text-center py-3 rounded-xl text-sm font-semibold hover:bg-primary-hover transition-colors active:scale-[0.98]"
-        >
-          Proceed to Checkout
-        </Link>
+        {effectivelyClosed ? (
+          <div className="bg-error/10 border border-error/20 rounded-xl p-3 text-center">
+            <p className="text-xs font-semibold text-error">Restaurant is closed</p>
+            <p className="text-[10px] text-text-muted mt-0.5">
+              {liveOpenTime && liveCloseTime
+                ? `Open ${formatTo12Hour(liveOpenTime)} — ${formatTo12Hour(liveCloseTime)}`
+                : "Orders are not being accepted right now"}
+            </p>
+          </div>
+        ) : (
+          <Link
+            href="/checkout"
+            className="block w-full bg-primary text-white text-center py-3 rounded-xl text-sm font-semibold hover:bg-primary-hover transition-colors active:scale-[0.98]"
+          >
+            Proceed to Checkout
+          </Link>
+        )}
       </div>
     </div>
   )
 }
 
-function DesktopDishCard({ dish, deals, unavailable }: { dish: Dish; deals?: (Deal & { dish?: { id: string; name_en: string; name_ur: string | null; image_url: string | null; price: number } | null })[]; unavailable?: boolean }) {
+function DesktopDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deals?: (Deal & { dish?: { id: string; name_en: string; name_ur: string | null; image_url: string | null; price: number } | null })[]; unavailable?: boolean; closed?: boolean }) {
   const [imgError, setImgError] = useState(false)
   const addItem = useCartStore((s) => s.addItem)
   const items = useCartStore((s) => s.items)
@@ -198,11 +212,11 @@ function DesktopDishCard({ dish, deals, unavailable }: { dish: Dish; deals?: (De
             <div className="flex items-center gap-2 bg-surface rounded-full px-2.5 py-1">
               <button onClick={() => updateQuantity(dish.id, cartItem.quantity - 1)} className="w-8 h-8 rounded-full flex items-center justify-center text-primary font-bold hover:bg-white/50 transition-colors text-lg">−</button>
               <span className="text-sm font-bold min-w-[22px] text-center text-text-primary">{cartItem.quantity}</span>
-              <button onClick={() => addItem(dish)} className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-hover transition-colors text-lg font-bold">+</button>
+              <button onClick={() => addItem(dish)} disabled={closed} className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-hover transition-colors disabled:opacity-30 text-lg font-bold">+</button>
             </div>
           ) : (
-            <button onClick={() => addItem(dish)} disabled={unavailable} className="bg-primary text-white rounded-full px-5 py-2 text-xs font-semibold hover:bg-primary-hover active:scale-[0.95] transition-all duration-200 disabled:opacity-50">
-              + Add
+            <button onClick={() => addItem(dish)} disabled={unavailable || closed} className="bg-primary text-white rounded-full px-5 py-2 text-xs font-semibold hover:bg-primary-hover active:scale-[0.95] transition-all duration-200 disabled:opacity-50">
+              {closed ? "Closed" : "+ Add"}
             </button>
           )}
         </div>
@@ -224,6 +238,13 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
   const cartItems = useCartStore((s) => s.items)
   const totalCartItems = useMemo(() => cartItems.reduce((sum, i) => sum + i.quantity, 0), [cartItems])
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
+
+  const isTimeClosed = !isRestaurantOpen(
+    restaurant.opening_time,
+    restaurant.closing_time,
+    restaurant.opening_hours
+  )
+  const effectivelyClosed = !liveIsOpen || isTimeClosed
 
   useEffect(() => {
     setLiveIsOpen(restaurant.is_open ?? true)
@@ -337,10 +358,10 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
               </div>
               <div className="flex items-center gap-2 mt-2">
                 <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full ${
-                  liveIsOpen ? "bg-accent/10 text-accent" : "bg-error/10 text-error"
+                  !effectivelyClosed ? "bg-accent/10 text-accent" : "bg-error/10 text-error"
                 }`}>
-                  <span className={`w-2 h-2 rounded-full ${liveIsOpen ? "bg-accent" : "bg-error"}`} />
-                  {liveIsOpen ? "Accepting Orders" : "Currently Closed"}
+                  <span className={`w-2 h-2 rounded-full ${!effectivelyClosed ? "bg-accent" : "bg-error"}`} />
+                  {effectivelyClosed ? "Currently Closed" : "Accepting Orders"}
                 </span>
                 {liveOpenTime && liveCloseTime && (
                   <span className="text-xs text-text-secondary font-medium flex items-center gap-1">
@@ -460,6 +481,22 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
 
           {deals.length > 0 && <DealBanner restaurantId={restaurant.id} slug={restaurant.slug} />}
 
+          {effectivelyClosed && (
+            <div className="bg-error/10 border border-error/30 rounded-xl px-4 py-3 mb-4 flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-error flex items-center justify-center shrink-0">
+                <Store className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-error">Currently Closed</p>
+                <p className="text-xs text-text-secondary mt-0.5">
+                  {liveOpenTime && liveCloseTime
+                    ? `Open today ${formatTo12Hour(liveOpenTime)} — ${formatTo12Hour(liveCloseTime)}`
+                    : "This restaurant is not accepting orders right now"}
+                </p>
+              </div>
+            </div>
+          )}
+
           {categories.length > 0 ? (
             <div className="space-y-6">
               {categories.map((category) => {
@@ -472,8 +509,8 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
                       {category.name_en}
                     </h2>
                     <div className="space-y-2">
-                      {availableDishes.map((dish) => <DishCard key={dish.id} dish={dish} deals={deals} />)}
-                      {unavailableDishes.map((dish) => <DishCard key={dish.id} dish={dish} unavailable deals={deals} />)}
+                      {availableDishes.map((dish) => <DishCard key={dish.id} dish={dish} closed={effectivelyClosed} deals={deals} />)}
+                      {unavailableDishes.map((dish) => <DishCard key={dish.id} dish={dish} unavailable closed={effectivelyClosed} deals={deals} />)}
                     </div>
                   </section>
                 )
@@ -488,7 +525,7 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
             </div>
           )}
         </main>
-        <CartBar />
+        <CartBar closed={effectivelyClosed} />
       </div>
 
       {/* ===== DESKTOP LAYOUT ===== */}
@@ -542,10 +579,10 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
                 </div>
                 <div className="flex items-center gap-4 mt-4 flex-wrap">
                   <span className={`inline-flex items-center gap-1.5 text-sm font-bold px-4 py-1.5 rounded-full ${
-                    liveIsOpen ? "bg-accent/10 text-accent" : "bg-error/10 text-error"
+                    !effectivelyClosed ? "bg-accent/10 text-accent" : "bg-error/10 text-error"
                   }`}>
-                    <span className={`w-2.5 h-2.5 rounded-full ${liveIsOpen ? "bg-accent" : "bg-error"}`} />
-                    {liveIsOpen ? "Open" : "Closed"}
+                    <span className={`w-2.5 h-2.5 rounded-full ${!effectivelyClosed ? "bg-accent" : "bg-error"}`} />
+                    {effectivelyClosed ? "Closed" : "Open"}
                   </span>
                   {liveOpenTime && liveCloseTime && (
                     <span className="text-sm text-text-secondary font-medium flex items-center gap-1.5">
@@ -603,6 +640,22 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
                 </div>
               )}
 
+              {effectivelyClosed && (
+                <div className="bg-error/10 border border-error/30 rounded-xl px-5 py-4 mb-6 flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-full bg-error flex items-center justify-center shrink-0">
+                    <Store className="w-4.5 h-4.5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-error">Currently Closed</p>
+                    <p className="text-xs text-text-secondary mt-0.5">
+                      {liveOpenTime && liveCloseTime
+                        ? `Open today ${formatTo12Hour(liveOpenTime)} — ${formatTo12Hour(liveCloseTime)}`
+                        : "This restaurant is not accepting orders right now"}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {categories.length > 0 ? (
                 <div className="space-y-10">
                   {categories.map((category) => {
@@ -613,8 +666,8 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
                       <section key={category.id} id={`desk-cat-${category.id}`}>
                         <h2 className="text-lg font-bold text-text-primary mb-4 border-l-[3px] border-primary pl-3">{category.name_en}</h2>
                         <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
-                          {availableDishes.map((dish) => <DesktopDishCard key={dish.id} dish={dish} deals={deals} />)}
-                          {unavailableDishes.map((dish) => <DesktopDishCard key={dish.id} dish={dish} unavailable deals={deals} />)}
+                          {availableDishes.map((dish) => <DesktopDishCard key={dish.id} dish={dish} closed={effectivelyClosed} deals={deals} />)}
+                          {unavailableDishes.map((dish) => <DesktopDishCard key={dish.id} dish={dish} unavailable closed={effectivelyClosed} deals={deals} />)}
                         </div>
                       </section>
                     )
@@ -633,7 +686,7 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
             {/* RIGHT SIDEBAR — Sticky Cart */}
             <aside className="w-80 shrink-0">
               <div className="sticky top-20 space-y-4">
-                <DesktopCartPanel />
+                <DesktopCartPanel effectivelyClosed={effectivelyClosed} liveOpenTime={liveOpenTime} liveCloseTime={liveCloseTime} />
               </div>
             </aside>
           </div>

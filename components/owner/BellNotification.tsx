@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
+import { useRouter } from "next/navigation"
 import { Bell, X, ChevronRight, Clock, Megaphone, BellRing } from "lucide-react"
 import { formatPrice, timeAgo } from "@/lib/utils"
 
@@ -76,6 +77,7 @@ function playNotificationSound() {
 }
 
 export function BellNotification({ restaurantId }: Props) {
+  const router = useRouter()
   const [unreadCount, setUnreadCount] = useState(0)
   const [showDropdown, setShowDropdown] = useState(false)
   const [alerts, setAlerts] = useState<OrderAlert[]>([])
@@ -260,7 +262,7 @@ export function BellNotification({ restaurantId }: Props) {
 
   const navigateToOrder = (orderId: string) => {
     setShowDropdown(false)
-    window.location.href = `/dashboard/orders/${orderId}`
+    router.push(`/dashboard/orders/${orderId}`)
   }
 
 
@@ -286,8 +288,8 @@ export function BellNotification({ restaurantId }: Props) {
                 key={alert.id}
                 role="button"
                 tabIndex={0}
-                onClick={() => { dismissAlert(alert.id); window.location.href = `/dashboard/orders/${alert.id}` }}
-                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); dismissAlert(alert.id); window.location.href = `/dashboard/orders/${alert.id}` } }}
+                onClick={() => { dismissAlert(alert.id); router.push(`/dashboard/orders/${alert.id}`) }}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); dismissAlert(alert.id); router.push(`/dashboard/orders/${alert.id}`) } }}
                 className="bg-black text-white rounded-2xl p-4 shadow-2xl animate-slide-up cursor-pointer active:scale-[0.98] transition-transform"
               >
                 <div className="flex items-start justify-between gap-3">
@@ -438,7 +440,7 @@ export function BellNotification({ restaurantId }: Props) {
                   : "Got it"}
               </button>
               <button
-                onClick={() => { dismissAnnouncement(); window.location.href = "/dashboard/announcements" }}
+                onClick={() => { dismissAnnouncement(); router.push("/dashboard/announcements") }}
                 className="shrink-0 h-12 px-4 rounded-xl border border-[#F0F0F0] text-sm font-medium text-[#555] hover:bg-[#F0F0F0] transition-colors flex items-center justify-center gap-1.5 min-h-[44px]"
               >
                 <BellRing className="w-4 h-4" />

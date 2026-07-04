@@ -58,7 +58,7 @@ export function DishGrid({ categories, deals }: Props) {
   )
 }
 
-export const Card = React.memo(function Card({ dish, unavailable = false, deals }: { dish: Dish; unavailable?: boolean; deals?: (Deal & { dish?: { id: string; name_en: string; name_ur: string | null; image_url: string | null; price: number } | null })[] }) {
+export const Card = React.memo(function Card({ dish, unavailable = false, closed = false, deals }: { dish: Dish; unavailable?: boolean; closed?: boolean; deals?: (Deal & { dish?: { id: string; name_en: string; name_ur: string | null; image_url: string | null; price: number } | null })[] }) {
   const { lang } = useI18n()
   const [imgError, setImgError] = useState(false)
   const items = useCartStore((s) => s.items)
@@ -157,7 +157,8 @@ export const Card = React.memo(function Card({ dish, unavailable = false, deals 
               <span className="text-[14px] font-bold min-w-[22px] text-center text-text-primary">{cartItem.quantity}</span>
               <button
                 onClick={() => addItem(dish)}
-                className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-hover transition-colors text-[18px] font-bold"
+                disabled={closed}
+                className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-hover transition-colors disabled:opacity-30 text-[18px] font-bold"
                 aria-label="Increase quantity"
               >
                 +
@@ -166,10 +167,10 @@ export const Card = React.memo(function Card({ dish, unavailable = false, deals 
           ) : (
             <button
               onClick={() => addItem(dish)}
-              disabled={unavailable}
+              disabled={unavailable || closed}
               className="bg-primary text-white rounded-full px-4 py-1.5 text-xs font-semibold hover:bg-primary-hover active:scale-[0.95] transition-all duration-200 disabled:opacity-50 flex items-center gap-1 min-h-[36px]"
             >
-              + Add
+              {closed ? "Closed" : "+ Add"}
             </button>
           )}
         </div>

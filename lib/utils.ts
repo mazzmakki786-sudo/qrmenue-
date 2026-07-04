@@ -30,17 +30,7 @@ export function escapeHtml(str: string): string {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;')
 }
 
-export function formatTo12Hour(time: string | null | undefined): string {
-  if (!time) return ""
-  const parts = time.split(":")
-  if (parts.length < 2) return time
-  let hours = parseInt(parts[0], 10)
-  const minutes = parts[1]
-  const ampm = hours >= 12 ? "PM" : "AM"
-  hours = hours % 12
-  if (hours === 0) hours = 12
-  return `${hours}:${minutes} ${ampm}`
-}
+export { formatTo12Hour } from "./restaurant-hours"
 
 export function timeAgo(date: string | Date): string {
   const now = new Date()

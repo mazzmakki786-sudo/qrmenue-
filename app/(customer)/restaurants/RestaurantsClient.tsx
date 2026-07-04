@@ -35,7 +35,7 @@ function RestaurantCard({
   onToggleFav: (id: string) => void
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-black/30 transition-all duration-200 group">
+    <div className="flex items-center justify-between gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-black/30 transition-all duration-200 group w-full">
       <Link href={`/menu/${r.slug}`} className="flex items-center gap-3 min-w-0 flex-1">
         {/* Logo */}
         {r.logo_url ? (
@@ -281,12 +281,13 @@ export function RestaurantsClient({ initialRestaurants, initialCities }: Restaur
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             {filteredRestaurants.map((r) => (
-              <RestaurantCard
-                key={r.id}
-                r={r}
-                isFav={isFavorited(r.id)}
-                onToggleFav={toggleFavorite}
-              />
+              <div key={r.id} className="flex">
+                <RestaurantCard
+                  r={r}
+                  isFav={isFavorited(r.id)}
+                  onToggleFav={toggleFavorite}
+                />
+              </div>
             ))}
           </div>
         )}

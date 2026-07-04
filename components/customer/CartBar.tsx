@@ -5,7 +5,7 @@ import { ShoppingCart } from "lucide-react"
 import Link from "next/link"
 import { useMemo } from "react"
 
-export function CartBar() {
+export function CartBar({ closed }: { closed?: boolean }) {
   const items = useCartStore((s) => s.items)
   const restaurantId = useCartStore((s) => s.restaurantId)
 
@@ -13,6 +13,21 @@ export function CartBar() {
   const subtotal = useMemo(() => items.reduce((sum, item) => sum + item.dish.price * item.quantity, 0), [items])
 
   if (totalItems === 0 || !restaurantId) return null
+
+  if (closed) {
+    return (
+      <div className="fixed bottom-12 left-3 right-3 z-[60] max-w-[568px] mx-auto">
+        <div className="bg-gray-800/80 text-white/60 rounded-2xl shadow-lg overflow-hidden ring-1 ring-white/5">
+          <div className="flex items-center justify-center px-5 py-3.5">
+            <div className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center mr-3">
+              <ShoppingCart className="w-4 h-4" />
+            </div>
+            <p className="text-sm font-medium">Restaurant is closed</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <Link
