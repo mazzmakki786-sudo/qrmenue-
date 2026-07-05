@@ -1,11 +1,69 @@
 import { NextResponse } from "next/server"
+import { cookies } from "next/headers"
 
-const ALLOWED_ORIGINS = [
-  process.env.NEXT_PUBLIC_APP_URL,
-  process.env.NEXT_PUBLIC_SITE_URL,
-  ...(process.env.NODE_ENV !== "production" ? ["http://localhost:3000"] : []),
-  ...(process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(",") : []),
-].filter(Boolean) as string[]
+function buildAllowedOrigins(): string[] {
+  const origins: string[] = []
+
+  const addWithWww = (url: string) => {
+    origins.push(url)
+    try {
+      const u = new URL(url)
+      if (u.hostname.startsWith("www.")) {
+        origins.push(`${u.protocol}//${u.hostname.slice(4)}`)
+      } else {
+        origins.push(`${u.protocol}//www.${u.hostname}`)
+      }
+    } catch {}
+  }
+
+  if (process.env.NEXT_PUBLIC_APP_URL) addWithWww(process.env.NEXT_PUBLIC_APP_URL)
+  if (process.env.NEXT_PUBLIC_SITE_URL) addWithWww(process.env.NEXT_PUBLIC_SITE_URL)
+
+  if (process.env.NODE_ENV !== "production") {
+    origins.push("http://localhost:3000")
+  }
+
+  if (process.env.CORS_ORIGINS) {
+    process.env.CORS_ORIGINS.split(",").forEach((o) => addWithWww(o.trim()))
+  }
+
+  return origins
+}
+
+const ALLOWED_ORIGINS = buildAllowedOrigins()
+
+const CSRF_COOKIE = "qrmenu_csrf"
+const CSRF_HEADER = "x-csrf-token"
+
+function generateToken(): string {
+  const array = new Uint8Array(32)
+  crypto.getRandomValues(array)
+  return Array.from(array, (b) => b.toString(16).padStart(2, "0")).join("")
+}
+
+export function getCsrfToken(): string {
+  return generateToken()
+}
+
+export async function validateCsrfToken(request: Request): Promise<{ valid: boolean; reason?: string }> {
+  if (!__isStateChangingMethod(request.method)) {
+    return { valid: true }
+  }
+
+  const cookieStore = await cookies()
+  const cookieToken = cookieStore.get(CSRF_COOKIE)?.value
+  const headerToken = request.headers.get(CSRF_HEADER)
+
+  if (!cookieToken || !headerToken) {
+    return { valid: false, reason: "Missing CSRF token" }
+  }
+
+  if (cookieToken !== headerToken) {
+    return { valid: false, reason: "CSRF token mismatch" }
+  }
+
+  return { valid: true }
+}
 
 export function validateCsrf(request: Request): { valid: boolean; reason?: string } {
   if (!__isStateChangingMethod(request.method)) {
@@ -41,6 +99,19 @@ export function csrfGuard(request: Request): NextResponse | null {
     )
   }
   return null
+}
+
+export function setCsrfCookie(): NextResponse {
+  const token = generateToken()
+  const response = NextResponse.json({ csrfToken: token })
+  response.cookies.set(CSRF_COOKIE, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+    maxAge: 3600,
+  })
+  return response
 }
 
 function __isStateChangingMethod(method: string): boolean {
