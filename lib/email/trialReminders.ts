@@ -14,7 +14,7 @@ function getResend(): Resend {
   return _resend
 }
 
-const FROM = "QRMenu.pk <noreply@qrmenu.pk>"
+const FROM = "Digital QR Menue <noreply@digitalmenue.com>"
 
 export type ReminderType =
   | "5_days_left"
@@ -67,12 +67,12 @@ function buildContent(opts: SendOptions): EmailContent {
   switch (type) {
     case "5_days_left":
       return {
-        subject: `${daysRemaining} days left in your QRMenu trial — upgrade to keep going`,
+        subject: `${daysRemaining} days left in your Digital QR Menue trial — upgrade to keep going`,
         html: `
           <div style="${sharedStyle}">
             <h1 style="font-size: 24px; margin-bottom: 8px;">${safeRestaurantName}, your trial is halfway through</h1>
             <p style="color: #555; font-size: 15px; line-height: 1.6;">
-              You have <strong>${daysRemaining} days left</strong> in your free trial. We hope QRMenu is helping you take more orders.
+              You have <strong>${daysRemaining} days left</strong> in your free trial. We hope Digital QR Menue is helping you take more orders.
             </p>
             <p style="color: #555; font-size: 15px; line-height: 1.6;">
               To keep your menu live, your data safe, and continue accepting orders — pick a plan today.

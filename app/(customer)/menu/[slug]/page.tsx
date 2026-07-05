@@ -27,17 +27,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Menu Not Found" }
   }
 
+  const noindex = process.env.NEXT_PUBLIC_NOINDEX_MENU_PAGES === "true"
   const title = `${restaurant.name} — ${restaurant.cuisine_type || "Restaurant"} in ${restaurant.city} | QRMenu.pk`
 
   return {
     title,
+    robots: noindex ? { index: false, follow: false } : undefined,
     description: restaurant.description || `View ${restaurant.name}'s digital menu. Browse dishes, prices, and order directly via WhatsApp. Powered by QRMenu.pk — Pakistan's #1 QR menu platform.`,
     openGraph: {
       title,
       description: restaurant.description || `View ${restaurant.name}'s digital menu. Browse dishes, prices, and order directly via WhatsApp.`,
       type: "website",
       url: `https://qrmenu.pk/menu/${slug}`,
-      siteName: "QRMenu.pk",
+      siteName: "Digitalmenue.com",
       images: [
         {
           url: restaurant.logo_url || "https://qrmenu.pk/og-image.svg",

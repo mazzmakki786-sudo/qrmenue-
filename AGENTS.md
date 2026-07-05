@@ -1,4 +1,4 @@
-# QRMenu.pk — Agent Instructions
+# Digital Menu — Agent Instructions
 
 QR-menu SaaS for Pakistani restaurants. Next.js 15 (App Router) + Supabase (PostgreSQL + RLS + Realtime) + Vercel.
 
@@ -147,7 +147,7 @@ SUPABASE_SERVICE_ROLE_KEY      # Server-side admin operations
 SUPER_ADMIN_EMAIL              # Gates superadmin API access
 RESEND_API_KEY                 # Transactional email (Resend)
 NEXT_PUBLIC_APP_URL            # QR codes, emails, WhatsApp links
-NEXT_PUBLIC_APP_NAME           # Display name (default "QRMenu.pk")
+NEXT_PUBLIC_APP_NAME           # Display name (default "Digital Menu")
 NEXT_PUBLIC_SITE_URL           # Optional, for CSRF origins
 CORS_ORIGINS                   # Optional, comma-separated for CSRF
 TWENTY_FIRST_API_KEY           # Optional, for 21st-dev/magic MCP

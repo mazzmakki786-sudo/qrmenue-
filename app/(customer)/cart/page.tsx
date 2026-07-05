@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useCartStore } from "@/stores/cartStore"
 import { Minus, Plus, Trash2, ArrowLeft, Store, ShoppingBag, ChevronRight } from "lucide-react"
 import Image from "next/image"
@@ -10,6 +10,13 @@ import { formatPrice } from "@/lib/utils"
 
 export default function CartPage() {
   const router = useRouter()
+  const restaurantId = useCartStore((s) => s.restaurantId)
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth >= 768 && restaurantId) {
+      router.replace("/checkout")
+    }
+  }, [restaurantId, router])
   const [showClearConfirm, setShowClearConfirm] = useState(false)
   const items = useCartStore((s) => s.items)
   const getSubtotal = useCartStore((s) => s.getSubtotal)

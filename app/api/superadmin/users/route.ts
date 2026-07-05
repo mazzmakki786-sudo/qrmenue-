@@ -19,7 +19,7 @@ export const GET = safeRoute(async (request) => {
   const { data, error } = await admin.auth.admin.listUsers({ perPage: limit, page })
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return NextResponse.json({ error: "Failed to fetch users" }, { status: 400 })
   }
 
   const users = data.users.map((u) => ({

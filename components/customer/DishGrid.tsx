@@ -80,7 +80,7 @@ export const Card = React.memo(function Card({ dish, unavailable = false, closed
     : null
 
   return (
-    <div className={`group flex gap-3.5 p-3.5 bg-white rounded-2xl border border-border hover:border-border-strong hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] transition-all duration-300 ${unavailable ? "opacity-50" : ""}`}>
+    <div className={`group flex gap-3 p-3 bg-white rounded-xl border border-border hover:border-border-strong hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] transition-all duration-300 items-start ${unavailable ? "opacity-50" : ""}`}>
       {/* Image */}
       <div className="relative w-24 h-24 flex-shrink-0 overflow-hidden rounded-xl bg-surface">
         {dish.image_url && !imgError ? (
@@ -97,16 +97,7 @@ export const Card = React.memo(function Card({ dish, unavailable = false, closed
             <ImageOff className="w-6 h-6 text-text-muted/40" />
           </div>
         )}
-        <div className="absolute top-1 left-1 z-10 space-y-0.5">
-          <DishBadges tags={badges} />
-          {dishDeal && (
-            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-primary/10 text-primary">
-              <Percent className="w-2 h-2" />
-              {dishDeal.deal_type === "percentage" ? `${dishDeal.deal_value}%` : `Rs ${dishDeal.deal_value}`} OFF
-            </span>
-          )}
-        </div>
-        {unavailable && (
+          {unavailable && (
           <div className="absolute inset-0 bg-black/30 flex items-center justify-center rounded-xl backdrop-blur-[1px]">
             <span className="text-white text-[10px] font-semibold bg-black/60 px-2.5 py-1 rounded-full">Unavailable</span>
           </div>
@@ -137,6 +128,18 @@ export const Card = React.memo(function Card({ dish, unavailable = false, closed
             )}
           </div>
         </div>
+
+        {(badges.length > 0 || dishDeal) && (
+          <div className="flex flex-wrap gap-1 mb-1.5">
+            <DishBadges tags={badges} />
+            {dishDeal && (
+              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-primary/10 text-primary">
+                <Percent className="w-2 h-2" />
+                {dishDeal.deal_type === "percentage" ? `${dishDeal.deal_value}%` : `Rs ${dishDeal.deal_value}`} OFF
+              </span>
+            )}
+          </div>
+        )}
 
         {description && (
           <p className="text-[12px] text-text-secondary leading-relaxed line-clamp-2 mb-2">

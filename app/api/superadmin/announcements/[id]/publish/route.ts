@@ -76,7 +76,7 @@ export const POST = safeRoute(async (request, { params }: { params: Promise<{ id
       try {
         const resend = new Resend(process.env.RESEND_API_KEY)
         await resend.emails.send({
-          from: "QRMenu.pk <onboarding@resend.dev>",
+          from: "Digital QR Menue <onboarding@resend.dev>",
           to: ownerEmail,
           subject: `Announcement: ${escapeHtml(announcement.title)}`,
           html: `
@@ -84,7 +84,7 @@ export const POST = safeRoute(async (request, { params }: { params: Promise<{ id
               <h1 style="font-size: 20px; color: #25D366;">${escapeHtml(announcement.title)}</h1>
               <div style="color: #555; font-size: 15px; line-height: 1.6; white-space: pre-wrap;">${escapeHtml(announcement.body)}</div>
               <hr style="margin-top: 24px; border: none; border-top: 1px solid #E8E8E8;" />
-              <p style="color: #999; font-size: 13px;">QRMenu.pk — ${escapeHtml(r.name)}</p>
+              <p style="color: #999; font-size: 13px;">Digital QR Menue — ${escapeHtml(r.name)}</p>
             </div>
           `,
         })

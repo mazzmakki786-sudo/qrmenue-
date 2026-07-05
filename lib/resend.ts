@@ -18,7 +18,7 @@ export async function sendOrderEmail(order: any, restaurant: any) {
     const resend = getResend()
     if (!resend) return
     await resend.emails.send({
-      from: "orders@qrmenu.pk",
+      from: "orders@digitalmenue.com",
       to: restaurant.owner_email,
       subject: `New Order #${escapeHtml(order.order_number)} — ${escapeHtml(restaurant.name)}`,
       html: `
@@ -49,7 +49,7 @@ export async function sendNewDishEmail(dish: any, restaurant: any, customerEmail
     const resend = getResend()
     if (!resend) return
     await resend.emails.send({
-      from: "updates@qrmenu.pk",
+      from: "updates@digitalmenue.com",
       to: customerEmails,
       subject: `New dish at ${escapeHtml(restaurant.name)}: ${escapeHtml(dish.name_en)}`,
       html: `

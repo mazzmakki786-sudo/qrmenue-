@@ -24,7 +24,7 @@ export default function SignupPage() {
         <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center mb-4">
           <User className="w-6 h-6 text-white" />
         </div>
-        <h1 className="text-2xl font-bold text-black mb-1">Join QRMenu.pk</h1>
+        <h1 className="text-2xl font-bold text-black mb-1">Join Digital QR Menue</h1>
         <p className="text-sm text-[#555]">Choose how you want to get started</p>
       </div>
 

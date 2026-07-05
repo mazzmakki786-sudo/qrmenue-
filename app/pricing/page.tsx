@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { PricingClient } from "./PricingClient"
 import { PricingJsonLd, FaqJsonLd } from "@/components/JsonLd"
+import { LandingHeader } from "@/components/shared/LandingHeader"
 
 export const metadata: Metadata = {
   title: "Pricing — QRMenu.pk Plans",
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
     description: "QR menu plans for restaurants",
     type: "website",
     url: "https://qrmenu.pk/pricing",
-    siteName: "QRMenu.pk",
+    siteName: "Digitalmenue.com",
   },
   alternates: {
     canonical: "https://qrmenu.pk/pricing",
@@ -44,9 +45,12 @@ const pricingFaqs = [
 export default function PricingPage() {
   return (
     <>
-      <PricingJsonLd />
-      <FaqJsonLd faqs={pricingFaqs} />
-      <PricingClient />
+      <div className="min-h-screen bg-white">
+        <LandingHeader />
+        <PricingJsonLd />
+        <FaqJsonLd faqs={pricingFaqs} />
+        <PricingClient />
+      </div>
     </>
   )
 }

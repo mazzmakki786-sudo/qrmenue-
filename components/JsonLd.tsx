@@ -17,9 +17,9 @@ export function OrganizationJsonLd() {
       data={{
         "@context": "https://schema.org",
         "@type": "Organization",
-        name: "QRMenu.pk",
-        url: "https://qrmenu.pk",
-        logo: "https://qrmenu.pk/favicon.svg",
+        name: "Digital QR Menue",
+        url: "https://digitalmenue.com",
+        logo: "https://digitalmenue.com/favicon.svg",
         description:
           "Pakistan's leading QR-based digital menu and ordering platform for restaurants. Create a free QR code menu in under 5 minutes.",
         foundingDate: "2024",
@@ -45,15 +45,69 @@ export function WebsiteJsonLd() {
       data={{
         "@context": "https://schema.org",
         "@type": "WebSite",
-        name: "QRMenu.pk",
-        url: "https://qrmenu.pk",
+        name: "Digital QR Menue",
+        url: "https://digitalmenue.com",
         description:
           "Pakistan's #1 QR-based digital menu platform for restaurants",
         potentialAction: {
           "@type": "SearchAction",
-          target: "https://qrmenu.pk/restaurants?q={search_term_string}",
+          target: "https://digitalmenue.com/restaurants?q={search_term_string}",
           "query-input": "required name=search_term_string",
         },
+      }}
+    />
+  )
+}
+
+export function SoftwareApplicationJsonLd() {
+  return (
+    <JsonLd
+      data={{
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        name: "QRMenu.pk — Digital QR Menue Platform",
+        operatingSystem: "Web",
+        applicationCategory: "BusinessApplication",
+        description:
+          "Pakistan's QR-based digital menu and WhatsApp ordering platform for restaurants. No app, no commission.",
+        url: "https://digitalmenue.com",
+        offers: [
+          {
+            "@type": "Offer",
+            name: "Free Trial",
+            price: 0,
+            priceCurrency: "PKR",
+            availability: "https://schema.org/InStock",
+          },
+          {
+            "@type": "Offer",
+            name: "Starter",
+            price: 1200,
+            priceCurrency: "PKR",
+            availability: "https://schema.org/InStock",
+          },
+          {
+            "@type": "Offer",
+            name: "Growth",
+            price: 2500,
+            priceCurrency: "PKR",
+            availability: "https://schema.org/InStock",
+          },
+          {
+            "@type": "Offer",
+            name: "Premium",
+            price: 4500,
+            priceCurrency: "PKR",
+            availability: "https://schema.org/InStock",
+          },
+        ],
+        author: {
+          "@type": "Organization",
+          name: "QRMenu.pk",
+          url: "https://digitalmenue.com",
+        },
+        applicationSuite: "QRMenu",
+        countryOfOrigin: "PK",
       }}
     />
   )
@@ -113,7 +167,7 @@ export function RestaurantJsonLd({
           description ||
           `${name} - ${cuisineType || "Restaurant"} in ${city || "Pakistan"}. View menu and order via WhatsApp.`,
         image: logoUrl || undefined,
-        url: `https://qrmenu.pk/menu/${slug}`,
+        url: `https://digitalmenue.com/menu/${slug}`,
         address: {
           "@type": "PostalAddress",
           addressLocality: city || "Pakistan",
@@ -151,7 +205,7 @@ export function ItemListJsonLd({
       data={{
         "@context": "https://schema.org",
         "@type": "ItemList",
-        name: "Restaurants in Pakistan — QRMenu.pk",
+        name: "Restaurants in Pakistan — Digital QR Menue",
         description:
           "Browse restaurants across Pakistan. View menus, prices, and order via WhatsApp.",
         numberOfItems: items.length,
@@ -176,12 +230,12 @@ export function PricingJsonLd() {
       data={{
         "@context": "https://schema.org",
         "@type": "Product",
-        name: "QRMenu.pk — Digital Menu Platform",
+        name: "Digital QR Menue — Digital Menu Platform",
         description:
           "QR-based digital menu and ordering platform for restaurants in Pakistan. Plans starting from free trial.",
         brand: {
           "@type": "Brand",
-          name: "QRMenu.pk",
+          name: "Digital QR Menue",
         },
         offers: [
           {
@@ -191,7 +245,7 @@ export function PricingJsonLd() {
             priceCurrency: "PKR",
             priceValidUntil: "2026-12-31",
             availability: "https://schema.org/InStock",
-            url: "https://qrmenu.pk/signup",
+            url: "https://digitalmenue.com/signup",
           },
           {
             "@type": "Offer",
@@ -200,7 +254,7 @@ export function PricingJsonLd() {
             priceCurrency: "PKR",
             priceValidUntil: "2026-12-31",
             availability: "https://schema.org/InStock",
-            url: "https://qrmenu.pk/signup/restaurant",
+            url: "https://digitalmenue.com/signup/restaurant",
           },
           {
             "@type": "Offer",
@@ -209,7 +263,7 @@ export function PricingJsonLd() {
             priceCurrency: "PKR",
             priceValidUntil: "2026-12-31",
             availability: "https://schema.org/InStock",
-            url: "https://qrmenu.pk/signup/restaurant",
+            url: "https://digitalmenue.com/signup/restaurant",
           },
           {
             "@type": "Offer",
@@ -218,9 +272,30 @@ export function PricingJsonLd() {
             priceCurrency: "PKR",
             priceValidUntil: "2026-12-31",
             availability: "https://schema.org/InStock",
-            url: "https://qrmenu.pk/signup/restaurant",
+            url: "https://digitalmenue.com/signup/restaurant",
           },
         ],
+      }}
+    />
+  )
+}
+
+export function BreadcrumbListJsonLd({
+  items,
+}: {
+  items: Array<{ name: string; url: string }>
+}) {
+  return (
+    <JsonLd
+      data={{
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: items.map((item, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: item.name,
+          item: item.url,
+        })),
       }}
     />
   )
@@ -244,6 +319,30 @@ export function FaqJsonLd({
             text: faq.answer,
           },
         })),
+      }}
+    />
+  )
+}
+
+export function ReviewJsonLd() {
+  return (
+    <JsonLd
+      data={{
+        "@context": "https://schema.org",
+        "@type": "Review",
+        itemReviewed: {
+          "@type": "SoftwareApplication",
+          name: "Digitalmenue.com",
+        },
+        reviewRating: {
+          "@type": "Rating",
+          ratingValue: 4.5,
+          bestRating: 5,
+        },
+        author: {
+          "@type": "Organization",
+          name: "Digitalmenue.com Users",
+        },
       }}
     />
   )

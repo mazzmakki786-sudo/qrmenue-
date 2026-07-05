@@ -1,6 +1,6 @@
 {
-  "name": "QRMenu.pk",
-  "short_name": "QRMenu",
+  "name": "Digital Menu",
+  "short_name": "Digital Menu",
   "description": "Pakistan's #1 QR-based digital menu platform for restaurants",
   "start_url": "/",
   "display": "standalone",

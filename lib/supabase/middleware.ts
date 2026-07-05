@@ -45,13 +45,40 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  if (pathname.startsWith("/superadmin")) {
+  if (pathname.startsWith("/superadmin") && !pathname.startsWith("/api/")) {
     if (!user) {
       if (pathname !== "/superadmin") {
         return NextResponse.redirect(new URL("/superadmin", request.url))
       }
     } else if (user.email?.toLowerCase() !== process.env.SUPER_ADMIN_EMAIL?.toLowerCase() && pathname !== "/superadmin") {
       return NextResponse.redirect(new URL("/superadmin", request.url))
+    }
+  }
+
+  if (pathname.startsWith("/api/owner")) {
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+    const { data: restaurant } = await supabase
+      .from("restaurants")
+      .select("id")
+      .eq("owner_id", user.id)
+      .maybeSingle()
+    if (!restaurant) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    }
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set("x-owner-id", user.id)
+    requestHeaders.set("x-restaurant-id", restaurant.id)
+    supabaseResponse = NextResponse.next({ request: { ...request, headers: requestHeaders } })
+  }
+
+  if (pathname.startsWith("/api/superadmin")) {
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+    if (user.email?.toLowerCase() !== process.env.SUPER_ADMIN_EMAIL?.toLowerCase()) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
   }
 

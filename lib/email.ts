@@ -7,8 +7,8 @@ export async function sendLockoutAlert(
   ipAddress: string,
   remainingMinutes: number
 ): Promise<void> {
-  const appName = process.env.NEXT_PUBLIC_APP_NAME || "QRMenu.pk"
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://qrmenu.pk"
+  const appName = process.env.NEXT_PUBLIC_APP_NAME || "Digital QR Menue"
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://digitalmenue.com"
 
   try {
     await resend.emails.send({

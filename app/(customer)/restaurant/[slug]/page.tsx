@@ -25,6 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Restaurant Not Found" }
   }
 
+  const noindex = process.env.NEXT_PUBLIC_NOINDEX_MENU_PAGES === "true"
   const title = `${restaurant.name} — ${restaurant.cuisine_type || "Restaurant"} in ${restaurant.city}`
   const description =
     restaurant.description ||
@@ -32,13 +33,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title,
+    robots: noindex ? { index: false, follow: false } : undefined,
     description,
     openGraph: {
       title,
       description,
       type: "website",
       url: `https://qrmenu.pk/restaurant/${slug}`,
-      siteName: "QRMenu.pk",
+      siteName: "Digitalmenue.com",
       images: [
         {
           url: restaurant.logo_url || "https://qrmenu.pk/og-image.svg",

@@ -69,7 +69,7 @@ export const POST = safeRoute(async (request) => {
   logOwnerAction(parsed.data.restaurant_id, user.id, "dish_created", {
     dish_id: data.id,
     name: parsed.data.name_en,
-  }, getIpSimple(request)).catch(() => {})
+  }, getIpSimple(request)).catch(console.error)
 
   return NextResponse.json({ dish: data })
 })

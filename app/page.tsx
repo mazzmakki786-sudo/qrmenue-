@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { Check, X } from "lucide-react"
 import { ContactSection } from "@/components/shared/ContactSection"
+import { LandingHeader } from "@/components/shared/LandingHeader"
 
 const plans = [
   {
@@ -10,15 +11,16 @@ const plans = [
     name: "Free Trial",
     price: "0",
     period: "7 days",
-    badge: "7 days",
+    badge: null,
     popular: false,
+    desc: "Try before you buy",
     features: [
       { label: "5 dishes", inc: true },
       { label: "5 dish images", inc: true },
       { label: "10 orders", inc: true },
       { label: "QR code generation", inc: true },
       { label: "WhatsApp orders", inc: true },
-      { label: "Analytics dashboard", inc: true },
+      { label: "Basic analytics", inc: true },
     ],
   },
   {
@@ -28,13 +30,14 @@ const plans = [
     period: "month",
     badge: null,
     popular: false,
+    desc: "For small restaurants",
     features: [
       { label: "30 dishes", inc: true },
       { label: "10 dish images", inc: true },
       { label: "Unlimited orders", inc: true },
       { label: "QR code generation", inc: true },
       { label: "WhatsApp orders", inc: true },
-      { label: "Analytics dashboard", inc: true },
+      { label: "Basic analytics", inc: true },
     ],
   },
   {
@@ -44,12 +47,15 @@ const plans = [
     period: "month",
     badge: "Most Popular",
     popular: true,
+    desc: "For growing businesses",
     features: [
       { label: "50 dishes", inc: true },
       { label: "20 dish images", inc: true },
       { label: "Unlimited orders", inc: true },
+      { label: "QR code generation", inc: true },
+      { label: "WhatsApp orders", inc: true },
       { label: "Priority support", inc: true },
-      { label: "Everything in Starter", inc: true },
+      { label: "Custom branding", inc: true },
     ],
   },
   {
@@ -59,12 +65,15 @@ const plans = [
     period: "month",
     badge: null,
     popular: false,
+    desc: "For established chains",
     features: [
       { label: "100 dishes", inc: true },
       { label: "100 dish images", inc: true },
       { label: "Unlimited orders", inc: true },
+      { label: "QR code generation", inc: true },
+      { label: "WhatsApp orders", inc: true },
       { label: "Priority support", inc: true },
-      { label: "Everything in Growth", inc: true },
+      { label: "Custom branding", inc: true },
     ],
   },
 ]
@@ -102,52 +111,14 @@ export default async function LandingPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* ─── Header ─── */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-[#F0F0F0]">
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-5 h-14">
-          <Link href="/" className="flex items-center gap-2 font-bold text-base">
-            <div className="w-7 h-7 rounded-lg bg-black text-white flex items-center justify-center text-xs">Q</div>
-            QRMenu.pk
-          </Link>
-          <div className="flex items-center gap-1 max-md:hidden">
-            <Link href="#pricing" className="text-sm text-[#555] font-medium px-3 py-1.5 hover:text-black transition-colors">
-              Pricing
-            </Link>
-            <Link href="#contact" className="text-sm text-[#555] font-medium px-3 py-1.5 hover:text-black transition-colors">
-              Contact
-            </Link>
-            <Link href="/login" className="text-sm text-[#555] font-medium px-3 py-1.5 hover:text-black transition-colors">
-              Sign In
-            </Link>
-            <Link
-              href="/signup"
-              className="text-sm font-medium px-4 py-1.5 rounded-full bg-black text-white hover:bg-[#1A1A1A] transition-colors"
-            >
-              Get Started
-            </Link>
-          </div>
-          <div className="flex md:hidden items-center gap-1.5">
-            <Link
-              href="/signup"
-              className="text-sm font-medium px-3 py-1.5 rounded-full bg-black text-white"
-            >
-              Get Started
-            </Link>
-            <Link href="/login" className="text-sm text-[#555] font-medium px-3 py-1.5">
-              Sign In
-            </Link>
-          </div>
-        </div>
-      </header>
+      <LandingHeader />
       {/* ─── Hero ─── */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#FAFAFA] to-white pointer-events-none" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b from-black/[0.03] to-transparent rounded-full blur-3xl pointer-events-none" />
         <div className="relative max-w-6xl mx-auto px-5 py-24 md:py-36 text-center">
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.05] mb-6">
-            Digital Menu for
-            <br />
-            <span>Every Restaurant</span>
+            Pakistan&apos;s #1 QR Code Menu Platform for Restaurants
           </h1>
           <p className="text-base md:text-lg text-[#888] max-w-xl mx-auto leading-relaxed mb-10">
             No app. No commission. Just a QR code — customers scan, browse your menu, and order directly on WhatsApp.
@@ -173,11 +144,11 @@ export default async function LandingPage() {
       <section className="max-w-6xl mx-auto px-5 py-16 md:py-24">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-6">
-            Why Pakistan&apos;s Restaurants Choose QRMenu.pk
+            Why Pakistan&apos;s Restaurants Choose Digital QR Menue
           </h2>
           <div className="text-sm md:text-base text-[#555] leading-relaxed space-y-4">
             <p>
-              QRMenu.pk is Pakistan&apos;s first QR-based digital menu platform built
+              Digital QR Menue is Pakistan&apos;s first QR-based digital menu platform built
               specifically for local restaurants. We help you go digital in under 5
               minutes — no technical skills required. Simply create your menu, print
               the QR code, and place it on your tables.
@@ -189,8 +160,7 @@ export default async function LandingPage() {
               no monthly hardware costs.
             </p>
             <p>
-              Whether you run a small café in Lahore, a fine dining restaurant in
-              Karachi, or a fast-food chain in Islamabad — QRMenu.pk works for every
+              Whether you run a <Link href="/restaurants?city=lahore" className="text-black underline underline-offset-2 hover:no-underline font-medium">small café in Lahore</Link>, a <Link href="/restaurants?city=karachi" className="text-black underline underline-offset-2 hover:no-underline font-medium">fine dining restaurant in Karachi</Link>, or a <Link href="/restaurants?city=islamabad" className="text-black underline underline-offset-2 hover:no-underline font-medium">fast-food chain in Islamabad</Link> — Digital QR Menue works for every
               type of restaurant in Pakistan. Our platform supports English and Urdu
               menus, multiple payment methods including JazzCash and Easypaisa, and
               real-time order notifications.
@@ -199,7 +169,7 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* ─── How It Works ─── */}
+      {/* ─── How It Works – Horizontal Timeline ─── */}
       <section className="max-w-6xl mx-auto px-5 py-16 md:py-24">
         <div className="text-center mb-16">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">How It Works</h2>
@@ -207,80 +177,87 @@ export default async function LandingPage() {
             Get your restaurant online in under 5 minutes
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 relative">
+          <div className="hidden md:block absolute top-9 left-[15%] right-[15%] h-[2px] bg-[#E8E8E8]">
+            <div className="absolute top-1/2 left-1/3 w-2 h-2 rounded-full bg-black -translate-y-1/2" />
+            <div className="absolute top-1/2 right-1/3 w-2 h-2 rounded-full bg-black -translate-y-1/2" />
+          </div>
           {[
             { step: "01", title: "Create Menu", desc: "Add your dishes, prices, and photos through our simple dashboard." },
             { step: "02", title: "Print QR Code", desc: "We generate a unique QR code for your restaurant. Print and place on tables." },
             { step: "03", title: "Get Orders", desc: "Customers scan, browse, and order via WhatsApp. No app download needed." },
-          ].map((s) => (
-            <div key={s.step} className="text-center group">
-              <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-black text-white text-lg md:text-xl font-bold flex items-center justify-center mx-auto mb-5 md:mb-6 group-hover:scale-105 transition-transform">
-                {s.step}
+          ].map((s, i) => (
+            <div key={s.step} className="relative flex md:flex-col items-start md:items-center gap-5 md:gap-0 md:text-center">
+              {i < 2 && (
+                <div className="md:hidden absolute left-[23px] top-12 w-[2px] h-[calc(100%+8px)] bg-[#E8E8E8]" />
+              )}
+              <div className="relative z-10 w-14 h-14 md:w-16 md:h-16 rounded-full bg-black text-white flex items-center justify-center shrink-0 shadow-sm">
+                <span className="text-lg md:text-xl font-bold">{s.step}</span>
               </div>
-              <h3 className="text-lg md:text-xl font-semibold mb-3">{s.title}</h3>
-              <p className="text-sm md:text-base text-[#555] leading-relaxed max-w-xs mx-auto">{s.desc}</p>
+              <div className="flex-1 md:mt-5">
+                <h3 className="text-base md:text-xl font-bold mt-1 mb-2">{s.title}</h3>
+                <p className="text-sm text-[#555] leading-relaxed md:max-w-xs md:mx-auto">{s.desc}</p>
+              </div>
             </div>
           ))}
         </div>
       </section>
 
       {/* ─── Pricing ─── */}
-      <section id="pricing" className="bg-[#F9FAFB] py-16 md:py-24">
+      <section id="pricing" className="bg-[#FAFAFA] py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-5">
           <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold mb-3">Simple, Transparent Pricing</h2>
-            <p className="text-sm text-[#888] max-w-md mx-auto">
-              No hidden fees. No commission on orders. Cancel anytime.
-            </p>
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">Simple, Transparent Pricing</h2>
+            <p className="text-sm text-[#888]">No hidden fees. No commission. Cancel anytime.</p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-6">
+          <div className="grid md:grid-cols-4 gap-3 md:gap-5">
             {plans.map((plan) => (
               <div
                 key={plan.key}
-                className={`relative rounded-xl md:rounded-2xl border p-2.5 md:p-6 flex flex-col transition-all hover:shadow-lg ${
+                className={`relative rounded-2xl p-5 md:p-6 flex flex-col transition-all duration-200 ${
                   plan.popular
-                    ? "bg-black text-white border-black shadow-xl scale-[1.02] md:scale-105 z-10"
-                    : "bg-white border-[#F0F0F0]"
+                    ? "bg-black text-white ring-2 ring-black shadow-xl scale-[1.02] md:scale-105 z-10"
+                    : "bg-white border border-[#E8E8E8] hover:border-[#CCC] hover:shadow-md"
                 }`}
               >
                 {plan.badge && (
-                  <span className={`absolute -top-2.5 left-1/2 -translate-x-1/2 text-[8px] md:text-[11px] font-bold px-2 md:px-4 py-0.5 md:py-1 rounded-full whitespace-nowrap uppercase tracking-wider ${
-                    plan.popular ? "bg-[#25D366] text-black" : "bg-black text-white"
-                  }`}>
-                    {plan.popular ? "MOST POPULAR" : plan.badge}
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#25D366] text-black text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider whitespace-nowrap">
+                    {plan.badge}
                   </span>
                 )}
-                <div className="mb-2 md:mb-6">
-                  <h3 className="text-[11px] md:text-lg font-bold">{plan.name}</h3>
-                  <div className="mt-0.5 md:mt-2 flex items-baseline gap-0.5 md:gap-1">
-                    <span className="text-sm md:text-3xl font-bold">PKR {plan.price}</span>
-                    <span className={`text-[9px] md:text-sm ${plan.popular ? "text-white/60" : "text-[#888]"}`}>/{plan.period}</span>
+
+                <div className="mb-4">
+                  <h3 className="text-sm md:text-base font-bold">{plan.name}</h3>
+                  {plan.desc && <p className={`text-xs mt-0.5 ${plan.popular ? "text-white/60" : "text-[#999]"}`}>{plan.desc}</p>}
+                  <div className="mt-3 flex items-baseline gap-0.5">
+                    <span className="text-xl md:text-3xl font-bold">Rs {plan.price}</span>
+                    <span className={`text-xs ${plan.popular ? "text-white/50" : "text-[#999]"}`}>/{plan.period}</span>
                   </div>
                 </div>
 
-                <div className="flex-1 space-y-1 md:space-y-3 mb-2 md:mb-6">
+                <div className="flex-1 space-y-2 mb-5">
                   {plan.features.map((f) => (
-                    <div key={f.label} className="flex items-start gap-1 md:gap-2.5 text-[9px] md:text-sm">
+                    <div key={f.label} className="flex items-center gap-2 text-xs md:text-sm">
                       {f.inc ? (
-                        <Check className={`w-2.5 h-2.5 md:w-4 md:h-4 ${plan.popular ? "text-[#25D366]" : "text-[#16A34A]"} flex-shrink-0 mt-0.5`} />
+                        <Check className={`w-3.5 h-3.5 md:w-4 md:h-4 ${plan.popular ? "text-[#25D366]" : "text-[#16A34A]"} shrink-0`} />
                       ) : (
-                        <X className={`w-2.5 h-2.5 md:w-4 md:h-4 ${plan.popular ? "text-white/30" : "text-[#CCC]"} flex-shrink-0 mt-0.5`} />
+                        <X className={`w-3.5 h-3.5 md:w-4 md:h-4 ${plan.popular ? "text-white/30" : "text-[#DDD]"} shrink-0`} />
                       )}
-                      <span className={f.inc ? (plan.popular ? "text-white/90" : "") : (plan.popular ? "text-white/40" : "text-[#BBB]")}>{f.label}</span>
+                      <span className={f.inc ? "" : (plan.popular ? "text-white/40" : "text-[#BBB]")}>{f.label}</span>
                     </div>
                   ))}
                 </div>
 
                 <Link
-                  href="/pricing"
-                  className={`block w-full py-1 md:py-2.5 rounded-lg md:rounded-xl text-[9px] md:text-sm font-semibold text-center transition-all ${
+                  href={plan.key === "trial" ? "/signup" : "/pricing"}
+                  className={`block w-full py-2.5 rounded-xl text-xs md:text-sm font-semibold text-center transition-all ${
                     plan.popular
                       ? "bg-white text-black hover:bg-[#F0F0F0]"
-                      : "border border-[#F0F0F0] text-[#555] hover:border-black hover:text-black"
+                      : "bg-black text-white hover:bg-[#1A1A1A]"
                   }`}
                 >
-                  {plan.key === "trial" ? "Start Free Trial" : "View Plan"}
+                  {plan.key === "trial" ? "Start Free Trial" : "Choose Plan"}
                 </Link>
               </div>
             ))}
@@ -288,7 +265,7 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* ─── Comparison Table ─── */}
+      {/* ─── Comparison Table (single, mobile+desktop) ─── */}
       <section className="py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-5">
           <div className="text-center mb-10">
@@ -296,48 +273,8 @@ export default async function LandingPage() {
             <p className="text-sm text-[#888]">All plans include WhatsApp order integration</p>
           </div>
 
-          {/* Mobile: simplified 2-plan view */}
-          <div className="md:hidden overflow-x-auto -mx-5 px-5">
-            <div className="min-w-[280px] bg-white rounded-2xl border border-[#E8E8E8] overflow-hidden">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-[#F0F0F0]">
-                    <th className="text-left px-4 py-3.5 font-semibold text-[#555] text-xs">Feature</th>
-                    <th className="text-center px-3 py-3.5 font-semibold text-xs">Free Trial</th>
-                    <th className="text-center px-3 py-3.5 font-semibold text-xs bg-[#FAFAFA] text-black">Starter</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {comparisonFeatures.slice(0, 5).map((f, i) => {
-                    const render = (val: boolean | string) => {
-                      if (typeof val === "boolean") {
-                        return val
-                          ? <Check className="w-3.5 h-3.5 text-[#16A34A] mx-auto" />
-                          : <X className="w-3.5 h-3.5 text-[#DDD] mx-auto" />
-                      }
-                      return <span className="font-medium text-[10px]">{val}</span>
-                    }
-                    return (
-                      <tr key={f.label} className={`border-b border-[#F0F0F0] last:border-0 ${i % 2 === 0 ? "bg-white" : "bg-[#FAFAFA]"}`}>
-                        <td className="px-4 py-3 text-[#111] text-[11px]">{f.label}</td>
-                        <td className="px-3 py-3 text-center">{render(f.trial)}</td>
-                        <td className="px-3 py-3 text-center bg-[#FAFAFA]">{render(f.starter)}</td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-            <div className="text-center mt-3">
-              <p className="text-[10px] text-[#999]">
-                <Link href="/pricing" className="text-black underline underline-offset-2 font-medium">View full comparison →</Link>
-              </p>
-            </div>
-          </div>
-
-          {/* md+: full comparison */}
-          <div className="hidden md:block overflow-x-auto -mx-5 px-5 md:mx-0 md:px-0">
-            <div className="min-w-[640px] bg-white rounded-2xl border border-[#E8E8E8] overflow-hidden">
+          <div className="overflow-x-auto -mx-5 px-5 md:mx-0 md:px-0">
+            <div className="min-w-[640px] bg-white rounded-2xl border border-[#E8E8E8] overflow-hidden shadow-sm">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-[#F0F0F0]">
@@ -386,39 +323,15 @@ export default async function LandingPage() {
 
       {/* ─── FAQs ─── */}
       <section className="py-16 md:py-24">
-        <div className="max-w-3xl mx-auto px-5">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-bold mb-3">Frequently Asked Questions</h2>
-            <p className="text-sm text-[#888]">Everything you need to know about QRMenu.pk</p>
-          </div>
-          <div className="space-y-3">
-            {[
-              { q: "Is the Free Trial really free?", a: "Yes! No credit card required. You get 7 days with full access to test QRMenu for your restaurant." },
-              { q: "What happens after my Free Trial ends?", a: "Your data is safe. Pick any plan to keep your menu live. If you don't, you have a 3-day grace period before the menu goes offline." },
-              { q: "Can I change plans later?", a: "Yes, upgrade or downgrade anytime. Just contact us on WhatsApp and we'll switch you in minutes." },
-              { q: "How do I pay?", a: "JazzCash, Easypaisa, or bank transfer. After payment, message us on WhatsApp and we'll activate your plan within minutes." },
-              { q: "Is there a commission on orders?", a: "Never. We charge a flat monthly fee. You keep 100% of your revenue." },
-            ].map((faq, i) => (
-              <details
-                key={i}
-                className="group bg-white border border-[#E8E8E8] rounded-xl p-4 md:p-5 open:bg-[#FAFAFA] transition-colors"
-              >
-                <summary className="flex items-center justify-between cursor-pointer font-semibold text-sm md:text-base list-none">
-                  <span>{faq.q}</span>
-                  <span className="text-[#999] group-open:rotate-45 transition-transform text-xl leading-none">+</span>
-                </summary>
-                <p className="mt-3 text-sm text-[#555] leading-relaxed">{faq.a}</p>
-              </details>
-            ))}
-          </div>
-          <div className="text-center mt-6">
-            <p className="text-xs text-[#999]">
-              Still have questions?{" "}
-              <Link href="/pricing" className="text-black underline underline-offset-2 hover:no-underline font-medium">
-                View full pricing page →
-              </Link>
-            </p>
-          </div>
+        <div className="max-w-3xl mx-auto px-5 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">Frequently Asked Questions</h2>
+          <p className="text-sm text-[#888] mb-8">Got questions? We have answers.</p>
+          <Link
+            href="/faq"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-black text-white text-sm font-semibold hover:bg-[#1A1A1A] transition-all"
+          >
+            View All FAQs
+          </Link>
         </div>
       </section>
 
@@ -433,7 +346,7 @@ export default async function LandingPage() {
             Ready to go digital?
           </h2>
           <p className="text-sm md:text-base text-white/70 mb-8 max-w-md mx-auto relative z-10">
-            Join hundreds of restaurants in Pakistan using QRMenu.pk to streamline their ordering process.
+            Join hundreds of restaurants in Pakistan using Digital QR Menue to streamline their ordering process.
           </p>
           <div className="relative z-10">
             <Link
@@ -453,14 +366,14 @@ export default async function LandingPage() {
             <div className="flex flex-col items-center md:items-start gap-3">
               <div className="flex items-center gap-2 font-bold text-base">
                 <div className="w-7 h-7 rounded-lg bg-black text-white flex items-center justify-center text-xs">Q</div>
-                QRMenu.pk
+                Digital QR Menue
               </div>
               <p className="text-xs text-[#999]">Made in Pakistan with 💚</p>
             </div>
             <div className="flex gap-6 text-xs text-[#555]">
-              <Link href="#pricing" className="hover:text-black transition-colors">Pricing</Link>
+              <Link href="/pricing" className="hover:text-black transition-colors">Pricing</Link>
               <Link href="/restaurants" className="hover:text-black transition-colors">Restaurants</Link>
-              <Link href="#contact" className="hover:text-black transition-colors">Contact</Link>
+              <Link href="/contact" className="hover:text-black transition-colors">Contact</Link>
             </div>
             <div className="flex gap-4 text-xs text-[#555]">
               <Link href="/privacy" className="hover:text-black underline transition-colors">Privacy Policy</Link>

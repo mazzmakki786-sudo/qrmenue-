@@ -182,7 +182,7 @@ INSERT INTO company_settings (key, value) VALUES
   ('account_title', 'QRMenu Pakistan'),
   ('account_number', '01234567890123'),
   ('whatsapp_support', '03001234567'),
-  ('company_email', 'support@qrmenu.pk');
+  ('company_email', 'support@digitalmenue.com');
 
 -- ============================================
 -- TABLE 8: NOTIFICATION LOGS

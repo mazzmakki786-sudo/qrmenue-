@@ -35,10 +35,10 @@ export default function CustomerLayout({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
             <Link href="/restaurants" className="flex items-center gap-2.5 group">
               <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white text-xs font-bold">
-                Q
+                D
               </div>
               <span className="text-base font-bold text-black group-hover:opacity-70 transition-opacity">
-                QRMenu.pk
+                Digital QR Menue
               </span>
             </Link>
             <nav className="flex items-center gap-1">

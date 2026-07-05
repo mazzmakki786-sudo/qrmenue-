@@ -6,6 +6,11 @@ const securityHeaders = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "X-XSS-Protection", value: "1; mode=block" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+  { key: "Access-Control-Allow-Origin", value: process.env.NEXT_PUBLIC_APP_URL || "https://digitalmenue.com" },
+  { key: "Access-Control-Allow-Methods", value: "GET, POST, PUT, PATCH, DELETE, OPTIONS" },
+  { key: "Access-Control-Allow-Headers", value: "Content-Type, Authorization, X-CSRF-Token, X-Requested-With" },
+  { key: "Access-Control-Allow-Credentials", value: "true" },
+  { key: "Access-Control-Max-Age", value: "86400" },
   {
     key: "Strict-Transport-Security",
     value: "max-age=63072000; includeSubDomains; preload",
@@ -38,6 +43,20 @@ const nextConfig: NextConfig = {
     ],
     formats: ['image/avif', 'image/webp'],
   },
+  redirects: async () => [
+    {
+      source: "/:path*",
+      has: [{ type: "host", value: "qr-menue-one.vercel.app" }],
+      destination: "https://digitalmenue.com/:path*",
+      permanent: true,
+    },
+    {
+      source: "/:path*",
+      has: [{ type: "host", value: "qrmenu.vercel.app" }],
+      destination: "https://digitalmenue.com/:path*",
+      permanent: true,
+    },
+  ],
   headers: async () => [
     {
       source: "/(.*)",

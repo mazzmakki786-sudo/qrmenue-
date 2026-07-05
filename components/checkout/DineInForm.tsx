@@ -14,9 +14,9 @@ interface Props {
 export function DineInForm({ name, phone, tableNumber, onNameChange, onPhoneChange, onTableChange }: Props) {
   return (
     <div className="bg-white rounded-2xl p-5 border border-border space-y-4">
-      <Input label="Your Name *" id="name" value={name} onChange={(e) => onNameChange(e.target.value)} placeholder="Enter your name" />
+      <Input label="Your Name" id="name" required value={name} onChange={(e) => onNameChange(e.target.value)} placeholder="Enter your name" />
       <Input label="Phone Number" id="phone" value={phone} onChange={(e) => onPhoneChange(e.target.value)} placeholder="0300-XXXXXXX (optional for dine-in)" />
-      <Input label="Table Number *" id="table" value={tableNumber} onChange={(e) => onTableChange(e.target.value)} placeholder="e.g. 5" />
+      <Input label="Table Number" id="table" required value={tableNumber} onChange={(e) => onTableChange(e.target.value)} placeholder="e.g. 5" />
     </div>
   )
 }

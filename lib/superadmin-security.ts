@@ -40,7 +40,9 @@ export async function recordLoginAttempt(email: string, ip: string, success: boo
       ip_address: ip,
       success,
     })
-  } catch {}
+  } catch (err) {
+    console.error("[superadmin-security] recordLoginAttempt failed:", err)
+  }
 }
 
 export async function isLockedOut(email: string): Promise<boolean> {
@@ -57,7 +59,8 @@ export async function isLockedOut(email: string): Promise<boolean> {
 
     if (!data || data.length < 3) return false
     return data.every((a: any) => !a.success)
-  } catch {
+  } catch (err) {
+    console.error("[superadmin-security] isLockedOut failed:", err)
     return true
   }
 }
@@ -70,9 +73,20 @@ export async function logAudit(email: string, action: string, details: Record<st
       action,
       details,
     })
-  } catch {}
+  } catch (err) {
+    console.error("[superadmin-security] logAudit failed:", err)
+  }
 }
 
 export function getIp(request: Request): string {
-  return request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown"
+  const cfIp = request.headers.get("cf-connecting-ip")
+  if (cfIp) return cfIp.trim()
+
+  const realIp = request.headers.get("x-real-ip")
+  if (realIp) return realIp.trim()
+
+  const forwarded = request.headers.get("x-forwarded-for")
+  if (forwarded) return forwarded.split(",")[0]?.trim() || ""
+
+  return "unknown"
 }

@@ -78,7 +78,7 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
       <header className="hidden md:flex items-center justify-between h-16 px-6 bg-white/80 backdrop-blur-md border-b border-[#F0F0F0] sticky top-0 z-30">
         <div className="flex items-center gap-6 lg:gap-8">
           <Link href="/dashboard" className="font-bold text-lg tracking-tight flex-shrink-0">
-            QRMenu.pk
+            Digital QR Menue
           </Link>
           <nav className="flex items-center gap-1">
             {navItems.map((item) => {
@@ -117,7 +117,7 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
         <button onClick={() => setMobileOpen(true)} className="p-2 -ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
           <Menu className="w-5 h-5" />
         </button>
-        <Link href="/dashboard" className="font-semibold text-sm">QRMenu.pk</Link>
+        <Link href="/dashboard" className="font-semibold text-sm">Digital QR Menue</Link>
         <div className="flex items-center gap-1">
           {restaurantId && <BellNotification restaurantId={restaurantId} />}
           <button
@@ -157,7 +157,7 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
               </button>
             </div>
             <div className="mb-4 px-2">
-              <p className="font-bold text-lg">QRMenu.pk</p>
+              <p className="font-bold text-lg">Digital QR Menue</p>
               <p className="text-xs text-[#999]">Owner dashboard</p>
             </div>
             <nav className="space-y-1 flex-1 overflow-y-auto">

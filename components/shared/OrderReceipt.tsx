@@ -176,7 +176,7 @@ export function OrderReceipt({ order, restaurant }: Props) {
         {/* Footer */}
         <div className="border-t border-dashed border-[#CCC] pt-4 text-center">
           <p className="text-[10px] text-[#999]">Powered By QR Menu</p>
-          <p className="text-[10px] text-[#999]">qrmenu.pk</p>
+          <p className="text-[10px] text-[#999]">digitalmenue.com</p>
         </div>
       </div>
 

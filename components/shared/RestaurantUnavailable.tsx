@@ -1,16 +1,16 @@
 import Link from "next/link"
-import { Store, ChevronRight } from "lucide-react"
+import { Ban, Store, ChevronRight } from "lucide-react"
 
 export function RestaurantUnavailable({ restaurantName }: { restaurantName: string }) {
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
       <div className="text-center max-w-sm w-full">
-        <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-[#F5F5F5] flex items-center justify-center">
-          <Store className="w-7 h-7 text-[#999]" />
+        <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-error/10 flex items-center justify-center">
+          <Ban className="w-7 h-7 text-error" />
         </div>
         <h1 className="text-lg font-bold text-[#333] mb-2">{restaurantName}</h1>
         <p className="text-sm text-[#777] mb-6 leading-relaxed">
-          This restaurant is not accepting orders right now. Please try again later.
+          This restaurant is sealed. The owner&apos;s plan has ended. Browse other restaurants to explore more options.
         </p>
         <Link
           href="/restaurants"

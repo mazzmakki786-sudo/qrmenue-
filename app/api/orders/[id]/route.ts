@@ -10,9 +10,15 @@ const VALID_PAYMENT_STATUSES = ["pending", "paid", "failed"] as const
 const VALID_PAYMENT_METHODS = ["cod", "bank_transfer", "jazzcash", "easypaisa"] as const
 
 export const GET = safeRoute(async (
-  _request,
+  request,
   { params }: { params: Promise<{ id: string }> }
 ) => {
+  const ip = getClientIp(request)
+  const allowed = await rateLimit(ip, 30, 60)
+  if (!allowed) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 })
+  }
+
   const { id } = await params
   const supabase = await createClient()
 
@@ -125,7 +131,7 @@ export const PATCH = safeRoute(async (
   logOwnerAction(restaurant.id, user.id, "order_updated", {
     order_id: id,
     changes: safeBody,
-  }, getIpSimple(request)).catch(() => {})
+  }, getIpSimple(request)).catch(console.error)
 
   return NextResponse.json({ order: data })
 })

@@ -31,7 +31,7 @@ export const POST = safeRoute(async (request) => {
     end_date: null,
   })
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+  if (error) return NextResponse.json({ error: "Failed to create subscription" }, { status: 400 })
 
   await logAudit(user.email || "", "subscription_created", { restaurant_id, plan_type, price })
 

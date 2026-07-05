@@ -8,7 +8,7 @@ function get() {
   return _r
 }
 
-const FROM = "QRMenu.pk <noreply@qrmenu.pk>"
+const FROM = "Digital QR Menue <noreply@digitalmenue.com>"
 const DAILY_THRESHOLD = 10
 
 export async function checkAndSendOrderLimitAlert(restaurantId: string): Promise<void> {
@@ -53,7 +53,7 @@ export async function checkAndSendOrderLimitAlert(restaurantId: string): Promise
     const { error } = await get().emails.send({
       from: FROM,
       to: ownerEmail,
-      subject: `You've received ${count} orders today — QRMenu.pk`,
+      subject: `You've received ${count} orders today — Digital QR Menue`,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #111;">
           <h1 style="font-size: 22px; margin-bottom: 8px;">${escapeHtml(restaurant.name)}, you're busy today!</h1>

@@ -1,25 +1,33 @@
-# QRMenu.pk - robots.txt
-# https://qr-menue-one.vercel.app
-
 User-agent: *
 Allow: /
-Allow: /menu/*
-Allow: /restaurants
-Allow: /pricing
-Allow: /login
-Allow: /signup
 
-# Disallow private/dashboard pages
-Disallow: /dashboard/
-Disallow: /superadmin/
-Disallow: /cart
-Disallow: /checkout
-Disallow: /order-confirm/
-Disallow: /account
-Disallow: /api/
+# AI crawlers that provide SEO value — allowed
+User-agent: Google-Extended
+Allow: /
 
-# Crawl-delay (optional, Google ignores this but other bots respect it)
-Crawl-delay: 1
+User-agent: PerplexityBot
+Allow: /
 
-# Sitemap
-Sitemap: https://qrmenu.pk/sitemap.xml
+User-agent: GPTBot
+Allow: /
+
+# AI crawlers blocked — no SEO value
+User-agent: CCBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+Sitemap: https://digitalmenue.com/sitemap.xml

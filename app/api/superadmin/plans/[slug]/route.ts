@@ -49,7 +49,7 @@ export const PATCH = safeRoute(async (request, { params }) => {
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ error: "Failed to update plan" }, { status: 500 })
 
   const { data: { user } } = await supabase.auth.getUser()
   await logAudit(user?.email || "", "plan_updated", { slug, fields: Object.keys(updates) })

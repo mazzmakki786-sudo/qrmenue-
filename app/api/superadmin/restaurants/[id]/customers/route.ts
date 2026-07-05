@@ -23,7 +23,7 @@ export const GET = safeRoute(async (
     .order("created_at", { ascending: false })
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return NextResponse.json({ error: "Failed to fetch customers" }, { status: 400 })
   }
 
   // Group by customer

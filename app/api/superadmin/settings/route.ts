@@ -22,7 +22,7 @@ export const GET = safeRoute(async (request) => {
   const admin = createAdminClient()
   const { data, error } = await admin.from("company_settings").select("*")
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+  if (error) return NextResponse.json({ error: "Failed to fetch settings" }, { status: 400 })
 
   const settings: Record<string, string> = {}
   data.forEach((s: any) => { settings[s.key] = s.value })

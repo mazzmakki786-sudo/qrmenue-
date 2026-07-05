@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { z } from "zod"
-import { getEffectiveLimits, type Plan } from "@/lib/subscription"
+import { type Plan } from "@/lib/subscription"
+import { getEffectiveLimitsFromDB } from "@/lib/subscription-db"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 import { csrfGuard } from "@/lib/csrf"
 import { safeRoute } from "@/lib/api-error"
@@ -57,7 +58,7 @@ export const POST = safeRoute(async (request) => {
   if (restaurant.is_suspended) return NextResponse.json({ error: "Restaurant is suspended" }, { status: 403 })
 
   const plan = restaurant.plan as Plan
-  const limits = getEffectiveLimits(plan, restaurant.plan_limits_override)
+  const limits = await getEffectiveLimitsFromDB(plan, restaurant.plan_limits_override)
 
   let body: any
   try {
@@ -143,7 +144,7 @@ export const POST = safeRoute(async (request) => {
   logOwnerAction(restaurant.id, user.id, "dish_created", {
     dish_id: data.id,
     name: parsed.data.name_en,
-  }, getIpSimple(request)).catch(() => {})
+  }, getIpSimple(request)).catch(console.error)
 
   return NextResponse.json({ dish: data })
 })
@@ -171,7 +172,7 @@ export const PATCH = safeRoute(async (request) => {
   if (!restaurant) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
 
   const plan = restaurant.plan as Plan
-  const limits = getEffectiveLimits(plan, restaurant.plan_limits_override)
+  const limits = await getEffectiveLimitsFromDB(plan, restaurant.plan_limits_override)
 
   let body: any
   try {
@@ -246,7 +247,7 @@ export const PATCH = safeRoute(async (request) => {
   logOwnerAction(restaurant.id, user.id, "dish_updated", {
     dish_id: id,
     changes: Object.keys(updateData),
-  }, getIpSimple(request)).catch(() => {})
+  }, getIpSimple(request)).catch(console.error)
 
   return NextResponse.json({ dish: data })
 })

@@ -80,6 +80,21 @@ export async function getPlanLimitsFromDB(slug: Plan): Promise<PlanLimits> {
   return PLAN_LIMITS[slug]
 }
 
+export async function getEffectiveLimitsFromDB(
+  plan: Plan,
+  override?: import("@/lib/subscription").PlanLimitsPartial | null
+): Promise<PlanLimits> {
+  const base = await getPlanLimitsFromDB(plan)
+  if (override) {
+    if (override.maxDishes !== undefined) base.maxDishes = override.maxDishes
+    if (override.maxImages !== undefined) base.maxImages = override.maxImages
+    if (override.maxOrders !== undefined) base.maxOrders = override.maxOrders
+    if (override.maxCategories !== undefined) base.maxCategories = override.maxCategories
+    if (override.aiPostsPerMonth !== undefined) base.aiPostsPerMonth = override.aiPostsPerMonth
+  }
+  return base
+}
+
 export async function getAllPlanLimitsFromDB(): Promise<Record<Plan, PlanLimits>> {
   const plans = await loadPlansFromDB()
   if (plans.length === 0) return PLAN_LIMITS

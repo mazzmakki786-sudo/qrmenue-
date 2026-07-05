@@ -3,7 +3,8 @@ import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/server"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 import { safeRoute } from "@/lib/api-error"
-import { getEffectiveLimits, type Plan } from "@/lib/subscription"
+import { type Plan } from "@/lib/subscription"
+import { getEffectiveLimitsFromDB } from "@/lib/subscription-db"
 
 export const GET = safeRoute(async (request) => {
   const ip = getClientIp(request)
@@ -24,7 +25,7 @@ export const GET = safeRoute(async (request) => {
 
   if (!restaurant) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
 
-  const limits = getEffectiveLimits(restaurant.plan as Plan, restaurant.plan_limits_override as any)
+  const limits = await getEffectiveLimitsFromDB(restaurant.plan as Plan, restaurant.plan_limits_override as any)
   const monthlyLimit = limits.aiPostsPerMonth
 
   if (monthlyLimit === 0) {

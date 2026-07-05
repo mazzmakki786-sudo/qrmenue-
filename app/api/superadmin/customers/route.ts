@@ -36,7 +36,7 @@ export const GET = safeRoute(async (request) => {
   ])
 
   if (customersRes.error) {
-    return NextResponse.json({ error: customersRes.error.message }, { status: 400 })
+    return NextResponse.json({ error: "Failed to fetch customers" }, { status: 400 })
   }
 
   const customers = customersRes.data || []

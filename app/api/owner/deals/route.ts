@@ -126,7 +126,7 @@ export const POST = safeRoute(async (request) => {
   logOwnerAction(restaurant.id, user.id, "deal_created", {
     deal_id: data.id,
     title: parsed.data.title_en,
-  }, getIpSimple(request)).catch(() => {})
+  }, getIpSimple(request)).catch(console.error)
 
   return NextResponse.json({ deal: data })
 })

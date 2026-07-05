@@ -51,7 +51,7 @@ export const POST = safeRoute(async (
     .single()
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return NextResponse.json({ error: "Failed to reset trial" }, { status: 400 })
   }
 
   await supabaseAdmin

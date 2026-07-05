@@ -71,7 +71,7 @@ export const POST = safeRoute(async (request) => {
       const results = await Promise.allSettled(
         emails.map((email: string) =>
           resend.emails.send({
-            from: "QRMenu.pk <onboarding@resend.dev>",
+            from: "Digital QR Menue <onboarding@resend.dev>",
             to: email,
             subject: `New Dish Added: ${escapeHtml(dish.name_en)}`,
             html: `

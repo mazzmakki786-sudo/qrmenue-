@@ -3,13 +3,15 @@ import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { generateOrderNumber } from "@/lib/utils"
 import { z } from "zod"
 import { loadTrialLimitsFromDB } from "@/lib/subscription-server"
-import { getEffectiveLimits, DEFAULT_TRIAL_LIMITS, GRACE_PERIOD_DAYS, type Plan } from "@/lib/subscription"
+import { DEFAULT_TRIAL_LIMITS, GRACE_PERIOD_DAYS, type Plan } from "@/lib/subscription"
+import { getEffectiveLimitsFromDB } from "@/lib/subscription-db"
 import { checkAndSendOrderLimitAlert } from "@/lib/email/orderLimitAlert"
 import { safeRoute } from "@/lib/api-error"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 import { csrfGuard } from "@/lib/csrf"
 import { buildWhatsAppURL } from "@/lib/whatsapp"
 import { isRestaurantOpen } from "@/lib/restaurant-hours"
+import { logCustomerAction, getIpSimple } from "@/lib/owner-audit"
 
 const orderItemSchema = z.object({
   id: z.string(),
@@ -132,7 +134,7 @@ export const POST = safeRoute(async (request) => {
 
   const orderLimit = restaurant.plan === "trial"
     ? (await loadTrialLimitsFromDB()).maxOrders ?? DEFAULT_TRIAL_LIMITS.maxOrders
-    : getEffectiveLimits(restaurant.plan as Plan, null).maxOrders
+    : (await getEffectiveLimitsFromDB(restaurant.plan as Plan, null)).maxOrders
 
   if ((orderCount ?? 0) >= orderLimit) {
     return NextResponse.json({
@@ -198,7 +200,19 @@ export const POST = safeRoute(async (request) => {
     status: "sent",
   })
 
-  checkAndSendOrderLimitAlert(parsed.data.restaurant_id).catch(() => {})
+  checkAndSendOrderLimitAlert(parsed.data.restaurant_id).catch(console.error)
+
+  logCustomerAction(
+    parsed.data.customer_id || null,
+    "order_created",
+    {
+      order_id: data.id,
+      restaurant_id: parsed.data.restaurant_id,
+      total_price: parsed.data.total_price,
+      order_type: parsed.data.order_type,
+    },
+    getIpSimple(request)
+  ).catch(console.error)
 
   return NextResponse.json({
     order: data,

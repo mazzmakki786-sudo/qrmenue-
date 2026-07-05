@@ -87,7 +87,7 @@ export const PATCH = safeRoute(async (request, { params }) => {
   logOwnerAction(restaurant.id, user.id, "deal_updated", {
     deal_id: id,
     changes: Object.keys(updateData),
-  }, getIpSimple(request)).catch(() => {})
+  }, getIpSimple(request)).catch(console.error)
 
   return NextResponse.json({ deal: data })
 })
@@ -138,7 +138,7 @@ export const DELETE = safeRoute(async (request, { params }) => {
 
   logOwnerAction(restaurant.id, user.id, "deal_deleted", {
     deal_id: id,
-  }, getIpSimple(request)).catch(() => {})
+  }, getIpSimple(request)).catch(console.error)
 
   return NextResponse.json({ success: true })
 })

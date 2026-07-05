@@ -10,5 +10,7 @@ export const config = {
     "/dashboard/:path*",
     "/superadmin/:path*",
     "/account/:path*",
+    "/api/owner/:path*",
+    "/api/superadmin/:path*",
   ],
 }

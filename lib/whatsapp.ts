@@ -27,7 +27,7 @@ export function buildWhatsAppURL(order: WhatsAppOrder): string {
         : "Takeaway"
 
   const message = [
-    "New Order — QRMenu.pk",
+    "New Order — Digital QR Menue",
     `Order #${order.orderNumber}`,
     "",
     "Items:",

@@ -30,7 +30,7 @@ export const DELETE = safeRoute(async (request, { params }: { params: Promise<{ 
 
   const { error } = await admin.from("qr_announcements").delete().eq("id", id)
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+  if (error) return NextResponse.json({ error: "Failed to delete announcement" }, { status: 400 })
 
   await logAudit(user.email || "", "announcement_deleted", { id })
   return NextResponse.json({ success: true })
@@ -84,7 +84,7 @@ export const PATCH = safeRoute(async (request, { params }: { params: Promise<{ i
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+  if (error) return NextResponse.json({ error: "Failed to update announcement" }, { status: 400 })
 
   await logAudit(user.email || "", "announcement_updated", { id, ...updates })
   return NextResponse.json({ announcement: data })

@@ -3,7 +3,8 @@ import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { checkRateLimit } from "@/lib/rate-limiter"
 import { csrfGuard } from "@/lib/csrf"
 import { safeRoute } from "@/lib/api-error"
-import { getEffectiveLimits, type Plan } from "@/lib/subscription"
+import { type Plan } from "@/lib/subscription"
+import { getEffectiveLimitsFromDB } from "@/lib/subscription-db"
 import { z } from "zod"
 
 const superAdminEmail = process.env.SUPER_ADMIN_EMAIL
@@ -48,8 +49,8 @@ export const GET = safeRoute(async (request) => {
 
   const usageMap = new Map((usageData || []).map((u: any) => [u.restaurant_id, u.count]))
 
-  const result = restaurants.map((r: any) => {
-    const limits = getEffectiveLimits(r.plan as Plan, r.plan_limits_override as any)
+  const result = await Promise.all(restaurants.map(async (r: any) => {
+    const limits = await getEffectiveLimitsFromDB(r.plan as Plan, r.plan_limits_override as any)
     const used = usageMap.get(r.id) ?? 0
     return {
       id: r.id,
@@ -64,7 +65,7 @@ export const GET = safeRoute(async (request) => {
       remaining: Math.max(0, limits.aiPostsPerMonth - used),
       plan_limits_override: r.plan_limits_override,
     }
-  })
+  }))
 
   return NextResponse.json({ restaurants: result })
 })

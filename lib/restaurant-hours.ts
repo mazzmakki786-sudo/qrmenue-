@@ -12,18 +12,31 @@ export function formatTo12Hour(time: string | null | undefined): string {
   return `${hours}:${minutes} ${ampm}`
 }
 
+function getPktMinutes(date: Date): number {
+  const utcMs = date.getTime()
+  const pktMs = utcMs + 5 * 60 * 60 * 1000
+  const pktDate = new Date(pktMs)
+  return pktDate.getUTCHours() * 60 + pktDate.getUTCMinutes()
+}
+
+function getPktDay(date: Date): number {
+  const utcMs = date.getTime()
+  const pktMs = utcMs + 5 * 60 * 60 * 1000
+  const pktDate = new Date(pktMs)
+  return pktDate.getUTCDay()
+}
+
 export function isRestaurantOpen(
   openingTime: string | null | undefined,
   closingTime: string | null | undefined,
   openingHours?: Record<string, { open: string; close: string; closed: boolean }> | null
 ): boolean {
   const now = new Date()
-  const currentMinutes = now.getHours() * 60 + now.getMinutes()
+  const currentMinutes = getPktMinutes(now)
 
-  // Check day-based opening_hours first if available
   if (openingHours) {
     const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
-    const todayKey = days[now.getDay()]
+    const todayKey = days[getPktDay(now)]
     const todayHours = openingHours[todayKey]
     if (todayHours) {
       if (todayHours.closed) return false
@@ -39,7 +52,6 @@ export function isRestaurantOpen(
     }
   }
 
-  // Fall back to opening_time / closing_time
   if (openingTime && closingTime) {
     const openClean = openingTime.includes("T") ? openingTime.split("T")[1] : openingTime
     const closeClean = closingTime.includes("T") ? closingTime.split("T")[1] : closingTime

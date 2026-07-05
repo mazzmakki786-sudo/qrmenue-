@@ -8,7 +8,7 @@ function get() {
   return _r
 }
 
-const FROM = "QRMenu.pk <noreply@qrmenu.pk>"
+const FROM = "Digital QR Menue <noreply@digitalmenue.com>"
 const TRIAL_REMINDER_DAYS = [5, 3, 1]
 
 export async function checkAndSendTrialReminders(): Promise<{ sent: number }> {
@@ -52,7 +52,7 @@ export async function checkAndSendTrialReminders(): Promise<{ sent: number }> {
         const { error } = await get().emails.send({
           from: FROM,
           to: ownerEmail,
-          subject: `Your trial ends in ${daysBefore} day${daysBefore > 1 ? "s" : ""} — QRMenu.pk`,
+          subject: `Your trial ends in ${daysBefore} day${daysBefore > 1 ? "s" : ""} — Digital QR Menue`,
           html: `
             <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #111;">
               <h1 style="font-size: 22px; margin-bottom: 8px;">Your trial ends in ${daysBefore} day${daysBefore > 1 ? "s" : ""}, ${escapeHtml(restaurant.name)}</h1>

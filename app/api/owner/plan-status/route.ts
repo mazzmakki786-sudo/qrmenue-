@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { getEffectiveLimits, type Plan } from "@/lib/subscription"
+import { type Plan } from "@/lib/subscription"
+import { getEffectiveLimitsFromDB } from "@/lib/subscription-db"
 import { safeRoute } from "@/lib/api-error"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 
@@ -23,7 +24,7 @@ export const GET = safeRoute(async (request) => {
   if (!restaurant) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
 
   const plan = restaurant.plan as Plan
-  const limits = getEffectiveLimits(plan, restaurant.plan_limits_override)
+  const limits = await getEffectiveLimitsFromDB(plan, restaurant.plan_limits_override)
 
   const [dishRes, catRes] = await Promise.all([
     supabase.from("dishes").select("id, image_url").eq("restaurant_id", restaurant.id),

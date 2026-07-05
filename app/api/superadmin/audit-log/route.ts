@@ -20,7 +20,7 @@ export const GET = safeRoute(async (request) => {
     .order("created_at", { ascending: false })
     .limit(100)
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+  if (error) return NextResponse.json({ error: "Failed to fetch audit logs" }, { status: 400 })
 
   return NextResponse.json({ logs: data || [] })
 })

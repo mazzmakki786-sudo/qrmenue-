@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server"
 
+const MAX_BODY_SIZE = 1 * 1024 * 1024
+
 type RouteHandler<T = { params: Promise<Record<string, string>> }> = (
   request: Request,
   context: T
@@ -9,16 +11,22 @@ export function safeRoute<T = { params: Promise<Record<string, string>> }>(
   handler: RouteHandler<T>
 ): RouteHandler<T> {
   return async (request: Request, context: T) => {
+    if (["POST", "PUT", "PATCH"].includes(request.method)) {
+      const contentLength = request.headers.get("content-length")
+      if (contentLength && parseInt(contentLength, 10) > MAX_BODY_SIZE) {
+        return NextResponse.json(
+          { error: "PAYLOAD_TOO_LARGE", message: "Request body too large" },
+          { status: 413 }
+        )
+      }
+    }
+
     try {
       return await handler(request, context)
     } catch (err: unknown) {
       console.error("[API Error]", err)
-      const message =
-        process.env.NODE_ENV === "production"
-          ? "An unexpected error occurred"
-          : err instanceof Error ? err.message : "An unexpected error occurred"
       return NextResponse.json(
-        { error: "INTERNAL_SERVER_ERROR", message },
+        { error: "INTERNAL_SERVER_ERROR", message: "An unexpected error occurred" },
         { status: 500 }
       )
     }

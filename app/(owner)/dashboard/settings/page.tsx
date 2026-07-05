@@ -254,7 +254,7 @@ export default function SettingsPage() {
       <div className="bg-white rounded-2xl border border-[#F0F0F0] p-5 space-y-4">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-black">Operation Hours</h2>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label="Opening Time"
             id="opening_time"
@@ -271,7 +271,7 @@ export default function SettingsPage() {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label="Delivery Fee (Rs)"
             id="delivery_fee"

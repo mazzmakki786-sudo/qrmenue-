@@ -1,7 +1,9 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { Save, RotateCcw, GripVertical } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
+import { uid } from "@/lib/realtime"
 
 interface Plan {
   id: string
@@ -59,6 +61,18 @@ export function PlanManager() {
   }, [])
 
   useEffect(() => { fetchPlans() }, [fetchPlans])
+
+  // Real-time subscription for plan changes
+  useEffect(() => {
+    const supabase = createClient()
+    const channel = supabase
+      .channel(uid("superadmin-plans"))
+      .on("postgres_changes", { event: "*", schema: "public", table: "plans" }, () => {
+        fetchPlans()
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [fetchPlans])
 
   const updatePlan = async (slug: string, updates: Partial<Plan>) => {
     setSaving(slug)

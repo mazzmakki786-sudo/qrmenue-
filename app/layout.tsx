@@ -2,7 +2,8 @@ import type { Metadata, Viewport } from "next"
 import { Inter, Noto_Nastaliq_Urdu } from "next/font/google"
 import "./globals.css"
 import { I18nProvider } from "@/lib/i18n/context"
-import { OrganizationJsonLd, WebsiteJsonLd } from "@/components/JsonLd"
+import { OrganizationJsonLd, WebsiteJsonLd, SoftwareApplicationJsonLd, ReviewJsonLd } from "@/components/JsonLd"
+import { DynamicBreadcrumb } from "@/components/shared/DynamicBreadcrumb"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -15,19 +16,21 @@ const notoUrdu = Noto_Nastaliq_Urdu({
   variable: "--font-urdu",
   display: "swap",
   weight: ["400", "700"],
+  preload: false,
 })
 
-const APP_NAME = "QRMenu.pk"
-const SITE_URL = "https://qrmenu.pk"
+const APP_NAME = "Digital QR Menue"
+const SITE_NAME = "Digitalmenue.com"
+const SITE_URL = "https://digitalmenue.com"
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${APP_NAME} — Digital Menu & Ordering Platform for Restaurants in Pakistan`,
-    template: `%s | ${APP_NAME}`,
+    default: `${SITE_NAME} — QR Code Menu & WhatsApp Ordering for Pakistan Restaurants`,
+    template: `%s | ${SITE_NAME}`,
   },
   description:
-    "Pakistan's #1 QR-based digital menu platform. Create a free QR code menu for your restaurant. Customers scan, browse, and order on WhatsApp. No app, no commission.",
+    "Create a free QR code menu for your restaurant in Pakistan. Customers scan, browse, and order on WhatsApp. No app, no commission. Start your 7-day free trial.",
   keywords: [
     "QR menu Pakistan",
     "digital menu for restaurant",
@@ -50,24 +53,24 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_PK",
     url: SITE_URL,
-    siteName: APP_NAME,
-    title: `${APP_NAME} — Digital Menu & Ordering Platform for Restaurants`,
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} — QR Code Menu & WhatsApp Ordering for Pakistan Restaurants`,
     description:
-      "Create a free QR code menu for your restaurant. Customers scan, browse, and order on WhatsApp. No app, no commission. Live in Pakistan.",
+      "Create a free QR code menu for your restaurant in Pakistan. Customers scan, browse, and order on WhatsApp. No app, no commission. Start your 7-day free trial.",
     images: [
       {
         url: "/og-image.svg",
         width: 1200,
         height: 630,
-        alt: `${APP_NAME} — Pakistan's QR Menu Platform`,
+        alt: `${SITE_NAME} — QR Code Menu & WhatsApp Ordering Platform`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${APP_NAME} — Digital Menu & Ordering Platform`,
+    title: `${SITE_NAME} — QR Code Menu & WhatsApp Ordering for Pakistan Restaurants`,
     description:
-      "Create a free QR code menu for your restaurant. No app, no commission.",
+      "Create a free QR code menu for your restaurant in Pakistan. No app, no commission. Start your 7-day free trial.",
     images: ["/og-image.svg"],
   },
   robots: {
@@ -116,6 +119,9 @@ export default function RootLayout({
       <body className="min-h-screen bg-white font-sans antialiased overflow-x-hidden">
         <OrganizationJsonLd />
         <WebsiteJsonLd />
+        <SoftwareApplicationJsonLd />
+        <ReviewJsonLd />
+        <DynamicBreadcrumb />
         <I18nProvider>{children}</I18nProvider>
       </body>
     </html>

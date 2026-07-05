@@ -25,7 +25,7 @@ export const GET = safeRoute(async (request) => {
     .select("*")
     .order("sort_order", { ascending: true })
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ error: "Failed to fetch plans" }, { status: 500 })
 
   return NextResponse.json({ plans: data })
 })

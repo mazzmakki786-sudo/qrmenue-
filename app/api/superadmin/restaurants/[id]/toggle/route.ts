@@ -47,7 +47,7 @@ export const PATCH = safeRoute(async (
     .single()
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return NextResponse.json({ error: "Failed to toggle restaurant" }, { status: 400 })
   }
 
   return NextResponse.json({ restaurant: data })

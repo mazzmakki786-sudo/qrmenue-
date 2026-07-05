@@ -3,8 +3,15 @@ import { Resend } from "resend"
 import { createClient } from "@/lib/supabase/server"
 import { safeRoute } from "@/lib/api-error"
 import { SUPER_ADMIN_EMAIL } from "@/lib/superadmin-security"
+import { checkRateLimit } from "@/lib/rate-limiter"
 
-export const GET = safeRoute(async () => {
+export const GET = safeRoute(async (request) => {
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json({ error: "Not available in production" }, { status: 404 })
+  }
+
+  await checkRateLimit(request, "default")
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || user.email?.toLowerCase() !== SUPER_ADMIN_EMAIL) {
@@ -20,14 +27,14 @@ export const GET = safeRoute(async () => {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: "QRMenu.pk <onboarding@resend.dev>",
+      from: "Digital QR Menue <onboarding@resend.dev>",
       to: testEmail,
-      subject: "QRMenu.pk — Test Email (from Resend)",
+      subject: "Digital QR Menue — Test Email (from Resend)",
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">
-          <h1 style="font-size: 24px; color: #25D366;">QRMenu.pk Test Email</h1>
+          <h1 style="font-size: 24px; color: #25D366;">Digital QR Menue Test Email</h1>
           <p style="color: #555; font-size: 15px; line-height: 1.6;">
-            This is a test email from QRMenu.pk using Resend.
+            This is a test email from Digital QR Menue using Resend.
           </p>
           <p style="color: #555; font-size: 15px; line-height: 1.6;">
             If you received this, Resend is configured correctly!

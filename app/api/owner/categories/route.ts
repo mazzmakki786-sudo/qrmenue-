@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { z } from "zod"
-import { getEffectiveLimits, type Plan } from "@/lib/subscription"
+import { type Plan } from "@/lib/subscription"
+import { getEffectiveLimitsFromDB } from "@/lib/subscription-db"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 import { csrfGuard } from "@/lib/csrf"
 import { safeRoute } from "@/lib/api-error"
@@ -54,7 +55,7 @@ export const POST = safeRoute(async (request) => {
   }
 
   const plan = restaurant.plan as Plan
-  const limits = getEffectiveLimits(plan, restaurant.plan_limits_override)
+  const limits = await getEffectiveLimitsFromDB(plan, restaurant.plan_limits_override)
 
   const { count: categoryCount } = await supabase
     .from("categories")
@@ -86,7 +87,7 @@ export const POST = safeRoute(async (request) => {
   logOwnerAction(restaurant.id, user.id, "category_created", {
     category_id: data.id,
     name: parsed.data.name_en,
-  }, getIpSimple(request)).catch(() => {})
+  }, getIpSimple(request)).catch(console.error)
 
   return NextResponse.json({ category: data })
 })
@@ -150,7 +151,7 @@ export const DELETE = safeRoute(async (request) => {
 
   logOwnerAction(restaurant.id, user.id, "category_deleted", {
     category_id: parsed.data.id,
-  }, getIpSimple(request)).catch(() => {})
+  }, getIpSimple(request)).catch(console.error)
 
   return NextResponse.json({ success: true })
 })

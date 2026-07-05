@@ -116,7 +116,7 @@ export const useCartStore = create<CartState>()(
         getTotalPrice: () => {
           const state = get()
           const subtotal = state.items.reduce((sum, item) => sum + item.dish.price * item.quantity, 0)
-          return Math.max(0, subtotal - state.discountAmount) + state.deliveryFee
+          return Math.round(Math.max(0, subtotal - state.discountAmount) + state.deliveryFee)
         },
       }},
       { name: "qrmenu-cart", partialize: (state) => ({

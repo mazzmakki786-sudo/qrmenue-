@@ -4,7 +4,8 @@ import { createAdminClient } from "@/lib/supabase/server"
 import { checkRateLimit } from "@/lib/rate-limiter"
 import { csrfGuard } from "@/lib/csrf"
 import { safeRoute } from "@/lib/api-error"
-import { getEffectiveLimits, type Plan } from "@/lib/subscription"
+import { type Plan } from "@/lib/subscription"
+import { getEffectiveLimitsFromDB } from "@/lib/subscription-db"
 import { generateImage, buildFoodPostPrompt } from "@/lib/ai/image-generation"
 import { z } from "zod"
 
@@ -38,7 +39,7 @@ export const POST = safeRoute(async (request) => {
   if (!restaurant.is_active) return NextResponse.json({ error: "Restaurant is not active" }, { status: 403 })
   if (restaurant.is_suspended) return NextResponse.json({ error: "Restaurant is suspended" }, { status: 403 })
 
-  const limits = getEffectiveLimits(restaurant.plan as Plan, restaurant.plan_limits_override as any)
+  const limits = await getEffectiveLimitsFromDB(restaurant.plan as Plan, restaurant.plan_limits_override as any)
   if (limits.aiPostsPerMonth <= 0) {
     return NextResponse.json({ error: "AI posts not available on your plan" }, { status: 403 })
   }

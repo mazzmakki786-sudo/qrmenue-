@@ -19,6 +19,7 @@ const DEFAULTS: Record<string, RateLimitConfig> = {
   "menu:read": { maxRequests: 30, windowSeconds: 60 },
   "notifications:send": { maxRequests: 5, windowSeconds: 60 },
   "ai:generate": { maxRequests: 5, windowSeconds: 60 },
+  "favorites:write": { maxRequests: 30, windowSeconds: 60 },
   "settings:read": { maxRequests: 20, windowSeconds: 60 },
   default: { maxRequests: 20, windowSeconds: 60 },
 }
@@ -34,15 +35,36 @@ export class RateLimitError extends Error {
 }
 
 export function getClientIp(request: Request | NextRequest): string {
+  const cfIp = request.headers.get("cf-connecting-ip")
+  if (cfIp) return cfIp.trim()
+
+  const realIp = request.headers.get("x-real-ip")
+  if (realIp) return realIp.trim()
+
   const forwarded = request.headers.get("x-forwarded-for")
   if (forwarded) {
-    return forwarded.split(",")[0].trim()
+    const firstIp = forwarded.split(",")[0]?.trim()
+    if (firstIp && !isPrivateIp(firstIp)) return firstIp
   }
-  const realIp = request.headers.get("x-real-ip")
-  if (realIp) return realIp
-  const cfIp = request.headers.get("cf-connecting-ip")
-  if (cfIp) return cfIp
+
   return "unknown"
+}
+
+function isPrivateIp(ip: string): boolean {
+  return (
+    ip === "127.0.0.1" ||
+    ip === "::1" ||
+    ip.startsWith("10.") ||
+    ip.startsWith("172.16.") || ip.startsWith("172.17.") || ip.startsWith("172.18.") ||
+    ip.startsWith("172.19.") || ip.startsWith("172.20.") || ip.startsWith("172.21.") ||
+    ip.startsWith("172.22.") || ip.startsWith("172.23.") || ip.startsWith("172.24.") ||
+    ip.startsWith("172.25.") || ip.startsWith("172.26.") || ip.startsWith("172.27.") ||
+    ip.startsWith("172.28.") || ip.startsWith("172.29.") || ip.startsWith("172.30.") ||
+    ip.startsWith("172.31.") ||
+    ip.startsWith("192.168.") ||
+    ip.startsWith("::ffff:127.") || ip.startsWith("::ffff:10.") ||
+    ip.startsWith("::ffff:172.16.") || ip.startsWith("::ffff:192.168.")
+  )
 }
 
 function shouldBypassRateLimit(identifier: string): boolean {
@@ -101,13 +123,15 @@ export async function rateLimit(
 
 export async function checkRateLimit(
   request: Request,
-  tier: keyof typeof DEFAULTS = "default"
+  tier: keyof typeof DEFAULTS = "default",
+  userId?: string
 ): Promise<void> {
   const config = DEFAULTS[tier] || DEFAULTS.default
-  const identifier = getClientIp(request)
+  const ip = getClientIp(request)
 
-  if (shouldBypassRateLimit(identifier)) return
+  if (shouldBypassRateLimit(ip)) return
 
+  const identifier = userId ? `${ip}:${userId}` : ip
   const url = new URL(request.url)
   const endpoint = url.pathname
 
