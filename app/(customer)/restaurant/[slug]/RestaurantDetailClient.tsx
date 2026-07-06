@@ -304,13 +304,13 @@ function MobileDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deal
 
         <div className="flex justify-end mt-2">
           {cartItem ? (
-            <div className="flex items-center gap-1 bg-surface rounded-full">
-              <button onClick={() => updateQuantity(dish.id, cartItem.quantity - 1)} className="w-6 h-6 rounded-full flex items-center justify-center text-primary font-bold text-sm">−</button>
-              <span className="text-xs font-bold min-w-[16px] text-center text-text-primary">{cartItem.quantity}</span>
-              <button onClick={() => addItem(dish)} disabled={closed} className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center disabled:opacity-30 text-sm font-bold">+</button>
+            <div className="flex items-center gap-1.5 bg-surface-dark rounded-full px-2 py-1 min-h-[32px]">
+              <button onClick={() => updateQuantity(dish.id, cartItem.quantity - 1)} className="w-7 h-7 rounded-full flex items-center justify-center text-primary font-bold hover:bg-white/50 transition-colors text-[16px]">−</button>
+              <span className="text-[13px] font-bold min-w-[18px] text-center text-text-primary">{cartItem.quantity}</span>
+              <button onClick={() => addItem(dish)} disabled={closed} className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-hover transition-colors disabled:opacity-30 text-[16px] font-bold">+</button>
             </div>
           ) : (
-            <button onClick={() => addItem(dish)} disabled={unavailable || closed} className="bg-primary text-white rounded-full px-2.5 py-1 text-[10px] font-semibold active:scale-95 transition-all disabled:opacity-50">
+            <button onClick={() => addItem(dish)} disabled={unavailable || closed} className="bg-primary text-white rounded-full px-3.5 py-1 text-[11px] font-semibold hover:bg-primary-hover active:scale-[0.95] transition-all disabled:opacity-50 flex items-center gap-1 min-h-[32px]">
               {closed ? "Closed" : "+ Add"}
             </button>
           )}
@@ -416,7 +416,7 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
       </div>
 
       {/* ===== MOBILE LAYOUT ===== */}
-      <div className="md:hidden">
+      <div className="md:hidden pt-12">
         {/* Sticky Category Tabs */}
         {categories.length > 0 && (
           <div className="sticky top-12 z-30 bg-white/95 backdrop-blur-md border-b border-border/50 overflow-x-auto no-scrollbar">
