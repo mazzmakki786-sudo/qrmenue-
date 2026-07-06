@@ -243,6 +243,7 @@ function MobileDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deal
 
   return (
     <div className={`bg-white rounded-xl border border-border overflow-hidden transition-all ${unavailable ? "opacity-50" : ""}`}>
+      {/* Image — clean, no overlay badges */}
       <div className="relative w-full aspect-[4/3] bg-surface overflow-hidden">
         {dish.image_url && !imgError ? (
           <Image
@@ -258,15 +259,13 @@ function MobileDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deal
             <ImageOff className="w-6 h-6 text-text-muted/30" />
           </div>
         )}
-        {(badges.length > 0 || dishDeal) && (
-          <div className="absolute top-1.5 left-1.5 flex flex-wrap gap-0.5">
-            <DishBadges tags={badges} />
-            {dishDeal && (
-              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-bold bg-primary/10 text-primary">
-                <Percent className="w-2 h-2" />
-                {dishDeal.deal_type === "percentage" ? `${dishDeal.deal_value}%` : `Rs ${dishDeal.deal_value}`} OFF
-              </span>
-            )}
+        {/* Only deal badge stays on image */}
+        {dishDeal && (
+          <div className="absolute top-1.5 left-1.5">
+            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-bold bg-primary/10 text-primary">
+              <Percent className="w-2 h-2" />
+              {dishDeal.deal_type === "percentage" ? `${dishDeal.deal_value}%` : `Rs ${dishDeal.deal_value}`} OFF
+            </span>
           </div>
         )}
         {unavailable && (
@@ -275,20 +274,35 @@ function MobileDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deal
           </div>
         )}
       </div>
+
+      {/* Info — name + tags + price + add button in balanced layout */}
       <div className="p-2.5">
-        <h3 className="text-[12px] font-semibold text-text-primary line-clamp-1 leading-tight">{dish.name_en}</h3>
-        {dish.name_ur && <p className="text-[9px] text-text-secondary font-urdu line-clamp-1 mt-0.5">{dish.name_ur}</p>}
-        {dish.description_en && (
-          <p className="text-[9px] text-text-secondary line-clamp-1 mt-0.5">{dish.description_en}</p>
-        )}
-        <div className="flex items-center justify-between mt-2">
-          <span className="text-[13px] font-bold text-text-primary">
+        <div className="flex items-start justify-between gap-1">
+          <div className="min-w-0 flex-1">
+            <h3 className="text-[12px] font-semibold text-text-primary line-clamp-1 leading-tight">{dish.name_en}</h3>
+            {dish.name_ur && <p className="text-[9px] text-text-secondary font-urdu line-clamp-1">{dish.name_ur}</p>}
+          </div>
+          <span className="text-[13px] font-bold text-text-primary shrink-0 mt-0.5">
             {dealPrice !== null ? (
               <span className="text-primary">{formatPrice(dealPrice)}</span>
             ) : (
               `Rs ${dish.price.toLocaleString("en-PK")}`
             )}
           </span>
+        </div>
+
+        {/* Tags moved here — next to name */}
+        {badges.length > 0 && (
+          <div className="flex flex-wrap gap-0.5 mt-1">
+            <DishBadges tags={badges} />
+          </div>
+        )}
+
+        {dish.description_en && (
+          <p className="text-[9px] text-text-secondary line-clamp-1 mt-1">{dish.description_en}</p>
+        )}
+
+        <div className="flex justify-end mt-2">
           {cartItem ? (
             <div className="flex items-center gap-1 bg-surface rounded-full">
               <button onClick={() => updateQuantity(dish.id, cartItem.quantity - 1)} className="w-6 h-6 rounded-full flex items-center justify-center text-primary font-bold text-sm">−</button>
@@ -381,9 +395,9 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* ===== SHARED HEADER ===== */}
+      {/* ===== MOBILE HEADER ===== */}
       <div
-        className="fixed top-0 left-0 right-0 z-40 bg-white/80 safe-top"
+        className="fixed top-0 left-0 right-0 z-40 bg-white/80 safe-top md:hidden"
         style={{ backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}
       >
         <div className="flex items-center justify-between px-4 h-12 mx-auto max-w-7xl md:px-6">
@@ -394,22 +408,10 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
           >
             <ArrowLeft className="w-4 h-4 text-text-primary" />
           </button>
-          <h2 className="text-[13px] font-semibold text-text-primary truncate mx-2 hidden sm:block max-w-[200px]">
+          <h2 className="text-[13px] font-semibold text-text-primary truncate mx-2 max-w-[200px]">
             {restaurant.name_ur || restaurant.name}
           </h2>
-          <Link href="/restaurants" className="text-[13px] font-semibold text-text-primary hover:opacity-70 transition-opacity sm:hidden">QRMenu.pk</Link>
-          <Link
-            href="/checkout"
-            className="relative w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center active:scale-95 transition-transform"
-            aria-label="Cart"
-          >
-            <ShoppingCart className="w-4 h-4 text-text-primary" />
-            {totalCartItems > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary text-white text-[9px] font-bold flex items-center justify-center leading-none">
-                {totalCartItems > 99 ? "99+" : totalCartItems}
-              </span>
-            )}
-          </Link>
+          <div className="w-8" />
         </div>
       </div>
 
@@ -515,7 +517,7 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
                 const unavailableDishes = category.dishes.filter((d) => !d.is_available)
                 if (availableDishes.length === 0 && unavailableDishes.length === 0) return null
                 return (
-                  <section key={category.id} id={`m-cat-${category.id}`}>
+                  <section key={category.id} id={`m-cat-${category.id}`} className="scroll-mt-28">
                     <h2 className="text-[13px] font-bold text-text-primary border-l-[3px] border-primary pl-2 mb-2.5 leading-tight">
                       {category.name_en}
                     </h2>
