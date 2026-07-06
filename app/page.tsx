@@ -1,9 +1,10 @@
-import { createClient } from "@/lib/supabase/server"
+import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { ContactSection } from "@/components/shared/ContactSection"
 import { LandingHeader } from "@/components/shared/LandingHeader"
 import { PricingSection } from "@/components/pricing/PricingSection"
+import { mapPlan, type DBPlan } from "@/lib/map-plans"
 
 export default async function LandingPage() {
   const supabase = await createClient()
@@ -25,6 +26,16 @@ export default async function LandingPage() {
 
   const settings: Record<string, string> = {}
   ;(settingsData || []).forEach((s: any) => { settings[s.key] = s.value })
+
+  // Server-side fetch — zero client loading for pricing section
+  const admin = createAdminClient()
+  const { data: dbPlans } = await admin
+    .from("plans")
+    .select("*")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true })
+
+  const initialPlans = (dbPlans as DBPlan[] | null)?.map(mapPlan) || []
 
   return (
     <div className="min-h-screen bg-white">
@@ -124,6 +135,7 @@ export default async function LandingPage() {
       <PricingSection
         heading="Simple, Transparent Pricing"
         description="No hidden fees. No commission on orders. Cancel anytime."
+        initialPlans={initialPlans}
       />
 
       {/* ─── FAQs ─── */}

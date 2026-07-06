@@ -1,7 +1,8 @@
 import type { Metadata } from "next"
 import { PricingSection } from "@/components/pricing/PricingSection"
+import { mapPlan, type DBPlan } from "@/lib/map-plans"
 import { PricingJsonLd, FaqJsonLd } from "@/components/JsonLd"
-import { LandingHeader } from "@/components/shared/LandingHeader"
+import { createAdminClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
   title: "Pricing — QRMenu.pk Plans",
@@ -42,7 +43,17 @@ const pricingFaqs = [
   },
 ]
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  // Server-side fetch — zero client loading
+  const admin = createAdminClient()
+  const { data: dbPlans } = await admin
+    .from("plans")
+    .select("*")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true })
+
+  const initialPlans = (dbPlans as DBPlan[] | null)?.map(mapPlan) || []
+
   return (
     <>
       <PricingJsonLd />
@@ -50,6 +61,7 @@ export default function PricingPage() {
       <PricingSection
         heading="Plans & Pricing"
         description="No hidden fees. No commission on orders. Cancel anytime."
+        initialPlans={initialPlans}
       />
     </>
   )
