@@ -39,11 +39,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
       type: "website",
-      url: `https://qrmenu.pk/restaurant/${slug}`,
+      url: `https://www.digitalmenue.com/restaurant/${slug}`,
       siteName: "Digitalmenue.com",
       images: [
         {
-          url: restaurant.logo_url || "https://qrmenu.pk/og-image.svg",
+          url: restaurant.logo_url || "https://www.digitalmenue.com/og-image.png",
           width: 1200,
           height: 630,
           alt: restaurant.name,
@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ],
     },
     alternates: {
-      canonical: `https://qrmenu.pk/restaurant/${slug}`,
+      canonical: `https://www.digitalmenue.com/restaurant/${slug}`,
     },
   }
 }

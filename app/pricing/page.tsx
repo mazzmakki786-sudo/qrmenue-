@@ -11,11 +11,11 @@ export const metadata: Metadata = {
     title: "Pricing | QRMenu.pk",
     description: "QR menu plans for restaurants",
     type: "website",
-    url: "https://qrmenu.pk/pricing",
+    url: "https://www.digitalmenue.com/pricing",
     siteName: "Digitalmenue.com",
   },
   alternates: {
-    canonical: "https://qrmenu.pk/pricing",
+    canonical: "https://www.digitalmenue.com/pricing",
   },
 }
 

@@ -21,7 +21,7 @@ const notoUrdu = Noto_Nastaliq_Urdu({
 
 const APP_NAME = "Digital QR Menue"
 const SITE_NAME = "Digitalmenue.com"
-const SITE_URL = "https://digitalmenue.com"
+const SITE_URL = "https://www.digitalmenue.com"
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
       "Create a free QR code menu for your restaurant in Pakistan. Customers scan, browse, and order on WhatsApp. No app, no commission. Start your 7-day free trial.",
     images: [
       {
-        url: "/og-image.svg",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: `${SITE_NAME} — QR Code Menu & WhatsApp Ordering Platform`,
@@ -71,7 +71,7 @@ export const metadata: Metadata = {
     title: `${SITE_NAME} — QR Code Menu & WhatsApp Ordering for Pakistan Restaurants`,
     description:
       "Create a free QR code menu for your restaurant in Pakistan. No app, no commission. Start your 7-day free trial.",
-    images: ["/og-image.svg"],
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
@@ -88,7 +88,6 @@ export const metadata: Metadata = {
     canonical: SITE_URL,
     languages: {
       en: SITE_URL,
-      ur: SITE_URL,
       "x-default": SITE_URL,
     },
   },

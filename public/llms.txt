@@ -1,33 +1,28 @@
-# Digitalmenue.com   Digital Menu Platform for Pakistan
+# Digital QR Menue
 
-> Digitalmenue.com is Pakistan's leading QR-based digital menu and WhatsApp ordering platform for restaurants, cafes, and food businesses.
+> https://www.digitalmenue.com
 
-## About
-
-- Founded: 2024
-- Location: Faisalabad, Pakistan
-- Pricing: Free Trial (PKR 0/7 days), Starter (PKR 1,200/mo), Growth (PKR 2,500/mo), Premium (PKR 4,500/mo)
-- No commission on orders
+Pakistan's first QR-based digital menu and WhatsApp ordering platform for restaurants, cafes, and food businesses across Pakistan.
 
 ## Features
 
-- QR code generation for restaurant menus
-- WhatsApp order integration with automatic message formatting
-- Real-time menu updates (pricing, photos, availability)
-- Analytics dashboard with order tracking
-- Urdu language support
-- JazzCash, Easypaisa, and bank transfer payments
+- Digital menu with QR codes
+- WhatsApp order integration
+- QR code generation and management
+- Analytics dashboard
+- Urdu / English bilingual support
+- JazzCash & Easypaisa payment integration
 
-## Pages
+## Pricing
 
-- Homepage: https://digitalmenue.com
-- Browse Restaurants: https://digitalmenue.com/restaurants
-- Pricing: https://digitalmenue.com/pricing
-- FAQ: https://digitalmenue.com/faq
-- Contact: https://digitalmenue.com/contact
-- Sign Up: https://digitalmenue.com/signup
+| Tier | Price |
+|------|-------|
+| Trial | PKR 0 (7 days) |
+| Starter | PKR 1,200 / month |
+| Growth | PKR 2,500 / month |
+| Premium | PKR 4,500 / month |
 
-## Support
+## Contact
 
 - WhatsApp: +92-314-6325823
 - Email: dmenue@gmail.com

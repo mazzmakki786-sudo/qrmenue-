@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import { useFavorites } from "@/lib/hooks/useFavorites"
 import Link from "next/link"
-import { Clock, Truck, Heart, MapPin, Search, Ban } from "lucide-react"
+import { Clock, Truck, Heart, MapPin, Search, Ban, ChevronRight } from "lucide-react"
 import { isRestaurantOpen } from "@/lib/restaurant-hours"
 import { isRestaurantSealed } from "@/lib/restaurant-sealed"
 
@@ -17,6 +17,7 @@ interface RestaurantSummary {
   city: string
   cuisine_type: string | null
   logo_url: string | null
+  phone: string | null
   delivery_time_min?: number
   delivery_fee?: number
   is_open?: boolean
@@ -46,64 +47,66 @@ function RestaurantCard({
   const sealed = isRestaurantSealed(r)
 
   return (
-    <div className={`flex items-center gap-2.5 p-3 bg-white border border-border rounded-xl hover:border-border-strong hover:shadow-[0_2px_12px_rgba(0,0,0,0.06)] transition-all duration-200 group h-full ${sealed ? "opacity-60" : ""}`}>
-      <Link href={`/menu/${r.slug}`} className="flex items-center gap-2.5 min-w-0 flex-1">
+    <div className={`flex items-center gap-3 p-3 bg-white border border-border rounded-xl hover:border-border-strong transition-colors h-full ${sealed ? "opacity-50" : ""}`}>
+      {/* Logo */}
+      <Link href={`/menu/${r.slug}`} className="shrink-0">
         {r.logo_url ? (
-          <div className="w-11 h-11 rounded-xl overflow-hidden flex-shrink-0 bg-[#F5F5F5] ring-1 ring-black/5">
+          <div className="w-11 h-11 rounded-xl overflow-hidden bg-[#F5F5F5] ring-1 ring-black/5">
             <Image src={r.logo_url} alt={r.name} width={44} height={44} className="w-full h-full object-cover" />
           </div>
         ) : (
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-[#1A1A1A] text-white flex items-center justify-center font-bold text-base flex-shrink-0">
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-[#1A1A1A] text-white flex items-center justify-center font-bold text-base">
             {r.name.charAt(0).toUpperCase()}
           </div>
         )}
+      </Link>
 
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5">
-            <h3 className="text-[13px] font-semibold text-text-primary truncate group-hover:underline decoration-1 underline-offset-2 decoration-text-muted">
-              {r.name}
-            </h3>
-            {sealed ? (
-              <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 bg-[#F5F5F5] text-text-muted">
-                Sealed
+      {/* Info */}
+      <Link href={`/menu/${r.slug}`} className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <h3 className="text-[13px] font-semibold text-text-primary truncate max-w-[160px]">{r.name}</h3>
+          {sealed ? (
+            <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-[#F5F5F5] text-text-muted shrink-0">
+              <Ban className="w-2.5 h-2.5 inline-block -mt-0.5 mr-0.5" />
+              Sealed
+            </span>
+          ) : (
+            <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 ${
+              reallyOpen ? "bg-accent/10 text-accent" : "bg-error/10 text-error"
+            }`}>
+              {reallyOpen ? "Open" : "Closed"}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2 text-[11px] text-text-muted mt-0.5">
+          {r.cuisine_type && <span className="truncate">{r.cuisine_type}</span>}
+          {r.city && (
+            <>
+              <span className="text-border-strong">·</span>
+              <span className="inline-flex items-center gap-0.5 shrink-0">
+                <MapPin className="w-2.5 h-2.5" />
+                {r.city}
               </span>
-            ) : (
-              <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 ${
-                reallyOpen ? "bg-accent/10 text-accent" : "bg-error/10 text-error"
-              }`}>
-                {reallyOpen ? "Open" : "Closed"}
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-2 text-[11px] text-text-muted mt-0.5">
-            {r.cuisine_type && <span className="truncate">{r.cuisine_type}</span>}
-            {r.city && (
-              <>
-                <span className="text-border-strong">·</span>
-                <span className="inline-flex items-center gap-0.5 shrink-0">
-                  <MapPin className="w-2.5 h-2.5" />
-                  {r.city}
-                </span>
-              </>
-            )}
-          </div>
-          <div className="flex items-center gap-2.5 mt-0.5 text-[10px] text-text-muted">
-            {r.delivery_time_min != null && (
-              <span className="inline-flex items-center gap-1 whitespace-nowrap shrink-0">
-                <Clock className="w-2.5 h-2.5" />
-                {r.delivery_time_min} min
-              </span>
-            )}
-            {r.delivery_fee != null && (
-              <span className="inline-flex items-center gap-1 whitespace-nowrap shrink-0">
-                <Truck className="w-2.5 h-2.5" />
-                {r.delivery_fee === 0 ? "Free" : `Rs\xa0${r.delivery_fee}`}
-              </span>
-            )}
-          </div>
+            </>
+          )}
+        </div>
+        <div className="flex items-center gap-2.5 mt-0.5 text-[10px] text-text-muted">
+          {r.delivery_time_min != null && (
+            <span className="inline-flex items-center gap-1 whitespace-nowrap">
+              <Clock className="w-2.5 h-2.5" />
+              {r.delivery_time_min} min
+            </span>
+          )}
+          {r.delivery_fee != null && (
+            <span className="inline-flex items-center gap-1 whitespace-nowrap">
+              <Truck className="w-2.5 h-2.5" />
+              {r.delivery_fee === 0 ? "Free" : `Rs\xa0${r.delivery_fee}`}
+            </span>
+          )}
         </div>
       </Link>
 
+      {/* Actions */}
       <div className="flex items-center gap-1 flex-shrink-0">
         <button
           onClick={(e) => { e.preventDefault(); onToggleFav(r.id) }}
@@ -114,9 +117,10 @@ function RestaurantCard({
         </button>
         <Link
           href={`/menu/${r.slug}`}
-          className="inline-flex items-center px-3 py-1.5 rounded-xl bg-primary text-white text-[11px] font-semibold hover:bg-primary-hover active:scale-[0.97] transition-all shadow-[0_1px_3px_rgba(0,0,0,0.1)]"
+          className="inline-flex items-center gap-0.5 px-3 py-1.5 rounded-xl bg-primary text-white text-[11px] font-semibold hover:bg-primary-hover active:scale-[0.97] transition-all shadow-[0_1px_3px_rgba(0,0,0,0.1)]"
         >
-          View Menu
+          Menu
+          <ChevronRight className="w-3 h-3" />
         </Link>
       </div>
     </div>
@@ -142,7 +146,7 @@ export function RestaurantsClient({ initialRestaurants, initialCities }: Restaur
       const supabase = createClient()
       let query = supabase
         .from("restaurants")
-        .select("id, name, slug, city, cuisine_type, logo_url, delivery_time_min, delivery_fee, is_open, opening_time, closing_time, opening_hours, plan, plan_end_date, trial_end")
+        .select("id, name, slug, city, cuisine_type, logo_url, delivery_time_min, delivery_fee, is_open, opening_time, closing_time, opening_hours, plan, plan_end_date, trial_end, phone")
         .eq("is_active", true)
         .eq("is_suspended", false)
 

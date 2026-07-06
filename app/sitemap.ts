@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next"
 import { createClient } from "@/lib/supabase/server"
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://digitalmenue.com"
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.digitalmenue.com"
 
 const testSlugs = new Set([
   "sher-hassan-mq40ywg7",

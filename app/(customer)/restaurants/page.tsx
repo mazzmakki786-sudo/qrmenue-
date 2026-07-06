@@ -11,11 +11,11 @@ export const metadata: Metadata = {
     title: "Restaurants | QRMenu.pk",
     description: "Browse restaurant menus in Pakistan",
     type: "website",
-    url: "https://qrmenu.pk/restaurants",
+    url: "https://www.digitalmenue.com/restaurants",
     siteName: "Digitalmenue.com",
   },
   alternates: {
-    canonical: "https://qrmenu.pk/restaurants",
+    canonical: "https://www.digitalmenue.com/restaurants",
   },
 }
 
@@ -23,7 +23,7 @@ export default async function RestaurantsPage() {
   const supabase = await createClient()
   const { data: restaurants } = await supabase
     .from("restaurants")
-    .select("id, name, slug, city, cuisine_type, logo_url, description, delivery_time_min, delivery_fee, is_open, plan, plan_end_date, trial_end")
+    .select("id, name, slug, city, cuisine_type, logo_url, description, delivery_time_min, delivery_fee, is_open, opening_time, closing_time, opening_hours, plan, plan_end_date, trial_end, phone")
     .eq("is_active", true)
     .eq("is_suspended", false)
     .order("name")

@@ -225,6 +225,87 @@ function DesktopDishCard({ dish, deals, unavailable, closed }: { dish: Dish; dea
   )
 }
 
+function MobileDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deals?: (Deal & { dish?: { id: string; name_en: string; name_ur: string | null; image_url: string | null; price: number } | null })[]; unavailable?: boolean; closed?: boolean }) {
+  const [imgError, setImgError] = useState(false)
+  const addItem = useCartStore((s) => s.addItem)
+  const items = useCartStore((s) => s.items)
+  const updateQuantity = useCartStore((s) => s.updateQuantity)
+  const cartItem = items.find((item) => item.dish.id === dish.id)
+
+  const recognizedTags = ["popular", "chef_special", "spicy"]
+  const badges = (dish.tags || []).filter((t) => recognizedTags.includes(t))
+  const dishDeal = deals?.find((d) => d.dish_id === dish.id && d.deal_type !== "bundle")
+  const dealPrice = dishDeal
+    ? dishDeal.deal_type === "percentage"
+      ? Math.round(dish.price * (1 - dishDeal.deal_value / 100))
+      : Math.max(0, dish.price - dishDeal.deal_value)
+    : null
+
+  return (
+    <div className={`bg-white rounded-xl border border-border overflow-hidden transition-all ${unavailable ? "opacity-50" : ""}`}>
+      <div className="relative w-full aspect-[4/3] bg-surface overflow-hidden">
+        {dish.image_url && !imgError ? (
+          <Image
+            src={dish.image_url}
+            alt={dish.name_en}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 50vw, 200px"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-surface to-border/20">
+            <ImageOff className="w-6 h-6 text-text-muted/30" />
+          </div>
+        )}
+        {(badges.length > 0 || dishDeal) && (
+          <div className="absolute top-1.5 left-1.5 flex flex-wrap gap-0.5">
+            <DishBadges tags={badges} />
+            {dishDeal && (
+              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-bold bg-primary/10 text-primary">
+                <Percent className="w-2 h-2" />
+                {dishDeal.deal_type === "percentage" ? `${dishDeal.deal_value}%` : `Rs ${dishDeal.deal_value}`} OFF
+              </span>
+            )}
+          </div>
+        )}
+        {unavailable && (
+          <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+            <span className="text-white text-[9px] font-semibold bg-black/60 px-2 py-0.5 rounded-full">Unavailable</span>
+          </div>
+        )}
+      </div>
+      <div className="p-2.5">
+        <h3 className="text-[12px] font-semibold text-text-primary line-clamp-1 leading-tight">{dish.name_en}</h3>
+        {dish.name_ur && <p className="text-[9px] text-text-secondary font-urdu line-clamp-1 mt-0.5">{dish.name_ur}</p>}
+        {dish.description_en && (
+          <p className="text-[9px] text-text-secondary line-clamp-1 mt-0.5">{dish.description_en}</p>
+        )}
+        <div className="flex items-center justify-between mt-2">
+          <span className="text-[13px] font-bold text-text-primary">
+            {dealPrice !== null ? (
+              <span className="text-primary">{formatPrice(dealPrice)}</span>
+            ) : (
+              `Rs ${dish.price.toLocaleString("en-PK")}`
+            )}
+          </span>
+          {cartItem ? (
+            <div className="flex items-center gap-1 bg-surface rounded-full">
+              <button onClick={() => updateQuantity(dish.id, cartItem.quantity - 1)} className="w-6 h-6 rounded-full flex items-center justify-center text-primary font-bold text-sm">−</button>
+              <span className="text-xs font-bold min-w-[16px] text-center text-text-primary">{cartItem.quantity}</span>
+              <button onClick={() => addItem(dish)} disabled={closed} className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center disabled:opacity-30 text-sm font-bold">+</button>
+            </div>
+          ) : (
+            <button onClick={() => addItem(dish)} disabled={unavailable || closed} className="bg-primary text-white rounded-full px-2.5 py-1 text-[10px] font-semibold active:scale-95 transition-all disabled:opacity-50">
+              {closed ? "Closed" : "+ Add"}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function RestaurantDetailClient({ restaurant, categories }: Props) {
   const router = useRouter()
   const [logoError, setLogoError] = useState(false)
@@ -313,204 +394,134 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
           >
             <ArrowLeft className="w-4 h-4 text-text-primary" />
           </button>
-          <Link href="/restaurants" className="text-[13px] font-semibold text-text-primary hover:opacity-70 transition-opacity">QRMenu.pk</Link>
-          <div className="w-8" />
+          <h2 className="text-[13px] font-semibold text-text-primary truncate mx-2 hidden sm:block max-w-[200px]">
+            {restaurant.name_ur || restaurant.name}
+          </h2>
+          <Link href="/restaurants" className="text-[13px] font-semibold text-text-primary hover:opacity-70 transition-opacity sm:hidden">QRMenu.pk</Link>
+          <Link
+            href="/checkout"
+            className="relative w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center active:scale-95 transition-transform"
+            aria-label="Cart"
+          >
+            <ShoppingCart className="w-4 h-4 text-text-primary" />
+            {totalCartItems > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary text-white text-[9px] font-bold flex items-center justify-center leading-none">
+                {totalCartItems > 99 ? "99+" : totalCartItems}
+              </span>
+            )}
+          </Link>
         </div>
       </div>
 
-      {/* Keep scroll position for mobile */}
+      {/* ===== MOBILE LAYOUT ===== */}
       <div className="md:hidden">
-        <main className="pt-12 pb-[100px] px-4 mx-auto">
-          {/* Compact Restaurant Header */}
-          <div className="flex items-start gap-3.5 py-5 border-b border-border/50 mb-4">
+        {/* Sticky Category Tabs */}
+        {categories.length > 0 && (
+          <div className="sticky top-12 z-30 bg-white/95 backdrop-blur-md border-b border-border/50 overflow-x-auto no-scrollbar">
+            <div className="flex gap-0.5 px-4 py-2 min-w-max">
+              {categories.map((cat) => {
+                if (cat.dishes.length === 0) return null
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      const el = document.getElementById(`m-cat-${cat.id}`)
+                      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" })
+                    }}
+                    className="whitespace-nowrap text-[11px] font-medium px-3 py-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface transition-colors"
+                  >
+                    {cat.name_en}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        <main className="pt-2 pb-[100px] px-4 mx-auto">
+          {/* Compact Restaurant Info */}
+          <div className="flex items-start gap-3 py-4 border-b border-border/50 mb-3">
             {restaurant.logo_url && !logoError ? (
-              <div className="w-14 h-14 rounded-xl overflow-hidden shadow-sm ring-1 ring-black/5 relative flex-shrink-0 bg-white">
-                <Image
-                  src={restaurant.logo_url}
-                  alt={restaurant.name}
-                  fill
-                  className="object-cover"
-                  sizes="56px"
-                  onError={() => setLogoError(true)}
-                />
+              <div className="w-12 h-12 rounded-xl overflow-hidden shadow-sm ring-1 ring-black/5 relative flex-shrink-0 bg-white">
+                <Image src={restaurant.logo_url} alt={restaurant.name} fill className="object-cover" sizes="48px" onError={() => setLogoError(true)} />
               </div>
             ) : (
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-[#8F2E19] text-white flex items-center justify-center font-bold text-lg flex-shrink-0 shadow-sm">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-[#8F2E19] text-white flex items-center justify-center font-bold text-base flex-shrink-0 shadow-sm">
                 {restaurant.name.charAt(0).toUpperCase()}
               </div>
             )}
-
-            <div className="min-w-0 flex-1 pt-0.5">
-              <h1 className="text-base font-bold text-text-primary leading-tight truncate">
-                {restaurant.name_ur || restaurant.name}
-              </h1>
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-text-secondary mt-0.5">
-                {restaurant.city && (
-                  <span className="flex items-center gap-0.5">
-                    <MapPin className="w-3 h-3" /> {restaurant.city}
-                  </span>
-                )}
-                {restaurant.cuisine_type && (
-                  <span className="flex items-center gap-0.5">
-                    <UtensilsCrossed className="w-3 h-3" /> {restaurant.cuisine_type}
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-2 mt-2">
-                <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full ${
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-sm font-bold text-text-primary leading-tight truncate">{restaurant.name_ur || restaurant.name}</h1>
+                <span className={`inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
                   !effectivelyClosed ? "bg-accent/10 text-accent" : "bg-error/10 text-error"
                 }`}>
-                  <span className={`w-2 h-2 rounded-full ${!effectivelyClosed ? "bg-accent" : "bg-error"}`} />
-                  {effectivelyClosed ? "Currently Closed" : "Accepting Orders"}
+                  <span className={`w-1.5 h-1.5 rounded-full ${!effectivelyClosed ? "bg-accent" : "bg-error"}`} />
+                  {effectivelyClosed ? "Closed" : "Open"}
                 </span>
-                {liveOpenTime && liveCloseTime && (
-                  <span className="text-xs text-text-secondary font-medium flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-text-muted" />
-                    {formatTo12Hour(liveOpenTime)} — {formatTo12Hour(liveCloseTime)}
-                  </span>
-                )}
               </div>
+              <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10px] text-text-secondary mt-0.5">
+                {restaurant.cuisine_type && <span>{restaurant.cuisine_type}</span>}
+                {restaurant.city && <><span className="text-border-strong">·</span><span>{restaurant.city}</span></>}
+                {liveOpenTime && liveCloseTime && <><span className="text-border-strong">·</span><span className="flex items-center gap-0.5"><Clock className="w-2.5 h-2.5" />{formatTo12Hour(liveOpenTime)} — {formatTo12Hour(liveCloseTime)}</span></>}
+              </div>
+              {(restaurant.delivery_time_min != null || restaurant.delivery_fee != null) && (
+                <div className="flex items-center gap-2 text-[10px] text-text-secondary mt-0.5">
+                  {restaurant.delivery_time_min != null && <span className="flex items-center gap-0.5"><Timer className="w-2.5 h-2.5" />{restaurant.delivery_time_min} min</span>}
+                  {restaurant.delivery_fee != null && <span className="flex items-center gap-0.5"><Truck className="w-2.5 h-2.5" />{restaurant.delivery_fee === 0 ? "Free delivery" : `Rs\xa0${restaurant.delivery_fee}`}</span>}
+                </div>
+              )}
             </div>
           </div>
 
-          {restaurant.description && (
-            <p className="text-xs text-text-secondary leading-relaxed mb-4 line-clamp-2">
-              {restaurant.description}
-            </p>
-          )}
-
-          <div className="flex gap-2.5 mb-5">
+          {/* Action Buttons */}
+          <div className="flex gap-2 mb-3">
             {restaurant.phone && (
-              <a
-                href={`tel:${restaurant.phone}`}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary text-white text-xs font-semibold active:scale-[0.97] transition-transform"
-              >
-                <Phone className="w-3.5 h-3.5" />
-                Call Now
+              <a href={`tel:${restaurant.phone}`} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-primary text-white text-[11px] font-semibold active:scale-[0.97] transition-transform">
+                <Phone className="w-3.5 h-3.5" /> Call
               </a>
             )}
             {restaurant.lat && restaurant.lng ? (
-              <a
-                href={`https://www.google.com/maps?q=${restaurant.lat},${restaurant.lng}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-border text-text-secondary text-xs font-semibold active:scale-[0.97] transition-transform hover:bg-[#FAFAFA]"
-              >
-                <Navigation className="w-3.5 h-3.5" />
-                Directions
+              <a href={`https://www.google.com/maps?q=${restaurant.lat},${restaurant.lng}`} target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border border-border text-text-secondary text-[11px] font-semibold active:scale-[0.97] transition-transform">
+                <Navigation className="w-3.5 h-3.5" /> Map
               </a>
             ) : restaurant.address ? (
-              <a
-                href={`https://www.google.com/maps/search/${encodeURIComponent(restaurant.address)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-border text-text-secondary text-xs font-semibold active:scale-[0.97] transition-transform hover:bg-[#FAFAFA]"
-              >
-                <MapPin className="w-3.5 h-3.5" />
-                Location
+              <a href={`https://www.google.com/maps/search/${encodeURIComponent(restaurant.address)}`} target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border border-border text-text-secondary text-[11px] font-semibold active:scale-[0.97] transition-transform">
+                <MapPin className="w-3.5 h-3.5" /> Map
               </a>
             ) : null}
           </div>
 
-          {restaurant.opening_hours && (
-            <details className="group border border-border rounded-xl overflow-hidden mb-4">
-              <summary className="flex items-center justify-between px-4 py-3 cursor-pointer text-xs font-semibold text-text-primary hover:bg-[#FAFAFA] transition-colors list-none">
-                <span className="flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  Opening Hours
-                </span>
-                <span className="text-text-muted group-open:rotate-180 transition-transform">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </span>
-              </summary>
-              <div className="px-4 pb-3 space-y-1">
-                {(["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const).map((day) => {
-                  const hours = restaurant.opening_hours?.[day]
-                  const today = new Date().toLocaleDateString("en-US", { weekday: "long" }).toLowerCase()
-                  const isToday = day === today
-                  if (!hours) return null
-                  return (
-                    <div key={day} className={`flex justify-between items-center text-xs py-1.5 px-2 rounded-lg ${isToday ? "bg-primary/5 font-medium" : ""}`}>
-                      <span className={`capitalize ${isToday ? "text-text-primary" : "text-text-secondary"}`}>{day}</span>
-                      <span className={hours.closed ? "text-error font-medium" : "text-text-primary"}>
-                        {hours.closed ? "Closed" : `${formatTo12Hour(hours.open)} — ${formatTo12Hour(hours.close)}`}
-                      </span>
-                    </div>
-                  )
-                })}
-              </div>
-            </details>
-          )}
-
-          {(restaurant.delivery_time_min != null || restaurant.delivery_fee != null) && (
-            <div className="bg-accent/5 border border-accent/20 rounded-xl px-4 py-3 mb-4 flex items-center justify-between gap-3">
-              {restaurant.delivery_time_min != null && (
-                <div className="flex items-center gap-2 text-sm font-semibold text-text-primary">
-                  <Timer className="w-4 h-4 text-accent" />
-                  <span>Delivery in <span className="text-accent">{restaurant.delivery_time_min} min</span></span>
-                </div>
-              )}
-              {restaurant.delivery_fee != null && (
-                <div className="text-sm font-semibold text-text-primary whitespace-nowrap">
-                  <span className={restaurant.delivery_fee === 0 ? "text-accent" : ""}>
-                    {restaurant.delivery_fee === 0 ? "Free delivery" : `Delivery: Rs\xa0${restaurant.delivery_fee}`}
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
-
-          {restaurant.lat && restaurant.lng && (
-            <div className="border border-border rounded-xl overflow-hidden mb-4">
-              <div className="h-32 bg-[#F9FAFB] flex items-center justify-center relative">
-                <MapPin className="w-6 h-6 text-text-muted" />
-                <a
-                  href={`https://www.google.com/maps?q=${restaurant.lat},${restaurant.lng}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="absolute bottom-2 left-2 bg-white px-2.5 py-1 rounded-lg text-[10px] font-medium border border-border flex items-center gap-1 hover:bg-surface transition-colors"
-                >
-                  <Navigation className="w-3 h-3" />
-                  Get Directions
-                </a>
-              </div>
-            </div>
-          )}
-
-          {deals.length > 0 && <DealBanner restaurantId={restaurant.id} slug={restaurant.slug} />}
+          {deals.length > 0 && <div className="mb-3"><DealBanner restaurantId={restaurant.id} slug={restaurant.slug} /></div>}
 
           {effectivelyClosed && (
-            <div className="bg-error/10 border border-error/30 rounded-xl px-4 py-3 mb-4 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-error flex items-center justify-center shrink-0">
-                <Store className="w-4 h-4 text-white" />
+            <div className="bg-error/5 border border-error/20 rounded-xl px-3 py-2.5 mb-3 flex items-center gap-2.5">
+              <div className="w-6 h-6 rounded-full bg-error flex items-center justify-center shrink-0">
+                <Store className="w-3 h-3 text-white" />
               </div>
-              <div>
-                <p className="text-sm font-semibold text-error">Currently Closed</p>
-                <p className="text-xs text-text-secondary mt-0.5">
-                  {liveOpenTime && liveCloseTime
-                    ? `Open today ${formatTo12Hour(liveOpenTime)} — ${formatTo12Hour(liveCloseTime)}`
-                    : "This restaurant is not accepting orders right now"}
-                </p>
-              </div>
+              <p className="text-[11px] text-error font-semibold">
+                {liveOpenTime && liveCloseTime
+                  ? `Open today ${formatTo12Hour(liveOpenTime)} — ${formatTo12Hour(liveCloseTime)}`
+                  : "Closed right now"}
+              </p>
             </div>
           )}
 
+          {/* Categories + 2-Column Dish Grid */}
           {categories.length > 0 ? (
-            <div className="space-y-6">
+            <div className="space-y-5">
               {categories.map((category) => {
                 const availableDishes = category.dishes.filter((d) => d.is_available)
                 const unavailableDishes = category.dishes.filter((d) => !d.is_available)
                 if (availableDishes.length === 0 && unavailableDishes.length === 0) return null
                 return (
-                  <section key={category.id}>
-                    <h2 className="text-sm font-bold text-text-primary border-l-4 border-primary pl-2.5 mb-3">
+                  <section key={category.id} id={`m-cat-${category.id}`}>
+                    <h2 className="text-[13px] font-bold text-text-primary border-l-[3px] border-primary pl-2 mb-2.5 leading-tight">
                       {category.name_en}
                     </h2>
-                    <div className="space-y-2">
-                      {availableDishes.map((dish) => <DishCard key={dish.id} dish={dish} closed={effectivelyClosed} deals={deals} />)}
-                      {unavailableDishes.map((dish) => <DishCard key={dish.id} dish={dish} unavailable closed={effectivelyClosed} deals={deals} />)}
+                    <div className="grid grid-cols-2 gap-2">
+                      {availableDishes.map((dish) => <MobileDishCard key={dish.id} dish={dish} closed={effectivelyClosed} deals={deals} />)}
+                      {unavailableDishes.map((dish) => <MobileDishCard key={dish.id} dish={dish} unavailable closed={effectivelyClosed} deals={deals} />)}
                     </div>
                   </section>
                 )
