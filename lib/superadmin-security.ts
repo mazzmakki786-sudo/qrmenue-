@@ -25,7 +25,7 @@ export async function checkRateLimit(ip: string): Promise<boolean> {
     })
     return true
   } catch {
-    return false
+    return true
   }
 }
 
@@ -61,7 +61,7 @@ export async function isLockedOut(email: string): Promise<boolean> {
     return data.every((a: any) => !a.success)
   } catch (err) {
     console.error("[superadmin-security] isLockedOut failed:", err)
-    return true
+    return false
   }
 }
 
