@@ -17,11 +17,13 @@ module.exports = {
         // 10% Accent    — Green #25D366 (CTAs, badges, highlights)
         primary: {
           DEFAULT: "#000000",   // 30% — Black
+          foreground: "#FFFFFF",
           hover: "#1A1A1A",
         },
         accent: {
           DEFAULT: "#25D366",   // 10% — WhatsApp Green
           hover: "#1DA85C",
+          foreground: "#000000",
         },
         muted: {
           DEFAULT: "#F9FAFB",   // 60% — Light gray surfaces
@@ -31,6 +33,12 @@ module.exports = {
           DEFAULT: "#E8E8E8",
           strong: "#CCCCCC",
         },
+        background: { DEFAULT: "#FFFFFF", foreground: "#111111" },
+        card: { DEFAULT: "#FFFFFF", foreground: "#111111" },
+        input: "#E8E8E8",
+        ring: "#000000",
+        secondary: { DEFAULT: "#F5F5F5", foreground: "#111111" },
+        destructive: { DEFAULT: "#DC2626", foreground: "#FFFFFF" },
         success: "#22C55E",
         error: "#EF4444",
         warning: "#D97706",

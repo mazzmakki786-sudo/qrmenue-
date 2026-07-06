@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { PricingClient } from "./PricingClient"
+import { PricingSection } from "@/components/pricing/PricingSection"
 import { PricingJsonLd, FaqJsonLd } from "@/components/JsonLd"
 import { LandingHeader } from "@/components/shared/LandingHeader"
 
@@ -45,12 +45,12 @@ const pricingFaqs = [
 export default function PricingPage() {
   return (
     <>
-      <div className="min-h-screen bg-white">
-        <LandingHeader />
-        <PricingJsonLd />
-        <FaqJsonLd faqs={pricingFaqs} />
-        <PricingClient />
-      </div>
+      <PricingJsonLd />
+      <FaqJsonLd faqs={pricingFaqs} />
+      <PricingSection
+        heading="Plans & Pricing"
+        description="No hidden fees. No commission on orders. Cancel anytime."
+      />
     </>
   )
 }

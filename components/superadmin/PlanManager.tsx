@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
-import { Save, RotateCcw, GripVertical } from "lucide-react"
+import { Save, RotateCcw, GripVertical, Plus, X } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 
@@ -22,6 +22,7 @@ interface Plan {
   description: string
   sort_order: number
   is_active: boolean
+  custom_features: string[]
 }
 
 const defaultLimits: Omit<Plan, "id" | "slug" | "sort_order" | "is_active"> = {
@@ -37,6 +38,7 @@ const defaultLimits: Omit<Plan, "id" | "slug" | "sort_order" | "is_active"> = {
   can_have_qr: true,
   can_have_whatsapp: true,
   description: "",
+  custom_features: [],
 }
 
 export function PlanManager() {
@@ -220,6 +222,58 @@ function PlanCard({ plan, saving, onSave }: { plan: Plan; saving: boolean; onSav
             <Toggle label="QR Code" checked={current.can_have_qr} onChange={(v) => handleChange("can_have_qr", v)} />
             <Toggle label="WhatsApp" checked={current.can_have_whatsapp} onChange={(v) => handleChange("can_have_whatsapp", v)} />
             <Toggle label="Active" checked={current.is_active} onChange={(v) => handleChange("is_active", v)} />
+          </div>
+
+          {/* Custom Features */}
+          <div>
+            <label className="block text-[11px] font-medium text-[#555] mb-1.5">Custom Features</label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {(current.custom_features || []).map((f, i) => (
+                <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 bg-black text-white text-xs rounded-full">
+                  {f}
+                  <button
+                    onClick={() => {
+                      const next = [...(current.custom_features || [])]
+                      next.splice(i, 1)
+                      handleChange("custom_features", next)
+                    }}
+                    className="hover:text-[#CCC] transition-colors"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Add a feature..."
+                className="flex-1 px-3 py-2 text-sm border border-[#E8E8E8] rounded-lg bg-white outline-none focus:border-black transition-colors"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const input = e.currentTarget
+                    const val = input.value.trim()
+                    if (val) {
+                      handleChange("custom_features", [...(current.custom_features || []), val])
+                      input.value = ""
+                    }
+                  }
+                }}
+              />
+              <button
+                onClick={(e) => {
+                  const input = e.currentTarget.previousElementSibling as HTMLInputElement
+                  const val = input?.value?.trim()
+                  if (val) {
+                    handleChange("custom_features", [...(current.custom_features || []), val])
+                    input.value = ""
+                  }
+                }}
+                className="px-3 py-2 bg-[#F0F0F0] text-[#555] text-xs font-medium rounded-lg hover:bg-[#E8E8E8] transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       )}
