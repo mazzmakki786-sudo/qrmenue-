@@ -2,10 +2,11 @@ import { NextResponse } from "next/server"
 import { safeRoute } from "@/lib/api-error"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { csrfGuard } from "@/lib/csrf"
+import { isSuperAdmin } from "@/lib/superadmin-security"
 
 async function checkAuth(supabase: Awaited<ReturnType<typeof createClient>>) {
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.email?.toLowerCase() !== process.env.SUPER_ADMIN_EMAIL?.toLowerCase()) {
+  if (!user || !(await isSuperAdmin(user.email))) {
     return false
   }
   return true

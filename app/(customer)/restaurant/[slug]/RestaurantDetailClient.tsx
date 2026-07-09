@@ -75,7 +75,7 @@ function DesktopCartPanel({ effectivelyClosed, liveOpenTime, liveCloseTime }: { 
           <div key={item.dish.id} className="flex items-center gap-3">
             {item.dish.image_url && (
               <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 relative bg-surface">
-                <Image src={item.dish.image_url} alt={item.dish.name_en} width={40} height={40} className="object-cover w-full h-full" />
+                <Image src={item.dish.image_url} alt={`${item.dish.name_en} in cart`} width={40} height={40} className="object-cover w-full h-full" />
               </div>
             )}
             <div className="flex-1 min-w-0">
@@ -161,10 +161,11 @@ function DesktopDishCard({ dish, deals, unavailable, closed }: { dish: Dish; dea
         {dish.image_url && !imgError ? (
           <Image
             src={dish.image_url}
-            alt={dish.name_en}
+            alt={`${dish.name_en}${dish.name_ur ? ` (${dish.name_ur})` : ""} — ₹${dish.price}`}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
             sizes="112px"
+            loading="lazy"
             onError={() => setImgError(true)}
           />
         ) : (
@@ -172,8 +173,7 @@ function DesktopDishCard({ dish, deals, unavailable, closed }: { dish: Dish; dea
             <ImageOff className="w-8 h-8 text-text-muted/30" />
           </div>
         )}
-        <div className="absolute top-1.5 left-1.5 space-y-0.5">
-          <DishBadges tags={badges} />
+        <div className="absolute top-1.5 left-1.5">
           {dishDeal && (
             <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-primary/10 text-primary">
               <Percent className="w-2 h-2" />
@@ -192,6 +192,11 @@ function DesktopDishCard({ dish, deals, unavailable, closed }: { dish: Dish; dea
           <div className="min-w-0 flex-1">
             <h3 className="text-sm font-semibold text-text-primary">{dish.name_en}</h3>
             {dish.name_ur && <p className="text-[11px] text-text-secondary mt-0.5 font-urdu">{dish.name_ur}</p>}
+            {(badges.length > 0) && (
+              <div className="flex flex-wrap gap-1 mt-1">
+                <DishBadges tags={badges} />
+              </div>
+            )}
           </div>
           <div className="text-right shrink-0">
             {dealPrice !== null ? (
@@ -248,10 +253,11 @@ function MobileDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deal
         {dish.image_url && !imgError ? (
           <Image
             src={dish.image_url}
-            alt={dish.name_en}
+            alt={`${dish.name_en}${dish.name_ur ? ` (${dish.name_ur})` : ""} — ₹${dish.price}`}
             fill
             className="object-cover"
             sizes="(max-width: 768px) 50vw, 200px"
+            loading="lazy"
             onError={() => setImgError(true)}
           />
         ) : (
@@ -305,12 +311,12 @@ function MobileDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deal
         <div className="flex justify-end mt-2">
           {cartItem ? (
             <div className="flex items-center gap-1.5 bg-surface-dark rounded-full px-2 py-1 min-h-[32px]">
-              <button onClick={() => updateQuantity(dish.id, cartItem.quantity - 1)} className="w-7 h-7 rounded-full flex items-center justify-center text-primary font-bold hover:bg-white/50 transition-colors text-[16px]">−</button>
+              <button onClick={() => updateQuantity(dish.id, cartItem.quantity - 1)} className="w-8 h-8 rounded-full flex items-center justify-center text-primary font-bold hover:bg-white/50 transition-colors text-[16px]">−</button>
               <span className="text-[13px] font-bold min-w-[18px] text-center text-text-primary">{cartItem.quantity}</span>
-              <button onClick={() => addItem(dish)} disabled={closed} className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-hover transition-colors disabled:opacity-30 text-[16px] font-bold">+</button>
+              <button onClick={() => addItem(dish)} disabled={closed} className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-hover transition-colors disabled:opacity-30 text-[16px] font-bold">+</button>
             </div>
           ) : (
-            <button onClick={() => addItem(dish)} disabled={unavailable || closed} className="bg-primary text-white rounded-full px-3.5 py-1 text-[11px] font-semibold hover:bg-primary-hover active:scale-[0.95] transition-all disabled:opacity-50 flex items-center gap-1 min-h-[32px]">
+            <button onClick={() => addItem(dish)} disabled={unavailable || closed} className="bg-primary text-white rounded-full px-5 py-2 text-xs font-semibold hover:bg-primary-hover active:scale-[0.95] transition-all disabled:opacity-50 flex items-center gap-1 min-h-[36px]">
               {closed ? "Closed" : "+ Add"}
             </button>
           )}
@@ -408,8 +414,8 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
           >
             <ArrowLeft className="w-4 h-4 text-text-primary" />
           </button>
-          <h2 className="text-[13px] font-semibold text-text-primary truncate mx-2 max-w-[200px]">
-            {restaurant.name_ur || restaurant.name}
+          <h2 className="text-[13px] font-semibold text-text-primary mx-2">
+            Digital QR Menue
           </h2>
           <div className="w-8" />
         </div>
@@ -417,35 +423,12 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
 
       {/* ===== MOBILE LAYOUT ===== */}
       <div className="md:hidden pt-12">
-        {/* Sticky Category Tabs */}
-        {categories.length > 0 && (
-          <div className="sticky top-12 z-30 bg-white/95 backdrop-blur-md border-b border-border/50 overflow-x-auto no-scrollbar">
-            <div className="flex gap-0.5 px-4 py-2 min-w-max">
-              {categories.map((cat) => {
-                if (cat.dishes.length === 0) return null
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => {
-                      const el = document.getElementById(`m-cat-${cat.id}`)
-                      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" })
-                    }}
-                    className="whitespace-nowrap text-[11px] font-medium px-3 py-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface transition-colors"
-                  >
-                    {cat.name_en}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-        )}
-
         <main className="pt-2 pb-[100px] px-4 mx-auto">
           {/* Compact Restaurant Info */}
           <div className="flex items-start gap-3 py-4 border-b border-border/50 mb-3">
             {restaurant.logo_url && !logoError ? (
               <div className="w-12 h-12 rounded-xl overflow-hidden shadow-sm ring-1 ring-black/5 relative flex-shrink-0 bg-white">
-                <Image src={restaurant.logo_url} alt={restaurant.name} fill className="object-cover" sizes="48px" onError={() => setLogoError(true)} />
+                <Image src={restaurant.logo_url} alt={restaurant.name} fill className="object-cover" sizes="48px" loading="lazy" onError={() => setLogoError(true)} />
               </div>
             ) : (
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-[#8F2E19] text-white flex items-center justify-center font-bold text-base flex-shrink-0 shadow-sm">
@@ -493,6 +476,29 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
               </a>
             ) : null}
           </div>
+
+          {/* Sticky Category Tabs (below Call/Map) */}
+          {categories.length > 0 && (
+            <div className="sticky top-12 z-30 bg-white/95 backdrop-blur-md border-b border-border/50 overflow-x-auto no-scrollbar -mx-4 px-4 mb-3">
+              <div className="flex gap-0.5 py-2 min-w-max">
+                {categories.map((cat) => {
+                  if (cat.dishes.length === 0) return null
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => {
+                        const el = document.getElementById(`m-cat-${cat.id}`)
+                        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" })
+                      }}
+                      className="whitespace-nowrap text-[11px] font-medium px-3 py-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface transition-colors"
+                    >
+                      {cat.name_en}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
 
           {deals.length > 0 && <div className="mb-3"><DealBanner restaurantId={restaurant.id} slug={restaurant.slug} /></div>}
 
@@ -549,7 +555,7 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
             <div className="flex items-start gap-5">
               {restaurant.logo_url && !logoError ? (
                 <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-md ring-1 ring-black/5 relative shrink-0 bg-white">
-                  <Image src={restaurant.logo_url} alt={restaurant.name} fill className="object-cover" sizes="80px" />
+                  <Image src={restaurant.logo_url} alt={`${restaurant.name} logo`} fill className="object-cover" sizes="80px" loading="lazy" />
                 </div>
               ) : (
                 <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-[#8F2E19] text-white flex items-center justify-center font-bold text-2xl shrink-0 shadow-md">

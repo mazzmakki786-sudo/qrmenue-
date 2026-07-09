@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
-import { SUPER_ADMIN_EMAIL, logAudit, getIp } from "@/lib/superadmin-security"
+import { isSuperAdmin, logAudit, getIp } from "@/lib/superadmin-security"
 import { Resend } from "resend"
 import { safeRoute } from "@/lib/api-error"
 import { escapeHtml } from "@/lib/utils"
@@ -9,12 +9,15 @@ import { csrfGuard } from "@/lib/csrf"
 async function checkAuth() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  return user && user.email?.toLowerCase() === SUPER_ADMIN_EMAIL
+  return user && (await isSuperAdmin(user.email))
 }
 
 export const POST = safeRoute(async (request, { params }: { params: Promise<{ id: string }> }) => {
   const csrfResponse = csrfGuard(request); if (csrfResponse) return csrfResponse
-  if (!(await checkAuth())) {
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user || !(await isSuperAdmin(user.email))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
   }
 
@@ -53,7 +56,7 @@ export const POST = safeRoute(async (request, { params }: { params: Promise<{ id
     .eq("is_active", true)
 
   if (!restaurants) {
-    await logAudit(SUPER_ADMIN_EMAIL || "unknown", "announcement_published", { id, notified: 0 })
+    await logAudit(user.email || "", "announcement_published", { id, notified: 0 })
     return NextResponse.json({ success: true, notified: 0 })
   }
 
@@ -92,7 +95,7 @@ export const POST = safeRoute(async (request, { params }: { params: Promise<{ id
     }
   }
 
-  await logAudit(SUPER_ADMIN_EMAIL || "unknown", "announcement_published", {
+  await logAudit(user.email || "", "announcement_published", {
     id,
     notified: notifiedCount,
     total: restaurants.length,

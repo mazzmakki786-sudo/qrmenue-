@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
-import { generateOrderNumber } from "@/lib/utils"
+import { generateOrderNumber, formatPrice } from "@/lib/utils"
 import { z } from "zod"
 import { loadTrialLimitsFromDB } from "@/lib/subscription-server"
 import { DEFAULT_TRIAL_LIMITS, GRACE_PERIOD_DAYS, type Plan } from "@/lib/subscription"
 import { getEffectiveLimitsFromDB } from "@/lib/subscription-db"
 import { checkAndSendOrderLimitAlert } from "@/lib/email/orderLimitAlert"
+import { sendPushNotification } from "@/lib/push-server"
 import { safeRoute } from "@/lib/api-error"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 import { csrfGuard } from "@/lib/csrf"
@@ -201,6 +202,14 @@ export const POST = safeRoute(async (request) => {
   })
 
   checkAndSendOrderLimitAlert(parsed.data.restaurant_id).catch(console.error)
+
+  // Send push notification to owner (fire-and-forget)
+  sendPushNotification(parsed.data.restaurant_id, {
+    title: `New Order #${orderNumber}`,
+    body: `${parsed.data.customer_name} — ${formatPrice(parsed.data.total_price)}`,
+    url: `/dashboard/orders/${data.id}`,
+    tag: `order-${data.id}`,
+  }).catch((err: any) => console.error("[orders] Push send failed:", err))
 
   logCustomerAction(
     parsed.data.customer_id || null,

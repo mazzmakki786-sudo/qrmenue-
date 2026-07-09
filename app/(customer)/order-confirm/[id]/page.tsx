@@ -5,7 +5,8 @@ import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Check, ArrowLeft, ClipboardList, Store, ExternalLink, Phone, RotateCcw, X, Clock, MessageCircle } from "lucide-react"
+import { Check, ArrowLeft, ClipboardList, Store, ExternalLink, Phone, RotateCcw, X, Clock, MessageCircle, AlertCircle } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useCartStore } from "@/stores/cartStore"
 import { buildWhatsAppURL } from "@/lib/whatsapp"
 import { formatPrice } from "@/lib/utils"
@@ -18,6 +19,9 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [whatsappSuccess, setWhatsappSuccess] = useState(false)
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+  const [cancelling, setCancelling] = useState(false)
+  const [cancelError, setCancelError] = useState<string | null>(null)
   const clearCart = useCartStore((s) => s.clearCart)
   const setRestaurant = useCartStore((s) => s.setRestaurant)
 
@@ -79,6 +83,29 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
       .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [id])
+
+  const handleCancelOrder = async () => {
+    if (!order || cancelling) return
+    setCancelling(true)
+    setCancelError(null)
+
+    try {
+      const res = await fetch(`/api/orders/${order.id}/cancel`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-csrf-token": "1" },
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to cancel order")
+      }
+      setOrder((prev: any) => prev ? { ...prev, order_status: "cancelled" } : prev)
+      setCancelDialogOpen(false)
+    } catch (err) {
+      setCancelError(err instanceof Error ? err.message : "Something went wrong")
+    } finally {
+      setCancelling(false)
+    }
+  }
 
   const handleReorder = () => {
     if (!order) return
@@ -339,7 +366,7 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
               <span className="text-sm font-medium text-text-primary">Track your order</span>
             </div>
             <Link
-              href={`/login?redirect=/order-confirm/${order.id}`}
+              href={`/login/customer?redirect=/order-confirm/${order.id}`}
               className="text-sm font-bold text-accent hover:underline"
             >
               Sign in
@@ -356,6 +383,18 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
             <RotateCcw className="w-4 h-4" />
             Reorder
           </button>
+
+          {/* Cancel Order — only for pending orders owned by the customer */}
+          {user && isPending && order.customer_id === user.id && (
+            <button
+              onClick={() => setCancelDialogOpen(true)}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm text-error font-semibold border border-error/30 hover:bg-error/5 active:scale-[0.98] transition-all"
+            >
+              <X className="w-4 h-4" />
+              Cancel Order
+            </button>
+          )}
+
           {user && (
             <Link
               href="/account"
@@ -375,6 +414,60 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
         </div>
       </main>
     </div>
+
+      {/* Cancel Confirmation Dialog */}
+      <Dialog open={cancelDialogOpen} onOpenChange={(open) => { if (!cancelling) setCancelDialogOpen(open) }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-error" />
+              Cancel Order
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-text-secondary">
+              Are you sure you want to cancel order <span className="font-semibold text-text-primary">#{order?.order_number}</span>?
+              This action cannot be undone.
+            </p>
+
+            {cancelError && (
+              <div className="bg-error/5 border border-error/10 rounded-xl px-4 py-3">
+                <p className="text-xs text-error font-medium">{cancelError}</p>
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => setCancelDialogOpen(false)}
+                disabled={cancelling}
+                className="flex-1 py-3 rounded-xl text-sm font-semibold border border-border text-text-secondary hover:bg-[#FAFAFA] disabled:opacity-50 transition-all"
+              >
+                Keep Order
+              </button>
+              <button
+                onClick={handleCancelOrder}
+                disabled={cancelling}
+                className="flex-1 py-3 rounded-xl text-sm font-semibold text-white bg-error hover:bg-error/90 disabled:opacity-50 flex items-center justify-center gap-2 transition-all"
+              >
+                {cancelling ? (
+                  <>
+                    <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-25" />
+                      <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="3" strokeLinecap="round" className="opacity-75" />
+                    </svg>
+                    Cancelling...
+                  </>
+                ) : (
+                  <>
+                    <X className="w-4 h-4" />
+                    Yes, Cancel Order
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* ===== DESKTOP LAYOUT ===== */}
       <div className="hidden md:block min-h-screen bg-[#F8F8F8]">
@@ -506,7 +599,7 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
                 </div>
                 <span className="text-[14px] font-medium text-text-primary">Track your order</span>
               </div>
-              <Link href={`/login?redirect=/order-confirm/${order.id}`} className="text-[13px] font-bold text-accent hover:underline">Sign in</Link>
+              <Link href={`/login/customer?redirect=/order-confirm/${order.id}`} className="text-[13px] font-bold text-accent hover:underline">Sign in</Link>
             </section>
           )}
 
@@ -516,6 +609,18 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
               <RotateCcw className="w-4 h-4" />
               Reorder
             </button>
+
+            {/* Cancel Order — only for pending orders owned by the customer */}
+            {user && isPending && order.customer_id === user.id && (
+              <button
+                onClick={() => setCancelDialogOpen(true)}
+                className="flex items-center justify-center gap-2 py-3.5 px-5 rounded-xl text-[14px] text-error font-semibold border border-error/30 hover:bg-error/5 transition-all"
+              >
+                <X className="w-4 h-4" />
+                Cancel
+              </button>
+            )}
+
             {user && (
               <Link href="/account" className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl text-[14px] text-text-secondary font-semibold border border-border hover:bg-white hover:border-border-strong transition-all">
                 <ClipboardList className="w-4 h-4" />

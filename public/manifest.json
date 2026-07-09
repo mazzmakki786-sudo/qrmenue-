@@ -1,12 +1,16 @@
 {
-  "name": "Digital Menu",
-  "short_name": "Digital Menu",
-  "description": "Pakistan's #1 QR-based digital menu platform for restaurants",
+  "name": "Digital QR Menue",
+  "short_name": "QR Menu",
+  "description": "Digital Menu for Pakistani Restaurants — Scan, Browse & Order on WhatsApp",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "categories": ["food", "restaurants", "business"],
   "icons": [
-    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" },
+    { "src": "/og-image.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/og-image.png", "sizes": "512x512", "type": "image/png" }
   ]
 }

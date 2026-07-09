@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { safeRoute } from "@/lib/api-error"
-import { SUPER_ADMIN_EMAIL, checkRateLimit, logAudit, getIp } from "@/lib/superadmin-security"
+import { isSuperAdmin, checkRateLimit, logAudit, getIp } from "@/lib/superadmin-security"
 import { csrfGuard } from "@/lib/csrf"
 import { invalidatePlansCache } from "@/lib/subscription-db"
 
 async function checkAuth(supabase: Awaited<ReturnType<typeof createClient>>) {
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.email?.toLowerCase() !== SUPER_ADMIN_EMAIL) return false
+  if (!user || !(await isSuperAdmin(user.email))) return false
   return true
 }
 
@@ -28,7 +28,7 @@ export const PATCH = safeRoute(async (request, { params }) => {
     "name", "price_pkr", "max_dishes", "max_images", "max_orders",
     "max_categories", "analytics", "custom_branding", "can_have_qr",
     "can_have_whatsapp", "description", "sort_order", "is_active",
-    "ai_posts_per_month", "custom_features"
+    "ai_posts_per_month", "custom_features", "interval", "yearly_price_pkr"
   ]
 
   const updates: Record<string, unknown> = {}

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { PasswordInput, validatePassword } from "@/components/ui/password-input"
 import CityAutocomplete from "@/components/shared/CityAutocomplete"
-import { ArrowLeft, Store } from "lucide-react"
+import { ArrowLeft, Store, Loader2 } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 
 export default function RestaurantSignupPage() {
@@ -29,7 +29,7 @@ export default function RestaurantSignupPage() {
         setForm((prev) => ({ ...prev, email: user.email ?? "" }))
       }
       setCheckingAuth(false)
-    })
+    }).catch(() => setCheckingAuth(false))
   }, [])
 
   const handleGoogleSignup = async () => {
@@ -44,6 +44,13 @@ export default function RestaurantSignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!form.name.trim() || !form.city.trim() || !form.phone.trim()) {
+      setError("Please fill in all required fields")
+      setLoading(false)
+      return
+    }
+
     setLoading(true)
     setError(null)
 
@@ -105,6 +112,11 @@ export default function RestaurantSignupPage() {
         return
       }
 
+      await supabase.auth.signInWithPassword({
+        email: form.email,
+        password: form.password,
+      })
+
       setLoading(false)
       router.push("/dashboard/onboarding")
     } catch {
@@ -126,7 +138,7 @@ export default function RestaurantSignupPage() {
   return (
     <div className="w-full flex flex-col items-center">
       <div className="w-full mb-8">
-        <Link href="/signup" className="inline-flex items-center gap-2 text-sm text-[#555] hover:text-black transition-colors">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm text-[#555] hover:text-black transition-colors">
           <div className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center shrink-0">
             <ArrowLeft className="w-4 h-4" />
           </div>
@@ -198,7 +210,7 @@ export default function RestaurantSignupPage() {
         )}
 
         <Button type="submit" variant="primary" fullWidth disabled={loading}>
-          {loading ? "Creating..." : "Create Restaurant & Start Trial"}
+          {loading ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Creating...</>) : "Create Restaurant & Start Trial"}
         </Button>
       </form>
 

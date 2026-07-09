@@ -179,16 +179,6 @@ export default function CartPage() {
         </div>
       </div>
 
-      {/* Continue Browsing */}
-      <div className="px-4 pb-24 max-w-[600px] mx-auto">
-        <Link
-          href="/restaurants"
-          className="block w-full py-3 rounded-xl text-[13px] text-text-secondary font-medium border border-border hover:bg-white transition-colors text-center"
-        >
-          Continue Browsing
-        </Link>
-      </div>
-
       {/* Fixed Checkout Bar */}
       <div className="fixed bottom-[60px] left-0 right-0 bg-white border-t border-border p-4 z-40">
         <div className="max-w-[600px] mx-auto">
@@ -289,9 +279,6 @@ export default function CartPage() {
                 </div>
                 <Link href="/checkout" className="block w-full bg-primary text-white text-center py-3 rounded-xl text-sm font-semibold hover:bg-primary-hover active:scale-[0.98] transition-all">
                   Proceed to Checkout
-                </Link>
-                <Link href="/restaurants" className="block w-full text-center py-2 rounded-xl text-xs text-text-secondary font-medium hover:bg-[#F5F5F5] transition-colors">
-                  Continue Browsing
                 </Link>
               </div>
             </div>

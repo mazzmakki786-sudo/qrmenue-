@@ -12,9 +12,19 @@ export function LandingHeader() {
     <>
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-[#E8E8E8]">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-5 h-14">
-          <div className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-2 font-bold text-sm md:text-base shrink-0 min-w-0">
+            <div className="w-7 h-7 rounded-lg bg-black text-white flex items-center justify-center text-xs shrink-0">D</div>
+            <span className="whitespace-nowrap truncate">Digital QR Menue</span>
+          </Link>
+
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Mobile: account buttons + menu (right aligned) */}
+            <div className="flex md:hidden items-center gap-1.5">
+              <Link href="/login" className="text-[11px] font-medium text-[#555] h-9 px-2.5 flex items-center rounded-lg border border-[#E0E0E0] whitespace-nowrap hover:border-[#999] hover:text-black transition-colors">Sign In</Link>
+              <Link href="/signup/restaurant" className="text-[11px] font-medium h-9 px-2.5 flex items-center rounded-lg bg-black text-white whitespace-nowrap hover:bg-[#1A1A1A] transition-colors">Get Started</Link>
+            </div>
             <button
-              className="md:hidden w-9 h-9 rounded-lg bg-[#F5F5F5] flex items-center justify-center hover:bg-[#EBEBEB] transition-colors"
+              className="md:hidden w-9 h-9 shrink-0 rounded-lg bg-[#F5F5F5] flex items-center justify-center hover:bg-[#EBEBEB] transition-colors"
               aria-label="Open menu"
               onClick={() => setOpen(true)}
             >
@@ -22,23 +32,17 @@ export function LandingHeader() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <Link href="/" className="flex items-center gap-2 font-bold text-base">
-              <div className="w-7 h-7 rounded-lg bg-black text-white flex items-center justify-center text-xs">D</div>
-              <span>Digital QR Menue</span>
-            </Link>
-          </div>
-          <nav className="hidden md:flex items-center gap-1">
-            <Link href="/restaurants" className="text-sm font-medium text-[#555] px-3 py-1.5 rounded-lg hover:bg-[#F5F5F5] hover:text-black transition-colors">Restaurants</Link>
-            <Link href="/pricing" className="text-sm font-medium text-[#555] px-3 py-1.5 rounded-lg hover:bg-[#F5F5F5] hover:text-black transition-colors">Pricing</Link>
-            <Link href="/faq" className="text-sm font-medium text-[#555] px-3 py-1.5 rounded-lg hover:bg-[#F5F5F5] hover:text-black transition-colors">FAQ</Link>
-            <Link href="/contact" className="text-sm font-medium text-[#555] px-3 py-1.5 rounded-lg hover:bg-[#F5F5F5] hover:text-black transition-colors">Contact</Link>
-            <div className="w-px h-5 bg-[#E0E0E0] mx-2" />
-            <Link href="/login" className="text-sm font-medium px-4 py-1.5 rounded-lg border border-[#E0E0E0] text-[#555] hover:border-[#999] hover:text-black transition-colors">Sign In</Link>
-            <Link href="/signup" className="text-sm font-medium px-4 py-1.5 rounded-lg bg-black text-white hover:bg-[#1A1A1A] transition-colors">Get Started</Link>
-          </nav>
-          <div className="flex md:hidden items-center gap-2">
-            <Link href="/login" className="text-xs font-medium text-[#555] px-2.5 py-1.5 rounded-lg border border-[#E0E0E0]">Sign In</Link>
-            <Link href="/signup" className="text-xs font-medium px-3 py-1.5 rounded-lg bg-black text-white">Get Started</Link>
+
+            {/* Desktop nav */}
+            <nav className="hidden md:flex items-center gap-1">
+              <Link href="/restaurants" className="text-sm font-medium text-[#555] px-3 py-1.5 rounded-lg hover:bg-[#F5F5F5] hover:text-black transition-colors">Restaurants</Link>
+              <Link href="/pricing" className="text-sm font-medium text-[#555] px-3 py-1.5 rounded-lg hover:bg-[#F5F5F5] hover:text-black transition-colors">Pricing</Link>
+              <Link href="/faq" className="text-sm font-medium text-[#555] px-3 py-1.5 rounded-lg hover:bg-[#F5F5F5] hover:text-black transition-colors">FAQ</Link>
+              <Link href="/contact" className="text-sm font-medium text-[#555] px-3 py-1.5 rounded-lg hover:bg-[#F5F5F5] hover:text-black transition-colors">Contact</Link>
+              <div className="w-px h-5 bg-[#E0E0E0] mx-2" />
+              <Link href="/login" className="text-sm font-medium px-4 py-1.5 rounded-lg border border-[#E0E0E0] text-[#555] hover:border-[#999] hover:text-black transition-colors">Sign In</Link>
+              <Link href="/signup/restaurant" className="text-sm font-medium px-4 py-1.5 rounded-lg bg-black text-white hover:bg-[#1A1A1A] transition-colors">Get Started</Link>
+            </nav>
           </div>
         </div>
       </header>
@@ -93,7 +97,7 @@ export function LandingHeader() {
             </svg>
             Sign In
           </Link>
-          <Link href="/signup" onClick={close}
+          <Link href="/signup/restaurant" onClick={close}
             className="flex items-center justify-center gap-2 mx-3 mt-2 px-3 py-2.5 rounded-lg bg-black text-white text-sm font-semibold hover:bg-[#1A1A1A] transition-colors"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -117,7 +121,7 @@ export function LandingHeader() {
         </nav>
 
         <div className="px-5 py-4 border-t border-[#E8E8E8]">
-          <p className="text-[10px] text-[#BBB]">&copy; 2026 QRMenu.pk. All rights reserved.</p>
+          <p className="text-[10px] text-[#BBB]">&copy; 2026 Digital QR Menue. All rights reserved.</p>
         </div>
       </aside>
     </>

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { safeRoute } from "@/lib/api-error"
-import { SUPER_ADMIN_EMAIL, checkRateLimit, isLockedOut, recordLoginAttempt, logAudit, getIp } from "@/lib/superadmin-security"
+import { checkRateLimit, isLockedOut, recordLoginAttempt, logAudit, getIp, isSuperAdmin, ensureSuperAdminEmail, seedFromEnvVar } from "@/lib/superadmin-security"
 
 export const GET = safeRoute(async (request) => {
   const ip = getIp(request)
@@ -26,9 +26,12 @@ export const GET = safeRoute(async (request) => {
     })
   }
 
-  const isSuperAdmin = email === SUPER_ADMIN_EMAIL
-  await recordLoginAttempt(email, ip, isSuperAdmin)
-  await logAudit(email, isSuperAdmin ? "login_success" : "login_failed", { ip })
+  await seedFromEnvVar()
+  await ensureSuperAdminEmail(email)
 
-  return NextResponse.json({ isSuperAdmin })
+  const isSA = await isSuperAdmin(email)
+  await recordLoginAttempt(email, ip, isSA)
+  await logAudit(email, isSA ? "login_success" : "login_failed", { ip })
+
+  return NextResponse.json({ isSuperAdmin: isSA })
 })

@@ -1,15 +1,25 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { LandingHeader } from "@/components/shared/LandingHeader"
+import { createAdminClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
   title: "Contact Us",
   description: "Get in touch with Digital QR Menue. WhatsApp support, email, or sign in to your account.",
 }
 
-export default function ContactPage() {
-  const whatsappLink = "https://wa.me/923146325823"
-  const companyEmail = "support@digitalmenue.com"
+export default async function ContactPage() {
+  const admin = createAdminClient()
+  const { data: settingsData } = await admin
+    .from("company_settings")
+    .select("*")
+
+  const settings: Record<string, string> = {}
+  ;(settingsData || []).forEach((s: any) => { settings[s.key] = s.value })
+
+  const whatsappNumber = settings.whatsapp_support || "923146325823"
+  const whatsappLink = `https://wa.me/${whatsappNumber}`
+  const companyEmail = settings.company_email || "support@digitalmenue.com"
 
   return (
     <div className="min-h-screen bg-white">
@@ -52,7 +62,7 @@ export default function ContactPage() {
               Sign In
             </Link>
             <Link
-              href="/signup"
+              href="/signup/restaurant"
               className="text-sm font-medium px-5 py-2.5 rounded-xl bg-black text-white hover:bg-[#1A1A1A] transition-colors"
             >
               Get Started

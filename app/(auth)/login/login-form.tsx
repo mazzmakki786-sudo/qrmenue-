@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { PasswordInput } from "@/components/ui/password-input"
 import Link from "next/link"
-import { User, ArrowLeft } from "lucide-react"
+import { User, ArrowLeft, Loader2 } from "lucide-react"
 
 function LoginForm() {
   const router = useRouter()
@@ -31,6 +31,12 @@ function LoginForm() {
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!email.trim() || !password.trim()) {
+      setError("Please enter both email and password")
+      return
+    }
+
     setLoading(true)
     setError(null)
 
@@ -38,7 +44,7 @@ function LoginForm() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim(), password }),
       })
 
       const data = await res.json()
@@ -128,7 +134,7 @@ function LoginForm() {
         </div>
 
         <Button type="submit" variant="primary" fullWidth disabled={loading}>
-          {loading ? "Signing in..." : "Sign In"}
+          {loading ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Signing in...</>) : "Sign In"}
         </Button>
       </form>
 

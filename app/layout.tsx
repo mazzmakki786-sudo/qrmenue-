@@ -88,6 +88,7 @@ export const metadata: Metadata = {
     canonical: SITE_URL,
     languages: {
       en: SITE_URL,
+      ur: `${SITE_URL}/menu`,
       "x-default": SITE_URL,
     },
   },
@@ -122,6 +123,19 @@ export default function RootLayout({
         <ReviewJsonLd />
         <DynamicBreadcrumb />
         <I18nProvider>{children}</I18nProvider>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js').catch(function(err) {
+                    console.warn('SW registration failed:', err)
+                  })
+                })
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   )

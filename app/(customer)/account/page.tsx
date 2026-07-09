@@ -8,7 +8,8 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { formatPrice } from "@/lib/utils"
-import { LogOut, Package, Store, ChevronDown, ChevronUp } from "lucide-react"
+import { LogOut, Package, Store, ChevronDown, ChevronUp, X, AlertCircle } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import type { Order } from "@/types"
 
 const statusColors: Record<string, "available" | "unavailable" | "trial" | "starter" | "growth" | "premium"> = {
@@ -27,6 +28,9 @@ export default function AccountPage() {
   const [orders, setOrders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [expandedRestaurants, setExpandedRestaurants] = useState<Set<string>>(new Set()) // All minimized by default
+  const [cancelTarget, setCancelTarget] = useState<any>(null)
+  const [cancelling, setCancelling] = useState(false)
+  const [cancelError, setCancelError] = useState<string | null>(null)
 
   const fetchOrders = useCallback(async () => {
     const supabase = createClient()
@@ -49,6 +53,30 @@ export default function AccountPage() {
       setLoading(false)
     }
   }, [])
+
+  const handleCancelOrder = async () => {
+    if (!cancelTarget || cancelling) return
+    setCancelling(true)
+    setCancelError(null)
+
+    try {
+      const res = await fetch(`/api/orders/${cancelTarget.id}/cancel`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-csrf-token": "1" },
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || "Failed to cancel order")
+
+      setOrders((prev) =>
+        prev.map((o) => (o.id === cancelTarget.id ? { ...o, order_status: "cancelled" } : o))
+      )
+      setCancelTarget(null)
+    } catch (err) {
+      setCancelError(err instanceof Error ? err.message : "Something went wrong")
+    } finally {
+      setCancelling(false)
+    }
+  }
 
   useEffect(() => {
     fetchOrders()
@@ -125,7 +153,7 @@ export default function AccountPage() {
         <Package className="w-12 h-12 text-[#999] mb-4" />
         <h1 className="text-xl font-bold mb-2">My Orders</h1>
         <p className="text-sm text-[#555] mb-6 text-center">Sign in to view your orders</p>
-        <Link href="/login?redirect=/account">
+        <Link href="/login/customer?redirect=/account">
           <Button variant="primary">Sign In</Button>
         </Link>
       </div>
@@ -178,31 +206,45 @@ export default function AccountPage() {
                   {isExpanded && (
                     <div className="space-y-2 transition-all duration-300">
                       {restaurantOrders.map((order) => (
-                        <Link
+                        <div
                           key={order.id}
-                          href={`/order-confirm/${order.id}`}
-                          className="block p-3.5 rounded-xl border border-[#F0F0F0] hover:border-[#DDD] hover:shadow-sm transition-all active:scale-[0.99]"
+                          className="block p-3.5 rounded-xl border border-[#F0F0F0] hover:border-[#DDD] hover:shadow-sm transition-all"
                         >
-                          <div className="flex items-center justify-between mb-1.5">
-                            <div className="flex items-center gap-2">
-                              <span className="text-[13px] font-semibold text-text-primary">#{order.order_number}</span>
-                              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                                order.order_status === "received" ? "bg-accent/10 text-accent" :
-                                order.order_status === "ready" ? "bg-purple-100 text-purple-600" :
-                                order.order_status === "completed" ? "bg-emerald-100 text-emerald-600" :
-                                order.order_status === "cancelled" ? "bg-gray-100 text-gray-500" :
-                                "bg-gray-100 text-gray-500"
-                              }`}>
-                                {statusLabels[order.order_status] || order.order_status}
-                              </span>
+                          <Link
+                            href={`/order-confirm/${order.id}`}
+                            className="block"
+                          >
+                            <div className="flex items-center justify-between mb-1.5">
+                              <div className="flex items-center gap-2">
+                                <span className="text-[13px] font-semibold text-text-primary">#{order.order_number}</span>
+                                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                                  order.order_status === "received" ? "bg-accent/10 text-accent" :
+                                  order.order_status === "ready" ? "bg-purple-100 text-purple-600" :
+                                  order.order_status === "completed" ? "bg-emerald-100 text-emerald-600" :
+                                  order.order_status === "cancelled" ? "bg-gray-100 text-gray-500" :
+                                  "bg-gray-100 text-gray-500"
+                                }`}>
+                                  {statusLabels[order.order_status] || order.order_status}
+                                </span>
+                              </div>
+                              <span className="text-[11px] text-text-muted">{new Date(order.created_at).toLocaleDateString("en-PK", { day: "numeric", month: "short" })}</span>
                             </div>
-                            <span className="text-[11px] text-text-muted">{new Date(order.created_at).toLocaleDateString("en-PK", { day: "numeric", month: "short" })}</span>
-                          </div>
-                          <div className="flex items-center justify-between text-xs text-text-muted">
-                            <span>{order.items?.length || 0} items • {formatPrice(order.total_price)}</span>
-                            <span className="text-[10px] text-text-muted">{order.order_type?.replace("_", " ")}</span>
-                          </div>
-                        </Link>
+                            <div className="flex items-center justify-between text-xs text-text-muted">
+                              <span>{order.items?.length || 0} items • {formatPrice(order.total_price)}</span>
+                              <span className="text-[10px] text-text-muted">{order.order_type?.replace("_", " ")}</span>
+                            </div>
+                          </Link>
+                          {/* Cancel button — only for pending orders */}
+                          {order.order_status === "received" && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setCancelTarget(order) }}
+                              className="mt-2 w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-[11px] font-semibold text-error border border-error/20 hover:bg-error/5 transition-all"
+                            >
+                              <X className="w-3 h-3" />
+                              Cancel Order
+                            </button>
+                          )}
+                        </div>
                       ))}
                     </div>
                   )}
@@ -212,6 +254,60 @@ export default function AccountPage() {
           )}
         </div>
       </main>
+
+      {/* Cancel Confirmation Dialog */}
+      <Dialog open={!!cancelTarget} onOpenChange={(open) => { if (!cancelling && !open) setCancelTarget(null) }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-error" />
+              Cancel Order
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-text-secondary">
+              Are you sure you want to cancel order <span className="font-semibold text-text-primary">#{cancelTarget?.order_number}</span>?
+              This action cannot be undone.
+            </p>
+
+            {cancelError && (
+              <div className="bg-error/5 border border-error/10 rounded-xl px-4 py-3">
+                <p className="text-xs text-error font-medium">{cancelError}</p>
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => { setCancelTarget(null); setCancelError(null) }}
+                disabled={cancelling}
+                className="flex-1 py-3 rounded-xl text-sm font-semibold border border-border text-text-secondary hover:bg-[#FAFAFA] disabled:opacity-50 transition-all"
+              >
+                Keep Order
+              </button>
+              <button
+                onClick={handleCancelOrder}
+                disabled={cancelling}
+                className="flex-1 py-3 rounded-xl text-sm font-semibold text-white bg-error hover:bg-error/90 disabled:opacity-50 flex items-center justify-center gap-2 transition-all"
+              >
+                {cancelling ? (
+                  <>
+                    <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-25" />
+                      <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="3" strokeLinecap="round" className="opacity-75" />
+                    </svg>
+                    Cancelling...
+                  </>
+                ) : (
+                  <>
+                    <X className="w-4 h-4" />
+                    Yes, Cancel Order
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -106,16 +106,18 @@ export function BellNotification({ restaurantId }: Props) {
     const supabase = createClient()
 
     const fetchInitial = async () => {
-      const today = new Date().toISOString().split("T")[0]
+      const now = new Date()
+      const pkOffset = 5 * 60 * 60 * 1000
+      const pkDate = new Date(now.getTime() + pkOffset)
+      const today = pkDate.toISOString().split("T")[0]
       const [ordersRes, announcementsRes] = await Promise.all([
         supabase
           .from("orders")
           .select("*")
           .eq("restaurant_id", restaurantId)
           .gte("created_at", today)
-          .eq("order_status", "received")
           .order("created_at", { ascending: false })
-          .limit(20),
+          .limit(50),
         supabase
           .from("owner_notifications")
           .select("id", { count: "exact", head: true })
@@ -158,7 +160,6 @@ export function BellNotification({ restaurantId }: Props) {
               order_type: order.order_type,
             }
             setAlerts((prev) => [newAlert, ...prev].slice(0, 5))
-            setTimeout(() => dismissAlert(order.id), 7000)
           }
         }
       )
@@ -225,7 +226,9 @@ export function BellNotification({ restaurantId }: Props) {
   const fetchTodayOrders = useCallback(async () => {
     setDropdownLoading(true)
     const supabase = createClient()
-    const today = new Date().toISOString().split("T")[0]
+    const pkOffset = 5 * 60 * 60 * 1000
+    const pkDate = new Date(Date.now() + pkOffset)
+    const today = pkDate.toISOString().split("T")[0]
 
     const { data } = await supabase
       .from("orders")
@@ -233,7 +236,7 @@ export function BellNotification({ restaurantId }: Props) {
       .eq("restaurant_id", restaurantId)
       .gte("created_at", today)
       .order("created_at", { ascending: false })
-      .limit(20)
+      .limit(50)
 
     setTodayOrders(data || [])
     setDropdownLoading(false)
@@ -290,7 +293,36 @@ export function BellNotification({ restaurantId }: Props) {
                 tabIndex={0}
                 onClick={() => { dismissAlert(alert.id); router.push(`/dashboard/orders/${alert.id}`) }}
                 onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); dismissAlert(alert.id); router.push(`/dashboard/orders/${alert.id}`) } }}
-                className="bg-black text-white rounded-2xl p-4 shadow-2xl animate-slide-up cursor-pointer active:scale-[0.98] transition-transform"
+                onTouchStart={(e) => {
+                  const touch = e.touches[0]
+                  const el = e.currentTarget
+                  let startX = touch.clientX
+                  let startY = touch.clientY
+
+                  const onMove = (ev: TouchEvent) => {
+                    const dx = ev.touches[0].clientX - startX
+                    const dy = ev.touches[0].clientY - startY
+                    if (Math.abs(dx) > Math.abs(dy)) {
+                      el.style.transform = `translateX(${dx}px)`
+                      el.style.opacity = `${1 - Math.min(Math.abs(dx) / 200, 1)}`
+                    }
+                  }
+                  const onEnd = (ev: TouchEvent) => {
+                    const dx = ev.changedTouches[0].clientX - startX
+                    el.removeEventListener('touchmove', onMove)
+                    el.removeEventListener('touchend', onEnd)
+                    if (Math.abs(dx) > 100) {
+                      dismissAlert(alert.id)
+                    } else {
+                      el.style.transform = ''
+                      el.style.opacity = '1'
+                    }
+                  }
+                  el.addEventListener('touchmove', onMove, { passive: true })
+                  el.addEventListener('touchend', onEnd, { passive: true })
+                }}
+                className="bg-black text-white rounded-2xl p-4 shadow-2xl animate-slide-up cursor-pointer active:scale-[0.98] transition-transform duration-200"
+                style={{ touchAction: 'pan-y' }}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">

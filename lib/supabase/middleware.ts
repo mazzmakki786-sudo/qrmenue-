@@ -45,12 +45,8 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  if (pathname.startsWith("/superadmin") && !pathname.startsWith("/api/")) {
+  if (pathname.startsWith("/superadmin") && !pathname.startsWith("/api/") && pathname !== "/superadmin") {
     if (!user) {
-      if (pathname !== "/superadmin") {
-        return NextResponse.redirect(new URL("/superadmin", request.url))
-      }
-    } else if (user.email?.toLowerCase() !== process.env.SUPER_ADMIN_EMAIL?.toLowerCase() && pathname !== "/superadmin") {
       return NextResponse.redirect(new URL("/superadmin", request.url))
     }
   }
@@ -71,15 +67,6 @@ export async function updateSession(request: NextRequest) {
     requestHeaders.set("x-owner-id", user.id)
     requestHeaders.set("x-restaurant-id", restaurant.id)
     supabaseResponse = NextResponse.next({ request: { ...request, headers: requestHeaders } })
-  }
-
-  if (pathname.startsWith("/api/superadmin")) {
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-    if (user.email?.toLowerCase() !== process.env.SUPER_ADMIN_EMAIL?.toLowerCase()) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-    }
   }
 
   return supabaseResponse

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { safeRoute } from "@/lib/api-error"
+import { isSuperAdmin } from "@/lib/superadmin-security"
 import { DEFAULT_TRIAL_LIMITS, DEFAULT_EXPIRED_TRIAL_LIMITS, type TrialLimitConfig, type ExpiredTrialLimitConfig } from "@/lib/subscription"
 import { csrfGuard } from "@/lib/csrf"
 
@@ -24,7 +25,7 @@ async function upsertSetting(key: string, value: string) {
 export const GET = safeRoute(async () => {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.email?.toLowerCase() !== process.env.SUPER_ADMIN_EMAIL?.toLowerCase()) {
+  if (!user || !(await isSuperAdmin(user.email))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
   }
 
@@ -46,7 +47,7 @@ export const PATCH = safeRoute(async (request) => {
   const csrfResponse = csrfGuard(request); if (csrfResponse) return csrfResponse
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.email?.toLowerCase() !== process.env.SUPER_ADMIN_EMAIL?.toLowerCase()) {
+  if (!user || !(await isSuperAdmin(user.email))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
   }
 
@@ -71,7 +72,7 @@ export const PUT = safeRoute(async (request) => {
   const csrfResponse = csrfGuard(request); if (csrfResponse) return csrfResponse
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.email?.toLowerCase() !== process.env.SUPER_ADMIN_EMAIL?.toLowerCase()) {
+  if (!user || !(await isSuperAdmin(user.email))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
   }
 

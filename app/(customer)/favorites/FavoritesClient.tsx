@@ -33,7 +33,7 @@ export function FavoritesClient() {
       const { data: { user } } = await supabase.auth.getUser()
 
       if (!user) {
-        router.push("/login?redirect=/favorites")
+        router.push("/login/customer?redirect=/favorites")
         return
       }
 

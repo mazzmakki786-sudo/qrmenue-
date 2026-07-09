@@ -10,6 +10,8 @@ interface Plan {
   slug: string
   name: string
   price_pkr: number
+  interval: "monthly" | "yearly"
+  yearly_price_pkr: number | null
   max_dishes: number
   max_images: number
   max_orders: number
@@ -28,6 +30,8 @@ interface Plan {
 const defaultLimits: Omit<Plan, "id" | "slug" | "sort_order" | "is_active"> = {
   name: "",
   price_pkr: 0,
+  interval: "monthly",
+  yearly_price_pkr: null,
   max_dishes: 20,
   max_images: 10,
   max_orders: 10,
@@ -153,49 +157,76 @@ function PlanCard({ plan, saving, onSave }: { plan: Plan; saving: boolean; onSav
   return (
     <div className="bg-white border border-[#E8E8E8] rounded-xl overflow-hidden">
       <div
-        className="flex items-center justify-between p-4 cursor-pointer hover:bg-[#FAFAFA] transition-colors"
+        className="flex items-center justify-between p-3 md:p-4 cursor-pointer hover:bg-[#FAFAFA] transition-colors"
         onClick={() => setExpanded(!expanded)}
       >
-        <div className="flex items-center gap-3">
-          <GripVertical className="w-4 h-4 text-[#CCC]" />
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-semibold text-sm">{current.name}</span>
+        <div className="flex items-center gap-2 md:gap-3 min-w-0">
+          <GripVertical className="w-4 h-4 text-[#CCC] flex-shrink-0" />
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="font-semibold text-sm truncate">{current.name}</span>
               <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${current.is_active ? "bg-green-50 text-green-600" : "bg-gray-100 text-gray-500"}`}>
                 {current.is_active ? "Active" : "Inactive"}
               </span>
+              {current.interval === "yearly" && (
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-blue-50 text-blue-600">Yearly</span>
+              )}
             </div>
-            <p className="text-xs text-[#555] mt-0.5">PKR {current.price_pkr.toLocaleString()}/mo</p>
+            <p className="text-xs text-[#555] mt-0.5">
+              {current.interval === "yearly" && current.yearly_price_pkr
+                ? `PKR ${current.yearly_price_pkr.toLocaleString()}/yr`
+                : `PKR ${current.price_pkr.toLocaleString()}/mo`
+              }
+            </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
           {hasChanges && (
-            <button
-              onClick={(e) => { e.stopPropagation(); onSave(edited); setEdited({}) }}
-              disabled={saving}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-xs font-medium rounded-lg hover:opacity-90 disabled:opacity-50 transition-all"
-            >
-              <Save className="w-3.5 h-3.5" />
-              {saving ? "Saving..." : "Save"}
-            </button>
-          )}
-          {hasChanges && (
-            <button
-              onClick={(e) => { e.stopPropagation(); setEdited({}) }}
-              className="p-1.5 text-[#999] hover:text-black transition-colors"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-            </button>
+            <>
+              <button
+                onClick={(e) => { e.stopPropagation(); onSave(edited); setEdited({}) }}
+                disabled={saving}
+                className="flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 bg-black text-white text-xs font-medium rounded-lg hover:opacity-90 disabled:opacity-50 transition-all"
+              >
+                <Save className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">{saving ? "Saving..." : "Save"}</span>
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); setEdited({}) }}
+                className="p-1.5 text-[#999] hover:text-black transition-colors"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+              </button>
+            </>
           )}
         </div>
       </div>
 
       {expanded && (
-        <div className="border-t border-[#F0F0F0] p-4 space-y-4 bg-[#FAFAFA]">
-          {/* Basic Info */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="border-t border-[#F0F0F0] p-3 md:p-4 space-y-4 bg-[#FAFAFA]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <Field label="Display Name" value={current.name} onChange={(v) => handleChange("name", v)} />
             <Field label="Price (PKR/mo)" type="number" value={current.price_pkr} onChange={(v) => handleChange("price_pkr", Number(v))} />
+            <div>
+              <label className="block text-[11px] font-medium text-[#555] mb-1">Interval</label>
+              <div className="flex rounded-lg border border-[#E8E8E8] overflow-hidden bg-white">
+                <button
+                  onClick={() => handleChange("interval", "monthly")}
+                  className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${current.interval === "monthly" ? "bg-black text-white" : "bg-white text-[#555] hover:bg-[#F5F5F5]"}`}
+                >
+                  Monthly
+                </button>
+                <button
+                  onClick={() => handleChange("interval", "yearly")}
+                  className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${current.interval === "yearly" ? "bg-black text-white" : "bg-white text-[#555] hover:bg-[#F5F5F5]"}`}
+                >
+                  Yearly
+                </button>
+              </div>
+            </div>
+            {current.interval === "yearly" && (
+              <Field label="Yearly Price (PKR)" type="number" value={current.yearly_price_pkr ?? current.price_pkr * 12} onChange={(v) => handleChange("yearly_price_pkr", Number(v))} hint="Leave empty for auto (12x monthly)" />
+            )}
             <Field label="Max Dishes" type="number" value={current.max_dishes} onChange={(v) => handleChange("max_dishes", Number(v))} hint="-1 for unlimited" />
             <Field label="Max Images" type="number" value={current.max_images} onChange={(v) => handleChange("max_images", Number(v))} hint="-1 for unlimited" />
             <Field label="Max Orders/mo" type="number" value={current.max_orders} onChange={(v) => handleChange("max_orders", Number(v))} hint="-1 for unlimited" />
@@ -204,7 +235,6 @@ function PlanCard({ plan, saving, onSave }: { plan: Plan; saving: boolean; onSav
             <Field label="Sort Order" type="number" value={current.sort_order} onChange={(v) => handleChange("sort_order", Number(v))} />
           </div>
 
-          {/* Description */}
           <div>
             <label className="block text-[11px] font-medium text-[#555] mb-1">Description</label>
             <textarea
@@ -215,7 +245,6 @@ function PlanCard({ plan, saving, onSave }: { plan: Plan; saving: boolean; onSav
             />
           </div>
 
-          {/* Toggles */}
           <div className="flex flex-wrap gap-3">
             <Toggle label="Analytics" checked={current.analytics} onChange={(v) => handleChange("analytics", v)} />
             <Toggle label="Custom Branding" checked={current.custom_branding} onChange={(v) => handleChange("custom_branding", v)} />
@@ -224,7 +253,6 @@ function PlanCard({ plan, saving, onSave }: { plan: Plan; saving: boolean; onSav
             <Toggle label="Active" checked={current.is_active} onChange={(v) => handleChange("is_active", v)} />
           </div>
 
-          {/* Custom Features */}
           <div>
             <label className="block text-[11px] font-medium text-[#555] mb-1.5">Custom Features</label>
             <div className="flex flex-wrap gap-2 mb-2">

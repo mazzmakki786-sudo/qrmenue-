@@ -16,6 +16,7 @@ import Image from "next/image"
 export default function MenuManagementPage() {
   const sub = useSubscription()
   const { restaurant, dishCount, imageCount, canAddDish, canAddCategory, canUploadImage, planLimits, status, refresh, isSuspended } = sub
+  const hasAiAccess = (planLimits?.aiPostsPerMonth ?? 0) > 0
   const [categories, setCategories] = useState<Category[]>([])
   const [dishes, setDishes] = useState<Dish[]>([])
   const [editingDish, setEditingDish] = useState<Dish | null>(null)
@@ -640,10 +641,12 @@ export default function MenuManagementPage() {
                       <span className="text-[10px] text-[#BBB] shrink-0">({catDishes.length})</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button onClick={() => { setPosterCategory(cat); setPosterHeading(""); setPosterPrice("") }}
-                        className="flex items-center gap-1 text-xs text-[#7C3AED] font-medium hover:underline">
-                        <Sparkles className="w-3 h-3" /> Poster
-                      </button>
+                      {hasAiAccess && (
+                        <button onClick={() => { setPosterCategory(cat); setPosterHeading(""); setPosterPrice("") }}
+                          className="flex items-center gap-1 text-xs text-[#7C3AED] font-medium hover:underline">
+                          <Sparkles className="w-3 h-3" /> Poster
+                        </button>
+                      )}
                       <button onClick={() => handleDeleteCategory(cat.id)} className="text-xs text-[#DC2626] hover:underline">Delete</button>
                     </div>
                   </div>

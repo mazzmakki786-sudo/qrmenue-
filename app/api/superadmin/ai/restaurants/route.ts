@@ -6,8 +6,7 @@ import { safeRoute } from "@/lib/api-error"
 import { type Plan } from "@/lib/subscription"
 import { getEffectiveLimitsFromDB } from "@/lib/subscription-db"
 import { z } from "zod"
-
-const superAdminEmail = process.env.SUPER_ADMIN_EMAIL
+import { isSuperAdmin } from "@/lib/superadmin-security"
 
 const overrideSchema = z.object({
   restaurant_id: z.string().uuid(),
@@ -18,7 +17,7 @@ const overrideSchema = z.object({
 async function checkSuperAdmin() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.email?.toLowerCase() !== superAdminEmail?.toLowerCase()) return false
+  if (!user || !(await isSuperAdmin(user.email))) return false
   return true
 }
 

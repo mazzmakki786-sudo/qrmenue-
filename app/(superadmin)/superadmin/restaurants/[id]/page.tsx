@@ -240,7 +240,7 @@ export default function RestaurantDetailPage() {
       </div>
 
       {/* Stat Cards Grid (4x2) */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 overflow-x-auto">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard label="Total Orders" value={stats.total} />
         <StatCard label="Revenue (PKR)" value={stats.revenue.toLocaleString()} />
         <StatCard label="Customers" value={stats.customers} />
@@ -252,7 +252,7 @@ export default function RestaurantDetailPage() {
       </div>
 
       {/* Details + Charts Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6 overflow-x-auto">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
         {/* Details Card (4 cols) */}
         <div className="md:col-span-4">
           <div className="bg-white border border-[#E8E8E8] rounded-[14px] p-4 h-full">
@@ -357,7 +357,7 @@ export default function RestaurantDetailPage() {
       {/* Subscription & Limits */}
       <section className="mb-6">
         <h2 className="text-xl font-bold text-black mb-4">Subscription &amp; Limits</h2>
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 overflow-x-auto">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
           <div className="md:col-span-8 bg-white border border-[#E8E8E8] rounded-[14px] p-4">
             <div className="flex flex-col md:flex-row gap-4 mb-4">
               <div className="w-full md:w-1/2">
@@ -384,7 +384,7 @@ export default function RestaurantDetailPage() {
           <div className="md:col-span-4 bg-white border border-[#E8E8E8] rounded-[14px] p-4 flex flex-col justify-between">
             <div>
               <h4 className="text-xs font-semibold text-black mb-2">Trial Controls</h4>
-              <p className="text-xs text-[#555] mb-4">Manually reset the 14-day trial period for this restaurant.</p>
+              <p className="text-xs text-[#555] mb-4">Manually reset the 7-day trial period for this restaurant.</p>
             </div>
             <Button variant="ghost" onClick={handleResetTrial} disabled={resetting} className="!bg-[#FFA07E]/20 !text-[#78351b] hover:!bg-[#FFA07E]/30 w-full">
               {resetting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RotateCcw className="w-4 h-4 mr-2" />}
@@ -396,7 +396,7 @@ export default function RestaurantDetailPage() {
       </section>
 
       {/* Bottom Lists */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-x-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Recent Customers */}
         <section>
           <div className="flex justify-between items-center mb-4">
@@ -407,7 +407,8 @@ export default function RestaurantDetailPage() {
             {customers.length === 0 ? (
               <p className="text-xs text-[#999] text-center py-8">No customers yet</p>
             ) : (
-              <div className="overflow-x-auto">
+              <>
+              <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead className="bg-[#F9FAFB] border-b border-[#F0F0F0]">
                   <tr>
@@ -425,6 +426,17 @@ export default function RestaurantDetailPage() {
                 </tbody>
               </table>
               </div>
+              <div className="md:hidden divide-y divide-[#F0F0F0]">
+                {customers.slice(0, 5).map((c: any) => (
+                  <div key={c.id || c.phone || c.name} className="p-3 flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium">{c.name}</p>
+                      <p className="text-xs text-[#555]">{c.last_order ? new Date(c.last_order).toLocaleDateString() : "—"}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              </>
             )}
           </div>
         </section>
@@ -439,7 +451,8 @@ export default function RestaurantDetailPage() {
             {orders.length === 0 ? (
               <p className="text-xs text-[#999] text-center py-8">No orders yet</p>
             ) : (
-              <div className="overflow-x-auto">
+              <>
+              <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead className="bg-[#F9FAFB] border-b border-[#F0F0F0]">
                   <tr>
@@ -466,6 +479,23 @@ export default function RestaurantDetailPage() {
                 </tbody>
               </table>
               </div>
+              <div className="md:hidden divide-y divide-[#F0F0F0]">
+                {orders.slice(0, 5).map((o) => (
+                  <div key={o.id} className="p-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
+                        o.order_status === "completed" ? "bg-[#25D366]/10 text-[#006d2f]" :
+                        o.order_status === "preparing" ? "bg-[#FFA07E]/10 text-[#78351b]" :
+                        o.order_status === "cancelled" ? "bg-gray-100 text-gray-500" :
+                        "bg-[#25D366]/10 text-[#006d2f]"
+                      }`}>{o.order_status === "completed" ? "Delivered" : o.order_status}</span>
+                      <span className="text-sm font-medium">{formatPrice(o.total_price)}</span>
+                    </div>
+                    <span className="text-xs text-[#555]">{timeAgo(o.created_at)}</span>
+                  </div>
+                ))}
+              </div>
+              </>
             )}
           </div>
         </section>

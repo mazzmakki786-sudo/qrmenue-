@@ -1,5 +1,9 @@
 User-agent: *
 Allow: /
+Disallow: /menu/
+Disallow: /api/
+Disallow: /superadmin/
+Disallow: /dashboard/
 
 # All AI crawlers — allowed
 User-agent: GPTBot

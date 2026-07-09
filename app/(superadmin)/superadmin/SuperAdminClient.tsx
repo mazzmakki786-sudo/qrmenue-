@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback, useRef } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
-import { formatPrice } from "@/lib/utils"
 import { Shield, LogOut, Eye, EyeOff, Users, Building2, BarChart3, Settings as SettingsIcon, Store, Megaphone, Clock, CreditCard, Sparkles } from "lucide-react"
 import { RestaurantTable } from "@/components/superadmin/RestaurantTable"
 import { CustomerTable } from "@/components/superadmin/CustomerTable"
@@ -32,14 +31,17 @@ function LoginForm({ onLogin, locked }: { onLogin: () => void; locked: boolean }
     setLoading(true)
     setError(null)
 
-    const supabase = createClient()
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
-    if (signInError) {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    })
+    if (!res.ok) {
       setError("Incorrect email or password")
-    } else {
-      onLogin()
+      setLoading(false)
+      return
     }
-    setLoading(false)
+    onLogin()
   }
 
   if (locked) {
@@ -138,7 +140,7 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
   const [users, setUsers] = useState<Record<string, { email: string; last_sign_in_at: string | null }>>({})
   const [loading, setLoading] = useState(true)
   const [showActivityLog, setShowActivityLog] = useState(false)
-  const [timestamp, setTimestamp] = useState(new Date().toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: true }).replace(",", " •"))
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const supabase = createClient()
   const router = useRouter()
@@ -167,7 +169,6 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
     }
   }, [])
 
-  // Session inactivity timeout
   const resetInactivityTimer = useCallback(() => {
     if (inactivityRef.current) clearTimeout(inactivityRef.current)
     if (isSuperAdmin) {
@@ -175,10 +176,10 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
         await supabase.auth.signOut()
         setUser(null)
         setIsSuperAdmin(false)
-        router.refresh()
+        window.location.href = "/superadmin"
       }, SESSION_TIMEOUT_MS)
     }
-  }, [isSuperAdmin, supabase, router])
+  }, [isSuperAdmin, supabase])
 
   useEffect(() => {
     if (!isSuperAdmin) return
@@ -203,13 +204,6 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
       setChecking(false)
       verifyAdmin(currentUserEmail)
     }
-  }, [])
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimestamp(new Date().toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: true }).replace(",", " •"))
-    }, 60000)
-    return () => clearInterval(interval)
   }, [])
 
   const fetchRestaurants = useCallback(async () => {
@@ -273,45 +267,21 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
-    setUser(null)
-    setIsSuperAdmin(false)
-    setIsLocked(false)
+    window.location.href = "/superadmin"
   }
 
   if (checking) return <div className="min-h-screen bg-white flex items-center justify-center"><p className="text-[#999]">Loading...</p></div>
   if (!user) return <LoginForm onLogin={async () => {
-    const { data: { session } } = await supabase.auth.getSession()
-    const u = session?.user as { email: string } | null
-    setUser(u)
-    if (u?.email) verifyAdmin(u.email)
-    router.refresh()
+    window.location.reload()
   }} locked={isLocked} />
   if (isLocked) return <LoginForm onLogin={async () => {}} locked={true} />
   if (!isSuperAdmin) return <AccessDenied onLogout={handleLogout} />
 
   return (
     <div className="min-h-screen bg-[#F8F8F8]">
-      <header className="bg-white/80 backdrop-blur-md fixed top-0 left-0 w-full z-50 border-b border-[#F0F0F0] safe-area-inset-top">
-        <div className="max-w-6xl mx-auto px-4 md:px-10 h-20 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center">
-              <Shield className="w-4 h-4" />
-            </div>
-            <h1 className="text-xl font-black text-black">Super Admin</h1>
-            <span className="h-6 w-px bg-[#F0F0F0]" />
-            <p className="text-xs text-[#555] hidden sm:block" id="live-timestamp">{timestamp}</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <button onClick={() => setShowActivityLog(true)} className="text-xs text-black hover:opacity-70 transition-opacity flex items-center gap-2">
-              <Clock className="w-4 h-4" /> Activity Log
-            </button>
-            <button onClick={handleLogout} className="text-xs text-[#ba1a1a] font-bold hover:underline">Sign Out</button>
-          </div>
-        </div>
-      </header>
-
-      <main className="pt-24 pb-8 max-w-6xl mx-auto px-4 md:px-10 min-h-screen">
-        <nav className="flex items-center gap-4 mb-6 overflow-x-auto pb-2 border-b border-[#F0F0F0]">
+      <div className="max-w-6xl mx-auto px-3 md:px-10 pt-4 md:pt-6">
+        <div className="mb-4 md:mb-6 flex items-end justify-between gap-4 border-b border-[#F0F0F0]">
+          <nav className="flex items-center gap-2 md:gap-4 overflow-x-auto scrollbar-hide flex-1">
           {TABS.map((t) => {
             const Icon = t.icon
             const isActive = activeTab === t.id
@@ -320,17 +290,23 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
                 key={t.id}
                 onClick={() => {
                   setActiveTab(t.id)
+                  setMenuOpen(false)
                   router.replace(`/superadmin?tab=${t.id}`, { scroll: false })
                 }}
-                className={`flex items-center gap-2 py-4 text-xs font-semibold transition-all whitespace-nowrap border-b-2 ${
+                className={`flex items-center gap-1.5 py-2.5 md:py-4 text-[10px] md:text-xs font-semibold transition-all whitespace-nowrap border-b-2 flex-shrink-0 ${
                   isActive ? "text-black border-black" : "text-[#555] border-transparent hover:text-black"
                 }`}
               >
-                <Icon className="w-4 h-4" /> {t.label}
-              </button>
-            )
-          })}
-        </nav>
+                  <Icon className="w-3.5 h-3.5 md:w-4 md:h-4" /> {t.label}
+                </button>
+              )
+            })}
+          </nav>
+          <button onClick={() => setShowActivityLog(true)} className="shrink-0 text-[10px] md:text-xs text-black hover:opacity-70 transition-opacity flex items-center gap-1.5 pb-2">
+            <Clock className="w-3.5 h-3.5 md:w-4 md:h-4" />
+            <span className="hidden sm:inline">Activity Log</span>
+          </button>
+        </div>
 
         {loading ? (
           <div className="space-y-4">
@@ -353,7 +329,7 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
             )}
           </>
         )}
-      </main>
+      </div>
       <ActivityLogView open={showActivityLog} onClose={() => setShowActivityLog(false)} />
     </div>
   )

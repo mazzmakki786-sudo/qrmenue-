@@ -2,17 +2,17 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { LayoutDashboard, UtensilsCrossed, ClipboardList, BarChart3, User, CreditCard, QrCode, Menu, X, LogOut, Megaphone, Image as ImageIcon } from "lucide-react"
+import { LayoutDashboard, UtensilsCrossed, ClipboardList, BarChart3, User, CreditCard, QrCode, Menu, X, LogOut, Megaphone, Image as ImageIcon, Percent } from "lucide-react"
 import { BellNotification } from "@/components/owner/BellNotification"
 import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary"
+import { usePushNotifications } from "@/lib/hooks/usePushNotifications"
 
-const navItems = [
+const ALL_NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/menu", label: "Menu", icon: UtensilsCrossed },
-
-  { href: "/dashboard/ai-posts", label: "AI Posts", icon: ImageIcon },
+  { href: "/dashboard/deals", label: "Deals", icon: Percent },
   { href: "/dashboard/orders", label: "Orders", icon: ClipboardList },
   { href: "/dashboard/announcements", label: "Announcements", icon: Megaphone },
   { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
@@ -21,11 +21,18 @@ const navItems = [
   { href: "/dashboard/qr", label: "QR Code", icon: QrCode },
 ]
 
+const AI_NAV_ITEM = { href: "/dashboard/ai-posts", label: "AI Posts", icon: ImageIcon }
+
 export default function OwnerLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [restaurantId, setRestaurantId] = useState<string | null>(null)
+  const [plan, setPlan] = useState<string>("trial")
+  const push = usePushNotifications(restaurantId)
+
+  const hasAiAccess = plan === "growth" || plan === "premium"
+  const navItems = hasAiAccess ? [...ALL_NAV_ITEMS.slice(0, 3), AI_NAV_ITEM, ...ALL_NAV_ITEMS.slice(3)] : ALL_NAV_ITEMS
 
   useEffect(() => {
     const supabase = createClient()
@@ -33,11 +40,14 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
       if (!user) return
       supabase
         .from("restaurants")
-        .select("id")
+        .select("id, plan")
         .eq("owner_id", user.id)
         .maybeSingle()
         .then(({ data }) => {
-          if (data) setRestaurantId(data.id)
+          if (data) {
+            setRestaurantId(data.id)
+            setPlan(data.plan)
+          }
         })
     })
   }, [])
@@ -100,6 +110,60 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
         </div>
         <div className="flex items-center gap-2">
           {restaurantId && <BellNotification restaurantId={restaurantId} />}
+          {push.supported && (
+            <div className="flex items-center gap-1">
+              {push.subscribed ? (
+                <>
+                  <button
+                    onClick={() => {
+                      fetch("/api/push/test", { method: "POST" })
+                        .then((r) => r.json())
+                        .then((d) => { if (d.sent > 0) alert("✅ Push notification sent!"); else alert("No devices subscribed. Click bell icon to enable."); })
+                        .catch(() => alert("❌ Test failed"))
+                    }}
+                    className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#F0F0F0] transition-colors"
+                    title="Send test notification"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-[#25D366]">
+                      <polyline points="9 11 12 14 22 4" />
+                      <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={push.unsubscribe}
+                    disabled={push.loading}
+                    className="w-9 h-9 flex items-center justify-center rounded-full bg-[#25D366]/10 hover:bg-[#25D366]/20 transition-colors relative"
+                    title="Push on — tap to disable"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#25D366]">
+                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                    </svg>
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#25D366] rounded-full border-2 border-white" />
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={push.requestPermission}
+                  disabled={push.loading}
+                  className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#F0F0F0] transition-colors"
+                  title="Enable push notifications"
+                >
+                  {push.loading ? (
+                    <svg className="w-4 h-4 text-[#555] animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#555]">
+                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                    </svg>
+                  )}
+                </button>
+              )}
+            </div>
+          )}
           <button
             onClick={handleLogout}
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-[#555] hover:bg-[#F0F0F0] transition-colors"
@@ -120,6 +184,33 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
         <Link href="/dashboard" className="font-semibold text-sm">Digital QR Menue</Link>
         <div className="flex items-center gap-1">
           {restaurantId && <BellNotification restaurantId={restaurantId} />}
+          {push.supported && (
+            push.subscribed ? (
+              <button
+                onClick={() => { fetch("/api/push/test", { method: "POST" }).catch(() => {}) }}
+                className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center relative"
+                title="Test push notification"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#25D366]">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                </svg>
+                <span className="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 bg-[#25D366] rounded-full border-2 border-white" />
+              </button>
+            ) : (
+              <button
+                onClick={push.requestPermission}
+                disabled={push.loading}
+                className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                title="Enable push notifications"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#555]">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                </svg>
+              </button>
+            )
+          )}
           <button
             onClick={handleLogout}
             className="p-2 -mr-2 min-w-[44px] min-h-[44px] flex items-center justify-center"

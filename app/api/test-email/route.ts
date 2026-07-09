@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { Resend } from "resend"
 import { createClient } from "@/lib/supabase/server"
 import { safeRoute } from "@/lib/api-error"
-import { SUPER_ADMIN_EMAIL } from "@/lib/superadmin-security"
+import { isSuperAdmin } from "@/lib/superadmin-security"
 import { checkRateLimit } from "@/lib/rate-limiter"
 
 export const GET = safeRoute(async (request) => {
@@ -14,7 +14,7 @@ export const GET = safeRoute(async (request) => {
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.email?.toLowerCase() !== SUPER_ADMIN_EMAIL) {
+  if (!user || !(await isSuperAdmin(user.email))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 

@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { safeRoute } from "@/lib/api-error"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
+import { isSuperAdmin } from "@/lib/superadmin-security"
 
 export const GET = safeRoute(async (request) => {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.email?.toLowerCase() !== process.env.SUPER_ADMIN_EMAIL?.toLowerCase()) {
+  if (!user || !(await isSuperAdmin(user.email))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
   }
 

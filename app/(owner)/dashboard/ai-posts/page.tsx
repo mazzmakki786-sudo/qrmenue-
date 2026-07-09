@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
+import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Sparkles, ImageIcon, Trash2, Download, Loader2, Send, Zap, AlertCircle } from "lucide-react"
 import type { AiPost } from "@/types"
@@ -11,6 +12,7 @@ interface AiLimitInfo {
 }
 
 export default function AiPostsPage() {
+  const router = useRouter()
   const sub = useSubscription()
   const { restaurant, planLimits } = sub
 
@@ -22,6 +24,12 @@ export default function AiPostsPage() {
   const [aiGenerating, setAiGenerating] = useState(false)
 
   const hasPlanAccess = (planLimits?.aiPostsPerMonth ?? 0) > 0
+
+  useEffect(() => {
+    if (!sub.loading && !hasPlanAccess) {
+      router.replace("/dashboard")
+    }
+  }, [sub.loading, hasPlanAccess, router])
 
   const fetchData = useCallback(async () => {
     try {

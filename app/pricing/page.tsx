@@ -1,15 +1,16 @@
 import type { Metadata } from "next"
 import { PricingSection } from "@/components/pricing/PricingSection"
+import { LandingHeader } from "@/components/shared/LandingHeader"
 import { mapPlan, type DBPlan } from "@/lib/map-plans"
 import { PricingJsonLd, FaqJsonLd } from "@/components/JsonLd"
 import { createAdminClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
-  title: "Pricing — QRMenu.pk Plans",
+  title: "Pricing — Digital QR Menue Plans",
   description:
-    "Choose the right QRMenu.pk plan for your restaurant. Free trial, Starter, Growth, and Premium plans available.",
+    "Choose the right Digital QR Menue plan for your restaurant. Free trial, Starter, Growth, and Premium plans available.",
   openGraph: {
-    title: "Pricing | QRMenu.pk",
+    title: "Pricing | Digital QR Menue",
     description: "QR menu plans for restaurants",
     type: "website",
     url: "https://www.digitalmenue.com/pricing",
@@ -44,7 +45,6 @@ const pricingFaqs = [
 ]
 
 export default async function PricingPage() {
-  // Server-side fetch — zero client loading
   const admin = createAdminClient()
   const { data: dbPlans } = await admin
     .from("plans")
@@ -58,6 +58,7 @@ export default async function PricingPage() {
     <>
       <PricingJsonLd />
       <FaqJsonLd faqs={pricingFaqs} />
+      <LandingHeader />
       <PricingSection
         heading="Plans & Pricing"
         description="No hidden fees. No commission on orders. Cancel anytime."

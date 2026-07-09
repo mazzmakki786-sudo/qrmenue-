@@ -74,7 +74,7 @@ export function mapPlan(plan: DBPlan): PricingPlan {
     features: buildFeatures(plan),
     button: {
       text: plan.slug === "trial" ? "Start Free Trial" : "Choose Plan",
-      url: plan.slug === "trial" ? "/signup" : "/signup/restaurant",
+      url: "/signup/restaurant",
     },
   }
 }

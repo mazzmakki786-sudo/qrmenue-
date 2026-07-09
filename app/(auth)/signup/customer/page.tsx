@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { PasswordInput, validatePassword } from "@/components/ui/password-input"
 import Link from "next/link"
-import { ArrowLeft, User } from "lucide-react"
+import { ArrowLeft, User, Loader2 } from "lucide-react"
 
 export default function CustomerSignupPage() {
   const router = useRouter()
@@ -18,6 +18,12 @@ export default function CustomerSignupPage() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      setError("Please fill in all required fields")
+      return
+    }
+
     setLoading(true)
     setError(null)
 
@@ -54,7 +60,7 @@ export default function CustomerSignupPage() {
   return (
     <div className="w-full flex flex-col items-center">
       <div className="w-full mb-8">
-        <Link href="/signup" className="inline-flex items-center gap-2 text-sm text-[#555] hover:text-black transition-colors">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm text-[#555] hover:text-black transition-colors">
           <div className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center shrink-0">
             <ArrowLeft className="w-4 h-4" />
           </div>
@@ -90,7 +96,7 @@ export default function CustomerSignupPage() {
         )}
 
         <Button type="submit" variant="primary" fullWidth disabled={loading}>
-          {loading ? "Creating account..." : "Sign Up"}
+          {loading ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Creating account...</>) : "Sign Up"}
         </Button>
       </form>
 

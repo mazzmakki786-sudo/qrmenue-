@@ -4,11 +4,11 @@ import { ItemListJsonLd } from "@/components/JsonLd"
 import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
-  title: "Restaurants in Pakistan — Browse Menus | QRMenu.pk",
+  title: "Restaurants in Pakistan — Browse Menus | Digital QR Menue",
   description:
     "Find restaurants in Lahore, Karachi, Islamabad and more. Browse digital menus, view dishes, and order via WhatsApp.",
   openGraph: {
-    title: "Restaurants | QRMenu.pk",
+    title: "Restaurants | Digital QR Menue",
     description: "Browse restaurant menus in Pakistan",
     type: "website",
     url: "https://www.digitalmenue.com/restaurants",

@@ -65,7 +65,7 @@ export function SoftwareApplicationJsonLd() {
       data={{
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
-        name: "QRMenu.pk — Digital QR Menue Platform",
+        name: "Digital QR Menue — Digital QR Menue Platform",
         operatingSystem: "Web",
         applicationCategory: "BusinessApplication",
         description:
@@ -103,7 +103,7 @@ export function SoftwareApplicationJsonLd() {
         ],
         author: {
           "@type": "Organization",
-          name: "QRMenu.pk",
+          name: "Digital QR Menue",
           url: "https://digitalmenue.com",
         },
         applicationSuite: "QRMenu",

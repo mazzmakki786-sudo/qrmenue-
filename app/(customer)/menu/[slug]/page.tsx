@@ -28,12 +28,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const noindex = process.env.NEXT_PUBLIC_NOINDEX_MENU_PAGES === "true"
-  const title = `${restaurant.name} — ${restaurant.cuisine_type || "Restaurant"} in ${restaurant.city} | QRMenu.pk`
+  const title = `${restaurant.name} — ${restaurant.cuisine_type || "Restaurant"} in ${restaurant.city} | Digital QR Menue`
 
   return {
     title,
     robots: noindex ? { index: false, follow: false } : undefined,
-    description: restaurant.description || `View ${restaurant.name}'s digital menu. Browse dishes, prices, and order directly via WhatsApp. Powered by QRMenu.pk — Pakistan's #1 QR menu platform.`,
+    description: restaurant.description || `View ${restaurant.name}'s digital menu. Browse dishes, prices, and order directly via WhatsApp. Powered by Digital QR Menue — Pakistan's #1 QR menu platform.`,
     openGraph: {
       title,
       description: restaurant.description || `View ${restaurant.name}'s digital menu. Browse dishes, prices, and order directly via WhatsApp.`,

@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = `${restaurant.name} — ${restaurant.cuisine_type || "Restaurant"} in ${restaurant.city}`
   const description =
     restaurant.description ||
-    `View ${restaurant.name}'s menu. Browse dishes, prices, and order directly via WhatsApp. Powered by QRMenu.pk`
+    `View ${restaurant.name}'s menu. Browse dishes, prices, and order directly via WhatsApp. Powered by Digital QR Menue`
 
   return {
     title,

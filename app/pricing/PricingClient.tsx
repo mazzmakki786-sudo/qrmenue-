@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { Check, X } from "lucide-react"
+import { AppFooter } from "@/components/shared/AppFooter"
 import { useCompanySettings } from "@/lib/hooks/useCompanySettings"
 import { useEffect, useState } from "react"
 import { PLAN_PRICES, PLAN_NAMES, DEFAULT_TRIAL_LIMITS, type Plan } from "@/lib/subscription"
@@ -415,7 +416,7 @@ export function PricingClient() {
             </div>
           </div>
           <div className="text-center mt-6 text-[10px] text-[#BBB]">
-            &copy; 2026 QRMenu.pk. All rights reserved.
+            &copy; 2026 Digital QR Menue. All rights reserved.
           </div>
         </div>
       </footer>

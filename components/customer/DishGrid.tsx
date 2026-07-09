@@ -86,10 +86,11 @@ export const Card = React.memo(function Card({ dish, unavailable = false, closed
         {dish.image_url && !imgError ? (
           <Image
             src={dish.image_url}
-            alt={dish.name_en}
+            alt={`${dish.name_en}${dish.name_ur ? ` (${dish.name_ur})` : ""} — ₹${dish.price}`}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
             sizes="96px"
+            loading="lazy"
             onError={() => setImgError(true)}
           />
         ) : (
@@ -171,7 +172,7 @@ export const Card = React.memo(function Card({ dish, unavailable = false, closed
             <button
               onClick={() => addItem(dish)}
               disabled={unavailable || closed}
-              className="bg-primary text-white rounded-full px-4 py-1.5 text-xs font-semibold hover:bg-primary-hover active:scale-[0.95] transition-all duration-200 disabled:opacity-50 flex items-center gap-1 min-h-[36px]"
+              className="bg-primary text-white rounded-full px-5 py-2 text-xs font-semibold hover:bg-primary-hover active:scale-[0.95] transition-all duration-200 disabled:opacity-50 flex items-center gap-1 min-h-[36px]"
             >
               {closed ? "Closed" : "+ Add"}
             </button>

@@ -2,8 +2,8 @@ import type { Metadata } from "next"
 import { FavoritesClient } from "./FavoritesClient"
 
 export const metadata: Metadata = {
-  title: "My Favorites — QRMenu.pk",
-  description: "View your favorite restaurants on QRMenu.pk",
+  title: "My Favorites — Digital QR Menue",
+  description: "View your favorite restaurants on Digital QR Menue",
   robots: { index: false, follow: true },
 }
 
