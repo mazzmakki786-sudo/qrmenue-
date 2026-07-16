@@ -1,0 +1,193 @@
+"use client"
+
+import { useState, useEffect, useCallback } from "react"
+import { createClient } from "@/lib/supabase/client"
+import { useI18n } from "@/lib/i18n/useTranslation"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card } from "@/components/ui/card"
+import { Dialog } from "@/components/ui/dialog"
+import { Plus, X, Trash2, Table2 } from "lucide-react"
+
+type Table = {
+  id: string
+  table_number: string
+  capacity: number
+  is_active: boolean
+  is_occupied: boolean
+  created_at: string
+}
+
+export default function TablesPage() {
+  const { t } = useI18n()
+  const [tables, setTables] = useState<Table[]>([])
+  const [loading, setLoading] = useState(true)
+  const [showAddDialog, setShowAddDialog] = useState(false)
+  const [tableNumber, setTableNumber] = useState("")
+  const [capacity, setCapacity] = useState(4)
+  const [error, setError] = useState("")
+  const [saving, setSaving] = useState(false)
+
+  const fetchTables = useCallback(async () => {
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const res = await fetch("/api/owner/tables")
+      if (res.ok) {
+        const data = await res.json()
+        setTables(data.tables)
+      }
+    } catch {
+      // silent
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { fetchTables() }, [fetchTables])
+
+  const handleAdd = async () => {
+    if (!tableNumber.trim()) {
+      setError("Table number is required")
+      return
+    }
+    setSaving(true)
+    setError("")
+    try {
+      const res = await fetch("/api/owner/tables", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ table_number: tableNumber.trim(), capacity }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setTables((prev) => [...prev, data.table])
+        setShowAddDialog(false)
+        setTableNumber("")
+        setCapacity(4)
+      } else {
+        const data = await res.json()
+        setError(data.error || "Failed to add table")
+      }
+    } catch {
+      setError("Something went wrong")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    const confirmed = window.confirm("Delete this table? This cannot be undone.")
+    if (!confirmed) return
+
+    try {
+      const res = await fetch(`/api/owner/tables/${id}`, { method: "DELETE" })
+      if (res.ok) {
+        setTables((prev) => prev.filter((t) => t.id !== id))
+      }
+    } catch {
+      // silent
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin w-6 h-6 border-2 border-black border-t-transparent rounded-full" />
+      </div>
+    )
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold">Table Management</h1>
+          <p className="text-sm text-gray-500 mt-1">{tables.length} table{tables.length !== 1 ? "s" : ""}</p>
+        </div>
+        <Button onClick={() => setShowAddDialog(true)}>
+          <Plus className="w-4 h-4 mr-1" />
+          Add Table
+        </Button>
+      </div>
+
+      {tables.length === 0 ? (
+        <Card className="p-12 text-center">
+          <Table2 className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+          <p className="text-gray-500">No tables yet. Add your first table.</p>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+          {tables.map((table) => (
+            <div
+              key={table.id}
+              className={`relative p-4 rounded-xl border-2 text-center transition-colors ${
+                table.is_occupied
+                  ? "border-red-300 bg-red-50"
+                  : "border-green-300 bg-green-50"
+              }`}
+            >
+              <button
+                onClick={() => handleDelete(table.id)}
+                className="absolute top-1 right-1 p-1 text-gray-400 hover:text-red-500 hover:bg-white/50 rounded"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+              <p className="text-lg font-bold mt-1">{table.table_number}</p>
+              <p className="text-xs text-gray-500">Cap: {table.capacity}</p>
+              <span className={`inline-block mt-1 text-xs font-medium px-2 py-0.5 rounded-full ${
+                table.is_occupied
+                  ? "bg-red-200 text-red-800"
+                  : "bg-green-200 text-green-800"
+              }`}>
+                {table.is_occupied ? "Occupied" : "Vacant"}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <Dialog open={showAddDialog} onOpenChange={(open: boolean) => { if (!open) setShowAddDialog(false); }}>
+        <div className="p-6 max-w-sm mx-auto">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Add Table</h2>
+            <button onClick={() => setShowAddDialog(false)} className="p-1 hover:bg-gray-100 rounded">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+              {error}
+            </div>
+          )}
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Table Number</label>
+              <Input
+                value={tableNumber}
+                onChange={(e) => setTableNumber(e.target.value)}
+                placeholder="e.g. 1, A1, Patio-1"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Capacity (persons)</label>
+              <Input
+                type="number"
+                value={capacity}
+                onChange={(e) => setCapacity(parseInt(e.target.value) || 1)}
+                min={1}
+              />
+            </div>
+            <Button onClick={handleAdd} disabled={saving} className="w-full">
+              {saving ? "Adding..." : "Add Table"}
+            </Button>
+          </div>
+        </div>
+      </Dialog>
+    </div>
+  )
+}

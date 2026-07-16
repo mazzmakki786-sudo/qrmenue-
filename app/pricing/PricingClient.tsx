@@ -59,8 +59,8 @@ function buildPlanData(key: Plan, dbPlan?: DBPlan): PlanCard {
       { label: "Analytics dashboard", inc: true },
     )
     return {
-      key, name, price: "0", period: "7 days",
-      badge: "7 days", popular: false, features,
+      key, name, price: "0", period: "30 days",
+      badge: "30 days", popular: false, features,
     }
   }
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { DEFAULT_TRIAL_LIMITS, type TrialLimitConfig } from "@/lib/subscription"
-import { Check, Settings2 } from "lucide-react"
+import { Check, Settings2, Loader2 } from "lucide-react"
 
 export function TrialLimitsEditor() {
   const [config, setConfig] = useState<TrialLimitConfig>({ ...DEFAULT_TRIAL_LIMITS })
@@ -91,7 +91,7 @@ export function TrialLimitsEditor() {
         <div className="flex items-center gap-3">
           <button onClick={handleSave} disabled={saving}
             className="h-10 px-5 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity flex items-center gap-2">
-            {saving ? "Saving..." : saved ? <><Check className="w-4 h-4" /> Saved!</> : "Save Trial Limits"}
+            {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</> : saved ? <><Check className="w-4 h-4" /> Saved!</> : "Save Trial Limits"}
           </button>
           {saved && <span className="text-xs text-[#16A34A]">Updated</span>}
         </div>

@@ -51,7 +51,7 @@ export default function OnboardingPage() {
         </div>
         <h1 className="text-2xl md:text-3xl font-bold">Welcome, {restaurant.name}!</h1>
         <p className="text-[#555] mt-2 text-sm md:text-base">
-          Your restaurant is all set. Here's what you need to know.
+          Your restaurant is all set. Here&apos;s what you need to know.
         </p>
       </div>
 

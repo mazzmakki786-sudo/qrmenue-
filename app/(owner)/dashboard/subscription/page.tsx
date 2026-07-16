@@ -1,35 +1,29 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import Link from "next/link"
+export const dynamic = "force-dynamic"
+
+import { useEffect, useState, useCallback, startTransition } from "react"
 import { Button } from "@/components/ui/button"
+import { Pricing2 } from "@/components/ui/pricing-cards"
 import { SubscriptionBanner } from "@/components/shared/SubscriptionBanner"
 import { useCompanySettings } from "@/lib/hooks/useCompanySettings"
 import { useSubscription } from "@/lib/hooks/useSubscription"
-import { PLAN_NAMES, type Plan, formatLimit } from "@/lib/subscription"
-import { Check, X, MessageCircle, Clock, ShoppingBag, Image as ImageIcon, Utensils, AlertTriangle, HelpCircle, Calendar, Sparkles, TrendingUp, ShieldCheck } from "lucide-react"
+import { PLAN_NAMES, type Plan } from "@/lib/subscription"
+import { mapPlan, type PricingPlan } from "@/lib/map-plans"
+import { createClient } from "@/lib/supabase/client"
+import { uid } from "@/lib/realtime"
+import { MessageCircle, Clock, ShoppingBag, Image as ImageIcon, Utensils, AlertTriangle, HelpCircle, Calendar, Sparkles, ShieldCheck } from "lucide-react"
 
 const planOrder: Plan[] = ["trial", "starter", "growth", "premium"]
-
-interface PlanFromAPI {
-  slug: string
-  name: string
-  price_pkr: number
-  max_dishes: number
-  max_images: number
-  max_orders: number
-  max_categories: number
-  ai_posts_per_month: number
-  analytics: boolean
-  custom_branding: boolean
-}
 
 export default function SubscriptionPage() {
   const sub = useSubscription()
   const { restaurant, orderCount, planLimits, loading } = sub
   const { settings, loading: settingsLoading } = useCompanySettings()
   const [error, setError] = useState<string | null>(null)
-  const [plansFromAPI, setPlansFromAPI] = useState<PlanFromAPI[]>([])
+  const [plans, setPlans] = useState<PricingPlan[]>([])
+  const [buyingPlan, setBuyingPlan] = useState<string | null>(null)
+  const [buyError, setBuyError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!loading && !restaurant) {
@@ -37,12 +31,59 @@ export default function SubscriptionPage() {
     }
   }, [loading, restaurant])
 
-  useEffect(() => {
-    fetch("/api/plans")
-      .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data?.plans) setPlansFromAPI(data.plans) })
-      .catch(() => {})
+  const fetchPlans = useCallback(async () => {
+    try {
+      const res = await fetch("/api/plans")
+      if (res.ok) {
+        const data = await res.json()
+        if (data.plans && Array.isArray(data.plans)) {
+          setPlans(data.plans.map(mapPlan))
+        }
+      }
+    } catch {
+      // silent
+    }
   }, [])
+
+  useEffect(() => { fetchPlans() }, [fetchPlans])
+
+  // Real-time subscription — instantly reflects superadmin changes
+  useEffect(() => {
+    const supabase = createClient()
+    const channel = supabase
+      .channel(uid("sub-page-plans"))
+      .on("postgres_changes", { event: "*", schema: "public", table: "plans" }, () => {
+        startTransition(() => fetchPlans())
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [fetchPlans])
+
+  const handleSelectPlan = async (planId: string) => {
+    if (planId === "trial") return
+    if (planId === currentPlan) return
+    setBuyError(null)
+    setBuyingPlan(planId)
+    try {
+      const res = await fetch("/api/payments/jazzcash/initiate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan: planId }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Payment initiation failed" }))
+        setBuyError(err.error || "Payment initiation failed. Please try again or contact support.")
+        return
+      }
+      const html = await res.text()
+      const blob = new Blob([html], { type: "text/html" })
+      window.open(URL.createObjectURL(blob), "_self")
+    } catch {
+      setBuyError("Unable to connect to payment gateway. Please try again.")
+    } finally {
+      setBuyingPlan(null)
+    }
+  }
 
   if (loading || settingsLoading) {
     return (
@@ -72,11 +113,8 @@ export default function SubscriptionPage() {
   const currentPlan = restaurant.plan as Plan
   const currentPlanIndex = planOrder.indexOf(currentPlan)
   const isExpired = sub.isExpired
-  const upgradePlans = isExpired
-    ? planOrder.filter((p) => p !== "trial")
-    : planOrder.filter((p) => p !== "trial" && planOrder.indexOf(p) > currentPlanIndex)
 
-  const jazzcash = settings.jazzcash_number || ""
+  const jazzcashNumber = settings.jazzcash_number || ""
   const easypaisa = settings.easypaisa_number || ""
   const bankName = settings.bank_name || ""
   const accountTitle = settings.account_title || ""
@@ -99,8 +137,21 @@ export default function SubscriptionPage() {
   const formatDate = (d: Date) =>
     d.toLocaleDateString("en-PK", { day: "numeric", month: "short", year: "numeric" })
 
+  // Show all paid plans — mark current plan with badge text, disable its button
+  const showPlans = plans
+    .filter(p => p.id !== "trial")
+    .map(p => ({
+      ...p,
+      button: {
+        text: p.id === currentPlan
+          ? (isExpired ? "Expired — Renew" : "Current Plan")
+          : p.button.text,
+        url: p.button.url,
+      },
+    }))
+
   return (
-    <div className="max-w-2xl mx-auto flex flex-col gap-6">
+    <div className="max-w-5xl mx-auto flex flex-col gap-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -121,6 +172,18 @@ export default function SubscriptionPage() {
       )}
 
       <SubscriptionBanner restaurant={restaurant} orderCount={orderCount} />
+
+      {/* Payment Error */}
+      {buyError && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-red-900">Payment Error</p>
+            <p className="text-xs text-red-700 mt-1">{buyError}</p>
+          </div>
+          <button onClick={() => setBuyError(null)} className="text-red-400 hover:text-red-600 text-sm">&times;</button>
+        </div>
+      )}
 
       {/* Current Plan Card */}
       <div className={`relative overflow-hidden bg-white border rounded-2xl shadow-sm ${isExpired ? "border-[#DC2626]/30" : "border-[#F0F0F0]"}`}>
@@ -202,70 +265,23 @@ export default function SubscriptionPage() {
         </div>
       </div>
 
-      {/* Available Plans */}
-      {upgradePlans.length > 0 && (
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <h2 className="text-sm font-bold text-black">Available Plans</h2>
-            <div className="h-px flex-1 bg-[#F0F0F0]" />
-          </div>
-          {upgradePlans.map((planKey) => {
-            const planAPI = plansFromAPI.find(p => p.slug === planKey)
-            const price = planAPI?.price_pkr ?? 0
-            const isRecommended = planKey === "growth"
-
-            return (
-              <div
-                key={planKey}
-                className={`relative bg-white border rounded-2xl overflow-hidden transition-shadow hover:shadow-md ${
-                  isRecommended ? "border-black shadow-sm" : "border-[#F0F0F0]"
-                }`}
-              >
-                {isRecommended && (
-                  <div className="bg-black text-white text-[9px] font-bold uppercase tracking-[0.2em] px-3 py-1 text-center">
-                    Most Popular
-                  </div>
-                )}
-                <div className="p-5 sm:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5">
-                  <div className="flex-1 min-w-0 w-full">
-                    <div className="flex items-center justify-between sm:justify-start gap-3 mb-1">
-                      <h3 className="text-lg font-bold text-black">{PLAN_NAMES[planKey]}</h3>
-                      <span className="text-xs text-[#999] bg-[#F0F0F0] px-2 py-0.5 rounded-full whitespace-nowrap">
-                        PKR {price.toLocaleString()}/mo
-                      </span>
-                    </div>
-                    <p className="text-xs text-[#999] mb-3">
-                      {planKey === "starter" ? "Perfect for small kiosks & new setups"
-                        : planKey === "growth" ? "For growing restaurants with high demand"
-                        : "Complete enterprise solution with priority support"}
-                    </p>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
-                      <FeatureRow label={`${formatLimit(planLimits.maxDishes)} dishes`} included />
-                      <FeatureRow label={planLimits.maxImages === 0 ? "No images" : `${formatLimit(planLimits.maxImages)} images`} included={planLimits.maxImages > 0} />
-                      <FeatureRow label={planLimits.maxOrders === Infinity ? "Unlimited orders" : `${planLimits.maxOrders} orders/mo`} included />
-                      <FeatureRow label={planLimits.analytics ? "Analytics dashboard" : "No analytics"} included={planLimits.analytics} />
-                      <FeatureRow label="QR code generation" included />
-                      <FeatureRow label="WhatsApp orders" included />
-                      <FeatureRow label="Priority support" included={planKey !== "starter"} />
-                    </div>
-                  </div>
-                  <div className="w-full sm:w-auto shrink-0">
-                    <a href={whatsappLink} target="_blank" rel="noopener">
-                      <Button variant={isRecommended ? "accent" : "primary"} fullWidth className="sm:w-auto">
-                        <MessageCircle className="w-4 h-4 mr-1.5" />
-                        Choose {PLAN_NAMES[planKey]}
-                      </Button>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
+      {/* All Plans — like pricing page */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <h2 className="text-sm font-bold text-black">All Plans</h2>
+          <div className="h-px flex-1 bg-[#F0F0F0]" />
         </div>
-      )}
 
-      {/* Paid user - contact for changes (only when NOT expired) */}
-      {currentPlan !== "trial" && upgradePlans.length === 0 && !isExpired && (
+        <Pricing2
+          heading=""
+          description=""
+          plans={showPlans}
+          onSelectPlan={handleSelectPlan}
+        />
+      </div>
+
+      {/* Premium user — contact support */}
+      {currentPlan !== "trial" && currentPlanIndex === planOrder.length - 1 && !isExpired && (
         <div className="bg-white border border-[#F0F0F0] rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-center sm:text-left">
             <div className="flex items-center gap-2 mb-1 justify-center sm:justify-start">
@@ -290,29 +306,18 @@ export default function SubscriptionPage() {
           {isExpired ? "Renew Your Plan" : "How to Pay"}
         </h3>
         {isExpired ? (
-          <>
-            <p className="text-xs text-[#555] leading-relaxed">
-              Your plan has expired. To restore your menu and start accepting orders again, choose a plan above and send the payment to one of the options below. We will activate your plan within minutes.
-            </p>
-            <div className="bg-[#F0F0F0] rounded-xl p-4 space-y-2">
-              <p className="text-xs font-semibold text-[#333]">Steps to Renew:</p>
-              <ol className="text-xs text-[#555] space-y-1.5 list-decimal list-inside">
-                <li>Choose a plan from the options above</li>
-                <li>Send the payment via JazzCash, Easypaisa, or Bank Transfer</li>
-                <li>Share the payment screenshot on our WhatsApp</li>
-                <li>We activate your plan within minutes</li>
-              </ol>
-            </div>
-          </>
+          <p className="text-xs text-[#555] leading-relaxed">
+            Your plan has expired. Choose a plan above to make a payment via JazzCash, Easypaisa, or Bank Transfer.
+          </p>
         ) : (
           <p className="text-xs text-[#555] leading-relaxed">
-            We accept manual payments via JazzCash, Easypaisa, and Bank Transfer. Send the amount and share the screenshot with our support team.
+            Choose a plan above to pay securely via JazzCash. You can also send manual payment via the options below.
           </p>
         )}
         <div className="grid sm:grid-cols-3 gap-3">
           <div className="bg-white p-3.5 rounded-xl border border-[#F0F0F0]">
             <p className="text-[10px] text-[#999] font-medium mb-0.5">JazzCash</p>
-            <p className="text-sm font-bold text-black">{jazzcash || "—"}</p>
+            <p className="text-sm font-bold text-black">{jazzcashNumber || "—"}</p>
             {accountTitle && <p className="text-[10px] text-[#555]">{accountTitle}</p>}
           </div>
           <div className="bg-white p-3.5 rounded-xl border border-[#F0F0F0]">
@@ -326,10 +331,16 @@ export default function SubscriptionPage() {
             {bankName && <p className="text-[10px] text-[#555]">{bankName}</p>}
           </div>
         </div>
-        <div className="bg-[#25D366]/5 border border-[#25D366]/10 rounded-xl px-4 py-3 flex items-center gap-3">
-          <HelpCircle className="w-4 h-4 text-[#25D366] shrink-0" />
-          <p className="text-xs text-[#555]">After payment, send proof to our WhatsApp for instant activation.</p>
-        </div>
+        {whatsappLink && (
+          <div className="bg-[#25D366]/5 border border-[#25D366]/10 rounded-xl px-4 py-3 flex items-center gap-3">
+            <HelpCircle className="w-4 h-4 text-[#25D366] shrink-0" />
+            <p className="text-xs text-[#555]">
+              After manual payment, send proof to our{" "}
+              <a href={whatsappLink} target="_blank" rel="noopener" className="text-[#25D366] font-semibold hover:underline">WhatsApp</a>{" "}
+              for instant activation.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -356,19 +367,6 @@ function UsageMeter({ icon, label, used, limit }: { icon: React.ReactNode; label
           <div className={`h-full rounded-full transition-all ${isNear ? "bg-[#DC2626]" : isWarning ? "bg-[#D97706]" : "bg-black"}`} style={{ width: `${percent}%` }} />
         </div>
       )}
-    </div>
-  )
-}
-
-function FeatureRow({ label, included }: { label: string; included: boolean }) {
-  return (
-    <div className="flex items-center gap-1.5 text-xs">
-      {included ? (
-        <Check className="w-3.5 h-3.5 text-[#25D366] shrink-0" />
-      ) : (
-        <X className="w-3.5 h-3.5 text-[#CCC] shrink-0" />
-      )}
-      <span className={included ? "text-[#333]" : "text-[#BBB]"}>{label}</span>
     </div>
   )
 }

@@ -29,11 +29,18 @@ export function OrganizationJsonLd() {
         },
         contactPoint: {
           "@type": "ContactPoint",
-          telephone: "+92-300-123-4567",
+          telephone: "+92-314-6325823",
           contactType: "customer service",
           availableLanguage: ["English", "Urdu"],
         },
-        sameAs: [],
+        sameAs: [
+          "https://www.facebook.com/digitalmenue",
+          "https://www.instagram.com/digitalmenue",
+          "https://www.linkedin.com/company/digitalmenue",
+          "https://www.tiktok.com/@digitalmenue",
+          "https://www.youtube.com/@digitalmenue",
+          "https://x.com/digitalmenue",
+        ],
       }}
     />
   )
@@ -65,7 +72,7 @@ export function SoftwareApplicationJsonLd() {
       data={{
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
-        name: "Digital QR Menue — Digital QR Menue Platform",
+        name: "Digital QR Menue Platform",
         operatingSystem: "Web",
         applicationCategory: "BusinessApplication",
         description:
@@ -324,26 +331,153 @@ export function FaqJsonLd({
   )
 }
 
-export function ReviewJsonLd() {
+export function LocalBusinessJsonLd() {
   return (
     <JsonLd
       data={{
         "@context": "https://schema.org",
-        "@type": "Review",
+        "@type": "LocalBusiness",
+        name: "Digital QR Menue",
+        description:
+          "Pakistan's leading QR-based digital menu and WhatsApp ordering platform for restaurants, cafes, and food businesses across Pakistan.",
+        url: "https://digitalmenue.com",
+        logo: "https://digitalmenue.com/favicon.svg",
+        image: "https://www.digitalmenue.com/og-image.png",
+        telephone: "+92-314-6325823",
+        email: "dmenue@gmail.com",
+        priceRange: "PKR 0 — 4,500",
+        address: {
+          "@type": "PostalAddress",
+          addressCountry: "PK",
+        },
+        areaServed: [
+          { "@type": "City", name: "Lahore" },
+          { "@type": "City", name: "Karachi" },
+          { "@type": "City", name: "Islamabad" },
+          { "@type": "City", name: "Faisalabad" },
+        ],
+        hasOfferCatalog: {
+          "@type": "OfferCatalog",
+          name: "QR Menu Plans",
+          itemListElement: [
+            { "@type": "Offer", itemOffered: { "@type": "Service", name: "Free Trial" }, price: "0", priceCurrency: "PKR" },
+            { "@type": "Offer", itemOffered: { "@type": "Service", name: "Starter" }, price: "1200", priceCurrency: "PKR" },
+            { "@type": "Offer", itemOffered: { "@type": "Service", name: "Growth" }, price: "2500", priceCurrency: "PKR" },
+            { "@type": "Offer", itemOffered: { "@type": "Service", name: "Premium" }, price: "4500", priceCurrency: "PKR" },
+          ],
+        },
+        sameAs: [
+          "https://www.facebook.com/digitalmenue",
+          "https://www.instagram.com/digitalmenue",
+          "https://www.linkedin.com/company/digitalmenue",
+          "https://www.tiktok.com/@digitalmenue",
+          "https://www.youtube.com/@digitalmenue",
+          "https://x.com/digitalmenue",
+        ],
+      }}
+    />
+  )
+}
+
+export function ReviewJsonLd({
+  reviews,
+}: {
+  reviews: Array<{
+    authorName: string
+    reviewBody: string
+    ratingValue: number
+    datePublished: string
+  }>
+}) {
+  return (
+    <JsonLd
+      data={{
+        "@context": "https://schema.org",
+        "@type": "AggregateRating",
         itemReviewed: {
-          "@type": "SoftwareApplication",
-          name: "Digitalmenue.com",
-        },
-        reviewRating: {
-          "@type": "Rating",
-          ratingValue: 4.5,
-          bestRating: 5,
-        },
-        author: {
           "@type": "Organization",
-          name: "Digitalmenue.com Users",
+          name: "Digital QR Menue",
+        },
+        ratingValue: reviews.length > 0
+          ? (reviews.reduce((sum, r) => sum + r.ratingValue, 0) / reviews.length).toFixed(1)
+          : "5.0",
+        bestRating: "5",
+        ratingCount: reviews.length || 1,
+        review: reviews.map((r) => ({
+          "@type": "Review",
+          author: { "@type": "Person", name: r.authorName },
+          reviewBody: r.reviewBody,
+          reviewRating: {
+            "@type": "Rating",
+            ratingValue: r.ratingValue,
+            bestRating: "5",
+          },
+          datePublished: r.datePublished,
+        })),
+      }}
+    />
+  )
+}
+
+export function VideoObjectJsonLd({
+  name,
+  description,
+  thumbnailUrl,
+  uploadDate,
+  contentUrl,
+}: {
+  name: string
+  description: string
+  thumbnailUrl: string
+  uploadDate: string
+  contentUrl: string
+}) {
+  return (
+    <JsonLd
+      data={{
+        "@context": "https://schema.org",
+        "@type": "VideoObject",
+        name,
+        description,
+        thumbnailUrl,
+        uploadDate,
+        contentUrl,
+        publisher: {
+          "@type": "Organization",
+          name: "Digital QR Menue",
+          url: "https://digitalmenue.com",
         },
       }}
     />
   )
 }
+
+export function ServiceJsonLd({
+  name,
+  description,
+  providerName,
+  areaServed,
+}: {
+  name: string
+  description: string
+  providerName: string
+  areaServed: string[]
+}) {
+  return (
+    <JsonLd
+      data={{
+        "@context": "https://schema.org",
+        "@type": "Service",
+        name,
+        description,
+        provider: {
+          "@type": "Organization",
+          name: providerName,
+          url: "https://digitalmenue.com",
+        },
+        areaServed: areaServed.map((city) => ({ "@type": "City", name: city })),
+      }}
+    />
+  )
+}
+

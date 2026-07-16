@@ -181,16 +181,16 @@ export const PATCH = safeRoute(async (request) => {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 })
   }
 
-  const { id, ...updateData } = body
-
-  if (!id) return NextResponse.json({ error: "Dish id required" }, { status: 400 })
-
   const parsed = dishUpdateSchema.safeParse(body)
   if (!parsed.success) {
     const fields = parsed.error.flatten().fieldErrors
     const firstMsg = Object.values(fields).flat().filter(Boolean)[0] || "Invalid input"
     return NextResponse.json({ error: firstMsg, fields }, { status: 400 })
   }
+
+  const { id, ...updateData } = parsed.data
+
+  if (!id) return NextResponse.json({ error: "Dish id required" }, { status: 400 })
 
   // Verify dish exists and belongs to user's restaurant
   const { data: dish } = await supabase
@@ -228,13 +228,15 @@ export const PATCH = safeRoute(async (request) => {
     .from("dishes")
     .update({
       name_en: updateData.name_en,
-      name_ur: updateData.name_ur || null,
-      description_en: updateData.description_en || null,
-      description_ur: updateData.description_ur || null,
+      name_ur: updateData.name_ur ?? null,
+      description_en: updateData.description_en ?? null,
+      description_ur: updateData.description_ur ?? null,
       price: updateData.price,
       category_id: updateData.category_id,
-      image_url: updateData.image_url,
-      tags: updateData.tags || [],
+      image_url: updateData.image_url ?? null,
+      tags: updateData.tags ?? [],
+      is_available: updateData.is_available,
+      sort_order: updateData.sort_order,
     })
     .eq("id", id)
     .select()

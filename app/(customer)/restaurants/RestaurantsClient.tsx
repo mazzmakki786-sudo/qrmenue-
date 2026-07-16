@@ -47,7 +47,7 @@ function RestaurantCard({
   const sealed = isRestaurantSealed(r)
 
   return (
-    <div className={`flex items-center gap-3 p-3 bg-white border border-border rounded-xl hover:border-border-strong transition-colors h-full ${sealed ? "opacity-50" : ""}`}>
+    <div data-testid={`restaurant-card-${r.slug}`} className={`flex items-center gap-3 p-3 bg-white border border-border rounded-xl hover:border-border-strong transition-colors h-full ${sealed ? "opacity-50" : ""}`}>
       {/* Logo */}
       <Link href={`/menu/${r.slug}`} className="shrink-0">
         {r.logo_url ? (
@@ -117,6 +117,7 @@ function RestaurantCard({
         </button>
         <Link
           href={`/menu/${r.slug}`}
+          data-testid={`menu-link-${r.slug}`}
           className="inline-flex items-center gap-0.5 px-3 py-1.5 rounded-xl bg-primary text-white text-[11px] font-semibold hover:bg-primary-hover active:scale-[0.97] transition-all shadow-[0_1px_3px_rgba(0,0,0,0.1)]"
         >
           Menu
@@ -207,6 +208,7 @@ export function RestaurantsClient({ initialRestaurants, initialCities }: Restaur
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted group-focus-within:text-text-primary transition-colors" />
               <input
                 type="text"
+                data-testid="search-input"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search restaurants, cuisines, or locations..."
@@ -230,6 +232,7 @@ export function RestaurantsClient({ initialRestaurants, initialCities }: Restaur
           <div className="flex items-center gap-2 overflow-x-auto pb-0.5 scrollbar-none">
             <button
               onClick={() => setSelectedCity("")}
+              data-testid="city-filter-all"
               className={`shrink-0 px-3.5 py-1.5 rounded-lg text-[12px] font-semibold transition-all ${
                 !selectedCity
                   ? "bg-primary text-white shadow-sm"
@@ -241,6 +244,7 @@ export function RestaurantsClient({ initialRestaurants, initialCities }: Restaur
             {allCities.map((city) => (
               <button
                 key={city}
+                data-testid={`city-filter-${city.toLowerCase()}`}
                 onClick={() => setSelectedCity(city)}
                 className={`shrink-0 px-3.5 py-1.5 rounded-lg text-[12px] font-semibold transition-all ${
                   selectedCity === city
@@ -276,7 +280,7 @@ export function RestaurantsClient({ initialRestaurants, initialCities }: Restaur
             ))}
           </div>
         ) : filteredRestaurants.length === 0 ? (
-          <div className="py-14 sm:py-20 text-center">
+          <div data-testid="restaurants-empty-state" className="py-14 sm:py-20 text-center">
             <div className="w-14 h-14 rounded-2xl bg-white border border-border mx-auto mb-4 flex items-center justify-center shadow-sm">
               <Search className="w-6 h-6 text-text-muted/30" />
             </div>
@@ -291,6 +295,7 @@ export function RestaurantsClient({ initialRestaurants, initialCities }: Restaur
             {searchQuery.trim() && (
               <button
                 onClick={handleSearchClear}
+                data-testid="clear-search-btn"
                 className="text-[12px] font-semibold text-text-primary bg-[#F5F5F5] hover:bg-border px-5 py-2 rounded-xl transition-colors"
               >
                 Clear search

@@ -37,6 +37,7 @@ export function LandingHeader() {
             <nav className="hidden md:flex items-center gap-1">
               <Link href="/restaurants" className="text-sm font-medium text-[#555] px-3 py-1.5 rounded-lg hover:bg-[#F5F5F5] hover:text-black transition-colors">Restaurants</Link>
               <Link href="/pricing" className="text-sm font-medium text-[#555] px-3 py-1.5 rounded-lg hover:bg-[#F5F5F5] hover:text-black transition-colors">Pricing</Link>
+              <Link href="/blog" className="text-sm font-medium text-[#555] px-3 py-1.5 rounded-lg hover:bg-[#F5F5F5] hover:text-black transition-colors">Blog</Link>
               <Link href="/faq" className="text-sm font-medium text-[#555] px-3 py-1.5 rounded-lg hover:bg-[#F5F5F5] hover:text-black transition-colors">FAQ</Link>
               <Link href="/contact" className="text-sm font-medium text-[#555] px-3 py-1.5 rounded-lg hover:bg-[#F5F5F5] hover:text-black transition-colors">Contact</Link>
               <div className="w-px h-5 bg-[#E0E0E0] mx-2" />
@@ -74,6 +75,7 @@ export function LandingHeader() {
           {[
             { href: "/restaurants", label: "Restaurants", icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" },
             { href: "/pricing", label: "Pricing & Plans", icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
+            { href: "/blog", label: "Blog", icon: "M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" },
             { href: "/faq", label: "FAQ", icon: "M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" },
             { href: "/contact", label: "Contact", icon: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" },
           ].map(({ href, label, icon }) => (

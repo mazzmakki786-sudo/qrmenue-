@@ -5,6 +5,7 @@ export default function robots(): MetadataRoute.Robots {
 
   return {
     rules: [
+      // Default — allow everything except sensitive routes
       {
         userAgent: "*",
         allow: "/",
@@ -18,17 +19,19 @@ export default function robots(): MetadataRoute.Robots {
           "/api/",
         ],
       },
-      // All AI crawlers — allowed
+      // AI search crawlers — explicitly allowed for AI visibility
       { userAgent: "GPTBot", allow: "/" },
+      { userAgent: "OAI-SearchBot", allow: "/" },
       { userAgent: "Google-Extended", allow: "/" },
       { userAgent: "PerplexityBot", allow: "/" },
       { userAgent: "ClaudeBot", allow: "/" },
-      { userAgent: "CCBot", allow: "/" },
       { userAgent: "ChatGPT-User", allow: "/" },
-      { userAgent: "anthropic-ai", allow: "/" },
-      { userAgent: "Bytespider", allow: "/" },
-      { userAgent: "Amazonbot", allow: "/" },
       { userAgent: "Applebot-Extended", allow: "/" },
+      // Training crawlers — explicitly blocked
+      { userAgent: "anthropic-ai", disallow: "/" },
+      { userAgent: "CCBot", disallow: "/" },
+      { userAgent: "Bytespider", disallow: "/" },
+      { userAgent: "cohere-ai", disallow: "/" },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
   }

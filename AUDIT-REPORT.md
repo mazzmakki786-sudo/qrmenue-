@@ -257,3 +257,34 @@ Sprint 4 (LOW — 1 day):
 | **Total** | **20 unique issues** | |
 
 **Currently Working:** ✅ Build passes, rate limiting applied, CSRF on majority of routes, all API routes error-safe.
+
+---
+
+## 10. LIVE SITE E2E AUDIT (July 14, 2026)
+
+### Test Results: `digitalmenue.com`
+
+| Section | Checks | ✅ Pass | ⚠️ Warn | ❌ Fail |
+|---------|--------|---------|---------|---------|
+| Public Pages | 10 | 9 | 0 | 1 |
+| Auth Flows | 5 | 5 | 0 | 0 |
+| Owner Dashboard | 12 | 12 | 0 | 0 |
+| Superadmin | 1 | 1 | 0 | 0 |
+| Mobile Responsive | 5 | 5 | 0 | 0 |
+| **Total** | **46** | **42** | **3** | **1** |
+
+### Issues Found
+
+| # | Severity | Area | Detail |
+|---|----------|------|--------|
+| 1 | 🔴 High | `/menu` 404 | Returns 404 — fixed in codebase via redirect, needs deploy |
+| 2 | 🟡 Medium | Homepage load | Cold load 3.5s (warm ~1.6s) — normal for Next.js SSR |
+| 3 | 🟢 Low | Console noise | `ERR_ABORTED` from Next.js prefetch — not a real error |
+
+### Recommendations
+
+| Priority | Action |
+|----------|--------|
+| 🔴 | **Deploy latest codebase** to production |
+| 🟡 | Add `/faq` to main navigation if not already linked |
+| 🟢 | Set up CI/CD with Playwright tests running on every deploy |

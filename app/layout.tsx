@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next"
 import { Inter, Noto_Nastaliq_Urdu } from "next/font/google"
 import "./globals.css"
 import { I18nProvider } from "@/lib/i18n/context"
-import { OrganizationJsonLd, WebsiteJsonLd, SoftwareApplicationJsonLd, ReviewJsonLd } from "@/components/JsonLd"
+import { WebsiteJsonLd, SoftwareApplicationJsonLd, LocalBusinessJsonLd } from "@/components/JsonLd"
 import { DynamicBreadcrumb } from "@/components/shared/DynamicBreadcrumb"
 
 const inter = Inter({
@@ -26,11 +26,11 @@ const SITE_URL = "https://www.digitalmenue.com"
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — QR Code Menu & WhatsApp Ordering for Pakistan Restaurants`,
-    template: `%s | ${SITE_NAME}`,
+    default: `Digitalmenue.com | QR Menu & WhatsApp Ordering Pakistan`,
+    template: `%s | Digitalmenue.com`,
   },
   description:
-    "Create a free QR code menu for your restaurant in Pakistan. Customers scan, browse, and order on WhatsApp. No app, no commission. Start your 7-day free trial.",
+    "Pakistan ke restaurants ke liye behtareen QR Code menu card. Save 30% Foodpanda commission & get direct orders on WhatsApp. Free trial shuru karein.",
   keywords: [
     "QR menu Pakistan",
     "digital menu for restaurant",
@@ -54,9 +54,9 @@ export const metadata: Metadata = {
     locale: "en_PK",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: `${SITE_NAME} — QR Code Menu & WhatsApp Ordering for Pakistan Restaurants`,
+    title: `Pakistan's #1 QR Code Menu & WhatsApp Ordering System for Restaurants`,
     description:
-      "Create a free QR code menu for your restaurant in Pakistan. Customers scan, browse, and order on WhatsApp. No app, no commission. Start your 7-day free trial.",
+      "Ab menu print karne ka kharcha khatam! Apne customers ko dein behtareen digital menu card aur orders receive karein seedha apne WhatsApp par. Aaj hi free trial shuru karein.",
     images: [
       {
         url: "/og-image.png",
@@ -68,9 +68,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} — QR Code Menu & WhatsApp Ordering for Pakistan Restaurants`,
+    title: `Pakistan's #1 QR Code Menu & WhatsApp Ordering System for Restaurants`,
     description:
-      "Create a free QR code menu for your restaurant in Pakistan. No app, no commission. Start your 7-day free trial.",
+      "Ab menu print karne ka kharcha khatam! Apne customers ko dein behtareen digital menu card aur orders receive karein seedha apne WhatsApp par. Aaj hi free trial shuru karein.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -88,7 +88,7 @@ export const metadata: Metadata = {
     canonical: SITE_URL,
     languages: {
       en: SITE_URL,
-      ur: `${SITE_URL}/menu`,
+      ur: `${SITE_URL}/restaurants`,
       "x-default": SITE_URL,
     },
   },
@@ -116,21 +116,40 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${notoUrdu.variable}`} suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://*.supabase.co" />
+        <link rel="dns-prefetch" href="https://*.supabase.co" />
+      </head>
       <body className="min-h-screen bg-white font-sans antialiased overflow-x-hidden">
-        <OrganizationJsonLd />
         <WebsiteJsonLd />
         <SoftwareApplicationJsonLd />
-        <ReviewJsonLd />
+        <LocalBusinessJsonLd />
         <DynamicBreadcrumb />
         <I18nProvider>{children}</I18nProvider>
         <script
           dangerouslySetInnerHTML={{
             __html: `
               if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js').catch(function(err) {
+                window.addEventListener('load', async function() {
+                  try {
+                    var reg = await navigator.serviceWorker.register('/sw.js')
+                    // If waiting, skip waiting so new SW takes over immediately
+                    if (reg.waiting) {
+                      reg.waiting.postMessage({ type: 'SKIP_WAITING' })
+                    }
+                    reg.addEventListener('updatefound', function() {
+                      var installing = reg.installing
+                      if (installing) {
+                        installing.addEventListener('statechange', function() {
+                          if (this.state === 'activated') {
+                            window.location.reload()
+                          }
+                        })
+                      }
+                    })
+                  } catch(err) {
                     console.warn('SW registration failed:', err)
-                  })
+                  }
                 })
               }
             `,

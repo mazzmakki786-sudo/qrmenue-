@@ -9,6 +9,7 @@ export interface DBPlan {
   slug: string
   name: string
   price_pkr: number
+  yearly_price_pkr: number | null
   max_dishes: number
   max_images: number
   max_orders: number
@@ -21,6 +22,7 @@ export interface DBPlan {
   description: string
   sort_order: number
   is_active: boolean
+  custom_features: string[] | null
 }
 
 // In-memory cache for plans (per-request)
@@ -169,9 +171,9 @@ export function invalidatePlansCache(): void {
 
 function getFallbackPlans(): DBPlan[] {
   return [
-    { id: "fallback-1", slug: "trial", name: "Free Trial", price_pkr: 0, max_dishes: 20, max_images: 20, max_orders: 10, max_categories: 20, analytics: true, custom_branding: false, can_have_qr: true, can_have_whatsapp: true, ai_posts_per_month: 0, description: "Perfect for testing", sort_order: 0, is_active: true },
-    { id: "fallback-2", slug: "starter", name: "Starter", price_pkr: 1200, max_dishes: 30, max_images: 10, max_orders: -1, max_categories: -1, analytics: true, custom_branding: false, can_have_qr: true, can_have_whatsapp: true, ai_posts_per_month: 0, description: "For small restaurants", sort_order: 1, is_active: true },
-    { id: "fallback-3", slug: "growth", name: "Growth", price_pkr: 2500, max_dishes: 50, max_images: 20, max_orders: -1, max_categories: -1, analytics: true, custom_branding: true, can_have_qr: true, can_have_whatsapp: true, ai_posts_per_month: 6, description: "For growing restaurants", sort_order: 2, is_active: true },
-    { id: "fallback-4", slug: "premium", name: "Premium", price_pkr: 4500, max_dishes: 100, max_images: 100, max_orders: -1, max_categories: -1, analytics: true, custom_branding: true, can_have_qr: true, can_have_whatsapp: true, ai_posts_per_month: 12, description: "Full features", sort_order: 3, is_active: true },
+    { id: "fallback-1", slug: "trial", name: "Free Trial", price_pkr: 0, yearly_price_pkr: 0, max_dishes: 20, max_images: 20, max_orders: 10, max_categories: 20, analytics: true, custom_branding: false, can_have_qr: true, can_have_whatsapp: true, ai_posts_per_month: 0, description: "Perfect for testing", sort_order: 0, is_active: true, custom_features: [] },
+    { id: "fallback-2", slug: "starter", name: "Starter", price_pkr: 1200, yearly_price_pkr: 12000, max_dishes: 30, max_images: 10, max_orders: -1, max_categories: -1, analytics: true, custom_branding: false, can_have_qr: true, can_have_whatsapp: true, ai_posts_per_month: 0, description: "For small restaurants", sort_order: 1, is_active: true, custom_features: [] },
+    { id: "fallback-3", slug: "growth", name: "Growth", price_pkr: 2500, yearly_price_pkr: 25000, max_dishes: 50, max_images: 20, max_orders: -1, max_categories: -1, analytics: true, custom_branding: true, can_have_qr: true, can_have_whatsapp: true, ai_posts_per_month: 6, description: "For growing restaurants", sort_order: 2, is_active: true, custom_features: [] },
+    { id: "fallback-4", slug: "premium", name: "Premium", price_pkr: 4500, yearly_price_pkr: 45000, max_dishes: 100, max_images: 100, max_orders: -1, max_categories: -1, analytics: true, custom_branding: true, can_have_qr: true, can_have_whatsapp: true, ai_posts_per_month: 12, description: "Full features", sort_order: 3, is_active: true, custom_features: [] },
   ]
 }

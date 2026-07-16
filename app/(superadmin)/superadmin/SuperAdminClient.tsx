@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
-import { Shield, LogOut, Eye, EyeOff, Users, Building2, BarChart3, Settings as SettingsIcon, Store, Megaphone, Clock, CreditCard, Sparkles } from "lucide-react"
+import { Shield, Eye, EyeOff, Users, BarChart3, Settings as SettingsIcon, Store, Megaphone, Clock, CreditCard, Sparkles, Loader2, Mail } from "lucide-react"
 import { RestaurantTable } from "@/components/superadmin/RestaurantTable"
 import { CustomerTable } from "@/components/superadmin/CustomerTable"
 import { AnalyticsView } from "@/components/superadmin/AnalyticsView"
@@ -14,8 +14,9 @@ import { AnnouncementsPanel } from "@/components/superadmin/AnnouncementsPanel"
 import { ActivityLogView } from "@/components/superadmin/ActivityLogView"
 import { PlanManager } from "@/components/superadmin/PlanManager"
 import { AiControls } from "@/components/superadmin/AiControls"
+import { ContactInquiriesPanel } from "@/components/superadmin/ContactInquiriesPanel"
 
-type Tab = "restaurants" | "customers" | "analytics" | "announcements" | "plans" | "settings" | "ai"
+type Tab = "restaurants" | "customers" | "analytics" | "announcements" | "plans" | "settings" | "ai" | "inquiries"
 
 const SESSION_TIMEOUT_MS = 15 * 60 * 1000
 
@@ -46,7 +47,7 @@ function LoginForm({ onLogin, locked }: { onLogin: () => void; locked: boolean }
 
   if (locked) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center px-4">
+      <div className="fixed inset-0 z-[60] bg-white flex items-center justify-center px-4">
         <div className="text-center max-w-sm">
           <div className="w-14 h-14 rounded-xl bg-red-50 text-[#DC2626] flex items-center justify-center mx-auto mb-4">
             <Shield className="w-7 h-7" />
@@ -67,7 +68,7 @@ function LoginForm({ onLogin, locked }: { onLogin: () => void; locked: boolean }
   }
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4">
+    <div className="fixed inset-0 z-[60] bg-white flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-xl bg-black text-white flex items-center justify-center mx-auto mb-4">
@@ -90,8 +91,8 @@ function LoginForm({ onLogin, locked }: { onLogin: () => void; locked: boolean }
             </button>
           </div>
           {error && <p className="text-xs text-[#DC2626] bg-red-50 rounded-lg p-3">{error}</p>}
-          <button type="submit" disabled={loading} className="w-full h-11 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity">
-            {loading ? "Signing in..." : "Sign In"}
+          <button type="submit" disabled={loading} className="w-full h-11 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity flex items-center justify-center gap-2">
+            {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Signing in...</> : "Sign In"}
           </button>
         </form>
 
@@ -103,7 +104,7 @@ function LoginForm({ onLogin, locked }: { onLogin: () => void; locked: boolean }
 
 function AccessDenied({ onLogout }: { onLogout: () => void }) {
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4">
+    <div className="fixed inset-0 z-[60] bg-white flex items-center justify-center px-4">
       <div className="text-center max-w-sm">
         <div className="w-14 h-14 rounded-xl bg-red-50 text-[#DC2626] flex items-center justify-center mx-auto mb-4">
           <Shield className="w-7 h-7" />
@@ -124,13 +125,14 @@ const TABS: { id: Tab; label: string; icon: any }[] = [
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "announcements", label: "Announcements", icon: Megaphone },
   { id: "plans", label: "Plans", icon: CreditCard },
+  { id: "inquiries", label: "Inquiries", icon: Mail },
   { id: "ai", label: "AI Management", icon: Sparkles },
   { id: "settings", label: "Settings", icon: SettingsIcon },
 ]
 
 export default function SuperAdminClient({ currentUserEmail }: { currentUserEmail: string }) {
-  const [user, setUser] = useState<{ email: string } | null>(currentUserEmail ? { email: currentUserEmail } : null)
-  const [checking, setChecking] = useState(!currentUserEmail)
+  const [user, setUser] = useState<{ email: string } | null>(null)
+  const [checking, setChecking] = useState(false)
   const [isSuperAdmin, setIsSuperAdmin] = useState(false)
   const [isLocked, setIsLocked] = useState(false)
   const searchParams = useSearchParams()
@@ -173,7 +175,7 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
     if (inactivityRef.current) clearTimeout(inactivityRef.current)
     if (isSuperAdmin) {
       inactivityRef.current = setTimeout(async () => {
-        await supabase.auth.signOut()
+        try { await fetch("/api/auth/logout", { method: "POST" }) } catch {}
         setUser(null)
         setIsSuperAdmin(false)
         window.location.href = "/superadmin"
@@ -192,19 +194,7 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
     }
   }, [isSuperAdmin, resetInactivityTimer])
 
-  useEffect(() => {
-    if (!currentUserEmail) {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        const u = session?.user as { email: string } | null
-        setUser(u)
-        setChecking(false)
-        if (u?.email) verifyAdmin(u.email)
-      })
-    } else {
-      setChecking(false)
-      verifyAdmin(currentUserEmail)
-    }
-  }, [])
+  // Auth handled by LoginForm — no auto-detection
 
   const fetchRestaurants = useCallback(async () => {
     try {
@@ -266,14 +256,21 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
   }, [isSuperAdmin, scheduleRefetch])
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
+    try { await fetch("/api/auth/logout", { method: "POST" }) } catch {}
     window.location.href = "/superadmin"
   }
 
-  if (checking) return <div className="min-h-screen bg-white flex items-center justify-center"><p className="text-[#999]">Loading...</p></div>
-  if (!user) return <LoginForm onLogin={async () => {
-    window.location.reload()
-  }} locked={isLocked} />
+  const handleLoginSuccess = async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    const u = session?.user as { email: string } | null
+    if (u?.email) {
+      setUser(u)
+      await verifyAdmin(u.email)
+    }
+  }
+
+  if (checking) return <div className="fixed inset-0 z-[60] bg-white flex items-center justify-center"><p className="text-[#999]">Loading...</p></div>
+  if (!user) return <LoginForm onLogin={handleLoginSuccess} locked={isLocked} />
   if (isLocked) return <LoginForm onLogin={async () => {}} locked={true} />
   if (!isSuperAdmin) return <AccessDenied onLogout={handleLogout} />
 
@@ -318,6 +315,7 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
             {activeTab === "restaurants" && <RestaurantTable restaurants={restaurants} users={users} setRestaurants={setRestaurants} />}
             {activeTab === "customers" && <CustomerTable />}
             {activeTab === "analytics" && <AnalyticsView />}
+            {activeTab === "inquiries" && <ContactInquiriesPanel />}
             {activeTab === "announcements" && <AnnouncementsPanel />}
             {activeTab === "plans" && <PlanManager />}
             {activeTab === "ai" && <AiControls />}

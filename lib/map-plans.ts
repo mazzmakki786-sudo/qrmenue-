@@ -3,6 +3,7 @@ export interface DBPlan {
   slug: string
   name: string
   price_pkr: number
+  yearly_price_pkr: number | null
   max_dishes: number
   max_images: number
   max_orders: number
@@ -65,16 +66,19 @@ function buildFeatures(plan: DBPlan): { text: string }[] {
 
 export function mapPlan(plan: DBPlan): PricingPlan {
   const monthlyPrice = `PKR ${plan.price_pkr.toLocaleString("en-PK")}`
+  const yearlyRaw = plan.yearly_price_pkr ?? plan.price_pkr * 12
   return {
     id: plan.slug,
     name: plan.name,
     description: plan.description || "",
     monthlyPrice: plan.price_pkr === 0 ? "Free" : monthlyPrice,
-    yearlyPrice: plan.price_pkr === 0 ? "Free" : `PKR ${(plan.price_pkr * 12).toLocaleString("en-PK")}`,
+    yearlyPrice: plan.price_pkr === 0 ? "Free" : `PKR ${yearlyRaw.toLocaleString("en-PK")}`,
     features: buildFeatures(plan),
     button: {
       text: plan.slug === "trial" ? "Start Free Trial" : "Choose Plan",
-      url: "/signup/restaurant",
+      url: plan.slug === "trial"
+        ? "/signup/restaurant"
+        : `/signup/restaurant?plan=${plan.slug}`,
     },
   }
 }

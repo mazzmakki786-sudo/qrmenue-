@@ -67,6 +67,11 @@ export function useSubscription(): UseSubscriptionReturn {
       const supabase = getSupabase()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
+        setRestaurant(null)
+        setDishCount(0)
+        setImageCount(0)
+        setOrderCount(0)
+        setCategoryCount(0)
         setLoading(false)
         return
       }

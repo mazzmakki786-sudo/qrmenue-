@@ -61,5 +61,5 @@ export function PricingSection({ heading, description, initialPlans }: PricingSe
     )
   }
 
-  return <Pricing2 heading={heading} description={description} plans={plans} />
+  return <Pricing2 heading={heading} description={description} plans={plans} data-testid="pricing-section" />
 }

@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { ArrowRight, CircleCheck } from "lucide-react";
 import Link from "next/link";
-
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -34,12 +32,14 @@ interface Pricing2Props {
   heading?: string;
   description?: string;
   plans?: PricingPlan[];
+  onSelectPlan?: (planId: string) => void;
 }
 
 const Pricing2 = ({
   heading = "Plans & Pricing",
   description = "Choose the plan that matches your workflow and scale with ease.",
   plans = [],
+  onSelectPlan,
 }: Pricing2Props) => {
   const [isYearly, setIsYearly] = useState(false);
 
@@ -103,19 +103,31 @@ const Pricing2 = ({
               </CardContent>
 
               <CardFooter className="mt-auto">
-                <Button
-                  asChild
-                  className={`w-full rounded-xl text-sm ${
-                    i === 1
-                      ? "bg-black text-white hover:bg-[#1A1A1A]"
-                      : "bg-white border border-[#E8E8E8] text-[#555] hover:border-black hover:text-black"
-                  }`}
-                >
-                  <Link href={plan.button.url}>
+                {onSelectPlan ? (
+                  <button
+                    onClick={() => onSelectPlan(plan.id)}
+                    className={`w-full rounded-xl text-sm inline-flex items-center justify-center h-12 px-6 font-semibold transition-all duration-150 active:scale-[0.98] ${
+                      i === 1
+                        ? "bg-black text-white hover:bg-[#1A1A1A]"
+                        : "bg-white border border-[#E8E8E8] text-[#555] hover:border-black hover:text-black"
+                    }`}
+                  >
+                    {plan.button.text}
+                    <ArrowRight className="ml-2 size-4" />
+                  </button>
+                ) : (
+                  <Link
+                    href={plan.button.url}
+                    className={`w-full rounded-xl text-sm inline-flex items-center justify-center h-12 px-6 font-semibold transition-all duration-150 active:scale-[0.98] ${
+                      i === 1
+                        ? "bg-black text-white hover:bg-[#1A1A1A]"
+                        : "bg-white border border-[#E8E8E8] text-[#555] hover:border-black hover:text-black"
+                    }`}
+                  >
                     {plan.button.text}
                     <ArrowRight className="ml-2 size-4" />
                   </Link>
-                </Button>
+                )}
               </CardFooter>
             </Card>
           ))}

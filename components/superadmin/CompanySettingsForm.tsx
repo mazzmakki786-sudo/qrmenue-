@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
-import { Check } from "lucide-react"
+import { Check, Loader2 } from "lucide-react"
 
 const settingKeys = [
   { key: "jazzcash_number", label: "JazzCash Number", placeholder: "03001234567" },
@@ -15,6 +15,15 @@ const settingKeys = [
   { key: "company_email", label: "Company Email", placeholder: "support@digitalmenue.com", type: "email" },
 ]
 
+const socialKeys = [
+  { key: "social_facebook", label: "Facebook URL", placeholder: "https://facebook.com/yourpage" },
+  { key: "social_instagram", label: "Instagram URL", placeholder: "https://instagram.com/yourpage" },
+  { key: "social_linkedin", label: "LinkedIn URL", placeholder: "https://linkedin.com/company/yourpage" },
+  { key: "social_tiktok", label: "TikTok URL", placeholder: "https://tiktok.com/@yourpage" },
+  { key: "social_youtube", label: "YouTube URL", placeholder: "https://youtube.com/@yourchannel" },
+  { key: "social_twitter", label: "Twitter / X URL", placeholder: "https://x.com/yourhandle" },
+]
+
 export function CompanySettingsForm() {
   const [settings, setSettings] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
@@ -24,11 +33,10 @@ export function CompanySettingsForm() {
   const supabase = createClient()
 
   const fetchSettings = useCallback(async () => {
-    const { data, error } = await supabase.from("company_settings").select("*")
-    if (data) {
-      const map: Record<string, string> = {}
-      data.forEach((s: any) => { map[s.key] = s.value })
-      setSettings(map)
+    const res = await fetch("/api/superadmin/settings")
+    if (res.ok) {
+      const json = await res.json()
+      setSettings(json.settings || {})
     }
     setLoading(false)
   }, [])
@@ -74,6 +82,7 @@ export function CompanySettingsForm() {
   return (
     <div className="space-y-4">
       <div className="bg-white rounded-[14px] border border-[#E8E8E8] p-5 space-y-4">
+        <h3 className="text-sm font-semibold mb-3">Payment & Support</h3>
         {settingKeys.map(({ key, label, placeholder, type }) => (
           <div key={key}>
             <label htmlFor={key} className="block text-xs font-medium text-[#555] mb-1.5">
@@ -89,12 +98,32 @@ export function CompanySettingsForm() {
             />
           </div>
         ))}
+      </div>
+
+      <div className="bg-white rounded-[14px] border border-[#E8E8E8] p-5 space-y-4">
+        <h3 className="text-sm font-semibold mb-3">Social Media Links</h3>
+        <p className="text-xs text-[#999] mb-2">Leave a field empty to hide that icon from the contact page.</p>
+        {socialKeys.map(({ key, label, placeholder }) => (
+          <div key={key}>
+            <label htmlFor={key} className="block text-xs font-medium text-[#555] mb-1.5">
+              {label}
+            </label>
+            <input
+              id={key}
+              type="url"
+              value={settings[key] || ""}
+              onChange={(e) => setSettings((p) => ({ ...p, [key]: e.target.value }))}
+              placeholder={placeholder}
+              className="w-full h-11 px-3.5 rounded-xl border border-[#E8E8E8] bg-white text-sm outline-none focus:border-black transition-colors"
+            />
+          </div>
+        ))}
         <button
           onClick={handleSave}
           disabled={saving}
           className="h-11 px-5 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity flex items-center gap-2"
         >
-          {saving ? "Saving..." : saved ? <><Check className="w-4 h-4" /> Saved!</> : "Save All Settings"}
+          {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</> : saved ? <><Check className="w-4 h-4" /> Saved!</> : "Save All Settings"}
         </button>
       </div>
       <p className="text-xs text-[#999]">

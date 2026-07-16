@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "Frequently Asked Questions",
   description:
     "Everything you need to know about Digital QR Menue — Pakistan's no-commission QR menu platform. Pricing, setup, WhatsApp ordering, and support FAQs.",
+  alternates: {
+    canonical: "https://www.digitalmenue.com/faq",
+  },
 }
 
 interface FaqItem {
@@ -40,11 +43,11 @@ const categories: Array<{ title: string; faqs: FaqItem[] }> = [
     faqs: [
       {
         q: "Is the free trial really free?",
-        a: "Yes. 7 days, no credit card required. You get full access with up to 5 dishes. Your menu goes live immediately.",
+        a: "Yes. 30 days, no credit card required. You get full access with up to 20 dishes. Your menu goes live immediately.",
       },
       {
         q: "What are the pricing plans?",
-        a: "Free Trial (PKR 0, 7 days), Starter (PKR 1,200/mo), Growth (PKR 2,500/mo), Premium (PKR 4,500/mo). All paid plans include unlimited orders, QR codes, WhatsApp ordering, and zero commission.",
+        a: "Free Trial (PKR 0, 30 days), Starter (PKR 1,500/mo), Growth (PKR 2,500/mo), Premium (PKR 4,500/mo). All paid plans include unlimited orders, QR codes, WhatsApp ordering, and zero commission.",
       },
       {
         q: "Can I upgrade or downgrade anytime?",
@@ -132,6 +135,7 @@ export default function FaqPage() {
 
         <section className="py-16 md:py-24">
           <div className="max-w-3xl mx-auto px-5 space-y-16">
+            <p className="text-xs text-[#888]">Last updated: July 16, 2026</p>
             {categories.map((cat, ci) => (
               <div key={ci}>
                 <h2 className="text-xl md:text-2xl font-bold mb-6">{cat.title}</h2>

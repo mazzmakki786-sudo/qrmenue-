@@ -1,7 +1,6 @@
 "use client"
 
 import { useRef, useState, useCallback, useEffect } from "react"
-import { toPng } from "html-to-image"
 import { Download, ArrowUpDown, ImageUp, Palette, Type, Layout, Sparkles, Loader2 } from "lucide-react"
 import type { Dish } from "@/types"
 import { PosterRenderer, TEMPLATES, getDefaultColors } from "./PosterTemplates"
@@ -70,6 +69,7 @@ export function PosterEditor({ dishes, restaurantName, restaurantLogo, initialCa
     if (!posterRef.current) return
     setExporting(true)
     try {
+      const { toPng } = await import("html-to-image")
       const dataUrl = await toPng(posterRef.current, { quality: 0.95, pixelRatio: 2 })
       const link = document.createElement("a")
       link.download = `poster-${template.id}-${Date.now()}.png`

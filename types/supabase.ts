@@ -237,6 +237,8 @@ export type Database = {
           order_type: string
           payment_method: string | null
           payment_status: string | null
+          prepared_at: string | null
+          ready_at: string | null
           restaurant_id: string
           table_number: string | null
           total_price: number
@@ -257,6 +259,8 @@ export type Database = {
           order_type: string
           payment_method?: string | null
           payment_status?: string | null
+          prepared_at?: string | null
+          ready_at?: string | null
           restaurant_id: string
           table_number?: string | null
           total_price: number
@@ -277,6 +281,8 @@ export type Database = {
           order_type?: string
           payment_method?: string | null
           payment_status?: string | null
+          prepared_at?: string | null
+          ready_at?: string | null
           restaurant_id?: string
           table_number?: string | null
           total_price?: number
@@ -380,61 +386,76 @@ export type Database = {
       }
       plans: {
         Row: {
+          ai_posts_per_month: number
           analytics: boolean
           can_have_qr: boolean
           can_have_whatsapp: boolean
           created_at: string
           custom_branding: boolean
+          custom_features: Json | null
           description: string | null
           id: string
+          interval: string
           is_active: boolean
           max_categories: number
           max_dishes: number
           max_images: number
           max_orders: number
+          max_staff: number | null
           name: string
           price_pkr: number
           slug: string
           sort_order: number
           updated_at: string
+          yearly_price_pkr: number | null
         }
         Insert: {
+          ai_posts_per_month?: number
           analytics?: boolean
           can_have_qr?: boolean
           can_have_whatsapp?: boolean
           created_at?: string
           custom_branding?: boolean
+          custom_features?: Json | null
           description?: string | null
           id?: string
+          interval?: string
           is_active?: boolean
           max_categories?: number
           max_dishes?: number
           max_images?: number
           max_orders?: number
+          max_staff?: number | null
           name: string
           price_pkr?: number
           slug: string
           sort_order?: number
           updated_at?: string
+          yearly_price_pkr?: number | null
         }
         Update: {
+          ai_posts_per_month?: number
           analytics?: boolean
           can_have_qr?: boolean
           can_have_whatsapp?: boolean
           created_at?: string
           custom_branding?: boolean
+          custom_features?: Json | null
           description?: string | null
           id?: string
+          interval?: string
           is_active?: boolean
           max_categories?: number
           max_dishes?: number
           max_images?: number
           max_orders?: number
+          max_staff?: number | null
           name?: string
           price_pkr?: number
           slug?: string
           sort_order?: number
           updated_at?: string
+          yearly_price_pkr?: number | null
         }
         Relationships: []
       }

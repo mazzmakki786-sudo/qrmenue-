@@ -22,10 +22,9 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const t = useCallback((key: string, vars?: Record<string, string | number>) => {
     const keys = key.split(".")
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let value: any = messages[lang]
+    let value: unknown = messages[lang]
     for (const k of keys) {
-      value = value?.[k]
+      value = (value as Record<string, unknown>)?.[k]
     }
     if (typeof value !== "string") return key
     if (vars) {

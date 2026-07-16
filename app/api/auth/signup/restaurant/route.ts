@@ -6,6 +6,8 @@ import { checkRateLimit } from "@/lib/rate-limiter"
 import { restaurantSignupSchema, sanitize, logValidationFailure } from "@/lib/auth-validation"
 import { slugify } from "@/lib/utils"
 
+const VALID_PLANS = ["starter", "growth", "premium"]
+
 export const POST = safeRoute(async (request) => {
   const csrfResponse = csrfGuard(request)
   if (csrfResponse) return csrfResponse
@@ -24,6 +26,10 @@ export const POST = safeRoute(async (request) => {
   }
 
   const { name, city, phone, email, password } = parsed.data
+  const bodyRecord = body as Record<string, unknown>
+  const selectedPlan = bodyRecord.plan as string | undefined
+  const hasPaidPlan = selectedPlan && VALID_PLANS.includes(selectedPlan)
+
   const admin = createAdminClient()
 
   const { data: authData, error: authError } = await admin.auth.admin.createUser({
@@ -48,18 +54,27 @@ export const POST = safeRoute(async (request) => {
   const ownerId = authData.user.id
   const slug = `${slugify(sanitize(name))}-${Date.now().toString(36)}`
 
-  const { error: dbError } = await admin.from("restaurants").insert({
+  const restaurantInsertData: Record<string, unknown> = {
     owner_id: ownerId,
     name: sanitize(name),
     slug,
     phone: sanitize(phone),
     city: sanitize(city),
-    plan: "trial",
-    trial_start: new Date().toISOString(),
-    trial_end: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    plan: hasPaidPlan ? selectedPlan : "trial",
+    trial_start: hasPaidPlan ? null : new Date().toISOString(),
+    trial_end: hasPaidPlan ? null : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
     image_upload_allowed: true,
     is_active: true,
-  })
+    is_suspended: false,
+    delivery_time_min: 30,
+  }
+
+  if (hasPaidPlan) {
+    restaurantInsertData.plan_start_date = new Date().toISOString()
+    restaurantInsertData.plan_end_date = new Date(Date.now() + 30 * 86400000).toISOString()
+  }
+
+  const { error: dbError } = await admin.from("restaurants").insert(restaurantInsertData)
 
   if (dbError) {
     console.warn("[Auth Restaurant Signup] db insert failure", {
@@ -73,5 +88,5 @@ export const POST = safeRoute(async (request) => {
     )
   }
 
-  return NextResponse.json({ success: true, slug })
+  return NextResponse.json({ success: true, slug, plan: selectedPlan || "trial" })
 })

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useCartStore } from "@/stores/cartStore"
-import { Minus, Plus, Trash2, ArrowLeft, Store, ShoppingBag, ChevronRight } from "lucide-react"
+import { Minus, Plus, Trash2, ArrowLeft, Store, ShoppingBag, ChevronRight, Tag, X } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -26,6 +26,9 @@ export default function CartPage() {
   const removeItem = useCartStore((s) => s.removeItem)
   const clearCart = useCartStore((s) => s.clearCart)
   const restaurantName = useCartStore((s) => s.restaurantName)
+  const selectedDeal = useCartStore((s) => s.selectedDeal)
+  const discountAmount = useCartStore((s) => s.discountAmount)
+  const clearDeal = useCartStore((s) => s.clearDeal)
 
   if (items.length === 0 || !restaurantName) {
     return (
@@ -49,7 +52,7 @@ export default function CartPage() {
 
   return (
     <>
-    <div className="min-h-screen bg-[#F9FAFB] md:hidden">
+    <div className="min-h-screen bg-[#F9FAFB] md:hidden animate-fade-in">
       {/* Header */}
       <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-border">
         <div className="flex items-center justify-between px-4 h-14 max-w-[600px] mx-auto">
@@ -171,6 +174,24 @@ export default function CartPage() {
                 {deliveryFee === 0 ? "Free" : formatPrice(deliveryFee)}
               </span>
             </div>
+            {discountAmount > 0 && selectedDeal && (
+              <div className="pt-2 border-t border-border space-y-1.5">
+                <div className="flex items-center justify-between text-[13px]">
+                  <span className="text-text-secondary">Subtotal</span>
+                  <span className="text-text-primary">{formatPrice(items.reduce((s, i) => s + i.dish.price * i.quantity, 0))}</span>
+                </div>
+                <div className="flex items-center justify-between text-[13px]">
+                  <div className="flex items-center gap-1 text-primary font-medium">
+                    <Tag className="w-3.5 h-3.5" />
+                    {selectedDeal.title_en}
+                    <button onClick={clearDeal} className="p-0.5 rounded-full hover:bg-primary/10">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                  <span className="text-primary font-semibold">-{formatPrice(discountAmount)}</span>
+                </div>
+              </div>
+            )}
             <div className="pt-2 border-t border-border flex items-center justify-between">
               <span className="text-[14px] font-bold text-text-primary">Total</span>
               <span className="text-[16px] font-bold text-text-primary">{formatPrice(getTotalPrice())}</span>
@@ -182,7 +203,7 @@ export default function CartPage() {
       {/* Fixed Checkout Bar */}
       <div className="fixed bottom-[60px] left-0 right-0 bg-white border-t border-border p-4 z-40">
         <div className="max-w-[600px] mx-auto">
-          <Link href="/checkout" className="block">
+          <Link href="/checkout" className="block" data-testid="checkout-link-mobile">
             <div className="bg-primary text-white rounded-xl h-12 flex items-center justify-between px-5 hover:bg-primary-hover active:scale-[0.99] transition-all">
               <span className="text-[13px] font-semibold">Checkout</span>
               <div className="flex items-center gap-2">
@@ -196,7 +217,7 @@ export default function CartPage() {
     </div>
 
       {/* ===== DESKTOP LAYOUT ===== */}
-      <div className="hidden md:block min-h-screen bg-[#F9FAFB]">
+      <div className="hidden md:block min-h-screen bg-[#F9FAFB] animate-fade-in">
         <header className="bg-white border-b border-border">
           <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -272,12 +293,30 @@ export default function CartPage() {
                       {deliveryFee === 0 ? "Free" : formatPrice(deliveryFee)}
                     </span>
                   </div>
+                  {discountAmount > 0 && selectedDeal && (
+                    <div className="pt-2 border-t border-border space-y-1.5">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-text-secondary">Subtotal</span>
+                        <span className="text-text-primary">{formatPrice(items.reduce((s, i) => s + i.dish.price * i.quantity, 0))}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-1 text-primary font-medium">
+                          <Tag className="w-3.5 h-3.5" />
+                          {selectedDeal.title_en}
+                          <button onClick={clearDeal} className="p-0.5 rounded-full hover:bg-primary/10">
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                        <span className="text-primary font-semibold">-{formatPrice(discountAmount)}</span>
+                      </div>
+                    </div>
+                  )}
                   <div className="pt-3 border-t border-border flex items-center justify-between">
                     <span className="text-base font-bold text-text-primary">Total</span>
                     <span className="text-lg font-bold text-text-primary">{formatPrice(getTotalPrice())}</span>
                   </div>
                 </div>
-                <Link href="/checkout" className="block w-full bg-primary text-white text-center py-3 rounded-xl text-sm font-semibold hover:bg-primary-hover active:scale-[0.98] transition-all">
+                <Link href="/checkout" data-testid="checkout-link-desktop" className="block w-full bg-primary text-white text-center py-3 rounded-xl text-sm font-semibold hover:bg-primary-hover active:scale-[0.98] transition-all">
                   Proceed to Checkout
                 </Link>
               </div>

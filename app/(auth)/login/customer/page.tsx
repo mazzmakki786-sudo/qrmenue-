@@ -106,16 +106,20 @@ function CustomerLoginForm() {
 
   return (
     <div className="w-full flex flex-col items-center">
-      <div className="w-full mb-8">
-        <Link href="/restaurants" className="inline-flex items-center gap-2 text-sm text-[#555] hover:text-black transition-colors">
+      <div className="w-full mb-6">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="inline-flex items-center gap-2 text-sm text-[#555] hover:text-black transition-colors min-h-[44px]"
+        >
           <div className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center shrink-0">
             <ArrowLeft className="w-4 h-4" />
           </div>
-          Restaurants
-        </Link>
+          Back
+        </button>
       </div>
 
-      <div className="flex flex-col items-center text-center mb-8">
+      <div className="flex flex-col items-center text-center mb-6">
         <div className="w-12 h-12 bg-[#25D366] rounded-xl flex items-center justify-center mb-4">
           <Heart className="w-6 h-6 text-white" />
         </div>
@@ -127,8 +131,8 @@ function CustomerLoginForm() {
         </p>
       </div>
 
-      <Button variant="google" onClick={handleGoogleAuth} className="w-full mb-5">
-        <svg className="w-[18px] h-[18px] mr-3" viewBox="0 0 24 24">
+      <Button variant="google" onClick={handleGoogleAuth} className="w-full mb-5 min-h-[48px]">
+        <svg className="w-[18px] h-[18px] mr-3 shrink-0" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
           <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
           <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -157,15 +161,15 @@ function CustomerLoginForm() {
           </div>
         )}
 
-        <Button type="submit" variant="primary" fullWidth disabled={loading}>
-          {loading ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" />{mode === "signin" ? "Signing in..." : "Creating account..."}</>) : mode === "signin" ? "Sign In" : "Create Account"}
+        <Button type="submit" variant="primary" fullWidth loading={loading}>
+          {loading ? (mode === "signin" ? "Signing in..." : "Creating account...") : mode === "signin" ? "Sign In" : "Create Account"}
         </Button>
       </form>
 
       <div className="flex flex-col items-center gap-3 mt-6 w-full">
         {mode === "signin" ? (
           <button onClick={() => { setMode("signup"); setError(null) }} className="text-sm text-[#555] hover:text-black transition-colors">
-            Don't have an account? <span className="text-[#25D366] font-semibold">Sign up</span>
+            Don&apos;t have an account? <span className="text-[#25D366] font-semibold">Sign up</span>
           </button>
         ) : (
           <button onClick={() => { setMode("signin"); setError(null) }} className="text-sm text-[#555] hover:text-black transition-colors">

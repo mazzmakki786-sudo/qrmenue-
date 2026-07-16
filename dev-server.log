@@ -1,0 +1,11 @@
+   ▲ Next.js 15.5.18
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.0.112:3001
+   - Environments: .env.local
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Ready in 14.6s
+
+C:\Users\Administrator\Desktop\qr_menue>

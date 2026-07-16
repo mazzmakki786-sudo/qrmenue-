@@ -4,7 +4,13 @@ import { LandingHeader } from "@/components/shared/LandingHeader"
 export const metadata: Metadata = {
   title: "Terms of Service",
   description: "Terms of Service for Digital QR Menue. Governs your use of our QR menu and WhatsApp ordering platform.",
+  alternates: {
+    canonical: "https://www.digitalmenue.com/terms",
+  },
 }
+
+// Revalidate every hour — static page with periodic regeneration
+export const revalidate = 3600
 
 const sections = [
   {
@@ -21,7 +27,7 @@ You must be at least 18 years old to create an account. If you are registering o
   },
   {
     title: "3. Subscription & Billing",
-    content: `Digital QR Menue offers tiered subscription plans: Free Trial (7 days), Starter (PKR 1,200/month), Growth (PKR 2,500/month), and Premium (PKR 4,500/month).
+    content: `Digital QR Menue offers tiered subscription plans: Free Trial (30 days), Starter (PKR 1,500/month), Growth (PKR 2,500/month), and Premium (PKR 4,500/month).
 
 • All prices are in Pakistani Rupees (PKR) and exclusive of applicable taxes
 • Subscriptions auto-renew monthly unless cancelled
@@ -32,7 +38,7 @@ You must be at least 18 years old to create an account. If you are registering o
   },
   {
     title: "4. Free Trial",
-    content: `The Free Trial period is 7 days from the date of sign-up. No credit card is required. At the end of the trial, your menu will be paused but your data is preserved for 90 days. Subscribe to any paid plan to reactivate.`,
+    content: `The Free Trial period is 30 days from the date of sign-up. No credit card is required. At the end of the trial, your menu will be paused but your data is preserved for 90 days. Subscribe to any paid plan to reactivate.`,
   },
   {
     title: "5. Restaurant Content",
@@ -87,7 +93,7 @@ This agreement shall be construed in accordance with the Prevention of Electroni
   },
   {
     title: "12. Changes to Terms",
-    content: `We may update these Terms from time to time. Material changes will be notified via email or through your dashboard dashboard. Continued use of the Service after changes constitutes acceptance of the updated Terms.
+    content: `We may update these Terms from time to time. Material changes will be notified via email or through your dashboard. Continued use of the Service after changes constitutes acceptance of the updated Terms.
 
 These Terms were last updated on July 5, 2026.`,
   },
@@ -108,6 +114,7 @@ export default function TermsPage() {
 
       <section className="py-16 md:py-24">
         <div className="max-w-3xl mx-auto px-5">
+          <p className="text-xs text-[#888] mb-6">Last updated: July 5, 2026</p>
           <div className="space-y-10">
             {sections.map((section, i) => (
               <div key={i}>

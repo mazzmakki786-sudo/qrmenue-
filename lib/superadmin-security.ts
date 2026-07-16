@@ -88,6 +88,16 @@ export async function isSuperAdmin(email: string | undefined): Promise<boolean> 
 
 export async function ensureSuperAdminEmail(email: string): Promise<void> {
   try {
+    const allowedEmails = (process.env.SUPER_ADMIN_EMAIL || "")
+      .split(",")
+      .map(e => e.trim().toLowerCase())
+      .filter(Boolean)
+
+    // Only auto-provision if email matches the SUPER_ADMIN_EMAIL env var
+    if (!allowedEmails.includes(email.toLowerCase())) {
+      return
+    }
+
     const admin = createAdminClient()
     const { data } = await admin
       .from("super_admins")

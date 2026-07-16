@@ -21,7 +21,7 @@ export const PATCH = safeRoute(async (
   const allowed: Record<string, any> = {}
   if (typeof body.is_active === "boolean") allowed.is_active = body.is_active
   if (typeof body.is_suspended === "boolean") allowed.is_suspended = body.is_suspended
-  if (body.plan && ["trial", "starter", "growth", "premium"].includes(body.plan)) {
+  if (body.plan && typeof body.plan === "string") {
     allowed.plan = body.plan
     allowed.plan_start_date = new Date().toISOString()
   }

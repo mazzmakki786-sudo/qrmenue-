@@ -231,8 +231,8 @@ export default function BrandingPage() {
 
       {/* Save */}
       <div className="flex items-center gap-3">
-        <Button onClick={handleSave} disabled={saving}>
-          {saved ? "Saved!" : saving ? "Saving..." : "Save"}
+        <Button onClick={handleSave} loading={saving}>
+          {saved ? "Saved!" : "Save"}
         </Button>
         {saved && (
           <span className="text-sm text-[#16A34A] font-medium flex items-center gap-1">

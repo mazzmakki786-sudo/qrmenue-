@@ -162,9 +162,9 @@ export function AddDishForm({ categories, onSubmit, onCancel, initialData, submi
         {errors.category_id && <p className="text-xs text-[#DC2626]">{errors.category_id.message}</p>}
       </div>
       <div className="flex gap-3 pt-2">
-        <Button type="button" variant="ghost" onClick={onCancel} disabled={submitting}>Cancel</Button>
-        <Button type="submit" disabled={isSubmitting || submitting}>
-          {submitting ? "Saving..." : isSubmitting ? "Saving..." : "Save Dish"}
+        <Button type="button" variant="ghost" onClick={onCancel} disabled={submitting || isSubmitting}>Cancel</Button>
+        <Button type="submit" loading={isSubmitting || submitting}>
+          {submitting || isSubmitting ? "Saving..." : "Save Dish"}
         </Button>
       </div>
     </form>

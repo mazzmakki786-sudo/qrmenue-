@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import Link from "next/link"
@@ -8,8 +8,15 @@ import { useRouter } from "next/navigation"
 import { timeAgo } from "@/lib/utils"
 import type { Order } from "@/types"
 import { useSubscription } from "@/lib/hooks/useSubscription"
-import { Lock, Sparkles, ArrowRight, Receipt, ChevronRight, Clock, ClipboardList } from "lucide-react"
+import { Lock, Sparkles, ArrowRight, Receipt, ChevronRight, Clock, ClipboardList, RefreshCw, Wifi, WifiOff } from "lucide-react"
 import { DashboardFooter } from "@/components/shared/DashboardFooter"
+
+function getStartOfTodayPK() {
+  const pkOffset = 5 * 60 * 60 * 1000
+  const nowPK = new Date(Date.now() + pkOffset)
+  const startPK = new Date(nowPK.getFullYear(), nowPK.getMonth(), nowPK.getDate())
+  return new Date(startPK.getTime() - pkOffset).toISOString()
+}
 
 const orderTypeLabels: Record<string, string> = {
   dine_in: "Dine-in",
@@ -24,69 +31,82 @@ export default function OrdersPage() {
   const sub = useSubscription()
   const { shouldBlurOrderDetails } = sub
   const [orders, setOrders] = useState<Order[]>([])
-  const [filter, setFilter] = useState<"today" | "week" | "month" | "all">("today")
+  const [filter, setFilter] = useState<"all" | "today" | "week" | "month">("all")
   const [currentPage, setCurrentPage] = useState(1)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [restaurantId, setRestaurantId] = useState<string | null>(null)
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null)
+  const [realtimeConnected, setRealtimeConnected] = useState(true)
+  const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null)
+  const lastRealtimeRef = useRef<number>(Date.now())
+  const getSupabase = () => {
+    if (!supabaseRef.current) supabaseRef.current = createClient()
+    return supabaseRef.current
+  }
 
   const fetchOrders = useCallback(async () => {
-    const supabase = createClient()
+    const supabase = getSupabase()
     setError(null)
+    setLoading(true)
     try {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      if (!user) {
+        setError("Session expired. Please sign in again.")
+        setLoading(false)
+        return
+      }
 
-      const { data: restaurant } = await supabase
-        .from("restaurants")
-        .select("id")
-        .eq("owner_id", user.id)
-        .single()
-      if (!restaurant) return
+      let { data: restaurant } = restaurantId
+        ? { data: { id: restaurantId } }
+        : await supabase.from("restaurants").select("id").eq("owner_id", user.id).single()
 
-      setRestaurantId(restaurant.id)
+      if (!restaurant) {
+        setLoading(false)
+        return
+      }
+
+      if (!restaurantId) setRestaurantId(restaurant.id)
 
       let query = supabase
         .from("orders")
         .select("*")
         .eq("restaurant_id", restaurant.id)
         .order("created_at", { ascending: false })
+        .limit(500)
 
-      const now = new Date()
       if (filter === "today") {
-        const start = now.toISOString().split("T")[0]
-        query = query.gte("created_at", start)
+        query = query.gte("created_at", getStartOfTodayPK())
       } else if (filter === "week") {
-        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
+        const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
         query = query.gte("created_at", weekAgo)
       } else if (filter === "month") {
-        const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
-        query = query.gte("created_at", monthAgo.toISOString())
+        const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+        query = query.gte("created_at", monthAgo)
       }
 
-      const { data } = await query.limit(500)
+      const { data } = await query
       setOrders(data || [])
+      setLastUpdated(new Date().toLocaleTimeString("en-PK"))
     } catch (err) {
       console.error("Orders fetch error:", err)
       setError("Failed to load orders. Please try again.")
     } finally {
       setLoading(false)
     }
-  }, [filter])
+  }, [filter, restaurantId])
+
+  const fetchOrdersRef = useRef(fetchOrders)
+  fetchOrdersRef.current = fetchOrders
 
   useEffect(() => {
     fetchOrders()
   }, [fetchOrders])
 
+  // Realtime subscriptions with connection monitoring
   useEffect(() => {
     if (!restaurantId) return
     const supabase = createClient()
-    const debounceRef = { current: null as ReturnType<typeof setTimeout> | null }
-
-    const debouncedFetch = () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current)
-      debounceRef.current = setTimeout(() => fetchOrders(), 500)
-    }
 
     const channel = supabase
       .channel(uid(`orders-page-${restaurantId}`))
@@ -99,6 +119,8 @@ export default function OrdersPage() {
           filter: `restaurant_id=eq.${restaurantId}`,
         },
         (payload) => {
+          lastRealtimeRef.current = Date.now()
+          setRealtimeConnected(true)
           setOrders((prev) => [payload.new as Order, ...prev.slice(0, 499)])
         }
       )
@@ -111,6 +133,8 @@ export default function OrdersPage() {
           filter: `restaurant_id=eq.${restaurantId}`,
         },
         (payload) => {
+          lastRealtimeRef.current = Date.now()
+          setRealtimeConnected(true)
           setOrders((prev) =>
             prev.map((o) => (o.id === payload.new.id ? (payload.new as Order) : o))
           )
@@ -124,15 +148,26 @@ export default function OrdersPage() {
           table: "restaurants",
           filter: `id=eq.${restaurantId}`,
         },
-        debouncedFetch
+        () => fetchOrdersRef.current()
       )
-      .subscribe()
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") {
+          lastRealtimeRef.current = Date.now()
+          setRealtimeConnected(true)
+        }
+      })
+
+    // Monitor connection — if no realtime event for 60s, show warning
+    const connectionMonitor = setInterval(() => {
+      const elapsed = Date.now() - lastRealtimeRef.current
+      setRealtimeConnected(elapsed < 90000)
+    }, 10000)
 
     return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current)
       supabase.removeChannel(channel)
+      clearInterval(connectionMonitor)
     }
-  }, [restaurantId, fetchOrders])
+  }, [restaurantId])
 
   const blur = (text: string) => "█".repeat(Math.max(4, Math.min(text?.length || 0, 14)))
 
@@ -171,8 +206,19 @@ export default function OrdersPage() {
       {/* Heading & Order Count + Time Filters */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-black">Orders</h1>
-          <p className="text-sm text-[#999] mt-1">{orders.length} order{orders.length !== 1 ? "s" : ""}</p>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl md:text-3xl font-bold text-black">Orders</h1>
+            {/* Connection indicator */}
+            {realtimeConnected ? (
+              <Wifi className="w-3.5 h-3.5 text-[#25D366]" />
+            ) : (
+              <WifiOff className="w-3.5 h-3.5 text-[#DC2626]" />
+            )}
+          </div>
+          <p className="text-sm text-[#999] mt-1">
+            {orders.length} order{orders.length !== 1 ? "s" : ""}
+            {lastUpdated && <span className="text-xs text-[#BBB] ml-2">Updated {lastUpdated}</span>}
+          </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {(["today", "week", "month", "all"] as const).map((f) => (
@@ -188,6 +234,14 @@ export default function OrdersPage() {
               {f === "month" ? "Last Month" : f.charAt(0).toUpperCase() + f.slice(1)}
             </button>
           ))}
+          <button
+            onClick={() => { setLoading(true); fetchOrders() }}
+            disabled={loading}
+            className="p-1.5 rounded-full bg-[#F0F0F0] text-[#555] hover:bg-[#E2E2E2] transition-colors disabled:opacity-40"
+            title="Refresh orders"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+          </button>
         </div>
       </div>
 

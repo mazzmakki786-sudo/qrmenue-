@@ -1,15 +1,110 @@
 "use client"
 
-import { useEffect, useState, use } from "react"
+import { useEffect, useState, use, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Check, ArrowLeft, ClipboardList, Store, ExternalLink, Phone, RotateCcw, X, Clock, MessageCircle, AlertCircle } from "lucide-react"
+import { Check, ArrowLeft, ClipboardList, Store, ExternalLink, Phone, RotateCcw, X, Clock, MessageCircle, AlertCircle, ChefHat } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useCartStore } from "@/stores/cartStore"
 import { buildWhatsAppURL } from "@/lib/whatsapp"
 import { formatPrice } from "@/lib/utils"
+import { useToastStore } from "@/stores/toastStore"
+import { playStatusChange, playNotification } from "@/lib/sound"
+import { useCustomerPushNotifications } from "@/lib/hooks/useCustomerPushNotifications"
+
+function formatCountdown(seconds: number) {
+  if (seconds <= 0) return "00:00"
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
+}
+
+function PreparingCard({ order, restaurant }: { order: any; restaurant: any }) {
+  const [remaining, setRemaining] = useState<number | null>(null)
+  const autoReadySentRef = useRef(false)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const pollingRef = useRef<NodeJS.Timeout | null>(null)
+
+  const calcRemaining = useCallback(() => {
+    if (!order.ready_at) return null
+    const diff = Math.floor((new Date(order.ready_at).getTime() - Date.now()) / 1000)
+    return Math.max(0, diff)
+  }, [order.ready_at])
+
+  const checkAndSetReady = useCallback(async () => {
+    if (autoReadySentRef.current) return
+    autoReadySentRef.current = true
+    try {
+      const res = await fetch(`/api/orders/${order.id}/ready-check`, { method: "POST" })
+      const data = await res.json()
+      // If order was already updated by owner, stop polling
+      if (data.already_updated || data.order_status === "ready" || data.order_status === "completed" || data.order_status === "cancelled") {
+        if (timerRef.current) clearInterval(timerRef.current)
+        if (pollingRef.current) clearInterval(pollingRef.current)
+      }
+    } catch {}
+  }, [order.id])
+
+  useEffect(() => {
+    if (!order.ready_at) {
+      setRemaining(null)
+      return
+    }
+
+    setRemaining(calcRemaining())
+    timerRef.current = setInterval(() => {
+      const r = calcRemaining()
+      setRemaining(r)
+      if (r !== null && r <= 0 && timerRef.current) {
+        clearInterval(timerRef.current)
+        checkAndSetReady()
+      }
+    }, 1000)
+
+    // Polling fallback: every 15s check if order status changed (backup if Realtime fails)
+    pollingRef.current = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/orders/${order.id}/ready-check`, { method: "POST" })
+        const data = await res.json()
+        if (data.order_status === "ready" || data.order_status === "completed") {
+          if (timerRef.current) clearInterval(timerRef.current)
+          if (pollingRef.current) clearInterval(pollingRef.current)
+        }
+      } catch {}
+    }, 15000)
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current)
+      if (pollingRef.current) clearInterval(pollingRef.current)
+    }
+  }, [calcRemaining, checkAndSetReady, order.id, order.ready_at])
+
+  return (
+    <section className="bg-[#EFF6FF] border border-[#BFDBFE] rounded-2xl p-6 text-center shadow-sm">
+      <div className="flex justify-center mb-4">
+        <div className="w-16 h-16 bg-[#2563EB] rounded-full flex items-center justify-center">
+          <ChefHat className="w-8 h-8 text-white" />
+        </div>
+      </div>
+      <h2 className="text-lg font-bold text-[#1E40AF] mb-1">Preparing Your Order</h2>
+      <p className="text-sm font-semibold text-[#1E40AF]/70 mb-3">#{order.order_number}</p>
+      {remaining !== null && remaining > 0 && (
+        <div className="mb-3">
+          <div className="text-3xl font-bold text-[#2563EB] tabular-nums">{formatCountdown(remaining)}</div>
+          <p className="text-xs text-[#1E40AF]/60 mt-1">Estimated time remaining</p>
+        </div>
+      )}
+      {remaining !== null && remaining <= 0 && (
+        <p className="text-sm font-semibold text-[#16A34A]">Almost done! Your order should be ready any moment.</p>
+      )}
+      {remaining === null && (
+        <p className="text-sm text-[#1E40AF]/70">Your order is being prepared. This should take about 30 minutes.</p>
+      )}
+    </section>
+  )
+}
 
 export default function OrderConfirmPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -22,7 +117,10 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
   const [cancelling, setCancelling] = useState(false)
   const [cancelError, setCancelError] = useState<string | null>(null)
+  const [pushSubscribed, setPushSubscribed] = useState(false)
   const clearCart = useCartStore((s) => s.clearCart)
+  const addToast = useToastStore((s) => s.addToast)
+  const customerPush = useCustomerPushNotifications(user?.id || null, id)
   const setRestaurant = useCartStore((s) => s.setRestaurant)
 
   useEffect(() => {
@@ -62,6 +160,18 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
     fetchOrder()
   }, [id, router])
 
+  const prevStatusRef = useRef<string | null>(null)
+
+  // Initialize prevStatusRef whenever order loads or status changes from realtime
+  useEffect(() => {
+    if (order?.order_status) {
+      prevStatusRef.current = order.order_status
+    }
+  }, [order?.order_status])
+
+  const lastRealtimeRef = useRef<number>(Date.now())
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
+
   useEffect(() => {
     if (!id) return
     const supabase = createClient()
@@ -76,13 +186,112 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
           filter: `id=eq.${id}`,
         },
         (payload) => {
-          const newStatus = (payload.new as any).order_status
-          setOrder((prev: any) => prev ? { ...prev, ...payload.new } : prev)
+          const newData = payload.new as any
+          const newStatus = newData.order_status
+          const oldStatus = prevStatusRef.current
+          lastRealtimeRef.current = Date.now()
+
+          // Only trigger notification if status actually changed
+          if (oldStatus && newStatus !== oldStatus) {
+            if (newStatus === "preparing") {
+              playStatusChange()
+              addToast({
+                type: "info",
+                title: "Order Being Prepared",
+                message: `Your order #${newData.order_number} is now being prepared`,
+                duration: 5000,
+                sound: true,
+                action: { label: "View Order", url: `/order-confirm/${id}` },
+              })
+            }
+            if (newStatus === "ready") {
+              playStatusChange()
+              addToast({
+                type: "order",
+                title: "Order Ready!",
+                message: `Your order #${newData.order_number} is ready!`,
+                duration: 6000,
+                sound: true,
+                action: { label: "View Order", url: `/order-confirm/${id}` },
+              })
+            }
+            if (newStatus === "cancelled") {
+              playNotification()
+              addToast({
+                type: "error",
+                title: "Order Cancelled",
+                message: `Your order #${newData.order_number} has been cancelled`,
+                duration: 5000,
+                sound: true,
+              })
+            }
+            if (newStatus === "completed") {
+              playNotification()
+              addToast({
+                type: "success",
+                title: "Order Completed",
+                message: `Your order #${newData.order_number} is completed`,
+                duration: 4000,
+              })
+            }
+            if ("Notification" in window && Notification.permission === "granted") {
+              new Notification("Order Update", {
+                body: newStatus === "preparing"
+                  ? `Order #${newData.order_number} is being prepared`
+                  : newStatus === "ready"
+                    ? `Order #${newData.order_number} is ready!`
+                    : `Order #${newData.order_number}: ${newStatus}`,
+                icon: "/og-image.png",
+                tag: `order-${id}`,
+              })
+            }
+          }
+          prevStatusRef.current = newStatus
+          setOrder((prev: any) => prev ? { ...prev, ...newData } : prev)
         }
       )
       .subscribe()
-    return () => { supabase.removeChannel(channel) }
-  }, [id])
+
+    // Polling fallback: if no realtime update for 30s, poll manually
+    pollingIntervalRef.current = setInterval(async () => {
+      const elapsed = Date.now() - lastRealtimeRef.current
+      if (elapsed < 25000) return // Still getting realtime updates
+
+      try {
+        const supabase = createClient()
+        const { data } = await supabase
+          .from("orders")
+          .select("order_status, updated_at")
+          .eq("id", id)
+          .single()
+        if (data && data.order_status !== prevStatusRef.current) {
+          prevStatusRef.current = data.order_status
+          setOrder((prev: any) => prev ? { ...prev, ...data } : prev)
+        }
+      } catch {}
+    }, 15000)
+
+    return () => {
+      supabase.removeChannel(channel)
+      if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current)
+    }
+  }, [id, addToast])
+
+  useEffect(() => {
+    if (user && order && !pushSubscribed) {
+      const nonFinal = ["received", "preparing", "ready"]
+      if (nonFinal.includes(order.order_status)) {
+        customerPush.subscribe().then((ok) => {
+          if (ok) setPushSubscribed(true)
+        })
+      }
+    }
+    return () => {
+      if (pushSubscribed && customerPush.subscribed) {
+        customerPush.unsubscribe()
+      }
+    }
+  }, [user, order, pushSubscribed, customerPush])
 
   const handleCancelOrder = async () => {
     if (!order || cancelling) return
@@ -146,8 +355,48 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center">
-        <p className="text-sm text-text-muted">Loading...</p>
+      <div className="min-h-screen bg-[#F9FAFB] animate-pulse">
+        <div className="h-16 border-b border-border bg-white/80" />
+        <div className="max-w-[500px] mx-auto px-4 py-6 space-y-6">
+          <div className="bg-white border border-border rounded-2xl p-6 text-center">
+            <div className="w-16 h-16 bg-[#F0F0F0] rounded-full mx-auto mb-4" />
+            <div className="h-5 w-32 bg-[#F0F0F0] rounded mx-auto mb-2" />
+            <div className="h-4 w-24 bg-[#F0F0F0] rounded mx-auto mb-1" />
+            <div className="h-3 w-48 bg-[#F0F0F0] rounded mx-auto" />
+          </div>
+          <div className="flex gap-2.5">
+            <div className="flex-1 h-11 bg-[#F0F0F0] rounded-xl" />
+            <div className="w-[88px] h-11 bg-[#F0F0F0] rounded-xl" />
+          </div>
+          <div className="bg-white border border-border rounded-2xl p-5 space-y-4">
+            <div className="h-5 w-28 bg-[#F0F0F0] rounded" />
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex justify-between">
+                <div className="h-3 w-40 bg-[#F0F0F0] rounded" />
+                <div className="h-3 w-16 bg-[#F0F0F0] rounded" />
+              </div>
+            ))}
+            <div className="pt-4 border-t border-border">
+              <div className="flex justify-between">
+                <div className="h-5 w-16 bg-[#F0F0F0] rounded" />
+                <div className="h-5 w-20 bg-[#F0F0F0] rounded" />
+              </div>
+            </div>
+            <div className="bg-[#F5F5F5] rounded-xl p-4 space-y-3">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="flex justify-between">
+                  <div className="h-3 w-20 bg-[#F0F0F0] rounded" />
+                  <div className="h-3 w-24 bg-[#F0F0F0] rounded" />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-3">
+            <div className="h-11 bg-[#F0F0F0] rounded-xl" />
+            <div className="h-11 bg-[#F0F0F0] rounded-xl" />
+            <div className="h-11 bg-[#F0F0F0] rounded-xl" />
+          </div>
+        </div>
       </div>
     )
   }
@@ -186,13 +435,14 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
   const restaurant = order.restaurants
   const restaurantPhone = restaurant?.phone?.replace(/[^0-9+]/g, "")
 
-  const isReady = order.order_status === "ready"
+  const isReady = order.order_status === "ready" || order.order_status === "completed"
   const isCancelled = order.order_status === "cancelled"
   const isPending = order.order_status === "received"
+  const isPreparing = order.order_status === "preparing"
 
   return (
     <>
-    <div className="min-h-screen bg-[#F9FAFB] pb-20 md:hidden">
+    <div className="min-h-screen bg-[#F9FAFB] pb-20 md:hidden animate-fade-in">
 
       {/* Top AppBar */}
       <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-border">
@@ -205,7 +455,7 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
               <ArrowLeft className="w-4 h-4" />
             </Link>
             <h1 className="text-lg font-bold text-text-primary">
-              {isReady ? "Order Ready" : isCancelled ? "Order Cancelled" : "Order Placed"}
+              {isReady ? "Order Ready" : isCancelled ? "Order Cancelled" : isPreparing ? "Preparing" : "Order Placed"}
             </h1>
           </div>
         </div>
@@ -242,6 +492,10 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
               Your order from <span className="font-semibold text-text-primary">{restaurant?.name || "the restaurant"}</span> has been cancelled
             </p>
           </section>
+        )}
+
+        {isPreparing && (
+          <PreparingCard order={order} restaurant={restaurant} />
         )}
 
         {isPending && (
@@ -471,13 +725,13 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
 
       {/* ===== DESKTOP LAYOUT ===== */}
       <div className="hidden md:block min-h-screen bg-[#F8F8F8]">
-        <header className="bg-white border-b border-border sticky top-0 z-40">
+        <header className="bg-white border-b border-border">
           <div className="max-w-2xl mx-auto px-8 h-16 flex items-center gap-3">
             <Link href={user ? "/account" : "/restaurants"} className="w-9 h-9 rounded-xl bg-[#F5F5F5] flex items-center justify-center active:scale-95 transition-all hover:bg-[#EFEFEF] shrink-0">
               <ArrowLeft className="w-4 h-4" />
             </Link>
             <h1 className="text-lg font-bold text-text-primary">
-              {isReady ? "Order Ready" : isCancelled ? "Order Cancelled" : "Order Confirmed"}
+              {isReady ? "Order Ready" : isCancelled ? "Order Cancelled" : isPreparing ? "Preparing" : "Order Confirmed"}
             </h1>
           </div>
         </header>
@@ -507,6 +761,32 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
               <h2 className="text-2xl font-bold text-error mb-1">Order Cancelled</h2>
               <p className="text-base font-semibold text-error/70 mb-4">#{order.order_number}</p>
               <p className="text-[14px] text-text-secondary">Your order from <span className="font-semibold text-text-primary">{restaurant?.name || "the restaurant"}</span> has been cancelled</p>
+            </section>
+          )}
+
+          {isPreparing && (
+            <section className="bg-[#EFF6FF] border border-[#BFDBFE] rounded-2xl p-10 text-center">
+              <div className="flex justify-center mb-5">
+                <div className="w-20 h-20 bg-[#2563EB] rounded-2xl flex items-center justify-center shadow-[0_4px_12px_rgba(37,99,235,0.3)]">
+                  <ChefHat className="w-10 h-10 text-white" />
+                </div>
+              </div>
+              <h2 className="text-2xl font-bold text-[#1E40AF] mb-1">Preparing Your Order</h2>
+              <p className="text-base font-semibold text-[#1E40AF]/70 mb-4">#{order.order_number}</p>
+              <p className="text-[14px] text-text-secondary mb-4">
+                <span className="font-semibold text-text-primary">{restaurant?.name || "the restaurant"}</span> is preparing your order
+              </p>
+              {order.ready_at && (
+                <div>
+                  <div className="text-4xl font-bold text-[#2563EB] tabular-nums">
+                    {(() => {
+                      const diff = Math.max(0, Math.floor((new Date(order.ready_at).getTime() - Date.now()) / 1000))
+                      return formatCountdown(diff)
+                    })()}
+                  </div>
+                  <p className="text-xs text-[#1E40AF]/60 mt-1">Estimated time remaining</p>
+                </div>
+              )}
             </section>
           )}
 

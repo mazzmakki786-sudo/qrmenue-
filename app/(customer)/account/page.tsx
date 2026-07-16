@@ -11,6 +11,8 @@ import { formatPrice } from "@/lib/utils"
 import { LogOut, Package, Store, ChevronDown, ChevronUp, X, AlertCircle } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import type { Order } from "@/types"
+import { useToastStore } from "@/stores/toastStore"
+import { playStatusChange, playNotification } from "@/lib/sound"
 
 const statusColors: Record<string, "available" | "unavailable" | "trial" | "starter" | "growth" | "premium"> = {
   received: "growth", preparing: "premium", ready: "available",
@@ -18,8 +20,8 @@ const statusColors: Record<string, "available" | "unavailable" | "trial" | "star
 }
 
 const statusLabels: Record<string, string> = {
-  received: "Pending", ready: "Ready",
-  completed: "Delivered", cancelled: "Cancelled",
+  received: "Pending", preparing: "Preparing",
+  ready: "Ready", completed: "Delivered", cancelled: "Cancelled",
 }
 
 export default function AccountPage() {
@@ -31,6 +33,7 @@ export default function AccountPage() {
   const [cancelTarget, setCancelTarget] = useState<any>(null)
   const [cancelling, setCancelling] = useState(false)
   const [cancelError, setCancelError] = useState<string | null>(null)
+  const addToast = useToastStore((s) => s.addToast)
 
   const fetchOrders = useCallback(async () => {
     const supabase = createClient()
@@ -108,9 +111,26 @@ export default function AccountPage() {
           filter: `customer_id=eq.${user.id}`,
         },
         (payload) => {
+          const old = payload.old as any
+          const updated = payload.new as any
           setOrders((prev) =>
-            prev.map((o) => (o.id === payload.new.id ? (payload.new as Order) : o))
+            prev.map((o) => (o.id === updated.id ? (updated as Order) : o))
           )
+          if (old?.order_status && old.order_status !== updated.order_status) {
+            if (updated.order_status === "preparing") {
+              playStatusChange()
+              addToast({ type: "info", title: "Order Being Prepared", message: `Order #${updated.order_number} is now being prepared`, duration: 5000, sound: true, action: { label: "View", url: `/order-confirm/${updated.id}` } })
+            } else if (updated.order_status === "ready") {
+              playStatusChange()
+              addToast({ type: "order", title: "Order Ready!", message: `Order #${updated.order_number} is ready!`, duration: 6000, sound: true, action: { label: "View", url: `/order-confirm/${updated.id}` } })
+            } else if (updated.order_status === "cancelled") {
+              playNotification()
+              addToast({ type: "error", title: "Order Cancelled", message: `Order #${updated.order_number} has been cancelled`, duration: 5000, sound: true })
+            } else if (updated.order_status === "completed") {
+              playNotification()
+              addToast({ type: "success", title: "Order Completed", message: `Order #${updated.order_number} is completed`, duration: 4000 })
+            }
+          }
         }
       )
       .subscribe()
@@ -129,20 +149,50 @@ export default function AccountPage() {
   // All restaurants collapsed (minimized) by default — user clicks to expand
 
   const handleLogout = async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push("/restaurants")
+    try { await fetch("/api/auth/logout", { method: "POST" }) } catch {}
+    window.location.href = "/restaurants"
   }
 
   if (loading) {
     return (
       <div className="min-h-screen bg-white">
-        <div className="h-14 border-b border-[#F0F0F0]" />
-        <div className="p-4 space-y-3">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-20 bg-[#F9FAFB] rounded-[10px] animate-pulse" />
-          ))}
-        </div>
+        <header
+          className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-[#F0F0F0] flex items-center justify-between px-4 animate-pulse"
+          style={{ height: "calc(48px + env(safe-area-inset-top, 0px))", paddingTop: "env(safe-area-inset-top, 0px)" }}
+        >
+          <div className="h-5 w-24 bg-[#F0F0F0] rounded" />
+          <div className="h-4 w-20 bg-[#F0F0F0] rounded" />
+        </header>
+        <main className="pt-16 pb-8 px-4 max-w-[600px] mx-auto">
+          <div className="space-y-6 mt-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i}>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-4 h-4 bg-[#F0F0F0] rounded" />
+                  <div className="h-3 w-28 bg-[#F0F0F0] rounded" />
+                  <div className="h-4 w-6 bg-[#F0F0F0] rounded-full" />
+                </div>
+                <div className="space-y-2">
+                  {[...Array(2)].map((_, j) => (
+                    <div key={j} className="p-3.5 rounded-xl border border-[#F0F0F0] space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="h-4 w-16 bg-[#F0F0F0] rounded" />
+                          <div className="h-4 w-14 bg-[#F0F0F0] rounded-full" />
+                        </div>
+                        <div className="h-3 w-12 bg-[#F0F0F0] rounded" />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="h-3 w-40 bg-[#F0F0F0] rounded" />
+                        <div className="h-3 w-14 bg-[#F0F0F0] rounded" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </main>
       </div>
     )
   }
@@ -169,15 +219,24 @@ export default function AccountPage() {
   }, {})
 
   return (
-    <div className="min-h-screen bg-white">
-      <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-[#F0F0F0] flex items-center justify-between px-4" style={{ height: "calc(48px + env(safe-area-inset-top, 0px))", paddingTop: "env(safe-area-inset-top, 0px)" }}>
+    <div className="min-h-screen bg-white animate-fade-in">
+      {/* Mobile header — hidden on desktop where layout navbar handles it */}
+      <header className="md:hidden fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-[#F0F0F0] flex items-center justify-between px-4" style={{ height: "calc(48px + env(safe-area-inset-top, 0px))", paddingTop: "env(safe-area-inset-top, 0px)" }}>
         <h1 className="text-lg font-semibold">My Orders</h1>
         <button onClick={handleLogout} className="text-sm text-[#DC2626] flex items-center gap-1 hover:underline">
           <LogOut className="w-4 h-4" /> Sign Out
         </button>
       </header>
 
-      <main className="pt-16 pb-8 px-4 max-w-[600px] mx-auto">
+      {/* Desktop header — in normal flow, no sticky/fixed to avoid double-header conflict */}
+      <header className="hidden md:flex bg-white border-b border-[#F0F0F0] px-4 h-14 items-center justify-between">
+        <h1 className="text-lg font-semibold">My Orders</h1>
+        <button onClick={handleLogout} className="text-sm text-[#DC2626] flex items-center gap-1 hover:underline">
+          <LogOut className="w-4 h-4" /> Sign Out
+        </button>
+      </header>
+
+      <main className="md:pt-4 pt-16 pb-8 px-4 max-w-[600px] mx-auto">
         <div className="space-y-6 mt-4">
           {orders.length === 0 ? (
             <div className="text-center py-16">

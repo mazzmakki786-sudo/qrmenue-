@@ -1,7 +1,6 @@
 "use client"
 
 import { useRef, useState, useCallback } from "react"
-import { toPng } from "html-to-image"
 import { Download, Sparkles, Image, Plus } from "lucide-react"
 import type { Dish } from "@/types"
 
@@ -82,7 +81,7 @@ function BoldDealPoster({ data, ratio, logo, restaurantName, onImageClick, onLog
       {/* Dish Image */}
       <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", top: isWide ? 80 : data.dishImage ? 130 : 130, width: isWide ? 90 : 120, height: isWide ? 90 : 120, borderRadius: 16, overflow: "hidden", border: "3px solid rgba(255,255,255,0.25)", boxShadow: "0 6px 24px rgba(0,0,0,0.3)", background: "rgba(255,255,255,0.08)" }}>
         <div className="relative w-full h-full" onClick={onImageClick}>
-          {data.dishImage ? <img src={data.dishImage} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <div className="w-full h-full" />}
+          {data.dishImage ? <img src={data.dishImage} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <div className="w-full h-full" />}
           <PlaceholderOverlay label={data.dishImage ? "Replace" : "Add dish"} onClick={onImageClick} />
         </div>
       </div>
@@ -124,7 +123,7 @@ function ShowcasePoster({ data, ratio, logo, restaurantName, onImageClick, onLog
           <div key={i} style={{ width: s, height: s, borderRadius: 8, overflow: "hidden", background: "#F5F5F5", position: "relative" }}>
             {i === 1 && data.dishImage ? (
               <div className="relative w-full h-full" onClick={onImageClick}>
-                <img src={data.dishImage} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                <img src={data.dishImage} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 <PlaceholderOverlay label="Replace" onClick={onImageClick} />
               </div>
             ) : (
@@ -169,7 +168,7 @@ function SignaturePoster({ data, ratio, logo, restaurantName, onImageClick, onLo
       {/* Dish */}
       <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", top: isWide ? 110 : 170, width: isWide ? 90 : 140, height: isWide ? 90 : 140, borderRadius: "50%", overflow: "hidden", border: "3px solid rgba(255,215,0,0.2)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)", background: "rgba(255,255,255,0.05)" }}>
         <div className="relative w-full h-full" onClick={onImageClick}>
-          {data.dishImage ? <img src={data.dishImage} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <div className="w-full h-full" />}
+          {data.dishImage ? <img src={data.dishImage} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <div className="w-full h-full" />}
           <PlaceholderOverlay label={data.dishImage ? "Replace" : "Add dish"} onClick={onImageClick} />
         </div>
       </div>
@@ -210,7 +209,7 @@ function FreshPoster({ data, ratio, logo, restaurantName, onImageClick, onLogoCl
       {/* Circular dish image */}
       <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", top: isWide ? 70 : 120, width: isWide ? 100 : 150, height: isWide ? 100 : 150, borderRadius: "50%", overflow: "hidden", border: "4px solid #fff", boxShadow: "0 6px 24px rgba(0,0,0,0.12)", zIndex: 5, background: "#DCFCE7" }}>
         <div className="relative w-full h-full" onClick={onImageClick}>
-          {data.dishImage ? <img src={data.dishImage} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <div className="w-full h-full" />}
+          {data.dishImage ? <img src={data.dishImage} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <div className="w-full h-full" />}
           <PlaceholderOverlay label={data.dishImage ? "Replace" : "Add dish"} onClick={onImageClick} />
         </div>
       </div>
@@ -265,6 +264,7 @@ export function CanvaEditor({ dishes, restaurantName, restaurantLogo, onSave }: 
       await Promise.all(Array.from(el.querySelectorAll("img")).map((img) =>
         img.complete ? Promise.resolve() : new Promise((r) => { img.onload = r; img.onerror = r })
       ))
+      const { toPng } = await import("html-to-image")
       const dataUrl = await toPng(el, { quality: 0.95, pixelRatio: 2, backgroundColor: "#ffffff" })
       const link = document.createElement("a")
       link.download = `poster-${templateId}-${Date.now()}.png`

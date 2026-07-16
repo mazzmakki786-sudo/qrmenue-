@@ -13,6 +13,7 @@ export default function CustomerNotFound() {
       </p>
       <Link
         href="/restaurants"
+        data-testid="not-found-back-btn"
         className="inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
       >
         <Home className="w-4 h-4" />

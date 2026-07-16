@@ -9,7 +9,7 @@ function get() {
 }
 
 const FROM = "Digital QR Menue <noreply@digitalmenue.com>"
-const TRIAL_REMINDER_DAYS = [5, 3, 1]
+const TRIAL_REMINDER_DAYS = [28, 21, 14, 7, 3, 1]
 
 export async function checkAndSendTrialReminders(): Promise<{ sent: number }> {
   if (!process.env.RESEND_API_KEY) return { sent: 0 }
@@ -69,7 +69,7 @@ export async function checkAndSendTrialReminders(): Promise<{ sent: number }> {
                 </a>
               </div>
               <p style="color: #999; font-size: 13px; text-align: center;">
-                Plans start at just PKR 1,200/month. Contact us on WhatsApp if you need help.
+                Plans start at just PKR 1,500/month. Contact us on WhatsApp if you need help.
               </p>
             </div>
           `,

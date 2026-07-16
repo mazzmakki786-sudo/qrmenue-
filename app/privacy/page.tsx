@@ -4,7 +4,13 @@ import { LandingHeader } from "@/components/shared/LandingHeader"
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description: "Privacy Policy for Digital QR Menue. Learn how we collect, use, and protect your data in compliance with Pakistani law (PECA 2016).",
+  alternates: {
+    canonical: "https://www.digitalmenue.com/privacy",
+  },
 }
+
+// Revalidate every hour — static page with periodic regeneration
+export const revalidate = 3600
 
 const sections = [
   {
@@ -77,8 +83,9 @@ export default function PrivacyPage() {
       <section className="py-16 md:py-24">
         <div className="max-w-3xl mx-auto px-5">
           <div className="mb-10">
+            <p className="text-xs text-[#888] mb-4">Last updated: July 5, 2026</p>
             <p className="text-sm text-[#555] leading-relaxed">
-              This Privacy Policy explains how Digital QR Menue ("we", "our", "us") collects, uses, discloses, and protects
+              This Privacy Policy explains how Digital QR Menue (&quot;we&quot;, &quot;our&quot;, &quot;us&quot;) collects, uses, discloses, and protects
               your personal information when you use our QR menu and WhatsApp ordering platform. We are committed to
               protecting your privacy in accordance with the <strong>Prevention of Electronic Crimes Act (PECA) 2016</strong> of
               Pakistan and applicable data protection laws.

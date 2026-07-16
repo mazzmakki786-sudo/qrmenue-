@@ -8,10 +8,11 @@ import {
 } from "@/components/ui/dialog"
 import { useCartStore } from "@/stores/cartStore"
 import { DishBadges } from "./DishBadges"
-import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react"
+import { Minus, Plus, Trash2, ShoppingBag, Tag, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
+import { formatPrice } from "@/lib/utils"
 
 interface Props {
   open: boolean
@@ -24,6 +25,9 @@ export function CartDrawer({ open, onOpenChange }: Props) {
   const updateQuantity = useCartStore((s) => s.updateQuantity)
   const removeItem = useCartStore((s) => s.removeItem)
   const restaurantName = useCartStore((s) => s.restaurantName)
+  const selectedDeal = useCartStore((s) => s.selectedDeal)
+  const discountAmount = useCartStore((s) => s.discountAmount)
+  const clearDeal = useCartStore((s) => s.clearDeal)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -86,6 +90,25 @@ export function CartDrawer({ open, onOpenChange }: Props) {
                 </div>
               ))}
             </div>
+
+            {discountAmount > 0 && selectedDeal && (
+              <div className="pt-2 border-t border-border space-y-1.5 mt-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-text-secondary">Subtotal</span>
+                  <span className="text-text-primary">{formatPrice(items.reduce((s, i) => s + i.dish.price * i.quantity, 0))}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-1 text-primary font-medium">
+                    <Tag className="w-3 h-3" />
+                    {selectedDeal.title_en}
+                    <button onClick={clearDeal} className="p-0.5 rounded-full hover:bg-primary/10">
+                      <X className="w-2.5 h-2.5" />
+                    </button>
+                  </div>
+                  <span className="text-primary font-semibold">-{formatPrice(discountAmount)}</span>
+                </div>
+              </div>
+            )}
 
             {restaurantName && (
               <p className="text-xs text-[#555] text-center mt-2">{restaurantName}</p>

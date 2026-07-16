@@ -21,10 +21,13 @@ export const metadata: Metadata = {
   },
 }
 
+// Revalidate every hour — static page with periodic regeneration
+export const revalidate = 3600
+
 const pricingFaqs = [
   {
     question: "Is the Free Trial really free?",
-    answer: "Yes! No credit card required. You get 7 days with full access to test QRMenu for your restaurant.",
+    answer: "Yes! No credit card required. You get 30 days with full access to test Digital QR Menue for your restaurant.",
   },
   {
     question: "What happens after my Free Trial ends?",

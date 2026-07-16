@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Percent, DollarSign, Package, Pencil, Trash2, Power } from "lucide-react"
 import type { Deal, Dish } from "@/types"
 
@@ -24,14 +25,16 @@ const dealTypeLabels = {
 }
 
 export function DealCard({ deal, linkedDish, onEdit, onDelete, onToggleActive }: Props) {
+  const [now, setNow] = useState<Date | null>(null)
+  useEffect(() => { setNow(new Date()) }, [])
+
   const Icon = dealTypeIcons[deal.deal_type]
   const typeLabel = dealTypeLabels[deal.deal_type]
 
-  const now = new Date()
   const startDate = deal.start_date ? new Date(deal.start_date) : null
   const endDate = deal.end_date ? new Date(deal.end_date) : null
-  const isExpired = endDate && endDate < now
-  const isFuture = startDate && startDate > now
+  const isExpired = now && endDate && endDate < now
+  const isFuture = now && startDate && startDate > now
 
   return (
     <div className={`bg-white rounded-2xl border p-4 transition-all ${

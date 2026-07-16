@@ -54,14 +54,15 @@ export function buildIpnUrl(): string {
 
 export function generateSecureHash(params: Record<string, string>): string {
   const config = getConfig()
-  const sortedKeys = Object.keys(params).filter((k) => k !== "pp_SecureHash").sort()
+  const sortedKeys = Object.keys(params).filter((k) => k.toLowerCase().startsWith("pp") && k !== "pp_SecureHash").sort()
 
-  let hashData = config.hashKey
-  for (const key of sortedKeys) {
-    hashData += "&" + (params[key] || "")
-  }
+  const values = sortedKeys.map((k) => params[k] || "").join("&")
+  const hashData = config.hashKey + "&" + values
 
-  return crypto.createHmac("sha256", config.hashKey).update(hashData).digest("hex").toUpperCase()
+  const utf8Bytes = new TextEncoder().encode(hashData)
+  const iso88591String = new TextDecoder("iso-8859-1").decode(utf8Bytes)
+
+  return crypto.createHmac("sha256", config.hashKey).update(iso88591String).digest("hex").toUpperCase()
 }
 
 export function verifySecureHash(params: Record<string, string>): boolean {
@@ -102,11 +103,11 @@ export function buildPaymentPayload(params: {
     pp_BillReference: params.billReference,
     pp_Description: params.description,
     pp_ReturnURL: params.returnUrl || buildReturnUrl(),
-    ppmpf_1: "",
-    ppmpf_2: "",
-    ppmpf_3: "",
-    ppmpf_4: "",
-    ppmpf_5: "",
+    ppmpf_1: "1",
+    ppmpf_2: "2",
+    ppmpf_3: "3",
+    ppmpf_4: "4",
+    ppmpf_5: "5",
   }
 
   payload.pp_SecureHash = generateSecureHash(payload)

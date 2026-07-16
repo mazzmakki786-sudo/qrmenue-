@@ -5,6 +5,7 @@ import { RestaurantDetailClient } from "@/app/(customer)/restaurant/[slug]/Resta
 import { RestaurantUnavailable } from "@/components/shared/RestaurantUnavailable"
 import type { Category, Dish } from "@/types"
 import type { Metadata } from "next"
+import { RestaurantJsonLd, BreadcrumbListJsonLd } from "@/components/JsonLd"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -89,28 +90,46 @@ export default async function MenuPage({ params }: Props) {
   const categories: (Category & { dishes: Dish[] })[] = restaurant.categories || []
 
   return (
-    <RestaurantDetailClient
-      restaurant={{
-        id: restaurant.id,
-        name: restaurant.name,
-        name_ur: restaurant.name_ur,
-        slug: restaurant.slug,
-        city: restaurant.city,
-        cuisine_type: restaurant.cuisine_type,
-        logo_url: restaurant.logo_url,
-        description: restaurant.description,
-        phone: restaurant.phone,
-        address: restaurant.address,
-        delivery_fee: restaurant.delivery_fee,
-        delivery_time_min: restaurant.delivery_time_min,
-        is_open: restaurant.is_open ?? true,
-        opening_time: restaurant.opening_time,
-        closing_time: restaurant.closing_time,
-        opening_hours: restaurant.opening_hours ?? null,
-        lat: restaurant.lat ?? null,
-        lng: restaurant.lng ?? null,
-      }}
-      categories={categories}
-    />
+    <>
+      <RestaurantJsonLd
+        name={restaurant.name}
+        description={restaurant.description}
+        logoUrl={restaurant.logo_url}
+        city={restaurant.city}
+        cuisineType={restaurant.cuisine_type}
+        slug={restaurant.slug}
+        categories={categories}
+      />
+      <BreadcrumbListJsonLd
+        items={[
+          { name: "Home", url: "https://www.digitalmenue.com" },
+          { name: "Restaurants", url: "https://www.digitalmenue.com/restaurants" },
+          { name: restaurant.name, url: `https://www.digitalmenue.com/menu/${restaurant.slug}` },
+        ]}
+      />
+      <RestaurantDetailClient
+        restaurant={{
+          id: restaurant.id,
+          name: restaurant.name,
+          name_ur: restaurant.name_ur,
+          slug: restaurant.slug,
+          city: restaurant.city,
+          cuisine_type: restaurant.cuisine_type,
+          logo_url: restaurant.logo_url,
+          description: restaurant.description,
+          phone: restaurant.phone,
+          address: restaurant.address,
+          delivery_fee: restaurant.delivery_fee,
+          delivery_time_min: restaurant.delivery_time_min,
+          is_open: restaurant.is_open ?? true,
+          opening_time: restaurant.opening_time,
+          closing_time: restaurant.closing_time,
+          opening_hours: restaurant.opening_hours ?? null,
+          lat: restaurant.lat ?? null,
+          lng: restaurant.lng ?? null,
+        }}
+        categories={categories}
+      />
+    </>
   )
 }

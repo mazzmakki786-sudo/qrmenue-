@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { PLAN_LIMITS } from "@/lib/subscription"
+import { getEffectiveLimitsFromDB } from "@/lib/subscription-db"
 import { safeRoute } from "@/lib/api-error"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 
@@ -19,7 +19,7 @@ export const GET = safeRoute(async (
 
   const { data: restaurant, error: rErr } = await supabase
     .from("restaurants")
-    .select("id, plan, trial_end, is_active")
+    .select("id, plan, trial_end, is_active, plan_limits_override")
     .eq("slug", slug)
     .single()
 
@@ -35,8 +35,8 @@ export const GET = safeRoute(async (
     })
   }
 
-  const plan = restaurant.plan as keyof typeof PLAN_LIMITS
-  const limits = PLAN_LIMITS[plan]
+  const plan = restaurant.plan
+  const limits = await getEffectiveLimitsFromDB(plan, restaurant.plan_limits_override)
 
   if (limits.maxOrders === Infinity) {
     return NextResponse.json({

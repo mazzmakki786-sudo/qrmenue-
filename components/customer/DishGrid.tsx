@@ -153,6 +153,7 @@ export const Card = React.memo(function Card({ dish, unavailable = false, closed
             <div className="flex items-center gap-2 bg-surface-dark rounded-full px-2.5 py-1 min-h-[36px] animate-scale-up">
               <button
                 onClick={() => updateQuantity(dish.id, cartItem.quantity - 1)}
+                data-testid={`dec-qty-${dish.id}`}
                 className="w-8 h-8 rounded-full flex items-center justify-center text-primary font-bold hover:bg-white/50 transition-colors text-[18px]"
                 aria-label="Decrease quantity"
               >
@@ -162,6 +163,7 @@ export const Card = React.memo(function Card({ dish, unavailable = false, closed
               <button
                 onClick={() => addItem(dish)}
                 disabled={closed}
+                data-testid={`inc-qty-${dish.id}`}
                 className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-hover transition-colors disabled:opacity-30 text-[18px] font-bold"
                 aria-label="Increase quantity"
               >
@@ -172,6 +174,7 @@ export const Card = React.memo(function Card({ dish, unavailable = false, closed
             <button
               onClick={() => addItem(dish)}
               disabled={unavailable || closed}
+              data-testid={`add-dish-${dish.id}`}
               className="bg-primary text-white rounded-full px-5 py-2 text-xs font-semibold hover:bg-primary-hover active:scale-[0.95] transition-all duration-200 disabled:opacity-50 flex items-center gap-1 min-h-[36px]"
             >
               {closed ? "Closed" : "+ Add"}

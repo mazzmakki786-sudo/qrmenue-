@@ -15,6 +15,8 @@ const DEFAULTS: Record<string, RateLimitConfig> = {
   "orders:check": { maxRequests: 15, windowSeconds: 60 },
   "owner:write": { maxRequests: 15, windowSeconds: 60 },
   "owner:read": { maxRequests: 30, windowSeconds: 60 },
+  "staff:read": { maxRequests: 30, windowSeconds: 60 },
+  "staff:write": { maxRequests: 15, windowSeconds: 60 },
   "admin:write": { maxRequests: 10, windowSeconds: 60 },
   "menu:read": { maxRequests: 30, windowSeconds: 60 },
   "notifications:send": { maxRequests: 5, windowSeconds: 60 },

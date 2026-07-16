@@ -4,8 +4,8 @@ import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import { formatPrice } from "@/lib/utils"
-import { TrendingUp, ShoppingBag, DollarSign, XCircle, BarChart3, Calendar, UserPlus, Users, Clock, AlertTriangle, Zap, Crown, ShoppingCart, ExternalLink } from "lucide-react"
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, CartesianGrid } from "recharts"
+import { TrendingUp, ShoppingBag, DollarSign, XCircle, UserPlus, Users, AlertTriangle, Zap, Crown, ShoppingCart } from "lucide-react"
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts"
 
 type AnalyticsData = {
   allTime: { total: number; revenue: number; cancelled: number; completed: number }

@@ -6,13 +6,14 @@ import { createClient } from "@/lib/supabase/client"
 import { useCartStore } from "@/stores/cartStore"
 import { useOrderStore } from "@/stores/orderStore"
 import { OrderTypeSelector } from "@/components/checkout/OrderTypeSelector"
-import { DineInForm } from "@/components/checkout/DineInForm"
+import { DineInForm, type TableOption } from "@/components/checkout/DineInForm"
 import { TakeawayForm } from "@/components/checkout/TakeawayForm"
 import { DeliveryForm } from "@/components/checkout/DeliveryForm"
 import { ArrowLeft, ChevronDown, ChevronUp, ShoppingBag, AlertCircle, Tag, X } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { formatPrice } from "@/lib/utils"
+import { useToastStore } from "@/stores/toastStore"
 import type { OrderType, PaymentMethod } from "@/types"
 
 const CUSTOMER_INFO_KEY = "qrmenu-customer-info"
@@ -54,6 +55,8 @@ export default function CheckoutPage() {
   const [localLoading, setLocalLoading] = React.useState(false)
   const [showSummary, setShowSummary] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [tables, setTables] = useState<TableOption[]>([])
+  const [hasTables, setHasTables] = useState(true)
 
   useEffect(() => {
     const saved = loadSavedInfo()
@@ -75,6 +78,20 @@ export default function CheckoutPage() {
       .then((res) => { if (!res.ok) { clearCart(); router.replace("/cart") } })
       .catch(() => {})
   }, [restaurantId, clearCart, router])
+
+  // Fetch available tables for dine-in option
+  React.useEffect(() => {
+    if (!restaurantId) { setTables([]); return }
+    fetch(`/api/public/tables?restaurant_id=${restaurantId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.tables) {
+          setTables(data.tables)
+          setHasTables(data.tables.length > 0)
+        }
+      })
+      .catch(() => { setHasTables(false) })
+  }, [restaurantId])
 
   const validatePhone = useCallback((phone: string): string => {
     if (!phone) return ""
@@ -162,6 +179,13 @@ export default function CheckoutPage() {
       })
       setCurrentOrder(data.order)
       useCartStore.getState().clearCart()
+      useToastStore.getState().addToast({
+        type: "success",
+        title: "Order Placed!",
+        message: `Your order #${data.order.order_number} has been placed successfully`,
+        duration: 5000,
+        action: { label: "Track Order", url: `/order-confirm/${data.order.id}` },
+      })
       router.push(`/order-confirm/${data.order.id}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong")
@@ -198,7 +222,7 @@ export default function CheckoutPage() {
 
   return (
     <>
-    <div className="min-h-screen bg-[#F9FAFB] md:hidden">
+    <div className="min-h-screen bg-[#F9FAFB] md:hidden animate-fade-in">
       {/* Header */}
       <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-border">
         <div className="flex items-center gap-3 px-4 h-14 max-w-[600px] mx-auto">
@@ -308,7 +332,7 @@ export default function CheckoutPage() {
       <div className="px-4 py-5 pb-32 space-y-5 max-w-[600px] mx-auto">
         {/* Order Type */}
         <div className="bg-white rounded-2xl p-5 border border-border">
-          <OrderTypeSelector selected={orderType} onSelect={setOrderType} />
+          <OrderTypeSelector selected={orderType} onSelect={setOrderType} hasTables={hasTables} />
         </div>
 
         {/* Forms */}
@@ -323,6 +347,7 @@ export default function CheckoutPage() {
                   onNameChange={setCustomerName}
                   onPhoneChange={setCustomerPhone}
                   onTableChange={setTableNumber}
+                  tables={tables}
                 />
                 {fieldErrors.name && <FieldError message={fieldErrors.name} />}
                 {fieldErrors.phone && <FieldError message={fieldErrors.phone} />}
@@ -401,6 +426,7 @@ export default function CheckoutPage() {
           <button
             onClick={handlePlaceOrder}
             disabled={!orderType || !customerName || localLoading}
+            data-testid="place-order-btn-mobile"
             className="w-full h-12 rounded-xl bg-primary text-white font-semibold text-[13px] hover:bg-primary-hover transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99]"
           >
             {localLoading ? (
@@ -417,7 +443,7 @@ export default function CheckoutPage() {
     </div>
 
       {/* ===== DESKTOP LAYOUT ===== */}
-      <div className="hidden md:block min-h-screen bg-[#F9FAFB]">
+      <div className="hidden md:block min-h-screen bg-[#F9FAFB] animate-fade-in">
         <header className="bg-white border-b border-border">
           <div className="max-w-5xl mx-auto px-6 h-16 flex items-center gap-3">
             <Link href="/cart" className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center active:scale-95 transition-transform">
@@ -454,7 +480,7 @@ export default function CheckoutPage() {
               {/* Order Type */}
               <div className="bg-white rounded-xl border border-border p-6">
                 <h2 className="text-sm font-bold text-text-primary mb-4">1. Order Type</h2>
-                <OrderTypeSelector selected={orderType} onSelect={setOrderType} />
+                <OrderTypeSelector selected={orderType} onSelect={setOrderType} hasTables={hasTables} />
               </div>
 
               {/* Details Form */}
@@ -464,7 +490,7 @@ export default function CheckoutPage() {
                   <div className="space-y-1">
                     {orderType === "dine_in" && (
                       <>
-                        <DineInForm name={customerName} phone={customerPhone} tableNumber={tableNumber} onNameChange={setCustomerName} onPhoneChange={setCustomerPhone} onTableChange={setTableNumber} />
+                        <DineInForm name={customerName} phone={customerPhone} tableNumber={tableNumber} onNameChange={setCustomerName} onPhoneChange={setCustomerPhone} onTableChange={setTableNumber} tables={tables} />
                         {fieldErrors.name && <FieldError message={fieldErrors.name} />}
                         {fieldErrors.phone && <FieldError message={fieldErrors.phone} />}
                         {fieldErrors.table && <FieldError message={fieldErrors.table} />}
@@ -570,6 +596,7 @@ export default function CheckoutPage() {
                     <button
                       onClick={handlePlaceOrder}
                       disabled={!orderType || !customerName || localLoading}
+                      data-testid="place-order-btn-desktop"
                       className="w-full h-12 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-hover transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {localLoading ? (

@@ -500,7 +500,7 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
             </div>
           )}
 
-          {deals.length > 0 && <div className="mb-3"><DealBanner restaurantId={restaurant.id} slug={restaurant.slug} /></div>}
+          {deals.length > 0 && <div className="mb-3 animate-fade-in"><DealBanner restaurantId={restaurant.id} slug={restaurant.slug} /></div>}
 
           {effectivelyClosed && (
             <div className="bg-error/5 border border-error/20 rounded-xl px-3 py-2.5 mb-3 flex items-center gap-2.5">

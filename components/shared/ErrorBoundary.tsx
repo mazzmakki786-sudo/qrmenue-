@@ -41,6 +41,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </p>
             <button
               onClick={() => window.location.reload()}
+              data-testid="error-refresh-btn"
               className="mt-4 px-6 py-2 bg-black text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors"
             >
               Refresh Page

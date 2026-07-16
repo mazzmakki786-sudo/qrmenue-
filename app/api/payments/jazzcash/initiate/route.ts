@@ -1,23 +1,22 @@
 import { NextResponse } from "next/server"
 import { safeRoute } from "@/lib/api-error"
-import { createClient } from "@/lib/supabase/server"
-import { validateCsrf } from "@/lib/csrf"
+import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { checkRateLimit } from "@/lib/rate-limiter"
+import { csrfGuard } from "@/lib/csrf"
 import {
   buildPaymentPayload,
   buildAutoSubmitForm,
   generateTxnRefNo,
   isJazzCashEnabled,
 } from "@/lib/jazzcash"
-import { PLAN_PRICES, PLAN_NAMES, type Plan } from "@/lib/subscription"
+import { type Plan } from "@/lib/subscription"
 
-const VALID_PLANS: Plan[] = ["starter", "growth", "premium"]
+const VALID_PLANS = ["starter", "growth", "premium"]
+const VALID_INTERVALS = ["monthly", "yearly"]
 
 export const POST = safeRoute(async (request) => {
-  const { valid } = validateCsrf(request)
-  if (!valid) {
-    return NextResponse.json({ error: "Invalid request origin" }, { status: 403 })
-  }
+  const csrfResponse = csrfGuard(request)
+  if (csrfResponse) return csrfResponse
 
   try {
     await checkRateLimit(request, "owner:write")
@@ -35,6 +34,7 @@ export const POST = safeRoute(async (request) => {
     )
   }
 
+  const admin = createAdminClient()
   const supabase = await createClient()
   const {
     data: { user },
@@ -44,10 +44,15 @@ export const POST = safeRoute(async (request) => {
   }
 
   const body = await request.json()
-  const plan = body.plan as Plan
+  const plan = body.plan as string
+  const billingInterval = (body.billingInterval as string) || "monthly"
 
   if (!plan || !VALID_PLANS.includes(plan)) {
     return NextResponse.json({ error: "Invalid plan" }, { status: 400 })
+  }
+
+  if (!VALID_INTERVALS.includes(billingInterval)) {
+    return NextResponse.json({ error: "Invalid billing interval" }, { status: 400 })
   }
 
   const { data: restaurant } = await supabase
@@ -60,19 +65,53 @@ export const POST = safeRoute(async (request) => {
     return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
   }
 
-  const amount = PLAN_PRICES[plan]
+  // Use admin client to bypass RLS on plans table
+  const { data: planData } = await admin
+    .from("plans")
+    .select("price_pkr, yearly_price_pkr, name")
+    .eq("slug", plan)
+    .eq("is_active", true)
+    .single()
+
+  if (!planData) {
+    return NextResponse.json({ error: "Invalid plan amount" }, { status: 400 })
+  }
+
+  const amount = billingInterval === "yearly" && planData.yearly_price_pkr
+    ? planData.yearly_price_pkr
+    : planData.price_pkr
+
   if (!amount || amount <= 0) {
     return NextResponse.json({ error: "Invalid plan amount" }, { status: 400 })
   }
 
+  const planDurationDays = billingInterval === "yearly" ? 365 : 30
   const txnRefNo = generateTxnRefNo()
   const amountInPaisa = amount * 100
+
+  const { error: subInsertError } = await admin.from("subscriptions").insert({
+    restaurant_id: restaurant.id,
+    plan: plan,
+    amount_pkr: amount,
+    payment_method: "jazzcash",
+    payment_ref: txnRefNo,
+    status: "pending",
+    billing_interval: billingInterval,
+    start_date: new Date().toISOString(),
+    end_date: new Date(Date.now() + planDurationDays * 86400000).toISOString(),
+    notes: `Pending payment via JazzCash | ${planData.name} (${billingInterval})`,
+  })
+
+  if (subInsertError) {
+    console.error("[JazzCash Initiate] Failed to create pending subscription:", subInsertError)
+    return NextResponse.json({ error: "Failed to initiate payment" }, { status: 500 })
+  }
 
   const payload = buildPaymentPayload({
     txnRefNo,
     amount: amountInPaisa,
-    billReference: restaurant.id,
-    description: `QRMenu.pk - ${PLAN_NAMES[plan]} Plan`,
+    billReference: `${restaurant.id}_${txnRefNo}`,
+    description: `QRMenu.pk - ${planData.name} (${billingInterval})`,
   })
 
   const html = buildAutoSubmitForm(payload)

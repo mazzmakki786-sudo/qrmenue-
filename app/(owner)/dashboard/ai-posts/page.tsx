@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { createClient } from "@/lib/supabase/client"
 import { Sparkles, ImageIcon, Trash2, Download, Loader2, Send, Zap, AlertCircle } from "lucide-react"
 import type { AiPost } from "@/types"
@@ -188,11 +189,13 @@ export default function AiPostsPage() {
                   <div key={post.id} className="group bg-white border border-[#F0F0F0] rounded-xl overflow-hidden hover:shadow-md hover:border-[#DDD] transition-all">
                     {post.image_url && (
                       <div className="relative aspect-square bg-[#F9FAFB]">
-                        <img
+                        <Image
                           src={post.image_url}
-                          alt=""
-                          className="w-full h-full object-cover"
-                          onError={(e) => { (e.target as HTMLImageElement).style.display = "none" }}
+                          alt="AI generated poster"
+                          fill
+                          className="object-cover"
+                          loading="lazy"
+                          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none" }}
                         />
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/[0.02] transition-colors" />
                       </div>

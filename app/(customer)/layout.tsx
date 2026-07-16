@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { ShoppingCart, Home, ClipboardList, Heart, Menu } from "lucide-react"
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary"
+import { Toaster } from "@/components/shared/Toaster"
 import { AppFooter } from "@/components/shared/AppFooter"
 import { useCartStore } from "@/stores/cartStore"
 
@@ -31,6 +32,7 @@ export default function CustomerLayout({
 
   return (
     <ErrorBoundary>
+      <Toaster />
       <div className="min-h-screen bg-white">
         {!hideNav && (
           <>

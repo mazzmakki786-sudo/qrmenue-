@@ -127,6 +127,55 @@ export const POST = safeRoute(async (request) => {
     }
   }
 
+  // Server-side price verification: fetch all dish prices from DB
+  const dishIds = parsed.data.items.map(item => item.id)
+  const { data: dishes, error: dishesError } = await supabase
+    .from("dishes")
+    .select("id, price")
+    .in("id", dishIds)
+    .eq("restaurant_id", parsed.data.restaurant_id)
+
+  if (dishesError || !dishes || dishes.length !== dishIds.length) {
+    return NextResponse.json({ error: "Invalid dish data in order" }, { status: 400 })
+  }
+
+  const dishPriceMap = new Map(dishes.map(d => [d.id, d.price]))
+
+  // Verify each item's price matches the database and recalculate subtotals
+  const recalculatedItems: Array<{
+    id: string
+    name_en: string
+    quantity: number
+    price: number
+    subtotal: number
+  }> = []
+  for (const item of parsed.data.items) {
+    const dbPrice = dishPriceMap.get(item.id)
+    if (dbPrice === undefined) {
+      return NextResponse.json(
+        { error: `Dish with id ${item.id} not found in this restaurant` },
+        { status: 400 }
+      )
+    }
+    if (item.price !== dbPrice) {
+      return NextResponse.json(
+        { error: `Price mismatch for "${item.name_en}"` },
+        { status: 400 }
+      )
+    }
+    recalculatedItems.push({
+      ...item,
+      price: dbPrice,
+      subtotal: dbPrice * item.quantity,
+    })
+  }
+
+  const recalculatedSubtotal = recalculatedItems.reduce((sum, item) => sum + item.subtotal, 0)
+  const recalculatedTotal = recalculatedSubtotal - (parsed.data.discount_amount || 0)
+  if (recalculatedTotal <= 0) {
+    return NextResponse.json({ error: "Invalid total price after discount" }, { status: 400 })
+  }
+
   const { count: orderCount } = await supabase
     .from("orders")
     .select("id", { count: "exact", head: true })
@@ -147,6 +196,27 @@ export const POST = safeRoute(async (request) => {
   const orderNumber = generateOrderNumber()
   const adminSupabase = createAdminClient()
 
+  // ── Table occupancy validation for dine-in ──
+  if (parsed.data.order_type === "dine_in" && parsed.data.table_number) {
+    const { data: table } = await adminSupabase
+      .from("restaurant_tables")
+      .select("id, is_active, is_occupied")
+      .eq("restaurant_id", parsed.data.restaurant_id)
+      .eq("table_number", parsed.data.table_number)
+      .single()
+
+    if (!table || !table.is_active) {
+      return NextResponse.json({ error: "Table not found" }, { status: 404 })
+    }
+
+    if (table.is_occupied) {
+      return NextResponse.json({
+        error: "TABLE_OCCUPIED",
+        message: "This table is already occupied. Please choose a different table.",
+      }, { status: 409 })
+    }
+  }
+
   let finalCustomerId = parsed.data.customer_id || null
   if (finalCustomerId) {
     await adminSupabase.from("customers").upsert({
@@ -162,8 +232,8 @@ export const POST = safeRoute(async (request) => {
       restaurant_id: parsed.data.restaurant_id,
       customer_id: parsed.data.customer_id || null,
       order_number: orderNumber,
-      items: parsed.data.items,
-      total_price: parsed.data.total_price,
+      items: recalculatedItems,
+      total_price: recalculatedTotal,
       order_type: parsed.data.order_type,
       customer_name: parsed.data.customer_name,
       customer_phone: parsed.data.customer_phone || null,
@@ -181,10 +251,22 @@ export const POST = safeRoute(async (request) => {
     return NextResponse.json({ error: "Failed to create order" }, { status: 400 })
   }
 
+  // Mark the table as occupied after a successful dine-in order
+  if (parsed.data.order_type === "dine_in" && parsed.data.table_number && data.table_number) {
+    await adminSupabase
+      .from("restaurant_tables")
+      .update({ is_occupied: true })
+      .eq("restaurant_id", parsed.data.restaurant_id)
+      .eq("table_number", parsed.data.table_number)
+      .then(({ error: occupyErr }) => {
+        if (occupyErr) console.error("[orders] Failed to mark table occupied:", occupyErr.message)
+      })
+  }
+
   const whatsappUrl = buildWhatsAppURL({
     orderNumber: data.order_number,
-    items: parsed.data.items,
-    totalPrice: parsed.data.total_price,
+    items: recalculatedItems,
+    totalPrice: recalculatedTotal,
     paymentMethod: parsed.data.payment_method || "cod",
     customerName: parsed.data.customer_name,
     customerPhone: parsed.data.customer_phone ?? undefined,
@@ -206,7 +288,7 @@ export const POST = safeRoute(async (request) => {
   // Send push notification to owner (fire-and-forget)
   sendPushNotification(parsed.data.restaurant_id, {
     title: `New Order #${orderNumber}`,
-    body: `${parsed.data.customer_name} — ${formatPrice(parsed.data.total_price)}`,
+    body: `${parsed.data.customer_name} — ${formatPrice(recalculatedTotal)}`,
     url: `/dashboard/orders/${data.id}`,
     tag: `order-${data.id}`,
   }).catch((err: any) => console.error("[orders] Push send failed:", err))
@@ -217,7 +299,7 @@ export const POST = safeRoute(async (request) => {
     {
       order_id: data.id,
       restaurant_id: parsed.data.restaurant_id,
-      total_price: parsed.data.total_price,
+      total_price: recalculatedTotal,
       order_type: parsed.data.order_type,
     },
     getIpSimple(request)

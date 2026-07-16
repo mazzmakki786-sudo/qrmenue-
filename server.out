@@ -1,0 +1,21 @@
+
+> qrmenu@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.5.18
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.112:3000
+   - Environments: .env.local
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Ready in 13.4s
+ ○ Compiling / ...
+ ✓ Compiled / in 25s (916 modules)
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 10.7s (1263 modules)
+ GET / 500 in 48998ms
+ GET / 500 in 898ms
+ GET / 500 in 3775ms
+ GET / 500 in 582ms

@@ -21,7 +21,7 @@ export function CustomerTable() {
     const res = await fetch("/api/superadmin/customers")
     if (res.ok) {
       const json = await res.json()
-      setCustomers(json.customers || [])
+      setCustomers(json.data || [])
     }
     setLoading(false)
   }

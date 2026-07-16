@@ -187,13 +187,13 @@ export default function RestaurantDetailPage() {
 
   const handleResetTrial = async () => {
     if (!restaurant) return
-    if (!window.confirm("Reset trial for this restaurant? This will set plan=trial with a fresh 7-day window and clear sent reminder emails.")) return
+    if (!window.confirm("Reset trial for this restaurant? This will set plan=trial with a fresh 30-day window and clear sent reminder emails.")) return
     setResetting(true); setResetMsg(null)
     try {
       const res = await fetch(`/api/superadmin/restaurants/${id}/reset-trial`, { method: "POST" })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || "Failed to reset trial")
-      setResetMsg({ type: "ok", text: "Trial reset to 7-day window." })
+      setResetMsg({ type: "ok", text: "Trial reset to 30-day window." })
       await fetchData()
     } catch (e: any) { setResetMsg({ type: "err", text: e.message || "Failed to reset trial" }) }
     finally { setResetting(false) }
@@ -384,7 +384,7 @@ export default function RestaurantDetailPage() {
           <div className="md:col-span-4 bg-white border border-[#E8E8E8] rounded-[14px] p-4 flex flex-col justify-between">
             <div>
               <h4 className="text-xs font-semibold text-black mb-2">Trial Controls</h4>
-              <p className="text-xs text-[#555] mb-4">Manually reset the 7-day trial period for this restaurant.</p>
+              <p className="text-xs text-[#555] mb-4">Manually reset the 30-day trial period for this restaurant.</p>
             </div>
             <Button variant="ghost" onClick={handleResetTrial} disabled={resetting} className="!bg-[#FFA07E]/20 !text-[#78351b] hover:!bg-[#FFA07E]/30 w-full">
               {resetting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RotateCcw className="w-4 h-4 mr-2" />}

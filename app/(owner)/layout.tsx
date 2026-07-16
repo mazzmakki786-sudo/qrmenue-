@@ -2,11 +2,12 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { LayoutDashboard, UtensilsCrossed, ClipboardList, BarChart3, User, CreditCard, QrCode, Menu, X, LogOut, Megaphone, Image as ImageIcon, Percent } from "lucide-react"
+import { LayoutDashboard, UtensilsCrossed, ClipboardList, BarChart3, User, CreditCard, QrCode, Menu, X, LogOut, Megaphone, Image as ImageIcon, Percent, Table2 } from "lucide-react"
 import { BellNotification } from "@/components/owner/BellNotification"
 import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary"
+import { Toaster } from "@/components/shared/Toaster"
 import { usePushNotifications } from "@/lib/hooks/usePushNotifications"
 
 const ALL_NAV_ITEMS = [
@@ -15,6 +16,7 @@ const ALL_NAV_ITEMS = [
   { href: "/dashboard/deals", label: "Deals", icon: Percent },
   { href: "/dashboard/orders", label: "Orders", icon: ClipboardList },
   { href: "/dashboard/announcements", label: "Announcements", icon: Megaphone },
+  { href: "/dashboard/tables", label: "Tables", icon: Table2 },
   { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/dashboard/settings", label: "Profile", icon: User },
   { href: "/dashboard/subscription", label: "Subscription", icon: CreditCard },
@@ -75,13 +77,15 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
   }, [handleEscape])
 
   const handleLogout = async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push("/")
+    setRestaurantId(null)
+    setPlan("trial")
+    try { await fetch("/api/auth/logout", { method: "POST" }) } catch {}
+    window.location.href = "/login"
   }
 
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
+      <Toaster />
       <head>
         <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
       </head>
@@ -164,13 +168,13 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
               )}
             </div>
           )}
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-[#555] hover:bg-[#F0F0F0] transition-colors"
+          <Link
+            href="/dashboard/settings"
+            className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#F0F0F0] transition-colors"
+            title="Profile"
           >
-            <LogOut className="w-4 h-4" />
-            <span className="hidden lg:inline">Sign Out</span>
-          </button>
+            <User className="w-5 h-5 text-[#555]" />
+          </Link>
         </div>
       </header>
 
@@ -184,39 +188,12 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
         <Link href="/dashboard" className="font-semibold text-sm">Digital QR Menue</Link>
         <div className="flex items-center gap-1">
           {restaurantId && <BellNotification restaurantId={restaurantId} />}
-          {push.supported && (
-            push.subscribed ? (
-              <button
-                onClick={() => { fetch("/api/push/test", { method: "POST" }).catch(() => {}) }}
-                className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center relative"
-                title="Test push notification"
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#25D366]">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                </svg>
-                <span className="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 bg-[#25D366] rounded-full border-2 border-white" />
-              </button>
-            ) : (
-              <button
-                onClick={push.requestPermission}
-                disabled={push.loading}
-                className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                title="Enable push notifications"
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#555]">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                </svg>
-              </button>
-            )
-          )}
-          <button
-            onClick={handleLogout}
-            className="p-2 -mr-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+          <Link
+            href="/dashboard/settings"
+            className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
           >
-            <LogOut className="w-5 h-5 text-[#555]" />
-          </button>
+            <User className="w-5 h-5 text-[#555]" />
+          </Link>
         </div>
       </div>
 

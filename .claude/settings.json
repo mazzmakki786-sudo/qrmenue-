@@ -1,0 +1,14 @@
+{
+  "slashCommands": [
+    {
+      "name": "makii",
+      "description": "Context-aware prompt builder — takes simple task descriptions and produces detailed, project-optimized prompts for DeepSeek, Claude, and other reasoning models.",
+      "agentType": "makii"
+    },
+    {
+      "name": "ceo",
+      "description": "Chief Executive Orchestrator — analyzes tasks, selects optimal subagents from 155+ specialists, delegates work, and synthesizes results. Use: /ceo <task>",
+      "agentType": "ceo"
+    }
+  ]
+}

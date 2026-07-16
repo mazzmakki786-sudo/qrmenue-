@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
-import { Save, RotateCcw, GripVertical, Plus, X } from "lucide-react"
+import { Save, RotateCcw, GripVertical, Plus, X, Loader2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 
@@ -57,7 +57,14 @@ export function PlanManager() {
       const res = await fetch("/api/superadmin/plans")
       if (res.ok) {
         const data = await res.json()
-        setPlans(data.plans || [])
+        const mapped = (data.plans || []).map((p: any) => ({
+          ...p,
+          interval: p.interval || "monthly",
+          yearly_price_pkr: p.yearly_price_pkr ?? null,
+          custom_features: Array.isArray(p.custom_features) ? p.custom_features : [],
+          ai_posts_per_month: p.ai_posts_per_month ?? 0,
+        }))
+        setPlans(mapped)
       }
     } catch (e) {
       console.error("Failed to fetch plans", e)
@@ -183,14 +190,14 @@ function PlanCard({ plan, saving, onSave }: { plan: Plan; saving: boolean; onSav
         <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
           {hasChanges && (
             <>
-              <button
-                onClick={(e) => { e.stopPropagation(); onSave(edited); setEdited({}) }}
-                disabled={saving}
-                className="flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 bg-black text-white text-xs font-medium rounded-lg hover:opacity-90 disabled:opacity-50 transition-all"
-              >
-                <Save className="w-3.5 h-3.5" />
-                <span className="hidden md:inline">{saving ? "Saving..." : "Save"}</span>
-              </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); onSave(edited); setEdited({}) }}
+                  disabled={saving}
+                  className="flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 bg-black text-white text-xs font-medium rounded-lg hover:opacity-90 disabled:opacity-50 transition-all"
+                >
+                  {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                  <span className="hidden md:inline">{saving ? "Saving..." : "Save"}</span>
+                </button>
               <button
                 onClick={(e) => { e.stopPropagation(); setEdited({}) }}
                 className="p-1.5 text-[#999] hover:text-black transition-colors"

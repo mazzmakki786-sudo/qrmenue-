@@ -36,7 +36,7 @@ export const POST = safeRoute(async (
     .single()
 
   const now = new Date().toISOString()
-  const newTrialEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+  const newTrialEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
 
   const { data, error } = await supabaseAdmin
     .from("restaurants")

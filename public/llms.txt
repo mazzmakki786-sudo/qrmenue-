@@ -1,8 +1,20 @@
 # Digital QR Menue
 
-> https://www.digitalmenue.com
+> Pakistan's first QR-based digital menu and WhatsApp ordering platform for restaurants, cafes, and food businesses across Pakistan.
 
-Pakistan's first QR-based digital menu and WhatsApp ordering platform for restaurants, cafes, and food businesses across Pakistan.
+## About
+
+Digital QR Menue (Digitalmenue.com) helps Pakistani restaurants create digital QR code menus in under 5 minutes. Customers scan, browse, and order via WhatsApp — no app download needed, no commission on orders.
+
+## Key Pages
+
+- [Home](https://www.digitalmenue.com): Pakistan's #1 QR Code Menu Platform for Restaurants
+- [Browse Restaurants](https://www.digitalmenue.com/restaurants): Find restaurants with digital menus across Pakistan
+- [Pricing](https://www.digitalmenue.com/pricing): Free Trial, Starter (PKR 1,200/mo), Growth (PKR 2,500/mo), Premium (PKR 4,500/mo)
+- [FAQ](https://www.digitalmenue.com/faq): Frequently asked questions about QR menus and WhatsApp ordering
+- [Contact](https://www.digitalmenue.com/contact): Get in touch via WhatsApp or email
+- [Privacy Policy](https://www.digitalmenue.com/privacy)
+- [Terms of Service](https://www.digitalmenue.com/terms)
 
 ## Features
 
@@ -12,17 +24,32 @@ Pakistan's first QR-based digital menu and WhatsApp ordering platform for restau
 - Analytics dashboard
 - Urdu / English bilingual support
 - JazzCash & Easypaisa payment integration
+- Real-time order notifications
+- Staff management
+- Table management
 
 ## Pricing
 
-| Tier | Price |
-|------|-------|
-| Trial | PKR 0 (7 days) |
-| Starter | PKR 1,200 / month |
-| Growth | PKR 2,500 / month |
-| Premium | PKR 4,500 / month |
+| Tier | Price | Dishes | Categories |
+|------|-------|--------|------------|
+| Trial | PKR 0 (7 days) | 20 | 5 |
+| Starter | PKR 1,200 / month | 30 | 10 |
+| Growth | PKR 2,500 / month | 50 | 20 |
+| Premium | PKR 4,500 / month | 100 | Unlimited |
+
+## Key Facts
+- Pakistan's first QR-based digital menu and WhatsApp ordering platform for restaurants
+- Founded: 2024
+- Served cities: Lahore, Karachi, Islamabad, Faisalabad, and all Pakistan
+- Pricing: Free Trial (PKR 0, 30 days), Starter (PKR 1,200/mo), Growth (PKR 2,500/mo), Premium (PKR 4,500/mo)
+- Payment integration: JazzCash, Easypaisa
+- Bilingual: English and Urdu
+- Zero commission on all orders
+- No app download needed for customers
+- Works on every smartphone in Pakistan
 
 ## Contact
 
 - WhatsApp: +92-314-6325823
 - Email: dmenue@gmail.com
+- Cities served: Lahore, Karachi, Islamabad, Faisalabad, and all Pakistan

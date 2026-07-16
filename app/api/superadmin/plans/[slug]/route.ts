@@ -28,7 +28,7 @@ export const PATCH = safeRoute(async (request, { params }) => {
     "name", "price_pkr", "max_dishes", "max_images", "max_orders",
     "max_categories", "analytics", "custom_branding", "can_have_qr",
     "can_have_whatsapp", "description", "sort_order", "is_active",
-    "ai_posts_per_month", "custom_features", "interval", "yearly_price_pkr"
+    "ai_posts_per_month", "custom_features", "billing_interval", "yearly_price_pkr"
   ]
 
   const updates: Record<string, unknown> = {}

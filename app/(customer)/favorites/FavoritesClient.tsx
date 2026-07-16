@@ -88,7 +88,7 @@ export function FavoritesClient() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f9f9f9]">
+    <div className="min-h-screen bg-[#f9f9f9] animate-fade-in">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 pb-24">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6 sm:mb-8">
@@ -113,18 +113,18 @@ export function FavoritesClient() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5 bg-white border border-gray-100 rounded-xl animate-pulse">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gray-100 shrink-0" />
+              <div key={i} className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5 bg-white border border-border rounded-xl animate-pulse">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#F0F0F0] shrink-0" />
                 <div className="flex-1 space-y-2.5">
-                  <div className="h-4 bg-gray-100 rounded w-1/3" />
-                  <div className="h-3 bg-gray-100 rounded w-1/2" />
+                  <div className="h-4 bg-[#F0F0F0] rounded w-1/3" />
+                  <div className="h-3 bg-[#F0F0F0] rounded w-1/2" />
                 </div>
               </div>
             ))}
           </div>
         ) : restaurants.length === 0 ? (
           <div className="py-12 sm:py-16 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-white mx-auto mb-4 flex items-center justify-center shadow-sm border border-gray-100">
+            <div className="w-14 h-14 rounded-2xl bg-white mx-auto mb-4 flex items-center justify-center shadow-sm border border-border">
               <Heart className="w-6 h-6 text-gray-400" />
             </div>
             <h3 className="text-lg font-semibold text-black mb-1">No favorites yet</h3>

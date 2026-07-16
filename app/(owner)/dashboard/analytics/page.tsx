@@ -4,7 +4,12 @@ import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { formatPrice } from "@/lib/utils"
 import type { DailyStats } from "@/types"
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts"
+import dynamic from "next/dynamic"
+
+const OrderChart = dynamic(
+  () => import("./OrderChart"),
+  { ssr: false }
+)
 
 type DateRange = "7d" | "30d"
 
@@ -161,33 +166,7 @@ export default function AnalyticsPage() {
         </div>
         {chartData.length > 0 ? (
           <div className="h-48">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fontSize: 10, fill: "#999" }}
-                  tickFormatter={(v: string) => {
-                    const d = new Date(v)
-                    return `${d.getMonth() + 1}/${d.getDate()}`
-                  }}
-                />
-                <YAxis tick={{ fontSize: 10, fill: "#999" }} allowDecimals={false} />
-                <Tooltip
-                  contentStyle={{ borderRadius: 10, border: "1px solid #F0F0F0", fontSize: 12 }}
-                  formatter={(value: number) => [value, "Orders"]}
-                  labelFormatter={(label: string) => new Date(label).toLocaleDateString()}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="orders"
-                  stroke="#000"
-                  strokeWidth={2}
-                  dot={{ r: 3, fill: "#000" }}
-                  activeDot={{ r: 5 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            <OrderChart data={chartData} dataKey="orders" color="#000" />
           </div>
         ) : (
           <div className="h-32 flex items-center justify-center text-xs text-[#999]">
@@ -203,33 +182,7 @@ export default function AnalyticsPage() {
         </div>
         {chartData.length > 0 ? (
           <div className="h-48">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fontSize: 10, fill: "#999" }}
-                  tickFormatter={(v: string) => {
-                    const d = new Date(v)
-                    return `${d.getMonth() + 1}/${d.getDate()}`
-                  }}
-                />
-                <YAxis tick={{ fontSize: 10, fill: "#999" }} />
-                <Tooltip
-                  contentStyle={{ borderRadius: 10, border: "1px solid #F0F0F0", fontSize: 12 }}
-                  formatter={(value: number) => [`Rs ${value.toLocaleString("en-PK")}`, "Revenue"]}
-                  labelFormatter={(label: string) => new Date(label).toLocaleDateString()}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="#25D366"
-                  strokeWidth={2}
-                  dot={{ r: 3, fill: "#25D366" }}
-                  activeDot={{ r: 5 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            <OrderChart data={chartData} dataKey="revenue" color="#25D366" />
           </div>
         ) : (
           <div className="h-32 flex items-center justify-center text-xs text-[#999]">

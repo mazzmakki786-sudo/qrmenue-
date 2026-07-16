@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { createServerClient } from "@supabase/ssr"
 import { safeRoute } from "@/lib/api-error"
 import { csrfGuard } from "@/lib/csrf"
 import { getClientIp, rateLimit } from "@/lib/rate-limiter"
@@ -11,6 +11,7 @@ import {
   clearLoginAttempts,
 } from "@/lib/account-lockout"
 import { sendLockoutAlert } from "@/lib/email"
+import type { NextRequest } from "next/server"
 
 const LOGIN_RATE_LIMIT_MAX = 10
 const LOGIN_RATE_LIMIT_WINDOW = 60
@@ -62,7 +63,26 @@ export const POST = safeRoute(async (request) => {
     await new Promise((resolve) => setTimeout(resolve, delayMs))
   }
 
-  const supabase = await createClient()
+  let authCookies: { name: string; value: string; options?: any }[] = []
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return (request as NextRequest).cookies.getAll()
+        },
+        setAll(cookiesToSet: { name: string; value: string; options?: any }[]) {
+          cookiesToSet.forEach(({ name, value }) =>
+            (request as NextRequest).cookies.set(name, value)
+          )
+          authCookies = cookiesToSet
+        },
+      },
+    }
+  )
+
   const { data, error } = await supabase.auth.signInWithPassword({
     email: sanitizedEmail,
     password,
@@ -92,7 +112,13 @@ export const POST = safeRoute(async (request) => {
 
   await clearLoginAttempts(sanitizedEmail)
 
-  return NextResponse.json({
+  const jsonResponse = NextResponse.json({
     user: { id: data.user.id, email: data.user.email },
   })
+
+  authCookies.forEach(({ name, value, options }) => {
+    jsonResponse.cookies.set(name, value, options)
+  })
+
+  return jsonResponse
 })

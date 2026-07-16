@@ -3,16 +3,18 @@
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { PasswordInput, validatePassword } from "@/components/ui/password-input"
 import CityAutocomplete from "@/components/shared/CityAutocomplete"
-import { ArrowLeft, Store, Loader2 } from "lucide-react"
+import { ArrowLeft, Store, Sparkles } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 
 export default function RestaurantSignupPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const preselectedPlan = searchParams.get("plan")
   const supabase = createClient()
   const [user, setUser] = useState<User | null>(null)
   const [checkingAuth, setCheckingAuth] = useState(true)
@@ -63,21 +65,31 @@ export default function RestaurantSignupPage() {
       }
     }
 
+    const hasPaidPlan = preselectedPlan && ["starter", "growth", "premium"].includes(preselectedPlan)
+
     if (user) {
       // User already signed in via Google — create restaurant directly
       const slug = `${form.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")}-${Date.now().toString(36)}`
-      const { error: dbError } = await (supabase.from("restaurants") as any).insert({
+      const insertData: Record<string, unknown> = {
         owner_id: user.id,
         name: form.name,
         slug,
         phone: form.phone,
         city: form.city,
-        plan: "trial",
-        trial_start: new Date().toISOString(),
-        trial_end: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        plan: hasPaidPlan ? preselectedPlan : "trial",
+        trial_start: hasPaidPlan ? null : new Date().toISOString(),
+        trial_end: hasPaidPlan ? null : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         image_upload_allowed: true,
         is_active: true,
-      })
+        is_suspended: !!hasPaidPlan,
+      }
+
+      if (hasPaidPlan) {
+        insertData.plan_start_date = new Date().toISOString()
+        insertData.plan_end_date = new Date(Date.now() + 30 * 86400000).toISOString()
+      }
+
+      const { error: dbError } = await (supabase.from("restaurants") as any).insert(insertData)
 
       if (dbError) {
         setError("Something went wrong. Please try again.")
@@ -86,7 +98,23 @@ export default function RestaurantSignupPage() {
       }
 
       setLoading(false)
-      router.push("/dashboard/onboarding")
+
+      if (hasPaidPlan) {
+        const paymentRes = await fetch("/api/payments/jazzcash/initiate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ plan: preselectedPlan, billingInterval: "monthly" }),
+        })
+        if (paymentRes.ok) {
+          const html = await paymentRes.text()
+          const blob = new Blob([html], { type: "text/html" })
+          window.open(URL.createObjectURL(blob), "_self")
+        } else {
+          router.push("/dashboard/onboarding")
+        }
+      } else {
+        router.push("/dashboard/onboarding")
+      }
       return
     }
 
@@ -101,6 +129,7 @@ export default function RestaurantSignupPage() {
           phone: form.phone,
           email: form.email,
           password: form.password,
+          plan: hasPaidPlan ? preselectedPlan : undefined,
         }),
       })
 
@@ -118,7 +147,23 @@ export default function RestaurantSignupPage() {
       })
 
       setLoading(false)
-      router.push("/dashboard/onboarding")
+
+      if (hasPaidPlan) {
+        const paymentRes = await fetch("/api/payments/jazzcash/initiate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ plan: preselectedPlan, billingInterval: "monthly" }),
+        })
+        if (paymentRes.ok) {
+          const html = await paymentRes.text()
+          const blob = new Blob([html], { type: "text/html" })
+          window.open(URL.createObjectURL(blob), "_self")
+        } else {
+          router.push("/dashboard/onboarding")
+        }
+      } else {
+        router.push("/dashboard/onboarding")
+      }
     } catch {
       setError("Something went wrong. Please try again.")
       setLoading(false)
@@ -137,22 +182,38 @@ export default function RestaurantSignupPage() {
 
   return (
     <div className="w-full flex flex-col items-center">
-      <div className="w-full mb-8">
-        <Link href="/" className="inline-flex items-center gap-2 text-sm text-[#555] hover:text-black transition-colors">
+      <div className="w-full mb-6">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="inline-flex items-center gap-2 text-sm text-[#555] hover:text-black transition-colors min-h-[44px]"
+        >
           <div className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center shrink-0">
             <ArrowLeft className="w-4 h-4" />
           </div>
           Back
-        </Link>
+        </button>
       </div>
 
-      <div className="flex flex-col items-center text-center mb-8">
+      <div className="flex flex-col items-center text-center mb-6">
         <div className="w-12 h-12 bg-[#25D366] rounded-xl flex items-center justify-center mb-4">
           <Store className="w-6 h-6 text-white" />
         </div>
         <h1 className="text-2xl font-bold text-black mb-1">Register Your Restaurant</h1>
-        <p className="text-sm text-[#555]">Start your 7-day free trial today</p>
+        <p className="text-sm text-[#555]">{preselectedPlan ? "Set up your account to continue" : "Start your 30-day free trial today"}</p>
       </div>
+
+      {preselectedPlan && (
+        <div className="bg-black/5 border border-black/10 rounded-xl p-4 flex items-center gap-3 mb-6">
+          <Sparkles className="w-5 h-5 text-black shrink-0" />
+          <div>
+            <p className="text-sm font-bold text-black">
+              {preselectedPlan.charAt(0).toUpperCase() + preselectedPlan.slice(1)} Plan
+            </p>
+            <p className="text-xs text-[#555]">You&apos;ll be redirected to payment after signup</p>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="w-full space-y-4">
         {restaurantFields.map((f) =>
@@ -209,8 +270,8 @@ export default function RestaurantSignupPage() {
           </div>
         )}
 
-        <Button type="submit" variant="primary" fullWidth disabled={loading}>
-          {loading ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Creating...</>) : "Create Restaurant & Start Trial"}
+        <Button type="submit" variant="primary" fullWidth loading={loading}>
+          {loading ? "Creating..." : "Create Restaurant & Start Trial"}
         </Button>
       </form>
 
@@ -223,8 +284,8 @@ export default function RestaurantSignupPage() {
             <span className="relative px-4 bg-white text-xs text-[#999] uppercase tracking-wider">or</span>
           </div>
 
-          <Button variant="google" onClick={handleGoogleSignup} className="w-full">
-            <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
+          <Button variant="google" onClick={handleGoogleSignup} className="w-full min-h-[48px]">
+            <svg className="w-[18px] h-[18px] mr-3 shrink-0" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>

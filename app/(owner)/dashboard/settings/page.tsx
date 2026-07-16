@@ -291,8 +291,8 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <Button onClick={handleSave} disabled={saving} className="w-full">
-        {saving ? "Saving..." : saved ? "Saved!" : "Save Changes"}
+      <Button onClick={handleSave} loading={saving} className="w-full">
+        {saved ? "Saved!" : "Save Changes"}
       </Button>
     </div>
   )

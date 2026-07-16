@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { PLAN_LIMITS, type Plan, getEffectiveLimits } from "@/lib/subscription"
 import { AlertTriangle, Sparkles, TrendingUp, XCircle, ArrowRight, Lock, Eye, ShoppingBag, PauseCircle } from "lucide-react"
@@ -10,6 +11,9 @@ interface Props {
 }
 
 export function SubscriptionBanner({ restaurant, orderCount = 0 }: Props) {
+  const [now, setNow] = useState<Date | null>(null)
+  useEffect(() => { setNow(new Date()) }, [])
+
   if (!restaurant) return null
 
   const plan = (restaurant.plan as Plan) || "trial"
@@ -17,11 +21,9 @@ export function SubscriptionBanner({ restaurant, orderCount = 0 }: Props) {
   const planEnd = restaurant.plan_end_date
     ? new Date(restaurant.plan_end_date)
     : null
-  const now = new Date()
   const msPerDay = 1000 * 60 * 60 * 24
 
   const isSuspended = restaurant.is_suspended === true
-
   if (isSuspended) {
     return (
       <div className="bg-[#FEF3C7] border border-[#D97706]/30 rounded-[14px] p-4">
@@ -47,6 +49,8 @@ export function SubscriptionBanner({ restaurant, orderCount = 0 }: Props) {
       </div>
     )
   }
+
+  if (!now) return <div className="h-28" />
 
   const trialDaysRemaining = Math.max(
     0,

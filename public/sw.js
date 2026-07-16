@@ -1,35 +1,23 @@
-// QRMenu.pk — Service Worker
-// Handles push notifications + offline caching for menu pages
+// QRMenu.pk — Service Worker v4
+// Handles push notifications + offline caching for images only
+// Next.js JS/CSS chunks are NOT intercepted (they have content hashes and
+// browser cache already handles them). Cloning streaming responses from
+// Next.js causes "Response body already used" errors.
 
-const CACHE_NAME = "qrmenu-v1"
-const STATIC_ASSETS = [
-  "/",
-  "/offline.html",
-  "/og-image.png",
-  "/favicon.svg",
-  "/manifest.json",
-]
-
-// Menu page URL pattern — cache these for offline reading
-const MENU_PATTERN = /^\/menu\//
+const CACHE_NAME = "qrmenu-v4"
+const STATIC_CACHE = "qrmenu-static-v4"
+const IMAGE_CACHE = "qrmenu-images-v4"
 
 // ── INSTALL ──
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      // Pre-cache static assets — failures are non-fatal
-      return Promise.allSettled(
-        STATIC_ASSETS.map((url) =>
-          cache.add(url).catch(() => { /* skip if unavailable */ })
-        )
-      )
-    }).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME)
+      .then(() => self.skipWaiting())
   )
 })
 
 // ── ACTIVATE ──
 self.addEventListener("activate", (event) => {
-  // Clean old caches
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
@@ -37,47 +25,43 @@ self.addEventListener("activate", (event) => {
   )
 })
 
-// ── FETCH — offline fallback for menu pages ──
+// ── FETCH ──
+// Only intercept images. NEVER intercept JS/CSS/HTML/API — those are
+// handled by Next.js built-in caching and middleware auth redirects.
 self.addEventListener("fetch", (event) => {
-  // Only handle GET requests
   if (event.request.method !== "GET") return
 
-  // For menu pages: try network first, fall back to cache
-  if (MENU_PATTERN.test(event.request.url)) {
+  const url = new URL(event.request.url)
+
+  // Images only: cache-first with network fallback
+  if (url.pathname.match(/\.(png|jpg|jpeg|svg|ico|webp)$/)) {
     event.respondWith(
-      fetch(event.request)
-        .then((response) => {
-          // Cache the fresh response for offline use
-          const cloned = response.clone()
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cloned))
+      caches.match(event.request).then((cached) => {
+        if (cached) return cached
+        return fetch(event.request).then((response) => {
+          // Only cache successful responses with a body we can clone
+          if (response.ok) {
+            const cloned = response.clone()
+            caches.open(IMAGE_CACHE).then((cache) => {
+              cache.put(event.request, cloned)
+            }).catch(() => {})
+          }
           return response
+        }).catch(() => {
+          // Offline fallback — return a transparent pixel
+          return new Response(
+            '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect fill="#f0f0f0" width="200" height="200"/></svg>',
+            { headers: { "Content-Type": "image/svg+xml" } }
+          )
         })
-        .catch(() => {
-          // Offline — serve cached version
-          return caches.match(event.request).then((cached) => {
-            if (cached) return cached
-            // No cached version — show offline page
-            return caches.match("/offline.html")
-          })
-        })
+      })
     )
     return
   }
 
-  // For other pages: stale-while-revalidate
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const fetchPromise = fetch(event.request)
-        .then((response) => {
-          const cloned = response.clone()
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cloned))
-          return response
-        })
-        .catch(() => cached || new Response("Offline", { status: 503 }))
-
-      return cached || fetchPromise
-    })
-  )
+  // Everything else (JS, CSS, HTML, API, menu pages, dashboard, etc.):
+  // Let the browser handle normally. This avoids clone errors on streaming
+  // responses and ensures middleware auth redirects work correctly.
 })
 
 // ── PUSH ──
@@ -86,7 +70,7 @@ self.addEventListener("push", (event) => {
   let body = "Your restaurant has a new update!"
   let url = "/dashboard/orders"
   let tag = "order-alert"
-  let icon = "/og-image.svg"
+  let icon = "/favicon.svg"
   let notificationData = {}
 
   if (event.data) {

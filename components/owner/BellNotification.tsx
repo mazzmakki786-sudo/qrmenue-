@@ -6,6 +6,8 @@ import { uid } from "@/lib/realtime"
 import { useRouter } from "next/navigation"
 import { Bell, X, ChevronRight, Clock, Megaphone, BellRing } from "lucide-react"
 import { formatPrice, timeAgo } from "@/lib/utils"
+import { useToastStore } from "@/stores/toastStore"
+import { playOrderAlert, playStatusChange, playNotification } from "@/lib/sound"
 
 interface Props {
   restaurantId: string
@@ -37,45 +39,6 @@ interface AnnouncementAlert {
   created_at: string
 }
 
-let audioCtx: AudioContext | null = null
-
-function getAudioContext() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)()
-  }
-  if (audioCtx.state === "suspended") {
-    audioCtx.resume()
-  }
-  return audioCtx
-}
-
-function playNotificationSound() {
-  try {
-    const ctx = getAudioContext()
-    const now = ctx.currentTime
-    const osc1 = ctx.createOscillator()
-    const gain1 = ctx.createGain()
-    osc1.type = "sine"
-    osc1.frequency.setValueAtTime(880, now)
-    osc1.frequency.setValueAtTime(1320, now + 0.1)
-    gain1.gain.setValueAtTime(0.3, now)
-    gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.3)
-    osc1.connect(gain1).connect(ctx.destination)
-    osc1.start(now)
-    osc1.stop(now + 0.3)
-    const osc2 = ctx.createOscillator()
-    const gain2 = ctx.createGain()
-    osc2.type = "sine"
-    osc2.frequency.setValueAtTime(1100, now + 0.15)
-    osc2.frequency.setValueAtTime(1540, now + 0.25)
-    gain2.gain.setValueAtTime(0.25, now + 0.15)
-    gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.5)
-    osc2.connect(gain2).connect(ctx.destination)
-    osc2.start(now + 0.15)
-    osc2.stop(now + 0.5)
-  } catch {}
-}
-
 export function BellNotification({ restaurantId }: Props) {
   const router = useRouter()
   const [unreadCount, setUnreadCount] = useState(0)
@@ -86,6 +49,7 @@ export function BellNotification({ restaurantId }: Props) {
   const [announcementQueue, setAnnouncementQueue] = useState<AnnouncementAlert[]>([])
   const [announcementModal, setAnnouncementModal] = useState<AnnouncementAlert | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const addToast = useToastStore((s) => s.addToast)
 
   const dismissAnnouncement = useCallback(() => {
     setAnnouncementModal((current) => {
@@ -102,20 +66,24 @@ export function BellNotification({ restaurantId }: Props) {
     })
   }, [])
 
+  function getStartOfTodayPK() {
+    const pkOffset = 5 * 60 * 60 * 1000
+    const nowPK = new Date(Date.now() + pkOffset)
+    const startPK = new Date(nowPK.getFullYear(), nowPK.getMonth(), nowPK.getDate())
+    return new Date(startPK.getTime() - pkOffset).toISOString()
+  }
+
   useEffect(() => {
     const supabase = createClient()
 
     const fetchInitial = async () => {
-      const now = new Date()
-      const pkOffset = 5 * 60 * 60 * 1000
-      const pkDate = new Date(now.getTime() + pkOffset)
-      const today = pkDate.toISOString().split("T")[0]
+      const startOfDay = getStartOfTodayPK()
       const [ordersRes, announcementsRes] = await Promise.all([
         supabase
           .from("orders")
           .select("*")
           .eq("restaurant_id", restaurantId)
-          .gte("created_at", today)
+          .gte("created_at", startOfDay)
           .order("created_at", { ascending: false })
           .limit(50),
         supabase
@@ -126,6 +94,7 @@ export function BellNotification({ restaurantId }: Props) {
           .eq("is_read", false),
       ])
 
+      setTodayOrders((ordersRes.data || []) as TodayOrder[])
       const pending = (ordersRes.data || []).filter((o: any) => o.order_status === "received")
       const announcementCount = announcementsRes.count ?? 0
       setUnreadCount(pending.length + announcementCount)
@@ -133,7 +102,7 @@ export function BellNotification({ restaurantId }: Props) {
 
     fetchInitial()
 
-      const channel = supabase
+    const channel = supabase
       .channel(uid(`orders-${restaurantId}`))
       .on(
         "postgres_changes",
@@ -145,8 +114,9 @@ export function BellNotification({ restaurantId }: Props) {
         },
         (payload) => {
           const order = payload.new as any
+          setTodayOrders((prev) => [order as TodayOrder, ...prev].slice(0, 50))
           if (order.order_status === "received") {
-            playNotificationSound()
+            playOrderAlert()
             setUnreadCount((prev) => prev + 1)
             const newAlert: OrderAlert = {
               id: order.id,
@@ -172,15 +142,37 @@ export function BellNotification({ restaurantId }: Props) {
           filter: `restaurant_id=eq.${restaurantId}`,
         },
         (payload) => {
-          const oldOrder = payload.old as any
           const newOrder = payload.new as any
-          // If status changed away from "received", decrement the count
-          if (oldOrder.order_status === "received" && newOrder.order_status !== "received") {
+          setTodayOrders((prev) =>
+            prev.map((o) => (o.id === newOrder.id ? (newOrder as TodayOrder) : o))
+          )
+          const oldStatus = (payload.old as any)?.order_status
+          const newStatus = newOrder.order_status
+          if (oldStatus === "received" && newStatus !== "received") {
             setUnreadCount((prev) => Math.max(0, prev - 1))
           }
-          // If order was reverted back to received (unlikely but handle)
-          if (oldOrder.order_status !== "received" && newOrder.order_status === "received") {
+          if (oldStatus !== "received" && newStatus === "received") {
             setUnreadCount((prev) => prev + 1)
+          }
+          if (oldStatus && oldStatus !== newStatus) {
+            const statusLabels: Record<string, string> = {
+              received: "New Order",
+              preparing: "Started Preparing",
+              ready: "Marked as Ready",
+              completed: "Completed",
+              cancelled: "Cancelled",
+            }
+            if (newStatus === "preparing" || newStatus === "ready") {
+              playStatusChange()
+            }
+            addToast({
+              type: newStatus === "cancelled" ? "error" : "info",
+              title: statusLabels[newStatus] || newStatus,
+              message: `Order #${newOrder.order_number} — ${newOrder.customer_name}`,
+              duration: 4000,
+              sound: true,
+              data: { order_id: newOrder.id },
+            })
           }
         }
       )
@@ -199,7 +191,7 @@ export function BellNotification({ restaurantId }: Props) {
         (payload) => {
           const n = payload.new as any
           if (n.type === "announcement") {
-            playNotificationSound()
+            playNotification()
             const alert: AnnouncementAlert = {
               id: n.id,
               title: n.title,
@@ -226,15 +218,12 @@ export function BellNotification({ restaurantId }: Props) {
   const fetchTodayOrders = useCallback(async () => {
     setDropdownLoading(true)
     const supabase = createClient()
-    const pkOffset = 5 * 60 * 60 * 1000
-    const pkDate = new Date(Date.now() + pkOffset)
-    const today = pkDate.toISOString().split("T")[0]
 
     const { data } = await supabase
       .from("orders")
       .select("id, order_number, customer_name, total_price, order_type, created_at, items")
       .eq("restaurant_id", restaurantId)
-      .gte("created_at", today)
+      .gte("created_at", getStartOfTodayPK())
       .order("created_at", { ascending: false })
       .limit(50)
 

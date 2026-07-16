@@ -1,39 +1,50 @@
 import { NextResponse } from "next/server"
-import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { safeRoute } from "@/lib/api-error"
-import { isSuperAdmin, checkRateLimit, logAudit, getIp } from "@/lib/superadmin-security"
-import { csrfGuard } from "@/lib/csrf"
+import { createAdminClient } from "@/lib/supabase/server"
+import { checkRateLimit } from "@/lib/rate-limiter"
 
-export const POST = safeRoute(async (request) => {
-  const csrfResponse = csrfGuard(request); if (csrfResponse) return csrfResponse
-  const ip = getIp(request)
-  if (!await checkRateLimit(ip)) return NextResponse.json({ error: "Too many requests" }, { status: 429 })
+export const GET = safeRoute(async (request) => {
+  await checkRateLimit(request, "superadmin:read")
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user || !(await isSuperAdmin(user.email))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
+  const supabase = createAdminClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const body = await request.json()
-  const { restaurant_id, plan_type, price } = body
-
-  if (!restaurant_id || !plan_type) {
-    return NextResponse.json({ error: "restaurant_id and plan_type are required" }, { status: 400 })
+  const superAdminEmail = process.env.SUPER_ADMIN_EMAIL
+  if (!superAdminEmail || user.email !== superAdminEmail) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
-  const admin = createAdminClient()
-  const { error } = await admin.from("subscriptions").insert({
-    restaurant_id,
-    plan: plan_type,
-    amount_pkr: price ?? 0,
-    start_date: new Date().toISOString(),
-    end_date: null,
-  })
+  const url = new URL(request.url)
+  const restaurantId = url.searchParams.get("restaurant_id")
+  const status = url.searchParams.get("status")
+  const limit = Math.min(parseInt(url.searchParams.get("limit") || "50", 10), 200)
+  const offset = parseInt(url.searchParams.get("offset") || "0", 10)
 
-  if (error) return NextResponse.json({ error: "Failed to create subscription" }, { status: 400 })
+  let query = supabase
+    .from("subscriptions")
+    .select("*, restaurants(name, slug)", { count: "exact" })
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1)
 
-  await logAudit(user.email || "", "subscription_created", { restaurant_id, plan_type, price })
+  if (restaurantId) {
+    query = query.eq("restaurant_id", restaurantId)
+  }
 
-  return NextResponse.json({ success: true })
+  if (status) {
+    query = query.eq("status", status)
+  }
+
+  const { data, error, count } = await query
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  return NextResponse.json({ subscriptions: data, total: count, offset, limit })
 })

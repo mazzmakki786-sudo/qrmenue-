@@ -107,7 +107,7 @@ export function AddDealForm({ dishes, initialData, submitting, onSubmit, onCance
 
       <div className="flex gap-3 pt-2">
         <Button type="button" variant="ghost" onClick={onCancel} disabled={submitting}>Cancel</Button>
-        <Button type="submit" disabled={submitting}>
+        <Button type="submit" loading={submitting}>
           {submitting ? "Saving..." : initialData ? "Update Deal" : "Create Deal"}
         </Button>
       </div>

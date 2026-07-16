@@ -1,14 +1,17 @@
 "use client"
 
 import { useCartStore } from "@/stores/cartStore"
-import { ShoppingCart } from "lucide-react"
+import { ShoppingCart, Tag } from "lucide-react"
 import Link from "next/link"
+import { formatPrice } from "@/lib/utils"
 import { useMemo } from "react"
 
 export function CartBar({ closed }: { closed?: boolean }) {
   const items = useCartStore((s) => s.items)
   const restaurantId = useCartStore((s) => s.restaurantId)
 
+  const selectedDeal = useCartStore((s) => s.selectedDeal)
+  const discountAmount = useCartStore((s) => s.discountAmount)
   const totalItems = useMemo(() => items.reduce((sum, item) => sum + item.quantity, 0), [items])
   const subtotal = useMemo(() => items.reduce((sum, item) => sum + item.dish.price * item.quantity, 0), [items])
 
@@ -32,6 +35,7 @@ export function CartBar({ closed }: { closed?: boolean }) {
   return (
     <Link
       href="/cart"
+      data-testid="cart-bar-link"
       className="fixed bottom-12 left-3 right-3 z-[60] max-w-[568px] mx-auto animate-slide-up"
     >
       <div className="bg-black text-white rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] overflow-hidden ring-1 ring-white/10">
@@ -51,6 +55,12 @@ export function CartBar({ closed }: { closed?: boolean }) {
               </p>
               <p className="text-[18px] font-bold leading-tight">Rs {subtotal.toLocaleString("en-PK")}</p>
               <p className="text-[9px] text-white/40">+ delivery at checkout</p>
+              {discountAmount > 0 && selectedDeal && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/20 text-[9px] font-bold text-primary mt-0.5">
+                  <Tag className="w-2.5 h-2.5" />
+                  {selectedDeal.title_en} • -{formatPrice(discountAmount)}
+                </span>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-2">

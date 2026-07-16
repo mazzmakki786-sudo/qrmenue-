@@ -2,13 +2,12 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Shield, LogOut, LayoutDashboard, Sparkles } from "lucide-react"
+import { Shield, LogOut, LayoutDashboard } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary"
 
 const NAV_ITEMS = [
   { href: "/superadmin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/superadmin/ai-management", label: "AI Management", icon: Sparkles },
 ]
 
 export default function SuperAdminLayout({ children }: { children: React.ReactNode }) {
@@ -19,9 +18,8 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
     href === "/superadmin" ? pathname === href : pathname === href || pathname.startsWith(href + "/")
 
   const handleLogout = async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push("/superadmin")
+    try { await fetch("/api/auth/logout", { method: "POST" }) } catch {}
+    window.location.href = "/superadmin"
   }
 
   return (

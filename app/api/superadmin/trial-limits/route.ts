@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { safeRoute } from "@/lib/api-error"
 import { isSuperAdmin } from "@/lib/superadmin-security"
 import { DEFAULT_TRIAL_LIMITS, DEFAULT_EXPIRED_TRIAL_LIMITS, type TrialLimitConfig, type ExpiredTrialLimitConfig } from "@/lib/subscription"
 import { csrfGuard } from "@/lib/csrf"
 
 async function getSetting(key: string) {
-  const supabase = await createClient()
-  const { data } = await supabase
+  const admin = createAdminClient()
+  const { data } = await admin
     .from("company_settings")
     .select("value")
     .eq("key", key)
@@ -16,8 +16,8 @@ async function getSetting(key: string) {
 }
 
 async function upsertSetting(key: string, value: string) {
-  const supabase = await createClient()
-  await supabase
+  const admin = createAdminClient()
+  await admin
     .from("company_settings")
     .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: "key" })
 }

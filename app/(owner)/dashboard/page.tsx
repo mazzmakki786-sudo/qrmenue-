@@ -56,8 +56,10 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null)
 
   const fetchData = useCallback(async () => {
-    // Wait until subscription provides a restaurant
-    if (!restaurant?.id) return
+    if (!restaurant?.id) {
+      setPageState("ready")
+      return
+    }
 
     const supabase = createClient()
     const pkOffset = 5 * 60 * 60 * 1000

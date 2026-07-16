@@ -88,6 +88,16 @@ export type OrderStatus = "received" | "preparing" | "ready" | "completed" | "ca
 export type PaymentMethod = "cod" | "bank_transfer" | "jazzcash" | "easypaisa"
 export type PaymentStatus = "pending" | "paid" | "failed"
 
+export interface RestaurantTable {
+  id: string
+  restaurant_id: string
+  table_number: string
+  capacity: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
 export interface Order {
   id: string
   restaurant_id: string
@@ -99,10 +109,13 @@ export interface Order {
   customer_name: string
   customer_phone: string | null
   table_number: string | null
+  table_id: string | null
   delivery_address: string | null
   payment_method: PaymentMethod
   payment_status: PaymentStatus
   order_status: OrderStatus
+  prepared_at: string | null
+  ready_at: string | null
   whatsapp_sent: boolean
   email_sent: boolean
   deal_id: string | null
@@ -118,6 +131,9 @@ export interface Subscription {
   amount_pkr: number
   payment_method: string | null
   payment_ref: string | null
+  transaction_ref: string | null
+  status: "pending" | "active" | "expired" | "cancelled" | "refunded"
+  billing_interval: "monthly" | "yearly" | null
   start_date: string
   end_date: string | null
   activated_by: string | null
@@ -211,6 +227,31 @@ export interface AiPostImage {
   dish_id: string
   image_url: string
   position: number
+}
+
+export interface ToastNotification {
+  id: string
+  type: "success" | "error" | "info" | "order"
+  title: string
+  message: string
+  duration?: number
+  sound?: boolean
+  action?: { label: string; url: string }
+  data?: Record<string, unknown>
+}
+
+export interface CustomerNotification {
+  id: string
+  customer_id: string
+  order_id: string
+  type: string
+  title_en: string
+  title_ur: string | null
+  body_en: string | null
+  body_ur: string | null
+  data: Record<string, unknown>
+  is_read: boolean
+  created_at: string
 }
 
 export interface AiUsage {

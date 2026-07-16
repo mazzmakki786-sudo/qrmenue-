@@ -31,7 +31,7 @@ export default async function RestaurantsPage() {
   const items =
     restaurants?.map((r) => ({
       name: r.name,
-      url: `https://qrmenu.pk/menu/${r.slug}`,
+      url: `https://www.digitalmenue.com/menu/${r.slug}`,
       description: r.description || undefined,
     })) ?? []
 
@@ -40,6 +40,19 @@ export default async function RestaurantsPage() {
   return (
     <>
       <ItemListJsonLd items={items} />
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 md:pt-24 pb-6">
+        <div className="text-center max-w-xl mx-auto">
+          <h1 className="text-xl md:text-2xl font-bold mb-1">
+            Browse Restaurants
+          </h1>
+          <p className="text-xs md:text-sm text-[#555]">
+            Digital menus across Pakistan. Browse, tap, and order.
+          </p>
+          <p className="text-xs md:text-sm text-[#555] mt-4 leading-relaxed">
+            Digital QR Menue lets you find restaurants in Lahore, Karachi, Islamabad, and across Pakistan with digital QR code menus. Browse dishes with photos and prices, then order directly via WhatsApp — no app download, no commission, no signup required.
+          </p>
+        </div>
+      </section>
       <RestaurantsClient
         initialRestaurants={restaurants ?? []}
         initialCities={cities}

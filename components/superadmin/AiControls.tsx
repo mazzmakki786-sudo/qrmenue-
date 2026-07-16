@@ -163,7 +163,7 @@ export function AiControls() {
                     <div key={p.id} className="bg-[#F9FAFB] rounded-xl p-3 flex items-center gap-3">
                       {p.image_url ? (
                         <button onClick={() => setPreview(p)} className="w-12 h-12 rounded-lg overflow-hidden shrink-0 bg-[#E8E8E8]">
-                          <img src={p.image_url} alt="" className="w-full h-full object-cover"
+                          <img src={p.image_url} alt="" loading="lazy" className="w-full h-full object-cover"
                             onError={(e) => { (e.target as HTMLImageElement).style.display = "none" }} />
                         </button>
                       ) : (
@@ -194,7 +194,7 @@ export function AiControls() {
       {preview && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setPreview(null)}>
           <div className="bg-white rounded-2xl overflow-hidden max-w-lg w-full" onClick={(e) => e.stopPropagation()}>
-            {preview.image_url && <img src={preview.image_url} alt="" className="w-full" />}
+            {preview.image_url && <img src={preview.image_url} alt="" loading="lazy" className="w-full" />}
             <div className="p-4">
               <p className="text-sm font-medium">{preview.restaurant.name}</p>
               <p className="text-xs text-[#555] mt-1">{preview.prompt}</p>

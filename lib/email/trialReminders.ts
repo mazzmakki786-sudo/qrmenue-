@@ -17,7 +17,10 @@ function getResend(): Resend {
 const FROM = "Digital QR Menue <noreply@digitalmenue.com>"
 
 export type ReminderType =
-  | "5_days_left"
+  | "28_days_left"
+  | "21_days_left"
+  | "14_days_left"
+  | "7_days_left"
   | "3_days_left"
   | "1_day_left"
   | "trial_expired"
@@ -65,17 +68,40 @@ function buildContent(opts: SendOptions): EmailContent {
   const upgradeUrl = `${process.env.NEXT_PUBLIC_APP_URL || ""}/dashboard/subscription`
 
   switch (type) {
-    case "5_days_left":
+    case "28_days_left":
       return {
-        subject: `${daysRemaining} days left in your Digital QR Menue trial — upgrade to keep going`,
+        subject: `${daysRemaining} days left in your Digital QR Menue trial — welcome!`,
         html: `
           <div style="${sharedStyle}">
-            <h1 style="font-size: 24px; margin-bottom: 8px;">${safeRestaurantName}, your trial is halfway through</h1>
+            <h1 style="font-size: 24px; margin-bottom: 8px;">Welcome, ${safeRestaurantName}! 🎉</h1>
             <p style="color: #555; font-size: 15px; line-height: 1.6;">
-              You have <strong>${daysRemaining} days left</strong> in your free trial. We hope Digital QR Menue is helping you take more orders.
+              You have <strong>${daysRemaining} days left</strong> in your free trial. We hope Digital QR Menue is helping your restaurant take more orders.
             </p>
             <p style="color: #555; font-size: 15px; line-height: 1.6;">
-              To keep your menu live, your data safe, and continue accepting orders — pick a plan today.
+              When you're ready to upgrade, pick a plan that works for you. Your menu stays live, your data stays safe.
+            </p>
+            <div style="margin: 32px 0; text-align: center;">
+              <a href="${upgradeUrl}" style="${buttonStyle}">Choose Your Plan →</a>
+            </div>
+            <p style="color: #999; font-size: 13px; text-align: center;">
+              Starter: PKR ${PLAN_PRICES.starter.toLocaleString()}/mo • Growth: PKR ${PLAN_PRICES.growth.toLocaleString()}/mo • Premium: PKR ${PLAN_PRICES.premium.toLocaleString()}/mo
+            </p>
+          </div>
+        `,
+      }
+    case "21_days_left":
+    case "14_days_left":
+    case "7_days_left":
+      return {
+        subject: `${daysRemaining} days left in your trial — keep your menu live`,
+        html: `
+          <div style="${sharedStyle}">
+            <h1 style="font-size: 24px; margin-bottom: 8px;">${safeRestaurantName}, you have ${daysRemaining} days left</h1>
+            <p style="color: #555; font-size: 15px; line-height: 1.6;">
+              You have <strong>${daysRemaining} days left</strong> in your free trial. Your digital menu is working and we'd love to keep it that way.
+            </p>
+            <p style="color: #555; font-size: 15px; line-height: 1.6;">
+              Upgrade to keep your menu live, your data safe, and keep receiving WhatsApp orders.
             </p>
             <div style="margin: 32px 0; text-align: center;">
               <a href="${upgradeUrl}" style="${buttonStyle}">Choose Your Plan →</a>
@@ -89,7 +115,7 @@ function buildContent(opts: SendOptions): EmailContent {
 
     case "3_days_left":
       return {
-        subject: `3 days left — don't lose your menu`,
+        subject: `Only 3 days left — don't lose your menu`,
         html: `
           <div style="${sharedStyle}">
             <h1 style="font-size: 24px; margin-bottom: 8px;">3 days left, ${safeRestaurantName}</h1>
@@ -252,16 +278,25 @@ export async function checkAndSendReminders(
 
   const remindersToSend: ReminderType[] = []
 
-  if (daysSinceStart >= 2 && daysUntilEnd === 5) {
-    remindersToSend.push("5_days_left")
+  if (daysSinceStart >= 2 && daysUntilEnd === 28) {
+    remindersToSend.push("28_days_left")
   }
-  if (daysSinceStart >= 4 && daysUntilEnd === 3) {
+  if (daysSinceStart >= 9 && daysUntilEnd === 21) {
+    remindersToSend.push("21_days_left")
+  }
+  if (daysSinceStart >= 16 && daysUntilEnd === 14) {
+    remindersToSend.push("14_days_left")
+  }
+  if (daysSinceStart >= 23 && daysUntilEnd === 7) {
+    remindersToSend.push("7_days_left")
+  }
+  if (daysSinceStart >= 27 && daysUntilEnd === 3) {
     remindersToSend.push("3_days_left")
   }
-  if (daysSinceStart >= 6 && daysUntilEnd === 1) {
+  if (daysSinceStart >= 29 && daysUntilEnd === 1) {
     remindersToSend.push("1_day_left")
   }
-  if (daysSinceStart >= 7 && daysUntilEnd <= 0 && now < graceEnd) {
+  if (daysSinceStart >= 30 && daysUntilEnd <= 0 && now < graceEnd) {
     remindersToSend.push("trial_expired")
   }
   if (daysUntilGraceEnd === 1) {

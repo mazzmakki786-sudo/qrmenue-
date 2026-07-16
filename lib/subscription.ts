@@ -115,7 +115,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
 
 export const PLAN_PRICES: Record<Plan, number> = {
   trial: 0,
-  starter: 1200,
+  starter: 1500,
   growth: 2500,
   premium: 4500,
 }
@@ -127,9 +127,9 @@ export const PLAN_NAMES: Record<Plan, string> = {
   premium: "Premium",
 }
 
-export const TRIAL_DURATION_DAYS = 7
+export const TRIAL_DURATION_DAYS = 30
 export const GRACE_PERIOD_DAYS = 3
-export const TRIAL_REMINDER_DAYS = [5, 3, 1]
+export const TRIAL_REMINDER_DAYS = [28, 21, 14, 7, 3, 1]
 
 export interface RestaurantLike {
   plan: Plan
