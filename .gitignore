@@ -30,6 +30,9 @@ yarn-error.log*
 .opencode.json
 opencode.json
 
+# daily x post day counter
+.x-post-day.json
+
 # vercel
 .vercel
 
@@ -38,3 +41,6 @@ opencode.json
 next-env.d.ts
 
 .env*
+
+# daily x post credentials
+scripts/.env-x-post
