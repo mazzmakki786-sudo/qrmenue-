@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
+import Image from "next/image"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { PasswordInput, validatePassword } from "@/components/ui/password-input"
 import CityAutocomplete from "@/components/shared/CityAutocomplete"
-import { ArrowLeft, Store, Sparkles } from "lucide-react"
+import { ArrowLeft, Sparkles } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 
 export default function RestaurantSignupPage() {
@@ -196,9 +197,7 @@ export default function RestaurantSignupPage() {
       </div>
 
       <div className="flex flex-col items-center text-center mb-6">
-        <div className="w-12 h-12 bg-[#25D366] rounded-xl flex items-center justify-center mb-4">
-          <Store className="w-6 h-6 text-white" />
-        </div>
+        <Image src="/favicon.svg" alt="Digital QR Menue" width={48} height={48} className="w-12 h-12 mb-4" />
         <h1 className="text-2xl font-bold text-black mb-1">Register Your Restaurant</h1>
         <p className="text-sm text-[#555]">{preselectedPlan ? "Set up your account to continue" : "Start your 30-day free trial today"}</p>
       </div>

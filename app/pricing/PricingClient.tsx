@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Check, X } from "lucide-react"
 import { AppFooter } from "@/components/shared/AppFooter"
 import { useCompanySettings } from "@/lib/hooks/useCompanySettings"
@@ -405,7 +406,13 @@ export function PricingClient() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex flex-col items-center md:items-start gap-3">
               <div className="flex items-center gap-2 font-bold text-base">
-                <div className="w-7 h-7 rounded-lg bg-black text-white flex items-center justify-center text-xs">D</div>
+                <Image
+                  src="/logos/logo-d-star-qr.svg"
+                  alt="Digital QR Menue"
+                  width={28}
+                  height={28}
+                  className="w-7 h-7 rounded-lg"
+                />
                 Digital QR Menue
               </div>
               <p className="text-xs text-[#999]">Made in Pakistan</p>

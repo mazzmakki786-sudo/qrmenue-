@@ -1,0 +1,41 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - link "D Digital QR Menue" [ref=e5] [cursor=pointer]:
+        - /url: /restaurants
+        - generic [ref=e6]: D
+        - generic [ref=e7]: Digital QR Menue
+      - navigation [ref=e8]:
+        - link "Home" [ref=e9] [cursor=pointer]:
+          - /url: /restaurants
+        - link "Favorites" [ref=e13] [cursor=pointer]:
+          - /url: /favorites
+          - text: Favs
+        - link "Cart" [ref=e16] [cursor=pointer]:
+          - /url: /cart
+        - link "Orders" [ref=e21] [cursor=pointer]:
+          - /url: /account
+  - main [ref=e25]
+  - contentinfo [ref=e70]:
+    - generic [ref=e71]:
+      - generic [ref=e72]:
+        - generic [ref=e73]:
+          - generic [ref=e74]:
+            - generic [ref=e75]: D
+            - text: Digital QR Menue
+          - paragraph [ref=e76]: Made in Pakistan with 💚
+        - generic [ref=e77]:
+          - link "Pricing" [ref=e78] [cursor=pointer]:
+            - /url: /pricing
+          - link "Restaurants" [ref=e79] [cursor=pointer]:
+            - /url: /restaurants
+          - link "About" [ref=e80] [cursor=pointer]:
+            - /url: /about
+          - link "Contact" [ref=e81] [cursor=pointer]:
+            - /url: /contact
+        - generic [ref=e82]:
+          - link "Privacy Policy" [ref=e83] [cursor=pointer]:
+            - /url: /privacy
+          - link "Terms of Service" [ref=e84] [cursor=pointer]:
+            - /url: /terms
+      - generic [ref=e85]: © 2026 Digital QR Menue. All rights reserved.

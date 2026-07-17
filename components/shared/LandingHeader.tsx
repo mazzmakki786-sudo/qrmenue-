@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { useState } from "react"
 
 export function LandingHeader() {
@@ -13,7 +14,13 @@ export function LandingHeader() {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-[#E8E8E8]">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-5 h-14">
           <Link href="/" className="flex items-center gap-2 font-bold text-sm md:text-base shrink-0 min-w-0">
-            <div className="w-7 h-7 rounded-lg bg-black text-white flex items-center justify-center text-xs shrink-0">D</div>
+            <Image
+              src="/logos/logo-d-star-qr.svg"
+              alt="Digital QR Menue"
+              width={28}
+              height={28}
+              className="w-7 h-7 rounded-lg shrink-0"
+            />
             <span className="whitespace-nowrap truncate">Digital QR Menue</span>
           </Link>
 
@@ -37,6 +44,7 @@ export function LandingHeader() {
             <nav className="hidden md:flex items-center gap-1">
               <Link href="/restaurants" className="text-sm font-medium text-[#555] px-3 py-1.5 rounded-lg hover:bg-[#F5F5F5] hover:text-black transition-colors">Restaurants</Link>
               <Link href="/pricing" className="text-sm font-medium text-[#555] px-3 py-1.5 rounded-lg hover:bg-[#F5F5F5] hover:text-black transition-colors">Pricing</Link>
+              <Link href="/about" className="text-sm font-medium text-[#555] px-3 py-1.5 rounded-lg hover:bg-[#F5F5F5] hover:text-black transition-colors">About</Link>
               <Link href="/blog" className="text-sm font-medium text-[#555] px-3 py-1.5 rounded-lg hover:bg-[#F5F5F5] hover:text-black transition-colors">Blog</Link>
               <Link href="/faq" className="text-sm font-medium text-[#555] px-3 py-1.5 rounded-lg hover:bg-[#F5F5F5] hover:text-black transition-colors">FAQ</Link>
               <Link href="/contact" className="text-sm font-medium text-[#555] px-3 py-1.5 rounded-lg hover:bg-[#F5F5F5] hover:text-black transition-colors">Contact</Link>
@@ -75,6 +83,7 @@ export function LandingHeader() {
           {[
             { href: "/restaurants", label: "Restaurants", icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" },
             { href: "/pricing", label: "Pricing & Plans", icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
+            { href: "/about", label: "About Us", icon: "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
             { href: "/blog", label: "Blog", icon: "M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" },
             { href: "/faq", label: "FAQ", icon: "M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" },
             { href: "/contact", label: "Contact", icon: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" },
@@ -109,7 +118,13 @@ export function LandingHeader() {
           </Link>
 
           <div className="h-px bg-[#E8E8E8] my-3" />
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-[#AAA] mb-2 px-3">Legal</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-[#AAA] mb-2 px-3">Info</p>
+          <Link href="/about" onClick={close}
+            className="block px-3 py-2 rounded-lg text-xs text-[#999] hover:bg-[#F5F5F5] hover:text-[#555] transition-colors"
+          >
+            About Us
+          </Link>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-[#AAA] mb-2 mt-2 px-3">Legal</p>
           <Link href="/privacy" onClick={close}
             className="block px-3 py-2 rounded-lg text-xs text-[#999] hover:bg-[#F5F5F5] hover:text-[#555] transition-colors"
           >

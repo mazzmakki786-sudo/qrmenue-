@@ -100,6 +100,7 @@ export const publicRoutes = [
   { path: "pricing", lastModified: "2026-07-16" },
   { path: "restaurants", lastModified: "2026-07-16" },
   { path: "faq", lastModified: "2026-07-16" },
+  { path: "about", lastModified: "2026-07-16" },
   { path: "contact", lastModified: "2026-07-16" },
   { path: "privacy", lastModified: "2026-04-01" },
   { path: "terms", lastModified: "2026-04-01" },

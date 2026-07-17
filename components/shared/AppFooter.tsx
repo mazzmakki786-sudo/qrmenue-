@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 
 export function AppFooter() {
   return (
@@ -7,7 +8,13 @@ export function AppFooter() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col items-center md:items-start gap-3">
             <div className="flex items-center gap-2 font-bold text-base">
-              <div className="w-7 h-7 rounded-lg bg-black text-white flex items-center justify-center text-xs">D</div>
+              <Image
+                src="/logos/logo-d-star-qr.svg"
+                alt="Digital QR Menue"
+                width={28}
+                height={28}
+                className="w-7 h-7 rounded-lg"
+              />
               Digital QR Menue
             </div>
             <p className="text-xs text-[#999]">Made in Pakistan with 💚</p>
@@ -15,6 +22,7 @@ export function AppFooter() {
           <div className="flex gap-6 text-xs text-[#555]">
             <Link href="/pricing" className="hover:text-black transition-colors">Pricing</Link>
             <Link href="/restaurants" className="hover:text-black transition-colors">Restaurants</Link>
+            <Link href="/about" className="hover:text-black transition-colors">About</Link>
             <Link href="/contact" className="hover:text-black transition-colors">Contact</Link>
           </div>
           <div className="flex gap-4 text-xs text-[#555]">

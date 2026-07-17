@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { ShoppingCart, Home, ClipboardList, Heart, Menu } from "lucide-react"
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary"
@@ -40,9 +41,13 @@ export default function CustomerLayout({
           <header className="hidden md:block sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-border">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
               <Link href="/restaurants" className="flex items-center gap-2.5 group">
-                <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white text-xs font-bold">
-                  D
-                </div>
+                <Image
+                  src="/logos/logo-d-star-qr.svg"
+                  alt="Digital QR Menue"
+                  width={32}
+                  height={32}
+                  className="w-8 h-8 rounded-lg shrink-0"
+                />
                 <span className="text-base font-bold text-black group-hover:opacity-70 transition-opacity">
                   Digital QR Menue
                 </span>

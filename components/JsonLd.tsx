@@ -55,7 +55,7 @@ export function WebsiteJsonLd() {
         name: "Digital QR Menue",
         url: "https://digitalmenue.com",
         description:
-          "Pakistan's #1 QR-based digital menu platform for restaurants",
+          "Pakistan's #1 free digital QR menu platform for restaurants. Create a QR code menu, get orders on WhatsApp, and eliminate Foodpanda commissions.",
         potentialAction: {
           "@type": "SearchAction",
           target: "https://digitalmenue.com/restaurants?q={search_term_string}",
@@ -76,7 +76,7 @@ export function SoftwareApplicationJsonLd() {
         operatingSystem: "Web",
         applicationCategory: "BusinessApplication",
         description:
-          "Pakistan's QR-based digital menu and WhatsApp ordering platform for restaurants. No app, no commission.",
+          "Pakistan's leading digital QR menu and WhatsApp online ordering platform for restaurants. Create a free QR code menu, eliminate printing costs, and get commission-free orders directly on WhatsApp with real-time updates.",
         url: "https://digitalmenue.com",
         offers: [
           {
@@ -339,7 +339,7 @@ export function LocalBusinessJsonLd() {
         "@type": "LocalBusiness",
         name: "Digital QR Menue",
         description:
-          "Pakistan's leading QR-based digital menu and WhatsApp ordering platform for restaurants, cafes, and food businesses across Pakistan.",
+          "Pakistan's leading free digital QR menu and WhatsApp ordering platform for restaurants, cafes, and food businesses across Pakistan. Create a QR code menu, get orders on WhatsApp, and save on commissions.",
         url: "https://digitalmenue.com",
         logo: "https://digitalmenue.com/favicon.svg",
         image: "https://www.digitalmenue.com/og-image.png",
@@ -355,6 +355,22 @@ export function LocalBusinessJsonLd() {
           { "@type": "City", name: "Karachi" },
           { "@type": "City", name: "Islamabad" },
           { "@type": "City", name: "Faisalabad" },
+          { "@type": "City", name: "Rawalpindi" },
+          { "@type": "City", name: "Peshawar" },
+          { "@type": "City", name: "Multan" },
+          { "@type": "City", name: "Gujranwala" },
+          { "@type": "City", name: "Hyderabad" },
+          { "@type": "City", name: "Quetta" },
+          { "@type": "City", name: "Sialkot" },
+          { "@type": "City", name: "Sargodha" },
+          { "@type": "City", name: "Bahawalpur" },
+          { "@type": "City", name: "Sukkur" },
+          { "@type": "City", name: "Larkana" },
+          { "@type": "City", name: "Sheikhupura" },
+          { "@type": "City", name: "Gujrat" },
+          { "@type": "City", name: "Mardan" },
+          { "@type": "City", name: "Sahiwal" },
+          { "@type": "City", name: "Okara" },
         ],
         hasOfferCatalog: {
           "@type": "OfferCatalog",

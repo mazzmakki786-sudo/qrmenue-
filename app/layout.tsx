@@ -26,12 +26,45 @@ const SITE_URL = "https://www.digitalmenue.com"
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `Digitalmenue.com | QR Menu & WhatsApp Ordering Pakistan`,
-    template: `%s | Digitalmenue.com`,
+    default: `Digital QR Menu for Restaurants in Pakistan | Free QR Code Menu & WhatsApp Ordering`,
+    template: `%s | Digital QR Menu Pakistan`,
   },
   description:
-    "Pakistan ke restaurants ke liye behtareen QR Code menu card. Save 30% Foodpanda commission & get direct orders on WhatsApp. Free trial shuru karein.",
+    "Create a free digital QR menu for your restaurant in Pakistan. Eliminate printing costs, get orders directly on WhatsApp, and save 30% on Foodpanda commissions. Start your free QR code menu trial today.",
   keywords: [
+    "menu qr code",
+    "menu qr code restaurant",
+    "digital restaurant menu",
+    "digital food menu",
+    "digital QR menu",
+    "digital qr code menu",
+    "digital qr menu for restaurant",
+    "how to create digital menu with qr code",
+    "digital menu design",
+    "online order",
+    "online ordering system",
+    "online order food near me",
+    "online restaurant ordering",
+    "online restaurant ordering system",
+    "online restaurant ordering platforms",
+    "online restaurant ordering website",
+    "qr code order online",
+    "free qr code order online",
+    "get order on whatsapp",
+    "get order updates on whatsapp",
+    "how to get order on whatsapp",
+    "how to take orders on whatsapp",
+    "how to place an order on whatsapp",
+    "digital restaurants",
+    "digital restaurant menu qr code",
+    "true digital restaurants",
+    "scan and get orders",
+    "online menu",
+    "pizza online menu",
+    "QR code menu free",
+    "Qr code menu pakistan",
+    "Scan menu code online free",
+    "Restaurants with QR code menus",
     "QR menu Pakistan",
     "digital menu for restaurant",
     "QR code menu system",
@@ -41,10 +74,6 @@ export const metadata: Metadata = {
     "WhatsApp ordering restaurant",
     "free QR menu",
     "restaurant menu QR code",
-    "menu digital Pakistan",
-    "ریسٹورنٹ کے لیے کیو آر مینو",
-    "ڈیجیٹل مینو پاکستان",
-    "کیو آر کوڈ مینو",
   ],
   authors: [{ name: APP_NAME }],
   creator: APP_NAME,
@@ -54,23 +83,23 @@ export const metadata: Metadata = {
     locale: "en_PK",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: `Pakistan's #1 QR Code Menu & WhatsApp Ordering System for Restaurants`,
+    title: `Pakistan's #1 Digital QR Menu for Restaurants — Free QR Code Menu & WhatsApp Online Ordering System`,
     description:
-      "Ab menu print karne ka kharcha khatam! Apne customers ko dein behtareen digital menu card aur orders receive karein seedha apne WhatsApp par. Aaj hi free trial shuru karein.",
+      "Create a free digital QR menu for your restaurant. Customers scan, browse your digital food menu, and order directly via WhatsApp. Zero commission. No app download. Start your free QR code menu trial today.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: `${SITE_NAME} — QR Code Menu & WhatsApp Ordering Platform`,
+        alt: `${SITE_NAME} — Free Digital QR Menu for Restaurants with WhatsApp Ordering in Pakistan`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `Pakistan's #1 QR Code Menu & WhatsApp Ordering System for Restaurants`,
+    title: `Digital QR Menu for Restaurants in Pakistan — Free QR Code Menu & WhatsApp Ordering`,
     description:
-      "Ab menu print karne ka kharcha khatam! Apne customers ko dein behtareen digital menu card aur orders receive karein seedha apne WhatsApp par. Aaj hi free trial shuru karein.",
+      "Create a free digital QR menu for your restaurant. Customers scan, browse your digital food menu, and order directly via WhatsApp. Zero commission. No app download.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -92,13 +121,18 @@ export const metadata: Metadata = {
       "x-default": SITE_URL,
     },
   },
-  icons: { icon: "/favicon.svg" },
-  manifest: "/manifest.json",
+  icons: [
+    { rel: "icon", type: "image/png", url: "/favicon-96x96.png", sizes: "96x96" },
+    { rel: "icon", type: "image/svg+xml", url: "/favicon.svg" },
+    { rel: "shortcut icon", url: "/favicon.ico" },
+    { rel: "apple-touch-icon", url: "/apple-touch-icon.png", sizes: "180x180" },
+  ],
   appleWebApp: {
     capable: true,
-    title: APP_NAME,
+    title: "Digital menu",
     statusBarStyle: "black-translucent",
   },
+  manifest: "/site.webmanifest",
   other: { "mobile-web-app-capable": "yes" },
 }
 
@@ -119,6 +153,21 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://*.supabase.co" />
         <link rel="dns-prefetch" href="https://*.supabase.co" />
+        {/* Google Analytics */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-DH740HGMFX" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-DH740HGMFX', {
+                send_page_view: true,
+                anonymize_ip: true,
+              });
+            `,
+          }}
+        />
       </head>
       <body className="min-h-screen bg-white font-sans antialiased overflow-x-hidden">
         <WebsiteJsonLd />

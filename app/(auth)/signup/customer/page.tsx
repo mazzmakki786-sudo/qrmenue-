@@ -2,11 +2,12 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { PasswordInput, validatePassword } from "@/components/ui/password-input"
 import Link from "next/link"
-import { ArrowLeft, User } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 
 export default function CustomerSignupPage() {
   const router = useRouter()
@@ -81,9 +82,7 @@ export default function CustomerSignupPage() {
       </div>
 
       <div className="flex flex-col items-center text-center mb-6">
-        <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center mb-4">
-          <User className="w-6 h-6 text-white" />
-        </div>
+        <Image src="/favicon.svg" alt="Digital QR Menue" width={48} height={48} className="w-12 h-12 mb-4" />
         <h1 className="text-2xl font-bold text-black mb-1">Create Account</h1>
         <p className="text-sm text-[#555]">Join as a customer to browse and order</p>
       </div>

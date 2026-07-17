@@ -1,15 +1,23 @@
 import type { Metadata } from "next"
+import Link from "next/link"
 import { LandingHeader } from "@/components/shared/LandingHeader"
+import { JsonLd } from "@/components/JsonLd"
 
 export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description: "Privacy Policy for Digital QR Menue. Learn how we collect, use, and protect your data in compliance with Pakistani law (PECA 2016).",
+  title: "Privacy Policy — Digital QR Menue | Data Protection for Pakistani Restaurants",
+  description:
+    "Privacy Policy for Digital QR Menue. Learn how we collect, use, and protect your personal data in compliance with Pakistani law (PECA 2016). Covers restaurant owner and customer data, cookies, and your rights.",
   alternates: {
     canonical: "https://www.digitalmenue.com/privacy",
   },
+  openGraph: {
+    title: "Privacy Policy — Digital QR Menue",
+    description:
+      "How Digital QR Menue collects, uses, and protects your data in compliance with Pakistan's Prevention of Electronic Crimes Act (PECA) 2016.",
+    url: "https://www.digitalmenue.com/privacy",
+  },
 }
 
-// Revalidate every hour — static page with periodic regeneration
 export const revalidate = 3600
 
 const sections = [
@@ -69,52 +77,100 @@ This policy was last updated on July 5, 2026.`,
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <LandingHeader />
-      <section className="bg-black text-white py-20 md:py-28">
-        <div className="max-w-3xl mx-auto px-5 text-center">
-          <h1 className="text-3xl md:text-5xl font-bold mb-4">Privacy Policy</h1>
-          <p className="text-sm md:text-base text-[#AAA] max-w-xl mx-auto">
-            How we collect, use, and protect your data — in compliance with Pakistani law (PECA 2016).
-          </p>
-        </div>
-      </section>
-
-      <section className="py-16 md:py-24">
-        <div className="max-w-3xl mx-auto px-5">
-          <div className="mb-10">
-            <p className="text-xs text-[#888] mb-4">Last updated: July 5, 2026</p>
-            <p className="text-sm text-[#555] leading-relaxed">
-              This Privacy Policy explains how Digital QR Menue (&quot;we&quot;, &quot;our&quot;, &quot;us&quot;) collects, uses, discloses, and protects
-              your personal information when you use our QR menu and WhatsApp ordering platform. We are committed to
-              protecting your privacy in accordance with the <strong>Prevention of Electronic Crimes Act (PECA) 2016</strong> of
-              Pakistan and applicable data protection laws.
+    <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          name: "Privacy Policy — Digital QR Menue",
+          description:
+            "Privacy Policy for Digital QR Menue — how we collect, use, store, and protect your personal data in compliance with Pakistan's PECA 2016.",
+          url: "https://www.digitalmenue.com/privacy",
+          isPartOf: {
+            "@type": "WebSite",
+            name: "Digital QR Menue",
+            url: "https://www.digitalmenue.com",
+          },
+          about: {
+            "@type": "Organization",
+            name: "Digital QR Menue",
+          },
+        }}
+      />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://www.digitalmenue.com" },
+            { "@type": "ListItem", position: 2, name: "Privacy Policy", item: "https://www.digitalmenue.com/privacy" },
+          ],
+        }}
+      />
+      <div className="min-h-screen bg-white">
+        <LandingHeader />
+        <section className="bg-black text-white py-20 md:py-28">
+          <div className="max-w-3xl mx-auto px-5 text-center">
+            <h1 className="text-3xl md:text-5xl font-bold mb-4">Privacy Policy</h1>
+            <p className="text-sm md:text-base text-[#AAA] max-w-xl mx-auto">
+              How we collect, use, and protect your data — in compliance with Pakistani law (PECA 2016).
             </p>
           </div>
+        </section>
 
-          <div className="space-y-10">
-            {sections.map((section, i) => (
-              <div key={i}>
-                <h2 className="text-xl font-bold mb-3">{section.title}</h2>
-                <p className="text-sm text-[#555] leading-relaxed whitespace-pre-line">{section.content}</p>
-              </div>
-            ))}
-          </div>
+        <section className="py-16 md:py-24">
+          <div className="max-w-3xl mx-auto px-5">
+            <div className="mb-10">
+              <p className="text-xs text-[#888] mb-4">Last updated: July 5, 2026</p>
+              <p className="text-sm text-[#555] leading-relaxed">
+                This Privacy Policy explains how Digital QR Menue (&quot;we&quot;, &quot;our&quot;, &quot;us&quot;) collects, uses, discloses, and protects
+                your personal information when you use our QR menu and WhatsApp ordering platform. We are committed to
+                protecting your privacy in accordance with the <strong>Prevention of Electronic Crimes Act (PECA) 2016</strong> of
+                Pakistan and applicable data protection laws.
+              </p>
+            </div>
 
-          <div className="mt-16 p-6 bg-[#F9FAFB] rounded-xl">
-            <h2 className="text-lg font-bold mb-3">Contact Us</h2>
-            <p className="text-sm text-[#555] leading-relaxed">
-              If you have questions about this Privacy Policy or how we handle your data, contact us at:
-            </p>
-            <p className="text-sm text-[#555] mt-2">
-              <strong>Email:</strong> support@digitalmenue.com
-            </p>
-            <p className="text-sm text-[#555]">
-              <strong>WhatsApp:</strong> <a href="https://wa.me/923146325823" target="_blank" rel="noopener noreferrer" className="text-black underline">+92-314-6325823</a>
-            </p>
+            <div className="space-y-10">
+              {sections.map((section, i) => (
+                <div key={i}>
+                  <h2 className="text-xl font-bold mb-3">{section.title}</h2>
+                  <p className="text-sm text-[#555] leading-relaxed whitespace-pre-line">{section.content}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-16 p-6 bg-[#F9FAFB] rounded-xl">
+              <h2 className="text-lg font-bold mb-3">Contact Us</h2>
+              <p className="text-sm text-[#555] leading-relaxed">
+                If you have questions about this Privacy Policy or how we handle your data, contact us at:
+              </p>
+              <p className="text-sm text-[#555] mt-2">
+                <strong>Email:</strong> support@digitalmenue.com
+              </p>
+              <p className="text-sm text-[#555]">
+                <strong>WhatsApp:</strong>{" "}
+                <a href="https://wa.me/923146325823" target="_blank" rel="noopener noreferrer" className="text-black underline">
+                  +92-314-6325823
+                </a>
+              </p>
+            </div>
+
+            <div className="mt-10 text-center">
+              <p className="text-xs text-[#888]">
+                Also read our{" "}
+                <Link href="/terms" className="text-black underline">
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link href="/about" className="text-black underline">
+                  About Us
+                </Link>
+                .
+              </p>
+            </div>
           </div>
-        </div>
-      </section>
-    </div>
+        </section>
+      </div>
+    </>
   )
 }

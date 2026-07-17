@@ -2,11 +2,12 @@
 
 import { Suspense, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { PasswordInput, validatePassword } from "@/components/ui/password-input"
 import Link from "next/link"
-import { User, ArrowLeft, Heart, Loader2 } from "lucide-react"
+import { ArrowLeft, Loader2 } from "lucide-react"
 
 function CustomerLoginForm() {
   const router = useRouter()
@@ -120,9 +121,7 @@ function CustomerLoginForm() {
       </div>
 
       <div className="flex flex-col items-center text-center mb-6">
-        <div className="w-12 h-12 bg-[#25D366] rounded-xl flex items-center justify-center mb-4">
-          <Heart className="w-6 h-6 text-white" />
-        </div>
+        <Image src="/favicon.svg" alt="Digital QR Menue" width={48} height={48} className="w-12 h-12 mb-4" />
         <h1 className="text-2xl font-bold text-black mb-1">
           {mode === "signin" ? "Welcome back" : "Create an Account"}
         </h1>

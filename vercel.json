@@ -1,4 +1,17 @@
 {
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "missing": [
+        {
+          "type": "host",
+          "value": "www.digitalmenue.com"
+        }
+      ],
+      "destination": "https://www.digitalmenue.com/$1",
+      "permanent": true
+    }
+  ],
   "framework": "nextjs",
   "buildCommand": "next build",
   "devCommand": "next dev",

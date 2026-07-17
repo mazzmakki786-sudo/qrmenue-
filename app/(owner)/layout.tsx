@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
 import { LayoutDashboard, UtensilsCrossed, ClipboardList, BarChart3, User, CreditCard, QrCode, Menu, X, LogOut, Megaphone, Image as ImageIcon, Percent, Table2 } from "lucide-react"
 import { BellNotification } from "@/components/owner/BellNotification"
@@ -91,7 +92,14 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
       </head>
       <header className="hidden md:flex items-center justify-between h-16 px-6 bg-white/80 backdrop-blur-md border-b border-[#F0F0F0] sticky top-0 z-30">
         <div className="flex items-center gap-6 lg:gap-8">
-          <Link href="/dashboard" className="font-bold text-lg tracking-tight flex-shrink-0">
+          <Link href="/dashboard" className="flex items-center gap-2 font-bold text-lg tracking-tight flex-shrink-0">
+            <Image
+              src="/logos/logo-d-star-qr.svg"
+              alt="Digital QR Menue"
+              width={28}
+              height={28}
+              className="w-7 h-7 rounded-lg"
+            />
             Digital QR Menue
           </Link>
           <nav className="flex items-center gap-1">
@@ -185,7 +193,16 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
         <button onClick={() => setMobileOpen(true)} className="p-2 -ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
           <Menu className="w-5 h-5" />
         </button>
-        <Link href="/dashboard" className="font-semibold text-sm">Digital QR Menue</Link>
+        <Link href="/dashboard" className="flex items-center gap-2 font-semibold text-sm">
+          <Image
+            src="/logos/logo-d-star-qr.svg"
+            alt="Digital QR Menue"
+            width={22}
+            height={22}
+            className="w-5 h-5 rounded"
+          />
+          Digital QR Menue
+        </Link>
         <div className="flex items-center gap-1">
           {restaurantId && <BellNotification restaurantId={restaurantId} />}
           <Link
@@ -225,7 +242,16 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
               </button>
             </div>
             <div className="mb-4 px-2">
-              <p className="font-bold text-lg">Digital QR Menue</p>
+              <div className="flex items-center gap-2 font-bold text-lg">
+                <Image
+                  src="/logos/logo-d-star-qr.svg"
+                  alt="Digital QR Menue"
+                  width={28}
+                  height={28}
+                  className="w-7 h-7 rounded-lg"
+                />
+                Digital QR Menue
+              </div>
               <p className="text-xs text-[#999]">Owner dashboard</p>
             </div>
             <nav className="space-y-1 flex-1 overflow-y-auto">

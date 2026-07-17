@@ -1,13 +1,19 @@
 import type { Metadata } from "next"
 import { LandingHeader } from "@/components/shared/LandingHeader"
-import { FaqJsonLd } from "@/components/JsonLd"
+import { FaqJsonLd, JsonLd } from "@/components/JsonLd"
 
 export const metadata: Metadata = {
-  title: "Frequently Asked Questions",
+  title: "Frequently Asked Questions — Digital QR Menue | QR Menu & WhatsApp Ordering Help",
   description:
     "Everything you need to know about Digital QR Menue — Pakistan's no-commission QR menu platform. Pricing, setup, WhatsApp ordering, and support FAQs.",
   alternates: {
     canonical: "https://www.digitalmenue.com/faq",
+  },
+  openGraph: {
+    title: "FAQ — Digital QR Menue | QR Menu, Pricing & WhatsApp Ordering Help for Restaurants in Pakistan",
+    description:
+      "Get answers to common questions about Digital QR Menue — free QR menu setup, pricing plans, WhatsApp ordering, and support for restaurants in Pakistan.",
+    url: "https://www.digitalmenue.com/faq",
   },
 }
 
@@ -110,6 +116,40 @@ const categories: Array<{ title: string; faqs: FaqItem[] }> = [
       },
     ],
   },
+  {
+    title: "Online Ordering & Food Delivery",
+    faqs: [
+      {
+        q: "How can I order food online?",
+        a: "Ordering food online is simple with Digital QR Menue. Find a restaurant near you in our restaurant directory, or scan their QR code if you're dining in. Browse their digital menu, select your dishes, add customizations, and tap 'Order via WhatsApp.' The restaurant receives your order instantly on their WhatsApp and confirms back to you. No app download, no account creation, and no OTP verification needed. You can pay via JazzCash, Easypaisa, or cash on delivery — whatever the restaurant offers.",
+      },
+      {
+        q: "Which delivery app is best for food in Pakistan?",
+        a: "Foodpanda is the most popular delivery app in Pakistan, but it charges restaurants 25-35% commission per order — costs that are often passed on to customers through higher prices. Digital QR Menue offers a better alternative: restaurants create a digital QR menu and customers order directly on WhatsApp. Restaurants keep 100% of their revenue, and customers often get lower prices since there's no middleman commission. For dine-in, customers scan the table QR code; for delivery, restaurants can share their digital menu link on social media or Google Maps so customers can order directly without going through a third-party app.",
+      },
+      {
+        q: "What is the difference between ordering on Foodpanda vs ordering via QR code?",
+        a: "When you order on Foodpanda, the app charges the restaurant a 25-35% commission. This means the restaurant either increases prices or loses money on every order. With a Digital QR Menue QR code, you order directly through WhatsApp — the restaurant pays no commission, so prices stay fair. Additionally, Foodpanda requires an app download and account creation; a QR code menu opens instantly in your phone browser with zero friction. Finally, with a QR code, you're ordering directly from the restaurant's own kitchen — no third-party delivery partner handling your food.",
+      },
+    ],
+  },
+  {
+    title: "Digital Menu Creation & Management",
+    faqs: [
+      {
+        q: "How to create a digital menu for your restaurant?",
+        a: "Creating a digital menu for your restaurant takes just 5 minutes. Sign up for a free trial on Digital QR Menue, enter your restaurant name and details, add your dishes with prices and descriptions, and upload mouth-watering photos. The platform automatically generates a unique QR code linked to your digital menu. Download the QR code, print it on table tents or stickers, and place them on your tables. Customers scan with their phone camera, view your complete digital restaurant menu with photos and prices, and place orders directly through WhatsApp. Updates are instant — change a price or add a new dish and it's live immediately.",
+      },
+      {
+        q: "How does a QR code menu work for restaurants?",
+        a: "A QR code menu works by encoding your restaurant's digital menu URL into a scannable square barcode. Restaurants create their menu on the Digital QR Menue platform, which generates the QR code. When printed and placed on tables, customers simply open their phone camera and point it at the QR code. The camera recognizes the code and opens the digital food menu in the browser automatically. No typing, no searching, no app. Customers can browse the full menu organized by categories, see photos of each dish, check prices, add items to their cart, and send a perfectly formatted order to the restaurant's WhatsApp. The entire process takes under 10 seconds from scan to order.",
+      },
+      {
+        q: "Can I update my digital restaurant menu myself?",
+        a: "Yes, absolutely. Your digital restaurant menu is fully self-managed through your dashboard. You can change prices, add new dishes, remove sold-out items, update photos, reorganize categories, and switch between English and Urdu — all in real-time. Changes are visible to customers the moment they scan your QR code next. No need to call anyone, no technical support ticket, and most importantly, no expensive reprinting of paper menus. If chicken prices go up tomorrow, you update them in 30 seconds from your phone.",
+      },
+    ],
+  },
 ]
 
 const allFaqs: FaqItem[] = categories.flatMap((c) => c.faqs)
@@ -119,6 +159,16 @@ export default function FaqPage() {
   return (
     <>
       <FaqJsonLd faqs={faqLd} />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://www.digitalmenue.com" },
+            { "@type": "ListItem", position: 2, name: "FAQ", item: "https://www.digitalmenue.com/faq" },
+          ],
+        }}
+      />
       <div className="min-h-screen bg-white">
         <LandingHeader />
         <section className="bg-black text-white py-20 md:py-28">

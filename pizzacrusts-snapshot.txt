@@ -1,0 +1,41 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e7] [cursor=pointer]:
+          - img "Pizza Crusts" [ref=e9]
+          - heading "Pizza Crusts" [level=1] [ref=e10]
+        - generic [ref=e17] [cursor=pointer]:
+          - generic [ref=e18]: Deliver to
+          - generic [ref=e22]: Select Location
+      - button "Cart" [ref=e24] [cursor=pointer]
+  - main [ref=e29]:
+    - generic [ref=e31]:
+      - button [ref=e33] [cursor=pointer]
+      - button [ref=e36] [cursor=pointer]
+    - generic [ref=e49]:
+      - textbox "Search the menu" [ref=e53]:
+        - /placeholder: Search the menu...
+      - button "Search" [ref=e54] [cursor=pointer]
+  - generic [ref=e57]:
+    - generic [ref=e58]:
+      - heading "Your Order" [level=2] [ref=e59]
+      - button [ref=e60] [cursor=pointer]
+    - generic [ref=e65]:
+      - generic [ref=e66]: 🛒
+      - paragraph [ref=e67]: Your cart is empty
+      - paragraph [ref=e68]: Add some delicious food!
+  - generic [ref=e70]:
+    - img "Logo" [ref=e87]
+    - generic [ref=e74]:
+      - heading "Select Location" [level=2] [ref=e75]
+      - paragraph [ref=e76]: Choose your city and area to continue
+    - generic [ref=e78]:
+      - generic [ref=e79]:
+        - paragraph [ref=e80]: City
+        - combobox [ref=e82] [cursor=pointer]:
+          - option "Select a city..."
+          - option "Mardan" [selected]
+      - generic [ref=e83]:
+        - paragraph [ref=e84]: Area
+        - generic [ref=e85] [cursor=pointer]: Select your area...
