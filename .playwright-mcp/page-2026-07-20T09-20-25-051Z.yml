@@ -1,0 +1,52 @@
+- generic [active] [ref=f4e1]:
+  - generic [ref=f4e2]:
+    - banner [ref=f4e3]:
+      - generic [ref=f4e4]:
+        - link "Digital QR Menue Digital QR Menue" [ref=f4e5] [cursor=pointer]:
+          - /url: /restaurants
+          - img "Digital QR Menue" [ref=f4e6]
+          - generic [ref=f4e7]: Digital QR Menue
+        - navigation [ref=f4e8]:
+          - link "Home" [ref=f4e9] [cursor=pointer]:
+            - /url: /restaurants
+          - link "Favorites" [ref=f4e13] [cursor=pointer]:
+            - /url: /favorites
+            - text: Favs
+          - link "Cart" [ref=f4e16] [cursor=pointer]:
+            - /url: /cart
+          - link "Orders" [ref=f4e21] [cursor=pointer]:
+            - /url: /account
+    - main [ref=f4e25]:
+      - generic [ref=f4e26]:
+        - heading "Your cart is empty" [level=2] [ref=f4e31]
+        - paragraph [ref=f4e32]: Add items to get started
+        - link "Browse Menu" [ref=f4e33] [cursor=pointer]:
+          - /url: /restaurants
+    - contentinfo [ref=f4e35]:
+      - generic [ref=f4e36]:
+        - generic [ref=f4e37]:
+          - generic [ref=f4e38]:
+            - generic [ref=f4e39]:
+              - img "Digital QR Menue" [ref=f4e40]
+              - text: Digital QR Menue
+            - paragraph [ref=f4e41]: Made in Pakistan with 💚
+          - generic [ref=f4e42]:
+            - link "Pricing" [ref=f4e43] [cursor=pointer]:
+              - /url: /pricing
+            - link "Restaurants" [ref=f4e44] [cursor=pointer]:
+              - /url: /restaurants
+            - link "About" [ref=f4e45] [cursor=pointer]:
+              - /url: /about
+            - link "Contact" [ref=f4e46] [cursor=pointer]:
+              - /url: /contact
+          - generic [ref=f4e47]:
+            - link "Privacy Policy" [ref=f4e48] [cursor=pointer]:
+              - /url: /privacy
+            - link "Terms of Service" [ref=f4e49] [cursor=pointer]:
+              - /url: /terms
+            - link "Return & Refund" [ref=f4e50] [cursor=pointer]:
+              - /url: /refund
+            - link "Shipping" [ref=f4e51] [cursor=pointer]:
+              - /url: /shipping
+        - generic [ref=f4e52]: © 2026 Digital QR Menue. All rights reserved.DIGITAL MENUE IS OWNED AND OPERATED BY MUHAMMAD MUAZ MAKI
+  - alert [ref=f4e53]

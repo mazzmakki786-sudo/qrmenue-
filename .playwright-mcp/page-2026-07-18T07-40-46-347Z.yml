@@ -1,0 +1,471 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img "Digital QR Menue" [ref=e6]
+          - text: Digital QR Menue
+        - generic [ref=e7]:
+          - generic [ref=e8]:
+            - link "Sign In" [ref=e9] [cursor=pointer]:
+              - /url: /login
+            - link "Get Started" [ref=e10] [cursor=pointer]:
+              - /url: /signup/restaurant
+          - button "Open menu" [ref=e11] [cursor=pointer]
+          - navigation [ref=e13]:
+            - link "Restaurants" [ref=e14] [cursor=pointer]:
+              - /url: /restaurants
+            - link "Pricing" [ref=e15] [cursor=pointer]:
+              - /url: /pricing
+            - link "About" [ref=e16] [cursor=pointer]:
+              - /url: /about
+            - link "Blog" [ref=e17] [cursor=pointer]:
+              - /url: /blog
+            - link "FAQ" [ref=e18] [cursor=pointer]:
+              - /url: /faq
+            - link "Contact" [ref=e19] [cursor=pointer]:
+              - /url: /contact
+            - link "Sign In" [ref=e20] [cursor=pointer]:
+              - /url: /login
+            - link "Get Started" [ref=e21] [cursor=pointer]:
+              - /url: /signup/restaurant
+    - complementary [ref=e22]:
+      - generic [ref=e23]:
+        - text: Menu
+        - button "Close menu" [ref=e24] [cursor=pointer]
+      - navigation [ref=e26]:
+        - link "Restaurants" [ref=e27] [cursor=pointer]:
+          - /url: /restaurants
+        - link "Pricing & Plans" [ref=e30] [cursor=pointer]:
+          - /url: /pricing
+        - link "About Us" [ref=e33] [cursor=pointer]:
+          - /url: /about
+        - link "Blog" [ref=e36] [cursor=pointer]:
+          - /url: /blog
+        - link "FAQ" [ref=e39] [cursor=pointer]:
+          - /url: /faq
+        - link "Contact" [ref=e42] [cursor=pointer]:
+          - /url: /contact
+        - paragraph [ref=e45]: Account
+        - link "Sign In" [ref=e46] [cursor=pointer]:
+          - /url: /login
+        - link "Get Started" [ref=e49] [cursor=pointer]:
+          - /url: /signup/restaurant
+        - paragraph [ref=e52]: Info
+        - link "About Us" [ref=e53] [cursor=pointer]:
+          - /url: /about
+        - paragraph [ref=e54]: Legal
+        - link "Privacy Policy" [ref=e55] [cursor=pointer]:
+          - /url: /privacy
+        - link "Terms of Service" [ref=e56] [cursor=pointer]:
+          - /url: /terms
+      - paragraph [ref=e58]: © 2026 Digital QR Menue. All rights reserved.
+    - generic [ref=e61]:
+      - generic [ref=e62]: Trusted by 1,000+ Restaurants in Pakistan
+      - heading "From Menu to Order in Seconds — Zero Commission" [level=1] [ref=e63]
+      - paragraph [ref=e64]: Ab menu print karne ka kharcha khatam! Apne customers ko dein behtareen digital menu card aur orders receive karein seedha apne WhatsApp par. Aaj hi free trial shuru karein.
+      - generic [ref=e65]:
+        - link "Start Free Trial" [ref=e66] [cursor=pointer]:
+          - /url: /signup/restaurant
+        - link "Browse Restaurants" [ref=e67] [cursor=pointer]:
+          - /url: /restaurants
+    - generic [ref=e69]:
+      - generic [ref=e70]:
+        - paragraph [ref=e71]: How It Works
+        - heading "Get started in 3 simple steps" [level=2] [ref=e72]
+      - generic [ref=e73]:
+        - generic [ref=e74]:
+          - generic [ref=e75]: "01"
+          - generic [ref=e76]:
+            - heading "Create Your Menu" [level=3] [ref=e77]
+            - paragraph [ref=e78]: Add your dishes, prices, and photos through our simple dashboard. Takes under 5 minutes — no technical skills needed.
+        - generic [ref=e79]:
+          - generic [ref=e80]: "02"
+          - generic [ref=e81]:
+            - heading "Print the QR Code" [level=3] [ref=e82]
+            - paragraph [ref=e83]: We generate a unique QR code for your restaurant. Download, print, and place on tables, menus, or your storefront.
+        - generic [ref=e84]:
+          - generic [ref=e85]: "03"
+          - generic [ref=e86]:
+            - heading "Start Receiving Orders" [level=3] [ref=e87]
+            - paragraph [ref=e88]: Customers scan the code, browse your menu, and order via WhatsApp. You keep 100% of every order.
+      - generic [ref=e89]:
+        - generic [ref=e90]:
+          - generic [ref=e91]: "01"
+          - heading "Create Your Menu" [level=3] [ref=e92]
+          - paragraph [ref=e93]: Add your dishes, prices, and photos through our simple dashboard. Takes under 5 minutes — no technical skills needed.
+        - generic [ref=e94]:
+          - generic [ref=e95]: "02"
+          - heading "Print the QR Code" [level=3] [ref=e96]
+          - paragraph [ref=e97]: We generate a unique QR code for your restaurant. Download, print, and place on tables, menus, or your storefront.
+        - generic [ref=e98]:
+          - generic [ref=e99]: "03"
+          - heading "Start Receiving Orders" [level=3] [ref=e100]
+          - paragraph [ref=e101]: Customers scan the code, browse your menu, and order via WhatsApp. You keep 100% of every order.
+    - generic [ref=e103]:
+      - heading "Digital QR Menu for Restaurants — The Complete Guide" [level=2] [ref=e104]
+      - generic [ref=e105]:
+        - heading "What Is a QR Code Menu for Restaurants?" [level=3] [ref=e106]
+        - paragraph [ref=e107]:
+          - text: A
+          - strong [ref=e108]: menu QR code
+          - text: is a scannable barcode that diners scan with their smartphone camera to instantly view a
+          - strong [ref=e109]: digital restaurant menu
+          - text: on their screen. Instead of handing out printed paper menus that get outdated the moment prices change, restaurants in Pakistan are switching to a
+          - strong [ref=e110]: digital QR menu
+          - text: that updates in real-time. A
+          - strong [ref=e111]: digital food menu
+          - text: powered by QR technology allows customers to browse dishes, see photos, check prices, and place an
+          - strong [ref=e112]: online order
+          - text: — all without waiting for a waiter. For any
+          - strong [ref=e113]: menu QR code restaurant
+          - text: "setup, the process is simple: the restaurant creates its"
+          - strong [ref=e114]: digital QR code menu
+          - text: on a platform like Digital QR Menue, prints the unique QR code on a table tent card, and diners scan it the moment they sit down.
+        - heading "How to Create a Digital Menu with QR Code" [level=3] [ref=e115]
+        - paragraph [ref=e116]:
+          - text: Learning
+          - strong [ref=e117]: how to create a digital menu with QR code
+          - text: technology is easier than you think. Most
+          - strong [ref=e118]: digital menu design
+          - text: platforms, including Digital QR Menue, let you set up a complete
+          - strong [ref=e119]: digital QR menu for restaurant
+          - text: in under five minutes. You simply add your dishes, prices, and photos through a dashboard; the platform generates a unique QR code linked to your
+          - strong [ref=e120]: online menu
+          - text: ; you print the code and place it on your tables; and customers start scanning and ordering immediately. Unlike traditional paper menus that can cost PKR 2,000–8,000 per reprint batch, a
+          - strong [ref=e121]: digital QR menu
+          - text: never needs reprinting. For restaurants looking for a
+          - strong [ref=e122]: free QR code order online
+          - text: solution, Digital QR Menue offers a free trial so you can test the system before committing.
+        - heading "How to Get Orders on WhatsApp with QR Code Menus" [level=3] [ref=e123]
+        - paragraph [ref=e124]:
+          - text: One of the biggest advantages of a
+          - strong [ref=e125]: QR code menu free
+          - text: platform is WhatsApp integration. Restaurant owners frequently ask
+          - strong [ref=e126]: how to get order on WhatsApp
+          - text: or
+          - strong [ref=e127]: how to take orders on WhatsApp
+          - text: without hiring extra staff. The answer is a
+          - strong [ref=e128]: digital restaurant menu QR code
+          - text: system. When a customer scans your QR code, browses your
+          - strong [ref=e129]: digital food menu
+          - text: ", and selects items, their complete order — item names, quantities, prices, and special instructions — is formatted and sent directly to your restaurant's WhatsApp number. Customers simply tap \"Order via WhatsApp,\" and a pre-filled message with their complete order appears. Restaurant owners also"
+          - strong [ref=e130]: get order updates on WhatsApp
+          - text: in real-time, so there's never any confusion. This is the future of
+          - strong [ref=e131]: online restaurant ordering
+          - text: — direct, commission-free, and instant.
+        - heading "Online Ordering System for Restaurants in Pakistan" [level=3] [ref=e132]
+        - paragraph [ref=e133]:
+          - text: A modern
+          - strong [ref=e134]: online ordering system
+          - text: does more than just display a menu. The best
+          - strong [ref=e135]: online restaurant ordering platforms
+          - text: give customers a seamless experience from browsing to payment. When you build your
+          - strong [ref=e136]: online restaurant ordering website
+          - text: around a QR code, every table in your restaurant becomes a self-ordering station. Customers who search for "
+          - strong [ref=e137]: online order food near me
+          - text: "\" can find your restaurant through the platform directory, browse your"
+          - strong [ref=e138]: pizza online menu
+          - text: ", and order ahead for pickup or delivery. For"
+          - strong [ref=e139]: true digital restaurants
+          - text: ", the"
+          - strong [ref=e140]: online restaurant ordering system
+          - text: must support multiple payment methods. Digital QR Menue integrates with JazzCash and Easypaisa so customers can
+          - strong [ref=e141]: scan and get orders
+          - text: paid for before they even arrive.
+        - heading "Why QR Code Menus Are Taking Over Pakistan's Restaurant Industry" [level=3] [ref=e142]
+        - paragraph [ref=e143]:
+          - text: There's a reason more
+          - strong [ref=e144]: restaurants with QR code menus
+          - text: are appearing across Lahore, Karachi, Islamabad, and every major Pakistani city. Food aggregators like Foodpanda charge 25–35% commission per order. A restaurant doing PKR 200,000 in monthly orders loses PKR 50,000+ to commissions. By switching to a
+          - strong [ref=e145]: menu QR code restaurant
+          - text: system with direct WhatsApp ordering, that commission disappears entirely. Additionally,
+          - strong [ref=e146]: digital restaurants
+          - text: equipped with QR menus reduce labor costs, eliminate order errors from phone calls, and provide customers with a modern dining experience. For restaurants searching "
+          - strong [ref=e147]: QR code menu Pakistan
+          - text: "\" or \""
+          - strong [ref=e148]: scan menu code online free
+          - text: "\" tools, Digital QR Menue is the most comprehensive platform available."
+        - paragraph [ref=e149]:
+          - text: Whether you run a
+          - link "café in Lahore" [ref=e150] [cursor=pointer]:
+            - /url: /restaurants?city=lahore
+          - text: ", a"
+          - link "restaurant in Karachi" [ref=e151] [cursor=pointer]:
+            - /url: /restaurants?city=karachi
+          - text: ", a"
+          - link "diner in Islamabad" [ref=e152] [cursor=pointer]:
+            - /url: /restaurants?city=islamabad
+          - text: ", or an eatery in"
+          - link "Faisalabad" [ref=e153] [cursor=pointer]:
+            - /url: /restaurants?city=faisalabad
+          - text: ","
+          - link "Rawalpindi" [ref=e154] [cursor=pointer]:
+            - /url: /restaurants?city=rawalpindi
+          - text: ","
+          - link "Peshawar" [ref=e155] [cursor=pointer]:
+            - /url: /restaurants?city=peshawar
+          - text: ", or"
+          - link "Multan" [ref=e156] [cursor=pointer]:
+            - /url: /restaurants?city=multan
+          - text: — a
+          - strong [ref=e157]: digital QR menu
+          - text: works for every type of food business. Get started with a
+          - link "free trial today" [ref=e158] [cursor=pointer]:
+            - /url: /signup/restaurant
+          - text: and see why hundreds of Pakistani restaurants have already gone digital. Visit our
+          - link "FAQ" [ref=e159] [cursor=pointer]:
+            - /url: /faq
+          - text: or
+          - link "blog" [ref=e160] [cursor=pointer]:
+            - /url: /blog
+          - text: for more restaurant tips and guides.
+    - generic [ref=e162]:
+      - generic [ref=e163]:
+        - paragraph [ref=e164]: Why Choose Us
+        - heading "The smarter way to run your restaurant" [level=2] [ref=e165]
+      - generic [ref=e166]:
+        - generic [ref=e167]:
+          - generic [ref=e168]:
+            - generic [ref=e169]: "01"
+            - heading "Save 30% on Delivery Commissions" [level=3] [ref=e170]
+          - paragraph [ref=e171]: Foodpanda charges 25-35% per order. With Digital QR Menue, every order goes directly through your customer's WhatsApp — no middleman, no commission. A restaurant doing PKR 200,000/month in orders saves over PKR 50,000 every month.
+          - list [ref=e172]:
+            - listitem [ref=e173]: Zero commission on every order
+            - listitem [ref=e176]: No listing fees or hidden charges
+            - listitem [ref=e179]: Full bill amount is yours to keep
+        - generic [ref=e182]:
+          - generic [ref=e183]:
+            - generic [ref=e184]: "02"
+            - heading "Eliminate Menu Reprint Costs" [level=3] [ref=e185]
+          - paragraph [ref=e186]: Paper menus cost PKR 2,000 – 8,000+ per batch and are outdated the moment prices change. Update prices, add dishes, or swap seasonal items in real-time from your dashboard. Zero printing cost. Zero waste.
+          - list [ref=e187]:
+            - listitem [ref=e188]: Instant price updates — no reprinting
+            - listitem [ref=e191]: Save PKR 6,000 – 24,000 per year
+            - listitem [ref=e194]: Eco-friendly — eliminate paper waste
+        - generic [ref=e197]:
+          - generic [ref=e198]:
+            - generic [ref=e199]: "03"
+            - heading "100% Error-Free Orders" [level=3] [ref=e200]
+          - paragraph [ref=e201]: Phone call orders lead to wrong items, misheard quantities, and disputes. When customers build their own cart, they see the menu, pick their items, and send a perfectly formatted WhatsApp order. Your kitchen gets the exact order, every time.
+          - list [ref=e202]:
+            - listitem [ref=e203]: Customers type their own order
+            - listitem [ref=e206]: All details in writing — no miscommunication
+            - listitem [ref=e209]: No more 'I ordered something else' disputes
+        - generic [ref=e212]:
+          - generic [ref=e213]:
+            - generic [ref=e214]: "04"
+            - heading "No App Downloads for Customers" [level=3] [ref=e215]
+          - paragraph [ref=e216]: No app store. No sign-up. No OTP. Your customer scans the QR code on their table — that's it. The menu opens instantly in their phone browser. Works on every phone — Android, iPhone, even basic smartphones.
+          - list [ref=e217]:
+            - listitem [ref=e218]: Scan with the phone camera
+            - listitem [ref=e221]: Works on every smartphone in Pakistan
+            - listitem [ref=e224]: Higher engagement, faster orders
+    - generic [ref=e228]:
+      - generic [ref=e229]:
+        - heading "Simple, Transparent Pricing" [level=2] [ref=e230]
+        - paragraph [ref=e231]: No hidden fees. No commission on orders. Cancel anytime.
+        - generic [ref=e232]:
+          - text: Monthly
+          - switch [ref=e233] [cursor=pointer]
+          - text: Yearly
+      - generic [ref=e234]:
+        - generic [ref=e235]:
+          - generic [ref=e236]:
+            - heading "Free Trial" [level=3] [ref=e237]
+            - paragraph [ref=e238]: Perfect for testing Digitalmenue.com
+            - generic [ref=e239]:
+              - text: Free
+              - generic [ref=e240]: /month
+          - list [ref=e242]:
+            - listitem [ref=e243]: 20 dishes
+            - listitem [ref=e247]: 5 categories
+            - listitem [ref=e251]: 20 images
+            - listitem [ref=e255]: 15 orders/mo
+            - listitem [ref=e259]: Analytics dashboard
+            - listitem [ref=e263]: QR code generation
+            - listitem [ref=e267]: WhatsApp orders
+          - button "Start Free Trial" [ref=e272] [cursor=pointer]
+        - generic [ref=e275]:
+          - generic [ref=e276]:
+            - heading "Starter" [level=3] [ref=e277]
+            - paragraph [ref=e278]: For small restaurants getting started
+            - generic [ref=e279]:
+              - text: PKR 1,500
+              - generic [ref=e280]: /month
+          - generic [ref=e281]:
+            - paragraph [ref=e282]: "Everything in Free Trial, and:"
+            - list [ref=e283]:
+              - listitem [ref=e284]: 30 dishes
+              - listitem [ref=e288]: Unlimited categories
+              - listitem [ref=e292]: 30 images
+              - listitem [ref=e296]: Unlimited orders
+              - listitem [ref=e300]: Analytics dashboard
+              - listitem [ref=e304]: QR code generation
+              - listitem [ref=e308]: WhatsApp orders
+          - button "Choose Plan" [ref=e313] [cursor=pointer]
+        - generic [ref=e316]:
+          - generic [ref=e317]:
+            - heading "Growth" [level=3] [ref=e318]
+            - paragraph [ref=e319]: For growing restaurants with multiple branches
+            - generic [ref=e320]:
+              - text: PKR 2,500
+              - generic [ref=e321]: /month
+          - generic [ref=e322]:
+            - paragraph [ref=e323]: "Everything in Starter, and:"
+            - list [ref=e324]:
+              - listitem [ref=e325]: 50 dishes
+              - listitem [ref=e329]: Unlimited categories
+              - listitem [ref=e333]: 20 images
+              - listitem [ref=e337]: Unlimited orders
+              - listitem [ref=e341]: Analytics dashboard
+              - listitem [ref=e345]: QR code generation
+              - listitem [ref=e349]: WhatsApp orders
+          - button "Choose Plan" [ref=e354] [cursor=pointer]
+        - generic [ref=e357]:
+          - generic [ref=e358]:
+            - heading "Premium" [level=3] [ref=e359]
+            - paragraph [ref=e360]: Full features with priority support
+            - generic [ref=e361]:
+              - text: PKR 4,500
+              - generic [ref=e362]: /month
+          - generic [ref=e363]:
+            - paragraph [ref=e364]: "Everything in Growth, and:"
+            - list [ref=e365]:
+              - listitem [ref=e366]: 100 dishes
+              - listitem [ref=e370]: Unlimited categories
+              - listitem [ref=e374]: 100 images
+              - listitem [ref=e378]: Unlimited orders
+              - listitem [ref=e382]: Analytics dashboard
+              - listitem [ref=e386]: QR code generation
+              - listitem [ref=e390]: WhatsApp orders
+          - button "Choose Plan" [ref=e395] [cursor=pointer]
+        - generic [ref=e398]:
+          - generic [ref=e399]:
+            - heading "Starter Yearly" [level=3] [ref=e400]
+            - paragraph [ref=e401]: Starter plan billed annually
+            - generic [ref=e402]:
+              - text: PKR 12,000
+              - generic [ref=e403]: /month
+          - generic [ref=e404]:
+            - paragraph [ref=e405]: "Everything in Premium, and:"
+            - list [ref=e406]:
+              - listitem [ref=e407]: 30 dishes
+              - listitem [ref=e411]: Unlimited categories
+              - listitem [ref=e415]: 30 images
+              - listitem [ref=e419]: Unlimited orders
+              - listitem [ref=e423]: Analytics dashboard
+              - listitem [ref=e427]: QR code generation
+              - listitem [ref=e431]: WhatsApp orders
+          - button "Choose Plan" [ref=e436] [cursor=pointer]
+        - generic [ref=e439]:
+          - generic [ref=e440]:
+            - heading "Growth Yearly" [level=3] [ref=e441]
+            - paragraph [ref=e442]: Growth plan billed annually
+            - generic [ref=e443]:
+              - text: PKR 25,000
+              - generic [ref=e444]: /month
+          - generic [ref=e445]:
+            - paragraph [ref=e446]: "Everything in Starter Yearly, and:"
+            - list [ref=e447]:
+              - listitem [ref=e448]: 50 dishes
+              - listitem [ref=e452]: Unlimited categories
+              - listitem [ref=e456]: 20 images
+              - listitem [ref=e460]: Unlimited orders
+              - listitem [ref=e464]: Analytics dashboard
+              - listitem [ref=e468]: QR code generation
+              - listitem [ref=e472]: WhatsApp orders
+          - button "Choose Plan" [ref=e477] [cursor=pointer]
+        - generic [ref=e480]:
+          - generic [ref=e481]:
+            - heading "Premium Yearly" [level=3] [ref=e482]
+            - paragraph [ref=e483]: Premium plan billed annually
+            - generic [ref=e484]:
+              - text: PKR 50,000
+              - generic [ref=e485]: /month
+          - generic [ref=e486]:
+            - paragraph [ref=e487]: "Everything in Growth Yearly, and:"
+            - list [ref=e488]:
+              - listitem [ref=e489]: 100 dishes
+              - listitem [ref=e493]: Unlimited categories
+              - listitem [ref=e497]: 100 images
+              - listitem [ref=e501]: Unlimited orders
+              - listitem [ref=e505]: Analytics dashboard
+              - listitem [ref=e509]: QR code generation
+              - listitem [ref=e513]: WhatsApp orders
+          - button "Choose Plan" [ref=e518] [cursor=pointer]
+    - generic [ref=e522]:
+      - generic [ref=e523]:
+        - paragraph [ref=e524]: Blog
+        - heading "Restaurant Tips & Guides" [level=2] [ref=e525]
+        - paragraph [ref=e526]: Learn how to grow your restaurant with QR menus, WhatsApp ordering, and smart marketing strategies.
+      - 'link "QR Menu Guides7 min read How to Make a QR Code Menu for Your Restaurant: Complete Step-by-Step Guide Learn how to make a QR code menu for your restaurant in Pakistan. Step-by-step guide covering QR code menu card price, WhatsApp ordering setup, and pro tips. Read Article→" [ref=e528] [cursor=pointer]':
+        - /url: /blog/how-to-make-qr-code-menu-for-restaurant
+        - generic [ref=e529]: QR Menu Guides7 min read
+        - 'heading "How to Make a QR Code Menu for Your Restaurant: Complete Step-by-Step Guide" [level=3] [ref=e530]'
+        - paragraph [ref=e531]: Learn how to make a QR code menu for your restaurant in Pakistan. Step-by-step guide covering QR code menu card price, WhatsApp ordering setup, and pro tips.
+        - generic [ref=e532]: Read Article→
+      - link "View All Articles" [ref=e534] [cursor=pointer]:
+        - /url: /blog
+    - generic [ref=e536]:
+      - generic [ref=e537]:
+        - paragraph [ref=e538]: FAQ
+        - heading "Frequently Asked Questions" [level=2] [ref=e539]
+        - paragraph [ref=e540]: Got questions? We have answers.
+      - generic [ref=e541]:
+        - group [ref=e542]:
+          - generic "How can I order food online?+" [ref=e543]
+        - group [ref=e544]:
+          - generic "Which delivery app is best for food?+" [ref=e545]
+        - group [ref=e546]:
+          - generic "How to create a digital menu for your restaurant?+" [ref=e547]
+        - group [ref=e548]:
+          - generic "What is a QR code menu and how does it work?+" [ref=e549]
+        - group [ref=e550]:
+          - generic "How much does Digital QR Menue cost?+" [ref=e551]
+        - group [ref=e552]:
+          - generic "How do restaurants get orders on WhatsApp?+" [ref=e553]
+      - link "View All FAQs" [ref=e555] [cursor=pointer]:
+        - /url: /faq
+    - generic [ref=e557]:
+      - generic [ref=e558]:
+        - heading "Get in Touch" [level=2] [ref=e559]
+        - paragraph [ref=e560]: Have questions? We're here to help
+      - generic [ref=e561]:
+        - link [ref=e562] [cursor=pointer]:
+          - /url: https://wa.me/923045451154
+          - heading "WhatsApp" [level=3] [ref=e565]
+          - paragraph [ref=e566]: Chat with us on WhatsApp for quick support
+        - generic [ref=e567]:
+          - heading "Email" [level=3] [ref=e570]
+          - paragraph [ref=e571]: maki2@gmail.com
+    - generic [ref=e573]:
+      - heading "Ready to go digital?" [level=2] [ref=e574]
+      - paragraph [ref=e575]: Join hundreds of restaurants in Pakistan using Digital QR Menue to streamline their ordering process.
+      - link "Start Free Trial — No Credit Card" [ref=e577] [cursor=pointer]:
+        - /url: /signup/restaurant
+    - contentinfo [ref=e578]:
+      - generic [ref=e579]:
+        - generic [ref=e580]:
+          - generic [ref=e581]:
+            - generic [ref=e582]:
+              - img "Digital QR Menue" [ref=e583]
+              - text: Digital QR Menue
+            - paragraph [ref=e584]: Made in Pakistan with 💚
+          - generic [ref=e585]:
+            - link "Pricing" [ref=e586] [cursor=pointer]:
+              - /url: /pricing
+            - link "Restaurants" [ref=e587] [cursor=pointer]:
+              - /url: /restaurants
+            - link "About" [ref=e588] [cursor=pointer]:
+              - /url: /about
+            - link "Contact" [ref=e589] [cursor=pointer]:
+              - /url: /contact
+          - generic [ref=e590]:
+            - link "Privacy Policy" [ref=e591] [cursor=pointer]:
+              - /url: /privacy
+            - link "Terms of Service" [ref=e592] [cursor=pointer]:
+              - /url: /terms
+        - generic [ref=e593]: © 2026 Digital QR Menue. All rights reserved.
+  - alert [ref=e594]

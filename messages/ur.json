@@ -73,7 +73,6 @@
     "cancelled": "منسوخ",
     "pending": "زیر التواء",
     "deals": "ڈیلز",
-    "aiPosts": "AI پوسٹس",
     "newDeal": "نئی ڈیل",
     "editDeal": "ڈیل میں ترمیم کریں",
     "activeDeals": "فعال ڈیلز",
@@ -91,19 +90,11 @@
     "disabled": "غیر فعال",
     "expired": "ختم شد",
     "upcoming": "آنے والی",
-    "aiPostGenerator": "AI پوسٹ جنریٹر",
-    "aiPostsHistory": "تیار کردہ پوسٹس",
-    "aiPostsRemaining": "اس مہینے باقی",
     "generatePost": "پوسٹ بنائیں",
     "download": "ڈاؤن لوڈ کریں",
-    "noAiPosts": "ابھی تک کوئی پوسٹ نہیں بنائی گئی",
-    "noAiPostsDesc": "اپنی پہلی AI پاورڈ پروموشنل پوسٹ بنائیں",
-    "generateFirstPost": "پہلی پوسٹ بنائیں",
     "selectLanguage": "زبان منتخب کریں",
     "selectRatio": "پہلو تناسب",
-    "selectImages": "تصاویر منتخب کریں",
-    "writePrompt": "AI کے لیے پرامپٹ لکھیں",
-    "promptPlaceholder": "مثلاً ویک اینڈ BBQ اسپیشل کے بارے میں پوسٹ بنائیں..."
+    "selectImages": "تصاویر منتخب کریں"
   },
   "superadmin": {
     "allRestaurants": "تمام ریستوران",

@@ -9,7 +9,7 @@ interface Props {
   currentPlan: string
   currentTrialEnd?: string | null
   currentOverrides?: PlanLimitsPartial | null
-  onSave: (plan: string, endDate: string) => void
+  onSave: (plan: string, endDate: string, extraDays?: number) => void
   onSaveOverrides?: (overrides: PlanLimitsPartial | null) => void
 }
 
@@ -27,11 +27,18 @@ interface DBPlan {
   custom_branding: boolean
   can_have_qr: boolean
   can_have_whatsapp: boolean
+  can_have_tables: boolean
+}
+
+function getDefaultEndDate(): string {
+  const d = new Date(Date.now() + 30 * 86400000)
+  return d.toISOString().slice(0, 10)
 }
 
 export function PlanEditor({ currentPlan, currentTrialEnd, currentOverrides, onSave, onSaveOverrides }: Props) {
   const [plan, setPlan] = useState(currentPlan)
   const [endDate, setEndDate] = useState("")
+  const [extraDays, setExtraDays] = useState(0)
   const [autoTrialEnd, setAutoTrialEnd] = useState<string>("")
   const [dbPlans, setDbPlans] = useState<Record<string, DBPlan>>({})
 
@@ -83,6 +90,7 @@ export function PlanEditor({ currentPlan, currentTrialEnd, currentOverrides, onS
         customBranding: db.custom_branding,
         canHaveQR: db.can_have_qr,
         canHaveWhatsapp: db.can_have_whatsapp,
+        canHaveTables: db.can_have_tables,
       }
     }
     return PLAN_LIMITS[slug]
@@ -116,6 +124,12 @@ export function PlanEditor({ currentPlan, currentTrialEnd, currentOverrides, onS
     if (orders && orders > 0) overrides.maxOrders = orders
     onSaveOverrides(Object.keys(overrides).length > 0 ? overrides : null)
   }
+
+  const handleSave = () => {
+    onSave(plan, endDate, extraDays)
+  }
+
+  const defaultEnd = getDefaultEndDate()
 
   return (
     <div className="space-y-4">
@@ -204,13 +218,34 @@ export function PlanEditor({ currentPlan, currentTrialEnd, currentOverrides, onS
           onChange={(e) => setEndDate(e.target.value)}
           className="flex h-12 w-full rounded-[10px] bg-[#F8F8F8] border border-[#E8E8E8] px-4 text-base focus:outline-none focus:border-black transition-colors"
         />
+        {plan !== "trial" && (
+          <p className="text-[11px] text-[#999] mt-1">
+            Default: 30 days from now ({new Date(defaultEnd).toLocaleDateString()}){extraDays > 0 ? ` + ${extraDays} extra day${extraDays > 1 ? "s" : ""}` : ""}
+          </p>
+        )}
         {plan === "trial" && autoTrialEnd && (
           <p className="text-[11px] text-[#999] mt-1">
             Current trial ends: {new Date(autoTrialEnd).toLocaleDateString()}
           </p>
         )}
       </div>
-      <Button onClick={() => onSave(plan, endDate)}>
+
+      {plan !== "trial" && (
+        <div>
+          <label className="block text-sm font-medium mb-1">Extra Days</label>
+          <input
+            type="number"
+            min={0}
+            value={extraDays}
+            onChange={(e) => setExtraDays(Math.max(0, parseInt(e.target.value) || 0))}
+            className="flex h-12 w-full rounded-[10px] bg-[#F8F8F8] border border-[#E8E8E8] px-4 text-base focus:outline-none focus:border-black transition-colors"
+            placeholder="0"
+          />
+          <p className="text-[11px] text-[#999] mt-1">Extra days to add on top of the end date</p>
+        </div>
+      )}
+
+      <Button onClick={handleSave}>
         Save Plan
       </Button>
     </div>

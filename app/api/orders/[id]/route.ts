@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 import { csrfGuard } from "@/lib/csrf"
 import { safeRoute } from "@/lib/api-error"
@@ -10,7 +10,7 @@ import { sendCustomerPushNotification, createCustomerNotification } from "@/lib/
 
 const VALID_STATUSES = ["received", "preparing", "ready", "completed", "cancelled"] as const
 const VALID_PAYMENT_STATUSES = ["pending", "paid", "failed"] as const
-const VALID_PAYMENT_METHODS = ["cod", "bank_transfer", "jazzcash", "easypaisa"] as const
+const VALID_PAYMENT_METHODS = ["cod", "bank_transfer", "easypaisa"] as const
 
 export const GET = safeRoute(async (
   request,
@@ -174,6 +174,15 @@ export const PATCH = safeRoute(async (
       tag: `order-${id}`,
     }).catch((err: any) => console.error("[orders] Push send failed:", err))
 
+    // Free table if dine-in order is cancelled
+    if (currentOrder.table_number) {
+      const admin = createAdminClient()
+      admin.from("restaurant_tables").update({ is_occupied: false })
+        .eq("restaurant_id", restaurant.id)
+        .eq("table_number", currentOrder.table_number)
+        .then(({ error: freeErr }) => { if (freeErr) console.error("[orders] Failed to free table:", freeErr.message) })
+    }
+
     return NextResponse.json({ order: data })
   }
 
@@ -234,6 +243,15 @@ export const PATCH = safeRoute(async (
           : `رڈرآ اک پآ #${currentOrder.order_number} ےہ رایت!`,
       }).catch((err: any) => console.error("[orders] Create notification failed:", err))
     }
+  }
+
+  // Free table when dine-in order is completed
+  if (newStatus && newStatus === "completed" && currentOrder.table_number) {
+    const admin = createAdminClient()
+    admin.from("restaurant_tables").update({ is_occupied: false })
+      .eq("restaurant_id", restaurant.id)
+      .eq("table_number", currentOrder.table_number)
+      .then(({ error: freeErr }) => { if (freeErr) console.error("[orders] Failed to free table:", freeErr.message) })
   }
 
   return NextResponse.json({ order: data })

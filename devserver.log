@@ -1,0 +1,29 @@
+
+> qrmenu@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.5.18
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.112:3000
+   - Environments: .env.local
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Ready in 6.3s
+ ○ Compiling /login ...
+ ✓ Compiled /login in 13.7s (859 modules)
+ GET /login 200 in 1047ms
+ GET /login 200 in 284ms
+ GET /login 200 in 430ms
+ ⚠ Cross origin request detected from 127.0.0.1 to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+ GET /login 200 in 599ms
+ ○ Compiling /api/auth/login ...
+ ✓ Compiled /api/auth/login in 3.6s (981 modules)
+ POST /api/auth/login 403 in 4222ms
+ GET /login 200 in 792ms
+ POST /api/auth/login 403 in 94ms
+ POST /api/auth/login 403 in 72ms
+
+C:\Users\Administrator\Desktop\qr_menue>

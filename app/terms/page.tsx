@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { LandingHeader } from "@/components/shared/LandingHeader"
 import { JsonLd } from "@/components/JsonLd"
+import { COMPANY_INFO } from "@/lib/company-info"
 
 export const metadata: Metadata = {
   title: "Terms of Service — Digital QR Menue | Restaurant QR Menu Platform Agreement",
@@ -25,7 +26,9 @@ const sections = [
     title: "1. Acceptance of Terms",
     content: `By creating an account or using Digital QR Menue ("the Service"), you agree to be bound by these Terms of Service. If you do not agree, do not use the Service.
 
-These Terms apply to all restaurant owners, staff, and customers who access or interact with the platform.`,
+These Terms apply to all restaurant owners, staff, and customers who access or interact with the platform.
+
+${COMPANY_INFO.ownershipStatement}. Our registered address is ${COMPANY_INFO.address}.`,
   },
   {
     title: "2. Account Registration",
@@ -37,7 +40,8 @@ You must be at least 18 years old to create an account. If you are registering o
     title: "3. Subscription & Billing",
     content: `Digital QR Menue offers tiered subscription plans: Free Trial (30 days), Starter (PKR 1,500/month), Growth (PKR 2,500/month), and Premium (PKR 4,500/month).
 
-• All prices are in Pakistani Rupees (PKR) and exclusive of applicable taxes
+• All prices are in Pakistani Rupees (PKR) and are exclusive of applicable taxes
+• Prices are the same regardless of payment method — no surcharges are applied for card payments, bank transfers, JazzCash, or Easypaisa
 • Subscriptions auto-renew monthly unless cancelled
 • You may upgrade, downgrade, or cancel at any time
 • No refunds for partial months — you retain access until the end of the paid period
@@ -60,7 +64,9 @@ You represent that you have the rights to any images or content you upload and t
     title: "6. QR Code & Menu Availability",
     content: `We strive to keep the Service available 24/7 but do not guarantee uninterrupted access. We reserve the right to temporarily suspend access for maintenance, updates, or emergencies.
 
-QR codes generated through the Service remain functional as long as your account is active. If your subscription expires or is cancelled, the menu page will be taken offline.`,
+QR codes generated through the Service remain functional as long as your account is active. If your subscription expires or is cancelled, the menu page will be taken offline.
+
+Operational hours for support: ${COMPANY_INFO.hours.full.join("; ")}.`,
   },
   {
     title: "7. WhatsApp Ordering",
@@ -69,7 +75,18 @@ QR codes generated through the Service remain functional as long as your account
 Restaurants are responsible for confirming, preparing, and delivering orders received through the platform. Customers are responsible for providing accurate contact and order details.`,
   },
   {
-    title: "8. Prohibited Conduct",
+    title: "8. Dispatch & Fulfillment",
+    content: `Restaurants using Digital QR Menue agree to:
+• Communicate estimated dispatch/preparation times to customers at order confirmation
+• Notify customers promptly if an order cannot be fulfilled within the estimated time
+• Verify the customer's delivery address before dispatching delivery orders
+• Issue transaction receipts to customers within 7 days of order completion
+• Retain transaction records for at least 5 years in compliance with payment processor requirements
+
+Customers are advised to verify their delivery address at checkout and ensure their contact information is accurate. Typical dispatch times are 20–45 minutes from order confirmation, though this varies by restaurant and order complexity.`,
+  },
+  {
+    title: "9. Prohibited Conduct",
     content: `You agree not to:
 • Use the Service for any unlawful purpose under Pakistani law
 • Upload harmful code, malware, or attempt to breach platform security
@@ -78,7 +95,7 @@ Restaurants are responsible for confirming, preparing, and delivering orders rec
 • Use the Service to distribute spam or unsolicited communications`,
   },
   {
-    title: "9. Limitation of Liability",
+    title: "10. Limitation of Liability",
     content: `Digital QR Menue is provided "as is" without warranties of any kind, express or implied. We are not liable for:
 • Loss of business, revenue, or profits
 • Indirect, incidental, or consequential damages
@@ -88,22 +105,22 @@ Restaurants are responsible for confirming, preparing, and delivering orders rec
 Our total liability is limited to the amount you paid us in the 12 months preceding the claim.`,
   },
   {
-    title: "10. Termination",
+    title: "11. Termination",
     content: `You may terminate your account at any time by contacting us via WhatsApp or email. We may suspend or terminate your account if you violate these Terms, with or without notice.
 
 Upon termination, your data will be retained for 90 days before permanent deletion. If you re-subscribe within that period, your data will be restored.`,
   },
   {
-    title: "11. Governing Law",
+    title: "12. Governing Law",
     content: `These Terms are governed by the laws of the Islamic Republic of Pakistan. Any disputes arising from these Terms shall be subject to the exclusive jurisdiction of the courts of Lahore, Pakistan.
 
 This agreement shall be construed in accordance with the Prevention of Electronic Crimes Act (PECA) 2016 and other applicable Pakistani laws.`,
   },
   {
-    title: "12. Changes to Terms",
+    title: "13. Changes to Terms",
     content: `We may update these Terms from time to time. Material changes will be notified via email or through your dashboard. Continued use of the Service after changes constitutes acceptance of the updated Terms.
 
-These Terms were last updated on July 5, 2026.`,
+These Terms were last updated on July 20, 2026.`,
   },
 ]
 
@@ -152,7 +169,12 @@ export default function TermsPage() {
 
         <section className="py-16 md:py-24">
           <div className="max-w-3xl mx-auto px-5">
-            <p className="text-xs text-[#888] mb-6">Last updated: July 5, 2026</p>
+            <p className="text-xs text-[#888] mb-6">Last updated: July 20, 2026</p>
+
+            <div className="p-4 bg-[#F9FAFB] rounded-xl border border-[#E8E8E8] mb-8">
+              <p className="text-sm font-semibold text-black">{COMPANY_INFO.ownershipStatement}</p>
+            </div>
+
             <div className="space-y-10">
               {sections.map((section, i) => (
                 <div key={i}>
@@ -168,14 +190,25 @@ export default function TermsPage() {
                 For questions about these Terms, contact us at:
               </p>
               <p className="text-sm text-[#555] mt-2">
-                <strong>Email:</strong> support@digitalmenue.com
+                <strong>Email:</strong> {COMPANY_INFO.support.email}
               </p>
               <p className="text-sm text-[#555]">
                 <strong>WhatsApp:</strong>{" "}
-                <a href="https://wa.me/923146325823" target="_blank" rel="noopener noreferrer" className="text-black underline">
-                  +92-314-6325823
+                <a href={`https://wa.me/${COMPANY_INFO.support.whatsapp.replace(/[^0-9]/g, "")}`} target="_blank" rel="noopener noreferrer" className="text-black underline">
+                  {COMPANY_INFO.support.whatsapp}
                 </a>
               </p>
+              <p className="text-sm text-[#555]">
+                <strong>Address:</strong> {COMPANY_INFO.address}
+              </p>
+              <p className="text-sm text-[#555]">
+                <strong>Operational Hours:</strong>
+              </p>
+              <ul className="text-sm text-[#555] list-disc list-inside mt-1">
+                {COMPANY_INFO.hours.full.map((h, i) => (
+                  <li key={i}>{h}</li>
+                ))}
+              </ul>
             </div>
 
             <div className="mt-10 text-center">
@@ -183,8 +216,16 @@ export default function TermsPage() {
                 Also read our{" "}
                 <Link href="/privacy" className="text-black underline">
                   Privacy Policy
-                </Link>{" "}
-                and{" "}
+                </Link>
+                ,{" "}
+                <Link href="/refund" className="text-black underline">
+                  Return &amp; Refund Policy
+                </Link>
+                ,{" "}
+                <Link href="/shipping" className="text-black underline">
+                  Shipping Policy
+                </Link>
+                , and{" "}
                 <Link href="/about" className="text-black underline">
                   About Us
                 </Link>

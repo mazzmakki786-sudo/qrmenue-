@@ -19,7 +19,7 @@ export function OrganizationJsonLd() {
         "@type": "Organization",
         name: "Digital QR Menue",
         url: "https://digitalmenue.com",
-        logo: "https://digitalmenue.com/favicon.svg",
+        logo: "https://digitalmenue.com/icon.svg",
         description:
           "Pakistan's leading QR-based digital menu and ordering platform for restaurants. Create a free QR code menu in under 5 minutes.",
         foundingDate: "2024",
@@ -341,7 +341,7 @@ export function LocalBusinessJsonLd() {
         description:
           "Pakistan's leading free digital QR menu and WhatsApp ordering platform for restaurants, cafes, and food businesses across Pakistan. Create a QR code menu, get orders on WhatsApp, and save on commissions.",
         url: "https://digitalmenue.com",
-        logo: "https://digitalmenue.com/favicon.svg",
+        logo: "https://digitalmenue.com/icon.svg",
         image: "https://www.digitalmenue.com/og-image.png",
         telephone: "+92-314-6325823",
         email: "dmenue@gmail.com",

@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { LandingHeader } from "@/components/shared/LandingHeader"
 import { JsonLd } from "@/components/JsonLd"
+import { COMPANY_INFO } from "@/lib/company-info"
 
 export const metadata: Metadata = {
   title: "About Us — Pakistan's Free QR Menu & WhatsApp Ordering Platform",
@@ -51,6 +52,12 @@ export default function AboutPage() {
             foundingDate: "2024",
             foundingLocation: "Lahore, Pakistan",
             areaServed: "PK",
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: "Lahore",
+              addressRegion: "Punjab",
+              addressCountry: "PK",
+            },
             description:
               "Pakistan's leading free digital QR menu and WhatsApp online ordering platform for restaurants. No commissions, no app download, instant updates.",
           },
@@ -142,6 +149,35 @@ export default function AboutPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* Company Information */}
+            <div className="mb-16">
+              <h2 className="text-2xl md:text-3xl font-bold mb-2 text-center">Company Information</h2>
+              <p className="text-sm text-[#555] text-center mb-8 max-w-md mx-auto">
+                Details about the company behind Digital QR Menue.
+              </p>
+              <div className="p-6 md:p-8 bg-[#F9FAFB] rounded-2xl border border-[#E8E8E8]">
+                <p className="text-sm font-semibold text-black mb-6 text-center">{COMPANY_INFO.ownershipStatement}</p>
+                <div className="grid sm:grid-cols-2 gap-4 text-sm">
+                  {[
+                    { label: "Owner", value: COMPANY_INFO.owner },
+                    { label: "Founded", value: COMPANY_INFO.founding.year },
+                    { label: "Location", value: COMPANY_INFO.founding.location },
+                    { label: "Address", value: COMPANY_INFO.address },
+                    { label: "Email", value: COMPANY_INFO.support.email },
+                    { label: "WhatsApp", value: COMPANY_INFO.support.whatsapp },
+                    { label: "Operational Hours (Mon–Fri)", value: COMPANY_INFO.hours.weekday },
+                    { label: "Saturday", value: COMPANY_INFO.hours.saturday },
+                    { label: "Sunday", value: COMPANY_INFO.hours.sunday },
+                  ].map((item, i) => (
+                    <div key={i} className="p-3 bg-white rounded-xl border border-[#F0F0F0]">
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-[#999] mb-1">{item.label}</p>
+                      <p className="text-sm font-medium text-black">{item.value}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 

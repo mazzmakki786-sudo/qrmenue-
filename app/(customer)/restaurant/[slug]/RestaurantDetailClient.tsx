@@ -5,13 +5,12 @@ import Image from "next/image"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
-import { MapPin, Phone, ArrowLeft, UtensilsCrossed, Clock, Navigation, Truck, Timer, ShoppingCart, Minus, Plus, Trash2, Percent, ImageOff, ChevronDown, Store } from "lucide-react"
+import { MapPin, Phone, ArrowLeft, UtensilsCrossed, Clock, Navigation, Truck, Timer, ShoppingCart, Minus, Plus, Trash2, Percent, ImageOff, Store } from "lucide-react"
 import { formatTo12Hour, formatPrice } from "@/lib/utils"
 import { isRestaurantOpen } from "@/lib/restaurant-hours"
 import { useRouter } from "next/navigation"
 import { useCartStore } from "@/stores/cartStore"
 import { CartBar } from "@/components/customer/CartBar"
-import { Card as DishCard } from "@/components/customer/DishGrid"
 import { DealBanner } from "@/components/customer/DealBanner"
 import { DishBadges } from "@/components/customer/DishBadges"
 import type { Category, Deal, Dish } from "@/types"
@@ -54,73 +53,75 @@ function DesktopCartPanel({ effectivelyClosed, liveOpenTime, liveCloseTime }: { 
 
   if (totalItems === 0 || !restaurantId) {
     return (
-      <div className="bg-white border border-border rounded-2xl p-6 text-center">
-        <div className="w-12 h-12 rounded-xl bg-surface flex items-center justify-center mx-auto mb-3">
-          <ShoppingCart className="w-6 h-6 text-text-muted" />
+      <div className="border border-dashed border-border rounded-2xl p-8 text-center">
+        <div className="w-14 h-14 rounded-2xl bg-surface flex items-center justify-center mx-auto mb-4">
+          <ShoppingCart className="w-7 h-7 text-text-muted" />
         </div>
-        <p className="text-sm text-text-muted font-medium">Your cart is empty</p>
-        <p className="text-xs text-text-muted/70 mt-1">Add items from the menu</p>
+        <p className="text-sm font-semibold text-text-primary mb-1">Your cart is empty</p>
+        <p className="text-[13px] text-text-muted leading-relaxed">Browse the menu and add dishes to get started</p>
       </div>
     )
   }
 
   return (
-    <div className="bg-white border border-border rounded-2xl overflow-hidden">
-      <div className="p-4 border-b border-border flex items-center justify-between">
-        <h3 className="text-sm font-bold text-text-primary">Your Cart</h3>
-        <span className="text-xs text-text-muted">{totalItems} item{totalItems !== 1 ? "s" : ""}</span>
+    <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm">
+      <div className="px-5 py-4 border-b border-border/60 flex items-center justify-between">
+        <h3 className="text-sm font-bold text-text-primary flex items-center gap-2">
+          <ShoppingCart className="w-4 h-4 text-text-muted" />
+          Your Order
+        </h3>
+        <span className="text-[12px] text-text-muted font-medium bg-surface px-2.5 py-1 rounded-full">{totalItems} item{totalItems !== 1 ? "s" : ""}</span>
       </div>
-      <div className="p-4 space-y-3 max-h-[50vh] overflow-y-auto">
+      <div className="px-5 py-4 space-y-3 max-h-[55vh] overflow-y-auto">
         {items.map((item) => (
-          <div key={item.dish.id} className="flex items-center gap-3">
+          <div key={item.dish.id} className="flex items-center gap-3 py-2 border-b border-border/30 last:border-0">
             {item.dish.image_url && (
-              <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 relative bg-surface">
-                <Image src={item.dish.image_url} alt={`${item.dish.name_en} in cart`} width={40} height={40} className="object-cover w-full h-full" />
+              <div className="w-11 h-11 rounded-xl overflow-hidden shrink-0 relative bg-surface ring-1 ring-black/5">
+                <Image src={item.dish.image_url} alt={`${item.dish.name_en} in cart`} width={44} height={44} className="object-cover w-full h-full" />
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-text-primary truncate">{item.dish.name_en}</p>
-              <p className="text-[11px] text-text-muted">Rs {item.dish.price.toLocaleString("en-PK")}</p>
+              <p className="text-[13px] font-semibold text-text-primary truncate">{item.dish.name_en}</p>
+              <p className="text-[11px] text-text-muted mt-0.5">Rs {item.dish.price.toLocaleString("en-PK")} each</p>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               <button
                 onClick={() => updateQuantity(item.dish.id, item.quantity - 1)}
-                className="w-7 h-7 rounded-full bg-surface flex items-center justify-center hover:bg-border transition-colors"
+                className="w-7 h-7 rounded-full bg-surface flex items-center justify-center hover:bg-border transition-colors active:scale-90"
+                aria-label="Decrease quantity"
               >
-                <Minus className="w-3 h-3" />
+                <Minus className="w-3 h-3 text-text-secondary" />
               </button>
-              <span className="text-xs font-bold min-w-[18px] text-center text-text-primary">{item.quantity}</span>
+              <span className="text-sm font-bold min-w-[20px] text-center text-text-primary">{item.quantity}</span>
               <button
                 onClick={() => addItem(item.dish)}
                 disabled={effectivelyClosed}
-                className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-hover transition-colors disabled:opacity-30"
+                className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-hover transition-colors disabled:opacity-30 active:scale-90"
+                aria-label="Increase quantity"
               >
                 <Plus className="w-3 h-3" />
               </button>
               <button
                 onClick={() => removeItem(item.dish.id)}
-                className="w-7 h-7 rounded-full flex items-center justify-center text-text-muted hover:text-error hover:bg-error/5 transition-colors ml-0.5"
+                className="w-7 h-7 rounded-full flex items-center justify-center text-text-muted hover:text-error hover:bg-error/5 transition-colors ml-1 active:scale-90"
+                aria-label="Remove item"
               >
-                <Trash2 className="w-3 h-3" />
+                <Trash2 className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
         ))}
       </div>
-      {restaurantName && (
-        <div className="px-4 pb-2">
-          <p className="text-[10px] text-text-muted text-center">{restaurantName}</p>
-        </div>
-      )}
-      <div className="px-4 pb-4 pt-2 border-t border-border mx-4">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-sm text-text-secondary">Total</span>
-          <span className="text-lg font-bold text-text-primary">Rs {getTotalPrice().toLocaleString("en-PK")}</span>
+      <div className="px-5 pb-5 pt-3 border-t border-border/60 mx-5">
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-sm text-text-secondary font-medium">Total</span>
+          <span className="text-xl font-bold text-text-primary">Rs {getTotalPrice().toLocaleString("en-PK")}</span>
         </div>
         {effectivelyClosed ? (
-          <div className="bg-error/10 border border-error/20 rounded-xl p-3 text-center">
-            <p className="text-xs font-semibold text-error">Restaurant is closed</p>
-            <p className="text-[10px] text-text-muted mt-0.5">
+          <div className="bg-error/5 border border-error/15 rounded-xl p-4 text-center">
+            <Store className="w-5 h-5 text-error mx-auto mb-1.5" />
+            <p className="text-[13px] font-semibold text-error">Restaurant is closed</p>
+            <p className="text-[11px] text-text-muted mt-1">
               {liveOpenTime && liveCloseTime
                 ? `Open ${formatTo12Hour(liveOpenTime)} — ${formatTo12Hour(liveCloseTime)}`
                 : "Orders are not being accepted right now"}
@@ -129,10 +130,13 @@ function DesktopCartPanel({ effectivelyClosed, liveOpenTime, liveCloseTime }: { 
         ) : (
           <Link
             href="/checkout"
-            className="block w-full bg-primary text-white text-center py-3 rounded-xl text-sm font-semibold hover:bg-primary-hover transition-colors active:scale-[0.98]"
+            className="block w-full bg-primary text-white text-center py-3.5 rounded-xl text-sm font-semibold hover:bg-primary-hover transition-all active:scale-[0.98] shadow-sm"
           >
             Proceed to Checkout
           </Link>
+        )}
+        {restaurantName && (
+          <p className="text-[11px] text-text-muted/60 text-center mt-3">{restaurantName}</p>
         )}
       </div>
     </div>
@@ -156,48 +160,44 @@ function DesktopDishCard({ dish, deals, unavailable, closed }: { dish: Dish; dea
     : null
 
   return (
-    <div className={`flex gap-4 p-4 bg-white rounded-2xl border border-border hover:shadow-[0_4px_24px_rgba(0,0,0,0.08)] transition-all duration-300 ${unavailable ? "opacity-50" : ""}`}>
-      <div className="relative w-28 h-28 shrink-0 overflow-hidden rounded-xl bg-surface">
+    <div className={`group bg-white rounded-2xl border border-border overflow-hidden transition-all duration-200 hover:shadow-[0_4px_24px_rgba(0,0,0,0.07)] hover:border-border-strong ${unavailable ? "opacity-50" : ""}`}>
+      {/* Image */}
+      <div className="relative w-full aspect-[16/9] bg-surface overflow-hidden">
         {dish.image_url && !imgError ? (
           <Image
             src={dish.image_url}
             alt={`${dish.name_en}${dish.name_ur ? ` (${dish.name_ur})` : ""} — ₹${dish.price}`}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
-            sizes="112px"
+            sizes="(max-width: 1280px) 50vw, 33vw"
             loading="lazy"
             onError={() => setImgError(true)}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-surface to-border/20">
             <ImageOff className="w-8 h-8 text-text-muted/30" />
           </div>
         )}
-        <div className="absolute top-1.5 left-1.5">
-          {dishDeal && (
-            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-primary/10 text-primary">
-              <Percent className="w-2 h-2" />
+        {/* Deal badge */}
+        {dishDeal && (
+          <div className="absolute top-2 left-2">
+            <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[9px] font-bold bg-white/90 text-primary shadow-sm">
+              <Percent className="w-2.5 h-2.5" />
               {dishDeal.deal_type === "percentage" ? `${dishDeal.deal_value}%` : `Rs ${dishDeal.deal_value}`} OFF
             </span>
-          )}
-        </div>
+          </div>
+        )}
         {unavailable && (
-          <div className="absolute inset-0 bg-black/30 flex items-center justify-center rounded-xl backdrop-blur-[1px]">
-            <span className="text-white text-[10px] font-semibold bg-black/60 px-2.5 py-1 rounded-full">Unavailable</span>
+          <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+            <span className="text-white text-[10px] font-semibold bg-black/60 px-3 py-1 rounded-full">Unavailable</span>
           </div>
         )}
       </div>
-      <div className="flex-1 flex flex-col min-w-0">
-        <div className="flex justify-between items-start gap-2">
-          <div className="min-w-0 flex-1">
-            <h3 className="text-sm font-semibold text-text-primary">{dish.name_en}</h3>
-            {dish.name_ur && <p className="text-[11px] text-text-secondary mt-0.5 font-urdu">{dish.name_ur}</p>}
-            {(badges.length > 0) && (
-              <div className="flex flex-wrap gap-1 mt-1">
-                <DishBadges tags={badges} />
-              </div>
-            )}
-          </div>
+
+      {/* Info */}
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-3 mb-1.5">
+          <h3 className="text-sm font-semibold text-text-primary leading-snug">{dish.name_en}</h3>
           <div className="text-right shrink-0">
             {dealPrice !== null ? (
               <>
@@ -205,22 +205,35 @@ function DesktopDishCard({ dish, deals, unavailable, closed }: { dish: Dish; dea
                 <p className="text-[10px] text-text-muted line-through">Rs {dish.price.toLocaleString("en-PK")}</p>
               </>
             ) : (
-              <span className="text-sm font-bold text-text-primary">Rs {dish.price.toLocaleString("en-PK")}</span>
+              <span className="text-sm font-bold text-text-primary whitespace-nowrap">Rs {dish.price.toLocaleString("en-PK")}</span>
             )}
           </div>
         </div>
-        {dish.description_en && (
-          <p className="text-[12px] text-text-secondary leading-relaxed line-clamp-2 mt-1.5">{dish.description_en}</p>
+
+        {dish.name_ur && <p className="text-[11px] text-text-secondary font-urdu leading-tight mb-1.5">{dish.name_ur}</p>}
+
+        {badges.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-1.5">
+            <DishBadges tags={badges} />
+          </div>
         )}
-        <div className="mt-auto pt-2 flex justify-end">
+
+        {dish.description_en && (
+          <p className="text-[12px] text-text-secondary leading-relaxed line-clamp-2 mb-3">{dish.description_en}</p>
+        )}
+
+        {!dish.description_en && <div className="mb-3" />}
+
+        {/* Add/Quantity */}
+        <div className="flex justify-end">
           {cartItem ? (
-            <div className="flex items-center gap-2 bg-surface rounded-full px-2.5 py-1">
-              <button onClick={() => updateQuantity(dish.id, cartItem.quantity - 1)} className="w-8 h-8 rounded-full flex items-center justify-center text-primary font-bold hover:bg-white/50 transition-colors text-lg">−</button>
-              <span className="text-sm font-bold min-w-[22px] text-center text-text-primary">{cartItem.quantity}</span>
-              <button onClick={() => addItem(dish)} disabled={closed} className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-hover transition-colors disabled:opacity-30 text-lg font-bold">+</button>
+            <div className="inline-flex items-center gap-1.5 bg-surface-dark rounded-full px-1.5 py-1">
+              <button onClick={() => updateQuantity(dish.id, cartItem.quantity - 1)} className="w-8 h-8 rounded-full flex items-center justify-center text-primary font-bold hover:bg-white/60 transition-colors text-[18px]">−</button>
+              <span className="text-[13px] font-bold min-w-[22px] text-center text-text-primary">{cartItem.quantity}</span>
+              <button onClick={() => addItem(dish)} disabled={closed} className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-hover transition-colors disabled:opacity-30 text-[18px] font-bold">+</button>
             </div>
           ) : (
-            <button onClick={() => addItem(dish)} disabled={unavailable || closed} className="bg-primary text-white rounded-full px-5 py-2 text-xs font-semibold hover:bg-primary-hover active:scale-[0.95] transition-all duration-200 disabled:opacity-50">
+            <button onClick={() => addItem(dish)} disabled={unavailable || closed} className="inline-flex items-center gap-1 bg-primary text-white rounded-full px-4 py-2 text-xs font-semibold hover:bg-primary-hover active:scale-[0.95] transition-all duration-200 disabled:opacity-50">
               {closed ? "Closed" : "+ Add"}
             </button>
           )}
@@ -247,15 +260,15 @@ function MobileDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deal
     : null
 
   return (
-    <div className={`bg-white rounded-xl border border-border overflow-hidden transition-all ${unavailable ? "opacity-50" : ""}`}>
-      {/* Image — clean, no overlay badges */}
+    <div className={`group bg-white rounded-xl border border-border overflow-hidden transition-all duration-200 ${unavailable ? "opacity-50" : ""}`}>
+      {/* Image */}
       <div className="relative w-full aspect-[4/3] bg-surface overflow-hidden">
         {dish.image_url && !imgError ? (
           <Image
             src={dish.image_url}
             alt={`${dish.name_en}${dish.name_ur ? ` (${dish.name_ur})` : ""} — ₹${dish.price}`}
             fill
-            className="object-cover"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
             sizes="(max-width: 768px) 50vw, 200px"
             loading="lazy"
             onError={() => setImgError(true)}
@@ -265,30 +278,27 @@ function MobileDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deal
             <ImageOff className="w-6 h-6 text-text-muted/30" />
           </div>
         )}
-        {/* Only deal badge stays on image */}
+        {/* Deal badge */}
         {dishDeal && (
-          <div className="absolute top-1.5 left-1.5">
-            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-bold bg-primary/10 text-primary">
+          <div className="absolute top-2 left-2">
+            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-bold bg-white/90 text-primary shadow-sm">
               <Percent className="w-2 h-2" />
               {dishDeal.deal_type === "percentage" ? `${dishDeal.deal_value}%` : `Rs ${dishDeal.deal_value}`} OFF
             </span>
           </div>
         )}
         {unavailable && (
-          <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-            <span className="text-white text-[9px] font-semibold bg-black/60 px-2 py-0.5 rounded-full">Unavailable</span>
+          <div className="absolute inset-0 bg-black/20 flex items-center justify-center backdrop-blur-[1px]">
+            <span className="text-white text-[9px] font-semibold bg-black/60 px-2.5 py-1 rounded-full">Unavailable</span>
           </div>
         )}
       </div>
 
-      {/* Info — name + tags + price + add button in balanced layout */}
+      {/* Info */}
       <div className="p-2.5">
-        <div className="flex items-start justify-between gap-1">
-          <div className="min-w-0 flex-1">
-            <h3 className="text-[12px] font-semibold text-text-primary line-clamp-1 leading-tight">{dish.name_en}</h3>
-            {dish.name_ur && <p className="text-[9px] text-text-secondary font-urdu line-clamp-1">{dish.name_ur}</p>}
-          </div>
-          <span className="text-[13px] font-bold text-text-primary shrink-0 mt-0.5">
+        <div className="flex items-start justify-between gap-1 mb-1">
+          <h3 className="text-[12px] font-semibold text-text-primary line-clamp-1 leading-tight flex-1">{dish.name_en}</h3>
+          <span className="text-[12px] font-bold text-text-primary shrink-0 ml-1">
             {dealPrice !== null ? (
               <span className="text-primary">{formatPrice(dealPrice)}</span>
             ) : (
@@ -297,26 +307,29 @@ function MobileDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deal
           </span>
         </div>
 
-        {/* Tags moved here — next to name */}
+        {dish.name_ur && <p className="text-[9px] text-text-secondary font-urdu line-clamp-1 leading-tight mb-1">{dish.name_ur}</p>}
+
         {badges.length > 0 && (
-          <div className="flex flex-wrap gap-0.5 mt-1">
+          <div className="flex flex-wrap gap-0.5 mb-1">
             <DishBadges tags={badges} />
           </div>
         )}
 
         {dish.description_en && (
-          <p className="text-[9px] text-text-secondary line-clamp-1 mt-1">{dish.description_en}</p>
+          <p className="text-[9px] text-text-secondary line-clamp-1 leading-relaxed mb-2">{dish.description_en}</p>
         )}
 
-        <div className="flex justify-end mt-2">
+        {!dish.description_en && <div className="mb-2" />}
+
+        <div className="flex justify-end">
           {cartItem ? (
-            <div className="flex items-center gap-1.5 bg-surface-dark rounded-full px-2 py-1 min-h-[32px]">
-              <button onClick={() => updateQuantity(dish.id, cartItem.quantity - 1)} className="w-8 h-8 rounded-full flex items-center justify-center text-primary font-bold hover:bg-white/50 transition-colors text-[16px]">−</button>
-              <span className="text-[13px] font-bold min-w-[18px] text-center text-text-primary">{cartItem.quantity}</span>
-              <button onClick={() => addItem(dish)} disabled={closed} className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-hover transition-colors disabled:opacity-30 text-[16px] font-bold">+</button>
+            <div className="inline-flex items-center gap-1 bg-surface-dark rounded-full px-1.5 py-0.5 min-h-[30px]">
+              <button onClick={() => updateQuantity(dish.id, cartItem.quantity - 1)} className="w-7 h-7 rounded-full flex items-center justify-center text-primary font-bold hover:bg-white/60 transition-colors text-[15px]">−</button>
+              <span className="text-[12px] font-bold min-w-[18px] text-center text-text-primary">{cartItem.quantity}</span>
+              <button onClick={() => addItem(dish)} disabled={closed} className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-hover transition-colors disabled:opacity-30 text-[15px] font-bold">+</button>
             </div>
           ) : (
-            <button onClick={() => addItem(dish)} disabled={unavailable || closed} className="bg-primary text-white rounded-full px-5 py-2 text-xs font-semibold hover:bg-primary-hover active:scale-[0.95] transition-all disabled:opacity-50 flex items-center gap-1 min-h-[36px]">
+            <button onClick={() => addItem(dish)} disabled={unavailable || closed} className="inline-flex items-center gap-1 bg-primary text-white rounded-full px-3.5 py-1.5 text-[10px] font-semibold hover:bg-primary-hover active:scale-[0.95] transition-all duration-200 disabled:opacity-50">
               {closed ? "Closed" : "+ Add"}
             </button>
           )}
@@ -329,6 +342,7 @@ function MobileDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deal
 export function RestaurantDetailClient({ restaurant, categories }: Props) {
   const router = useRouter()
   const [logoError, setLogoError] = useState(false)
+  const [coverError, setCoverError] = useState(false)
   const [liveIsOpen, setLiveIsOpen] = useState(restaurant.is_open ?? true)
   const [liveOpenTime, setLiveOpenTime] = useState(restaurant.opening_time ? restaurant.opening_time.slice(0, 5) : undefined)
   const [liveCloseTime, setLiveCloseTime] = useState(restaurant.closing_time ? restaurant.closing_time.slice(0, 5) : undefined)
@@ -336,10 +350,6 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
   const setRestaurant = useCartStore((s) => s.setRestaurant)
   const clearCart = useCartStore((s) => s.clearCart)
   const currentRestaurantId = useCartStore((s) => s.restaurantId)
-  const cartItems = useCartStore((s) => s.items)
-  const totalCartItems = useMemo(() => cartItems.reduce((sum, i) => sum + i.quantity, 0), [cartItems])
-  const [activeCategory, setActiveCategory] = useState<string | null>(null)
-
   const isTimeClosed = !isRestaurantOpen(
     restaurant.opening_time,
     restaurant.closing_time,
@@ -391,7 +401,6 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
   }, [restaurant.id, restaurant.name, restaurant.slug])
 
   function scrollToCategory(categoryId: string) {
-    setActiveCategory(categoryId)
     const el = document.getElementById(`desk-cat-${categoryId}`)
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" })
   }
@@ -414,8 +423,8 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
           >
             <ArrowLeft className="w-4 h-4 text-text-primary" />
           </button>
-          <h2 className="text-[13px] font-semibold text-text-primary mx-2">
-            Digital QR Menue
+          <h2 className="text-[13px] font-semibold text-text-primary mx-2 truncate">
+            {restaurant.name}
           </h2>
           <div className="w-8" />
         </div>
@@ -423,64 +432,120 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
 
       {/* ===== MOBILE LAYOUT ===== */}
       <div className="md:hidden pt-12">
-        <main className="pt-2 pb-[100px] px-4 mx-auto">
-          {/* Compact Restaurant Info */}
-          <div className="flex items-start gap-3 py-4 border-b border-border/50 mb-3">
-            {restaurant.logo_url && !logoError ? (
-              <div className="w-12 h-12 rounded-xl overflow-hidden shadow-sm ring-1 ring-black/5 relative flex-shrink-0 bg-white">
-                <Image src={restaurant.logo_url} alt={restaurant.name} fill className="object-cover" sizes="48px" loading="lazy" onError={() => setLogoError(true)} />
-              </div>
-            ) : (
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-[#8F2E19] text-white flex items-center justify-center font-bold text-base flex-shrink-0 shadow-sm">
-                {restaurant.name.charAt(0).toUpperCase()}
-              </div>
-            )}
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-sm font-bold text-text-primary leading-tight truncate">{restaurant.name_ur || restaurant.name}</h1>
-                <span className={`inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
-                  !effectivelyClosed ? "bg-accent/10 text-accent" : "bg-error/10 text-error"
-                }`}>
-                  <span className={`w-1.5 h-1.5 rounded-full ${!effectivelyClosed ? "bg-accent" : "bg-error"}`} />
-                  {effectivelyClosed ? "Closed" : "Open"}
-                </span>
-              </div>
-              <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10px] text-text-secondary mt-0.5">
-                {restaurant.cuisine_type && <span>{restaurant.cuisine_type}</span>}
-                {restaurant.city && <><span className="text-border-strong">·</span><span>{restaurant.city}</span></>}
-                {liveOpenTime && liveCloseTime && <><span className="text-border-strong">·</span><span className="flex items-center gap-0.5"><Clock className="w-2.5 h-2.5" />{formatTo12Hour(liveOpenTime)} — {formatTo12Hour(liveCloseTime)}</span></>}
-              </div>
-              {(restaurant.delivery_time_min != null || restaurant.delivery_fee != null) && (
-                <div className="flex items-center gap-2 text-[10px] text-text-secondary mt-0.5">
-                  {restaurant.delivery_time_min != null && <span className="flex items-center gap-0.5"><Timer className="w-2.5 h-2.5" />{restaurant.delivery_time_min} min</span>}
-                  {restaurant.delivery_fee != null && <span className="flex items-center gap-0.5"><Truck className="w-2.5 h-2.5" />{restaurant.delivery_fee === 0 ? "Free delivery" : `Rs\xa0${restaurant.delivery_fee}`}</span>}
-                </div>
+        <main className="pb-[100px] mx-auto">
+          {/* Hero Image */}
+          {restaurant.logo_url && !logoError && (
+            <div className="relative w-full h-44 bg-surface overflow-hidden">
+              {!coverError ? (
+                <Image
+                  src={restaurant.logo_url}
+                  alt={restaurant.name}
+                  fill
+                  className="object-cover"
+                  sizes="100vw"
+                  priority
+                  onError={() => setCoverError(true)}
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-primary to-primary/60" />
               )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+              <div className="absolute bottom-4 left-4 right-4 z-10">
+                <div className="flex items-end gap-3">
+                  <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-white/90 shadow-lg relative shrink-0 bg-white">
+                    <Image src={restaurant.logo_url} alt={restaurant.name} fill className="object-cover" sizes="56px" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h1 className="text-white text-lg font-bold leading-tight drop-shadow-sm">{restaurant.name_ur || restaurant.name}</h1>
+                    <div className="flex items-center gap-1.5 text-white/80 text-[11px] mt-0.5">
+                      {restaurant.cuisine_type && <span>{restaurant.cuisine_type}</span>}
+                      {restaurant.city && <><span className="text-white/40">·</span><span>{restaurant.city}</span></>}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {(!restaurant.logo_url || logoError) && (
+            <div className="px-4 pt-4 pb-3">
+              <div className="flex items-start gap-3">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-[#8F2E19] text-white flex items-center justify-center font-bold text-xl shrink-0 shadow-sm">
+                  {restaurant.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-lg font-bold text-text-primary leading-tight">{restaurant.name_ur || restaurant.name}</h1>
+                  <div className="flex items-center gap-1.5 text-[11px] text-text-secondary mt-0.5">
+                    {restaurant.cuisine_type && <span>{restaurant.cuisine_type}</span>}
+                    {restaurant.city && <><span className="text-border">·</span><span>{restaurant.city}</span></>}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Status + Info chips */}
+          <div className="px-4 pt-3 pb-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full ${
+                !effectivelyClosed ? "bg-accent/8 text-accent" : "bg-error/8 text-error"
+              }`}>
+                <span className={`relative w-1.5 h-1.5 rounded-full ${!effectivelyClosed ? "bg-accent" : "bg-error"}`}>
+                  {!effectivelyClosed && <span className="absolute inset-0 rounded-full bg-accent animate-ping opacity-30" />}
+                </span>
+                {effectivelyClosed ? "Closed" : "Open now"}
+              </span>
+              {liveOpenTime && liveCloseTime && (
+                <span className="text-[11px] text-text-secondary flex items-center gap-1">
+                  <Clock className="w-3 h-3 text-text-muted" />
+                  {formatTo12Hour(liveOpenTime)} — {formatTo12Hour(liveCloseTime)}
+                </span>
+              )}
+              {restaurant.delivery_time_min != null && (
+                <span className="text-[11px] text-text-secondary flex items-center gap-1">
+                  <Timer className="w-3 h-3 text-text-muted" />
+                  {restaurant.delivery_time_min} min
+                </span>
+              )}
+            </div>
+            {restaurant.delivery_fee != null && (
+              <span className="text-[11px] text-text-secondary flex items-center gap-1 mt-1.5">
+                <Truck className="w-3 h-3 text-text-muted" />
+                {restaurant.delivery_fee === 0 ? "Free delivery" : `Delivery: Rs\xa0${restaurant.delivery_fee}`}
+              </span>
+            )}
+          </div>
+
+          {/* Description — if no hero image */}
+          {restaurant.description && !restaurant.logo_url && (
+            <p className="px-4 text-[13px] text-text-secondary leading-relaxed pb-3 border-b border-border/40">{restaurant.description}</p>
+          )}
+
+          {/* Action Buttons */}
+          <div className="px-4 pt-3 pb-2">
+            <div className="flex gap-2">
+              {restaurant.phone && (
+                <a href={`tel:${restaurant.phone}`} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-primary text-white text-[12px] font-semibold active:scale-[0.97] transition-transform">
+                  <Phone className="w-3.5 h-3.5" /> Call
+                </a>
+              )}
+              {(restaurant.lat && restaurant.lng) || restaurant.address ? (
+                <a
+                  href={restaurant.lat && restaurant.lng ? `https://www.google.com/maps?q=${restaurant.lat},${restaurant.lng}` : `https://www.google.com/maps/search/${encodeURIComponent(restaurant.address || "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-border text-text-secondary text-[12px] font-semibold active:scale-[0.97] transition-transform"
+                >
+                  <Navigation className="w-3.5 h-3.5" /> Direction
+                </a>
+              ) : null}
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-2 mb-3">
-            {restaurant.phone && (
-              <a href={`tel:${restaurant.phone}`} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-primary text-white text-[11px] font-semibold active:scale-[0.97] transition-transform">
-                <Phone className="w-3.5 h-3.5" /> Call
-              </a>
-            )}
-            {restaurant.lat && restaurant.lng ? (
-              <a href={`https://www.google.com/maps?q=${restaurant.lat},${restaurant.lng}`} target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border border-border text-text-secondary text-[11px] font-semibold active:scale-[0.97] transition-transform">
-                <Navigation className="w-3.5 h-3.5" /> Map
-              </a>
-            ) : restaurant.address ? (
-              <a href={`https://www.google.com/maps/search/${encodeURIComponent(restaurant.address)}`} target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border border-border text-text-secondary text-[11px] font-semibold active:scale-[0.97] transition-transform">
-                <MapPin className="w-3.5 h-3.5" /> Map
-              </a>
-            ) : null}
-          </div>
-
-          {/* Sticky Category Tabs (below Call/Map) */}
+          {/* Sticky Category Pills */}
           {categories.length > 0 && (
-            <div className="sticky top-12 z-30 bg-white/95 backdrop-blur-md border-b border-border/50 overflow-x-auto no-scrollbar -mx-4 px-4 mb-3">
-              <div className="flex gap-0.5 py-2 min-w-max">
+            <div className="sticky top-12 z-30 bg-white/95 backdrop-blur-md border-b border-border/40 overflow-x-auto no-scrollbar px-4">
+              <div className="flex gap-1.5 py-2.5 min-w-max" role="tablist">
                 {categories.map((cat) => {
                   if (cat.dishes.length === 0) return null
                   return (
@@ -490,7 +555,7 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
                         const el = document.getElementById(`m-cat-${cat.id}`)
                         if (el) el.scrollIntoView({ behavior: "smooth", block: "start" })
                       }}
-                      className="whitespace-nowrap text-[11px] font-medium px-3 py-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface transition-colors"
+                      className="whitespace-nowrap text-[12px] font-semibold px-4 py-2 rounded-full bg-surface text-text-secondary hover:bg-surface-dark hover:text-text-primary transition-all active:scale-95"
                     >
                       {cat.name_en}
                     </button>
@@ -500,49 +565,52 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
             </div>
           )}
 
-          {deals.length > 0 && <div className="mb-3 animate-fade-in"><DealBanner restaurantId={restaurant.id} slug={restaurant.slug} /></div>}
+          <div className="px-4 pt-3">
+            {deals.length > 0 && <div className="mb-4 animate-fade-in"><DealBanner restaurantId={restaurant.id} slug={restaurant.slug} /></div>}
 
-          {effectivelyClosed && (
-            <div className="bg-error/5 border border-error/20 rounded-xl px-3 py-2.5 mb-3 flex items-center gap-2.5">
-              <div className="w-6 h-6 rounded-full bg-error flex items-center justify-center shrink-0">
-                <Store className="w-3 h-3 text-white" />
+            {effectivelyClosed && (
+              <div className="bg-error/5 border border-error/20 rounded-xl px-4 py-3 mb-4 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-error flex items-center justify-center shrink-0">
+                  <Store className="w-4 h-4 text-white" />
+                </div>
+                <p className="text-[12px] text-error font-semibold">
+                  {liveOpenTime && liveCloseTime
+                    ? `Open today ${formatTo12Hour(liveOpenTime)} — ${formatTo12Hour(liveCloseTime)}`
+                    : "Closed right now"}
+                </p>
               </div>
-              <p className="text-[11px] text-error font-semibold">
-                {liveOpenTime && liveCloseTime
-                  ? `Open today ${formatTo12Hour(liveOpenTime)} — ${formatTo12Hour(liveCloseTime)}`
-                  : "Closed right now"}
-              </p>
-            </div>
-          )}
+            )}
 
-          {/* Categories + 2-Column Dish Grid */}
-          {categories.length > 0 ? (
-            <div className="space-y-5">
-              {categories.map((category) => {
-                const availableDishes = category.dishes.filter((d) => d.is_available)
-                const unavailableDishes = category.dishes.filter((d) => !d.is_available)
-                if (availableDishes.length === 0 && unavailableDishes.length === 0) return null
-                return (
-                  <section key={category.id} id={`m-cat-${category.id}`} className="scroll-mt-28">
-                    <h2 className="text-[13px] font-bold text-text-primary border-l-[3px] border-primary pl-2 mb-2.5 leading-tight">
-                      {category.name_en}
-                    </h2>
-                    <div className="grid grid-cols-2 gap-2">
-                      {availableDishes.map((dish) => <MobileDishCard key={dish.id} dish={dish} closed={effectivelyClosed} deals={deals} />)}
-                      {unavailableDishes.map((dish) => <MobileDishCard key={dish.id} dish={dish} unavailable closed={effectivelyClosed} deals={deals} />)}
-                    </div>
-                  </section>
-                )
-              })}
-            </div>
-          ) : (
-            <div className="py-12 text-center">
-              <div className="w-12 h-12 rounded-xl bg-[#F5F5F5] flex items-center justify-center mx-auto mb-3">
-                <UtensilsCrossed className="w-6 h-6 text-primary" />
+            {/* Categories + 2-Column Dish Grid */}
+            {categories.length > 0 ? (
+              <div className="space-y-6 pb-4">
+                {categories.map((category) => {
+                  const availableDishes = category.dishes.filter((d) => d.is_available)
+                  const unavailableDishes = category.dishes.filter((d) => !d.is_available)
+                  if (availableDishes.length === 0 && unavailableDishes.length === 0) return null
+                  return (
+                    <section key={category.id} id={`m-cat-${category.id}`} className="scroll-mt-28">
+                      <div className="flex items-center gap-2 mb-3">
+                        <h2 className="text-[14px] font-bold text-text-primary">{category.name_en}</h2>
+                        <span className="h-px flex-1 bg-border/50" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2.5">
+                        {availableDishes.map((dish) => <MobileDishCard key={dish.id} dish={dish} closed={effectivelyClosed} deals={deals} />)}
+                        {unavailableDishes.map((dish) => <MobileDishCard key={dish.id} dish={dish} unavailable closed={effectivelyClosed} deals={deals} />)}
+                      </div>
+                    </section>
+                  )
+                })}
               </div>
-              <p className="text-sm text-text-muted font-medium">No menu items available</p>
-            </div>
-          )}
+            ) : (
+              <div className="py-12 text-center">
+                <div className="w-12 h-12 rounded-xl bg-surface flex items-center justify-center mx-auto mb-3">
+                  <UtensilsCrossed className="w-6 h-6 text-primary" />
+                </div>
+                <p className="text-sm text-text-muted font-medium">No menu items available</p>
+              </div>
+            )}
+          </div>
         </main>
         <CartBar closed={effectivelyClosed} />
       </div>
@@ -550,38 +618,38 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
       {/* ===== DESKTOP LAYOUT ===== */}
       <div className="hidden md:block">
         {/* HERO SECTION */}
-        <div className="bg-gradient-to-b from-surface to-white pt-16 pb-8 border-b border-border">
+        <div className="bg-white pt-16 pb-10 border-b border-border/60">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="flex items-start gap-5">
+            <div className="flex items-start gap-6">
               {restaurant.logo_url && !logoError ? (
-                <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-md ring-1 ring-black/5 relative shrink-0 bg-white">
+                <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-sm ring-1 ring-black/5 relative shrink-0 bg-white">
                   <Image src={restaurant.logo_url} alt={`${restaurant.name} logo`} fill className="object-cover" sizes="80px" loading="lazy" />
                 </div>
               ) : (
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-[#8F2E19] text-white flex items-center justify-center font-bold text-2xl shrink-0 shadow-md">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-[#8F2E19] text-white flex items-center justify-center font-bold text-2xl shrink-0 shadow-sm">
                   {restaurant.name.charAt(0).toUpperCase()}
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex items-start justify-between gap-6">
                   <div className="min-w-0">
-                    <h1 className="text-2xl font-bold text-text-primary">{restaurant.name_ur || restaurant.name}</h1>
-                    <div className="flex items-center gap-3 mt-1.5 text-sm text-text-secondary">
+                    <h1 className="text-2xl font-bold text-text-primary tracking-tight">{restaurant.name_ur || restaurant.name}</h1>
+                    <div className="flex items-center gap-2 mt-1.5 text-sm text-text-secondary">
                       {restaurant.city && (
                         <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {restaurant.city}</span>
                       )}
                       {restaurant.cuisine_type && (
-                        <span className="flex items-center gap-1"><UtensilsCrossed className="w-3.5 h-3.5" /> {restaurant.cuisine_type}</span>
+                        <><span className="w-1 h-1 rounded-full bg-border" /><span className="flex items-center gap-1"><UtensilsCrossed className="w-3.5 h-3.5" /> {restaurant.cuisine_type}</span></>
                       )}
                     </div>
                     {restaurant.description && (
                       <p className="text-sm text-text-secondary mt-2 max-w-2xl leading-relaxed">{restaurant.description}</p>
                     )}
                   </div>
-                  <div className="shrink-0 flex items-center gap-3">
+                  <div className="shrink-0 flex items-center gap-2.5">
                     {restaurant.phone && (
-                      <a href={`tel:${restaurant.phone}`} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold hover:opacity-90 transition-all active:scale-[0.97]">
-                        <Phone className="w-4 h-4" /> Call
+                      <a href={`tel:${restaurant.phone}`} className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-border text-text-primary text-sm font-semibold hover:bg-surface transition-all active:scale-[0.97]">
+                        <Phone className="w-3.5 h-3.5" /> Call
                       </a>
                     )}
                     {(restaurant.lat && restaurant.lng) || restaurant.address ? (
@@ -589,35 +657,37 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
                         href={restaurant.lat && restaurant.lng ? `https://www.google.com/maps?q=${restaurant.lat},${restaurant.lng}` : `https://www.google.com/maps/search/${encodeURIComponent(restaurant.address || "")}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-border text-text-secondary text-sm font-semibold hover:bg-[#FAFAFA] transition-all active:scale-[0.97]"
+                        className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary-hover transition-all active:scale-[0.97]"
                       >
-                        <Navigation className="w-4 h-4" /> Directions
+                        <Navigation className="w-3.5 h-3.5" /> Directions
                       </a>
                     ) : null}
                   </div>
                 </div>
-                <div className="flex items-center gap-4 mt-4 flex-wrap">
-                  <span className={`inline-flex items-center gap-1.5 text-sm font-bold px-4 py-1.5 rounded-full ${
-                    !effectivelyClosed ? "bg-accent/10 text-accent" : "bg-error/10 text-error"
+                <div className="flex items-center gap-4 mt-4 flex-wrap text-sm">
+                  <span className={`inline-flex items-center gap-1.5 font-semibold px-3.5 py-1.5 rounded-full ${
+                    !effectivelyClosed ? "bg-accent/8 text-accent" : "bg-error/8 text-error"
                   }`}>
-                    <span className={`w-2.5 h-2.5 rounded-full ${!effectivelyClosed ? "bg-accent" : "bg-error"}`} />
-                    {effectivelyClosed ? "Closed" : "Open"}
+                    <span className={`relative w-2 h-2 rounded-full ${!effectivelyClosed ? "bg-accent" : "bg-error"}`}>
+                      {!effectivelyClosed && <span className="absolute inset-0 rounded-full bg-accent animate-ping opacity-30" />}
+                    </span>
+                    {effectivelyClosed ? "Closed" : "Open now"}
                   </span>
                   {liveOpenTime && liveCloseTime && (
-                    <span className="text-sm text-text-secondary font-medium flex items-center gap-1.5">
-                      <Clock className="w-4 h-4 text-text-muted" />
+                    <span className="text-text-secondary font-medium flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-text-muted" />
                       {formatTo12Hour(liveOpenTime)} — {formatTo12Hour(liveCloseTime)}
                     </span>
                   )}
                   {restaurant.delivery_time_min != null && (
-                    <span className="text-sm text-text-secondary font-medium flex items-center gap-1.5">
-                      <Timer className="w-4 h-4 text-text-muted" />
+                    <span className="text-text-secondary font-medium flex items-center gap-1.5">
+                      <Timer className="w-3.5 h-3.5 text-text-muted" />
                       {restaurant.delivery_time_min} min
                     </span>
                   )}
                   {restaurant.delivery_fee != null && (
-                    <span className="text-sm text-text-secondary font-medium flex items-center gap-1.5">
-                      <Truck className="w-4 h-4 text-text-muted" />
+                    <span className="text-text-secondary font-medium flex items-center gap-1.5">
+                      <Truck className="w-3.5 h-3.5 text-text-muted" />
                       {restaurant.delivery_fee === 0 ? "Free delivery" : `Rs\xa0${restaurant.delivery_fee}`}
                     </span>
                   )}
@@ -632,18 +702,21 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
           <div className="flex gap-8">
             {/* LEFT SIDEBAR — Category Nav */}
             {hasAnyDishes && (
-              <aside className="w-52 shrink-0">
-                <nav className="sticky top-20 space-y-0.5">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-text-muted mb-3 px-3">Menu</p>
+              <aside className="w-48 shrink-0">
+                <nav className="sticky top-24 space-y-1">
                   {categories.map((cat) => {
                     if (cat.dishes.length === 0) return null
+                    const availableCount = cat.dishes.filter((d) => d.is_available).length
                     return (
                       <button
                         key={cat.id}
                         onClick={() => scrollToCategory(cat.id)}
-                        className="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-text-secondary hover:bg-surface hover:text-text-primary transition-colors"
+                        className="group block w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-medium text-text-secondary hover:bg-surface hover:text-text-primary transition-all"
                       >
-                        {cat.name_en}
+                        <span className="flex items-center justify-between">
+                          <span>{cat.name_en}</span>
+                          <span className="text-[10px] text-text-muted group-hover:text-text-secondary transition-colors">{availableCount}</span>
+                        </span>
                       </button>
                     )
                   })}
@@ -676,15 +749,18 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
               )}
 
               {categories.length > 0 ? (
-                <div className="space-y-10">
+                <div className="space-y-12">
                   {categories.map((category) => {
                     const availableDishes = category.dishes.filter((d) => d.is_available)
                     const unavailableDishes = category.dishes.filter((d) => !d.is_available)
                     if (availableDishes.length === 0 && unavailableDishes.length === 0) return null
                     return (
                       <section key={category.id} id={`desk-cat-${category.id}`}>
-                        <h2 className="text-lg font-bold text-text-primary mb-4 border-l-[3px] border-primary pl-3">{category.name_en}</h2>
-                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+                        <div className="flex items-center gap-3 mb-5">
+                          <h2 className="text-lg font-bold text-text-primary">{category.name_en}</h2>
+                          <span className="h-px flex-1 bg-border/60" />
+                        </div>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                           {availableDishes.map((dish) => <DesktopDishCard key={dish.id} dish={dish} closed={effectivelyClosed} deals={deals} />)}
                           {unavailableDishes.map((dish) => <DesktopDishCard key={dish.id} dish={dish} unavailable closed={effectivelyClosed} deals={deals} />)}
                         </div>

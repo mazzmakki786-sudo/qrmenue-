@@ -82,7 +82,11 @@ export function AnnouncementsPanel() {
       const res = await fetch(`/api/superadmin/announcements/${id}/publish`, { method: "POST" })
       if (res.ok) {
         const json = await res.json()
-        alert(`Published! Notified ${json.notified} of ${json.total} restaurant owners.`)
+        const parts = []
+        if (json.emailNotified > 0) parts.push(`${json.emailNotified} emails`)
+        if (json.pushNotified > 0) parts.push(`${json.pushNotified} push`)
+        const delivery = parts.length ? ` (${parts.join(", ")})` : ""
+        alert(`Published! Delivered to all ${json.total} restaurant owners${delivery}.`)
         fetchAnnouncements()
       }
     } finally {

@@ -6,7 +6,8 @@ import { safeRoute } from "@/lib/api-error"
  * GET /api/public/tables?restaurant_id=xxx
  *
  * Public endpoint — no auth required.
- * Returns only active, un-occupied tables so customers can pick one at checkout.
+ * Returns active, un-occupied tables so customers can pick one at checkout.
+ * Also returns can_have_tables based on the restaurant's plan.
  */
 export const GET = safeRoute(async (request) => {
   const { searchParams } = new URL(request.url)
@@ -17,6 +18,20 @@ export const GET = safeRoute(async (request) => {
   }
 
   const supabase = await createClient()
+
+  // Check restaurant plan — tables only for growth+ plans
+  const { data: restaurant } = await supabase
+    .from("restaurants")
+    .select("plan")
+    .eq("id", restaurantId)
+    .single()
+
+  const TABLES_ENABLED_PLANS = ["growth", "growth-yearly", "premium", "premium-yearly"]
+  const canHaveTables = restaurant ? TABLES_ENABLED_PLANS.includes(restaurant.plan) : false
+
+  if (!canHaveTables) {
+    return NextResponse.json({ tables: [], can_have_tables: false })
+  }
 
   const { data: tables, error } = await supabase
     .from("restaurant_tables")
@@ -31,5 +46,5 @@ export const GET = safeRoute(async (request) => {
     return NextResponse.json({ error: "Failed to fetch tables" }, { status: 500 })
   }
 
-  return NextResponse.json({ tables })
+  return NextResponse.json({ tables, can_have_tables: true })
 })

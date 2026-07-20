@@ -15,7 +15,7 @@ export function LandingHeader() {
         <div className="max-w-6xl mx-auto flex items-center justify-between px-5 h-14">
           <Link href="/" className="flex items-center gap-2 font-bold text-sm md:text-base shrink-0 min-w-0">
             <Image
-              src="/logos/logo-d-star-qr.svg"
+              src="/icon.svg"
               alt="Digital QR Menue"
               width={28}
               height={28}
@@ -134,6 +134,16 @@ export function LandingHeader() {
             className="block px-3 py-2 rounded-lg text-xs text-[#999] hover:bg-[#F5F5F5] hover:text-[#555] transition-colors"
           >
             Terms of Service
+          </Link>
+          <Link href="/refund" onClick={close}
+            className="block px-3 py-2 rounded-lg text-xs text-[#999] hover:bg-[#F5F5F5] hover:text-[#555] transition-colors"
+          >
+            Return &amp; Refund Policy
+          </Link>
+          <Link href="/shipping" onClick={close}
+            className="block px-3 py-2 rounded-lg text-xs text-[#999] hover:bg-[#F5F5F5] hover:text-[#555] transition-colors"
+          >
+            Shipping Policy
           </Link>
         </nav>
 

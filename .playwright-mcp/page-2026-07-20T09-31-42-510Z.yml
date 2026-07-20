@@ -1,0 +1,51 @@
+- generic [active] [ref=f2e1]:
+  - generic [ref=f2e2]:
+    - complementary [ref=f2e3]:
+      - generic [ref=f2e4]:
+        - img "Digital QR Menue" [ref=f2e6]
+        - generic [ref=f2e7]:
+          - generic [ref=f2e8]: Digital QR
+          - generic [ref=f2e9]: Menue
+      - navigation [ref=f2e10]:
+        - link "Dashboard" [ref=f2e11] [cursor=pointer]:
+          - /url: /dashboard
+        - link "Menu" [ref=f2e18] [cursor=pointer]:
+          - /url: /dashboard/menu
+        - link "Deals" [ref=f2e25] [cursor=pointer]:
+          - /url: /dashboard/deals
+        - link "Orders" [ref=f2e31] [cursor=pointer]:
+          - /url: /dashboard/orders
+        - link "Announcements" [ref=f2e37] [cursor=pointer]:
+          - /url: /dashboard/announcements
+        - link "Analytics" [ref=f2e42] [cursor=pointer]:
+          - /url: /dashboard/analytics
+        - link "Profile" [ref=f2e46] [cursor=pointer]:
+          - /url: /dashboard/settings
+        - link "Subscription" [ref=f2e51] [cursor=pointer]:
+          - /url: /dashboard/subscription
+        - link "QR Code" [ref=f2e55] [cursor=pointer]:
+          - /url: /dashboard/qr
+      - button "Sign Out" [ref=f2e65] [cursor=pointer]
+    - banner [ref=f2e70]:
+      - heading "Orders" [level=1] [ref=f2e73]
+      - generic [ref=f2e74]:
+        - button "Enable push notifications" [ref=f2e75] [cursor=pointer]
+        - link "Profile" [ref=f2e79] [cursor=pointer]:
+          - /url: /dashboard/settings
+    - main [ref=f2e84]:
+      - generic [ref=f2e85]:
+        - generic [ref=f2e86]:
+          - generic [ref=f2e87]:
+            - heading "Orders" [level=1] [ref=f2e89]
+            - paragraph [ref=f2e94]: 0 orders
+          - generic [ref=f2e95]:
+            - button "Today" [ref=f2e96] [cursor=pointer]
+            - button "Week" [ref=f2e97] [cursor=pointer]
+            - button "Last Month" [ref=f2e98] [cursor=pointer]
+            - button "All" [ref=f2e99] [cursor=pointer]
+            - button "Refresh orders" [disabled] [ref=f2e100]
+        - textbox "Search by order number..." [ref=f2e108]
+        - generic [ref=f2e115]:
+          - generic [ref=f2e116]: Digital QR Menue
+          - generic [ref=f2e117]: © 2026 Digital QR Menue. All rights reserved.
+  - alert [ref=f2e118]

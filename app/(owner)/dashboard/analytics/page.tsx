@@ -142,7 +142,7 @@ export default function AnalyticsPage() {
         </div>
         <div className="bg-white border border-[#F0F0F0] p-4 rounded-2xl">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-[#555]">Total Revenue</p>
-          <p className="text-2xl font-bold text-black mt-1 truncate">{formatPrice(totalRevenue)}</p>
+          <p className="text-2xl font-bold text-black mt-1">{formatPrice(totalRevenue)}</p>
         </div>
       </div>
 

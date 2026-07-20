@@ -48,3 +48,72 @@ export const GET = safeRoute(async (request) => {
 
   return NextResponse.json({ subscriptions: data, total: count, offset, limit })
 })
+
+// POST: Create a new subscription record (superadmin manual activation)
+export const POST = safeRoute(async (request) => {
+  await checkRateLimit(request, "superadmin:write")
+
+  const supabase = createAdminClient()
+  const admin = createAdminClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  const superAdminEmail = process.env.SUPER_ADMIN_EMAIL
+  if (!superAdminEmail || user.email !== superAdminEmail) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  }
+
+  const body = await request.json()
+  const { restaurant_id, plan_type, price, start_date, end_date } = body
+
+  if (!restaurant_id || !plan_type || !price) {
+    return NextResponse.json({ error: "Missing required fields: restaurant_id, plan_type, price" }, { status: 400 })
+  }
+
+  // Create subscription record
+  const { data: subscription, error: subError } = await admin
+    .from("subscriptions")
+    .insert({
+      restaurant_id,
+      plan: plan_type,
+      amount_pkr: price,
+      payment_method: "manual",
+      payment_ref: `SUPERADMIN_${Date.now()}`,
+      status: "active",
+      billing_interval: "monthly",
+      start_date: start_date || new Date().toISOString(),
+      end_date: end_date || null,
+      activated_by: user.id,
+      notes: `Manually activated by superadmin (${user.email})`,
+    })
+    .select()
+    .single()
+
+  if (subError) {
+    console.error("[Superadmin Subscriptions] Failed to create subscription:", subError)
+    return NextResponse.json({ error: "Failed to create subscription" }, { status: 500 })
+  }
+
+  // Also update the restaurant's plan fields
+  const { error: updateError } = await admin
+    .from("restaurants")
+    .update({
+      plan: plan_type,
+      plan_start_date: start_date || new Date().toISOString(),
+      plan_end_date: end_date || null,
+      is_suspended: false,
+      is_active: true,
+    })
+    .eq("id", restaurant_id)
+
+  if (updateError) {
+    console.error("[Superadmin Subscriptions] Failed to update restaurant plan:", updateError)
+  }
+
+  return NextResponse.json({ subscription })
+})

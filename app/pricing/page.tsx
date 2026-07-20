@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { PricingSection } from "@/components/pricing/PricingSection"
 import { LandingHeader } from "@/components/shared/LandingHeader"
-import { mapPlan, type DBPlan } from "@/lib/map-plans"
+import { mergeYearlyPlans, type DBPlan } from "@/lib/map-plans"
 import { PricingJsonLd, FaqJsonLd } from "@/components/JsonLd"
 import { createAdminClient } from "@/lib/supabase/server"
 
@@ -39,7 +39,7 @@ const pricingFaqs = [
   },
   {
     question: "How do I pay?",
-    answer: "JazzCash, Easypaisa, or bank transfer. After payment, message us on WhatsApp and we'll activate your plan within minutes.",
+    answer: "Easypaisa or bank transfer. After payment, message us on WhatsApp and we'll activate your plan within minutes.",
   },
   {
     question: "Is there a commission on orders?",
@@ -49,13 +49,26 @@ const pricingFaqs = [
 
 export default async function PricingPage() {
   const admin = createAdminClient()
-  const { data: dbPlans } = await admin
-    .from("plans")
-    .select("*")
-    .eq("is_active", true)
-    .order("sort_order", { ascending: true })
 
-  const initialPlans = (dbPlans as DBPlan[] | null)?.map(mapPlan) || []
+  const [plansRes, settingsRes] = await Promise.all([
+    admin.from("plans").select("*").eq("is_active", true).order("sort_order", { ascending: true }),
+    admin.from("company_settings").select("key, value"),
+  ])
+
+  const plansData = plansRes.data as DBPlan[] | null
+  const initialPlans = plansData ? mergeYearlyPlans(plansData) : []
+
+  // Get WhatsApp support number
+  let whatsappNumber = ""
+  if (settingsRes.data) {
+    const whatsappSetting = settingsRes.data.find((s: any) => s.key === "whatsapp_support")
+    if (whatsappSetting) {
+      whatsappNumber = whatsappSetting.value.replace(/[^0-9]/g, "")
+      if (whatsappNumber.startsWith("0")) {
+        whatsappNumber = "92" + whatsappNumber.slice(1)
+      }
+    }
+  }
 
   return (
     <>
@@ -66,6 +79,7 @@ export default async function PricingPage() {
         heading="Plans & Pricing"
         description="No hidden fees. No commission on orders. Cancel anytime."
         initialPlans={initialPlans}
+        whatsappNumber={whatsappNumber}
       />
     </>
   )

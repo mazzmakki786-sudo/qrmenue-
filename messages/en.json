@@ -73,7 +73,6 @@
     "cancelled": "Cancelled",
     "pending": "Pending",
     "deals": "Deals",
-    "aiPosts": "AI Posts",
     "newDeal": "New Deal",
     "editDeal": "Edit Deal",
     "activeDeals": "Active Deals",
@@ -91,19 +90,11 @@
     "disabled": "Disabled",
     "expired": "Expired",
     "upcoming": "Upcoming",
-    "aiPostGenerator": "AI Post Generator",
-    "aiPostsHistory": "Generated Posts",
-    "aiPostsRemaining": "Remaining this month",
     "generatePost": "Generate Post",
     "download": "Download",
-    "noAiPosts": "No posts generated yet",
-    "noAiPostsDesc": "Generate your first AI-powered promotional post",
-    "generateFirstPost": "Generate First Post",
     "selectLanguage": "Language",
     "selectRatio": "Aspect Ratio",
-    "selectImages": "Select Images",
-    "writePrompt": "Write a prompt for the AI",
-    "promptPlaceholder": "e.g. Create a post about our weekend BBQ special..."
+    "selectImages": "Select Images"
   },
   "superadmin": {
     "allRestaurants": "All Restaurants",

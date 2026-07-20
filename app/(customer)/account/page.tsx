@@ -149,8 +149,12 @@ export default function AccountPage() {
   // All restaurants collapsed (minimized) by default — user clicks to expand
 
   const handleLogout = async () => {
+    try {
+      const supabase = createClient()
+      await supabase.auth.signOut()
+    } catch {}
     try { await fetch("/api/auth/logout", { method: "POST" }) } catch {}
-    window.location.href = "/restaurants"
+    router.replace("/restaurants")
   }
 
   if (loading) {

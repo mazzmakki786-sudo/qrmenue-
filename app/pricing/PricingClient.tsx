@@ -1,111 +1,13 @@
 "use client"
 
+import { useEffect, useState } from "react"
+import { Pricing2 } from "@/components/ui/pricing-cards"
+import { mergeYearlyPlans, type DBPlan } from "@/lib/map-plans"
 import Link from "next/link"
 import Image from "next/image"
 import { Check, X } from "lucide-react"
 import { AppFooter } from "@/components/shared/AppFooter"
 import { useCompanySettings } from "@/lib/hooks/useCompanySettings"
-import { useEffect, useState } from "react"
-import { PLAN_PRICES, PLAN_NAMES, DEFAULT_TRIAL_LIMITS, type Plan } from "@/lib/subscription"
-
-interface DBPlan {
-  slug: string
-  name: string
-  price: number
-  limits: {
-    maxDishes: number
-    maxImages: number
-    maxOrders: number
-    maxCategories: number
-    analytics: boolean
-    customBranding: boolean
-    canHaveQR: boolean
-    canHaveWhatsapp: boolean
-  }
-  description: string
-}
-
-const planKeys: Plan[] = ["trial", "starter", "growth", "premium"]
-
-interface PlanCard {
-  key: string
-  name: string
-  price: string
-  period: string
-  badge: string | null
-  popular: boolean
-  features: { label: string; inc: boolean }[]
-}
-
-function buildPlanData(key: Plan, dbPlan?: DBPlan): PlanCard {
-  const name = dbPlan?.name || PLAN_NAMES[key]
-  const price = dbPlan?.price ?? PLAN_PRICES[key]
-
-  const limits = dbPlan?.limits ? {
-    maxDishes: dbPlan.limits.maxDishes === -1 ? Infinity : dbPlan.limits.maxDishes,
-    maxImages: dbPlan.limits.maxImages === -1 ? Infinity : dbPlan.limits.maxImages,
-    maxOrders: dbPlan.limits.maxOrders === -1 ? Infinity : dbPlan.limits.maxOrders,
-    maxCategories: dbPlan.limits.maxCategories === -1 ? Infinity : dbPlan.limits.maxCategories,
-  } : null
-
-  const features: { label: string; inc: boolean }[] = []
-
-  if (key === "trial") {
-    features.push(
-      { label: `${limits?.maxDishes ?? DEFAULT_TRIAL_LIMITS.maxDishes} dishes`, inc: true },
-      { label: `${limits?.maxImages ?? 20} dish images`, inc: true },
-      { label: `${limits?.maxOrders ?? DEFAULT_TRIAL_LIMITS.maxOrders} orders`, inc: true },
-      { label: "QR code generation", inc: true },
-      { label: "WhatsApp orders", inc: true },
-      { label: "Analytics dashboard", inc: true },
-    )
-    return {
-      key, name, price: "0", period: "30 days",
-      badge: "30 days", popular: false, features,
-    }
-  }
-
-  if (key === "starter") {
-    features.push(
-      { label: `${limits?.maxDishes ?? 30} dishes`, inc: true },
-      { label: `${limits?.maxImages ?? 10} dish images`, inc: true },
-      { label: "Unlimited orders", inc: true },
-      { label: "QR code generation", inc: true },
-      { label: "WhatsApp orders", inc: true },
-      { label: "Analytics dashboard", inc: true },
-    )
-    return {
-      key, name, price: price.toLocaleString(), period: "month",
-      badge: null, popular: false, features,
-    }
-  }
-
-  if (key === "growth") {
-    features.push(
-      { label: `${limits?.maxDishes ?? 50} dishes`, inc: true },
-      { label: `${limits?.maxImages ?? 20} dish images`, inc: true },
-      { label: "Unlimited orders", inc: true },
-      { label: "Priority support", inc: true },
-      { label: "Everything in Starter", inc: true },
-    )
-    return {
-      key, name, price: price.toLocaleString(), period: "month",
-      badge: "Most Popular", popular: true, features,
-    }
-  }
-
-  features.push(
-    { label: `${limits?.maxDishes ?? 100} dishes`, inc: true },
-    { label: `${limits?.maxImages ?? 100} dish images`, inc: true },
-    { label: "Unlimited orders", inc: true },
-    { label: "Priority support", inc: true },
-    { label: "Everything in Growth", inc: true },
-  )
-  return {
-    key, name, price: price.toLocaleString(), period: "month",
-    badge: null, popular: false, features,
-  }
-}
 
 const comparisonFeatures = [
   { label: "Menu Items", trial: "20", starter: "30", growth: "50", premium: "100" },
@@ -121,38 +23,18 @@ const comparisonFeatures = [
 
 export function PricingClient() {
   const { settings, loading } = useCompanySettings()
-  const [dbPlans, setDbPlans] = useState<DBPlan[]>([])
+  const [plans, setPlans] = useState<any[]>([])
 
   useEffect(() => {
     fetch("/api/plans")
       .then((res) => res.json())
       .then((data) => {
         if (data.plans) {
-          setDbPlans(data.plans.map((p: any) => ({
-            slug: p.slug,
-            name: p.name,
-            price: p.price_pkr,
-            limits: {
-              maxDishes: p.max_dishes,
-              maxImages: p.max_images,
-              maxOrders: p.max_orders,
-              maxCategories: p.max_categories,
-              analytics: p.analytics,
-              customBranding: p.custom_branding,
-              canHaveQR: p.can_have_qr,
-              canHaveWhatsapp: p.can_have_whatsapp,
-            },
-            description: p.description,
-          })))
+          setPlans(mergeYearlyPlans(data.plans))
         }
       })
       .catch(() => {})
   }, [])
-
-  const plans: PlanCard[] = planKeys.map((key) => {
-    const dbPlan = dbPlans.find((p) => p.slug === key)
-    return buildPlanData(key, dbPlan)
-  })
 
   const whatsapp = settings.whatsapp_support || "03001234567"
   const whatsappDigits = whatsapp.replace(/[^0-9]/g, "")
@@ -160,129 +42,12 @@ export function PricingClient() {
 
   return (
     <>
-      {/* Hero with integrated pricing */}
-      <section className="max-w-6xl mx-auto px-5 pt-12 md:pt-20 pb-16 md:pb-24 text-center">
-        <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-3 md:mb-4">
-          Simple, Transparent Pricing
-        </h1>
-        <p className="text-sm md:text-base text-[#888] max-w-md mx-auto mb-10 md:mb-14">
-          No hidden fees. No commission on orders. Cancel anytime.
-        </p>
-
-        {/* Mobile: Horizontal Scroll Carousel */}
-        <div className="md:hidden">
-          <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory px-5 pb-2 no-scrollbar pt-4" style={{ WebkitOverflowScrolling: "touch" }}>
-            {plans.map((plan) => (
-              <div
-                key={plan.key}
-                className={`relative snap-center shrink-0 w-[78%] first:ml-0 last:mr-0 rounded-2xl border p-5 flex flex-col transition-all ${
-                  plan.popular
-                    ? "bg-black text-white border-black shadow-xl"
-                    : "bg-white border-[#F0F0F0] shadow-sm"
-                }`}
-              >
-                {plan.badge && (
-                  <span className={`inline-flex mx-auto mb-3 text-[10px] font-bold px-3 py-0.5 rounded-full whitespace-nowrap uppercase tracking-wider ${
-                    plan.popular ? "bg-[#25D366] text-black" : "bg-black/5 text-[#888] border border-[#E8E8E8]"
-                  }`}>
-                    {plan.popular ? "MOST POPULAR" : plan.badge}
-                  </span>
-                )}
-                <div className="mb-5">
-                  <h3 className="text-sm font-bold">{plan.name}</h3>
-                  <div className="mt-1.5 flex items-baseline justify-center gap-1">
-                    <span className="text-2xl font-bold">PKR {plan.price}</span>
-                    <span className={`text-xs ${plan.popular ? "text-white/60" : "text-[#888]"}`}>/{plan.period}</span>
-                  </div>
-                </div>
-
-                <div className="flex-1 space-y-2.5 mb-5">
-                  {plan.features.map((f) => (
-                    <div key={f.label} className="flex items-start gap-2 text-sm">
-                      {f.inc ? (
-                        <Check className={`w-4 h-4 ${plan.popular ? "text-[#25D366]" : "text-[#16A34A]"} flex-shrink-0 mt-0.5`} />
-                      ) : (
-                        <X className={`w-4 h-4 ${plan.popular ? "text-white/30" : "text-[#CCC]"} flex-shrink-0 mt-0.5`} />
-                      )}
-                      <span className={f.inc ? (plan.popular ? "text-white/90" : "text-[#333]") : (plan.popular ? "text-white/40" : "text-[#BBB]")}>{f.label}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <Link
-                  href={plan.key === "trial" ? "/signup" : "/signup/restaurant"}
-                  className={`block w-full py-2.5 rounded-xl text-sm font-semibold text-center transition-all ${
-                    plan.popular
-                      ? "bg-white text-black hover:bg-[#F0F0F0]"
-                      : "border border-[#F0F0F0] text-[#555] hover:border-black hover:text-black"
-                  }`}
-                >
-                  {plan.key === "trial" ? "Start Free Trial" : "Choose Plan"}
-                </Link>
-              </div>
-            ))}
-          </div>
-          {/* Scroll indicators */}
-          <div className="flex justify-center gap-1.5 mt-4">
-            {plans.map((plan) => (
-              <div key={plan.key} className={`h-1.5 rounded-full transition-all ${plan.popular ? "w-6 bg-black" : "w-1.5 bg-[#DDD]"}`} />
-            ))}
-          </div>
-        </div>
-
-        {/* Desktop: 4-column grid */}
-        <div className="hidden md:grid grid-cols-4 gap-6 px-5">
-          {plans.map((plan) => (
-            <div
-              key={plan.key}
-              className={`relative rounded-2xl border p-6 flex flex-col transition-all hover:shadow-lg ${
-                plan.popular
-                  ? "bg-black text-white border-black shadow-xl scale-105 z-10"
-                  : "bg-white border-[#F0F0F0]"
-              }`}
-            >
-              {plan.badge && (
-                <span className={`inline-flex mx-auto mb-4 text-[11px] font-bold px-4 py-1 rounded-full whitespace-nowrap uppercase tracking-wider ${
-                  plan.popular ? "bg-[#25D366] text-black" : "bg-black/5 text-[#888] border border-[#E8E8E8]"
-                }`}>
-                  {plan.popular ? "MOST POPULAR" : plan.badge}
-                </span>
-              )}
-              <div className="mb-6">
-                <h3 className="text-lg font-bold">{plan.name}</h3>
-                <div className="mt-2 flex items-baseline justify-center gap-1">
-                  <span className="text-3xl font-bold">PKR {plan.price}</span>
-                  <span className={`text-sm ${plan.popular ? "text-white/60" : "text-[#888]"}`}>/{plan.period}</span>
-                </div>
-              </div>
-
-              <div className="flex-1 space-y-3 mb-6">
-                {plan.features.map((f) => (
-                  <div key={f.label} className="flex items-start gap-2.5 text-sm">
-                    {f.inc ? (
-                      <Check className={`w-4 h-4 ${plan.popular ? "text-[#25D366]" : "text-[#16A34A]"} flex-shrink-0 mt-0.5`} />
-                    ) : (
-                      <X className={`w-4 h-4 ${plan.popular ? "text-white/30" : "text-[#CCC]"} flex-shrink-0 mt-0.5`} />
-                    )}
-                    <span className={f.inc ? (plan.popular ? "text-white/90" : "") : (plan.popular ? "text-white/40" : "text-[#BBB]")}>{f.label}</span>
-                  </div>
-                ))}
-              </div>
-
-              <Link
-                href={plan.key === "trial" ? "/signup" : "/signup/restaurant"}
-                className={`block w-full py-2.5 rounded-xl text-sm font-semibold text-center transition-all ${
-                  plan.popular
-                    ? "bg-white text-black hover:bg-[#F0F0F0]"
-                    : "border border-[#F0F0F0] text-[#555] hover:border-black hover:text-black"
-                }`}
-              >
-                {plan.key === "trial" ? "Start Free Trial" : "Choose Plan"}
-              </Link>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* Reusable Pricing2 component with Monthly/Yearly toggle, offer badges, strikethrough pricing */}
+      <Pricing2
+        heading="Simple, Transparent Pricing"
+        description="No hidden fees. No commission on orders. Cancel anytime."
+        plans={plans}
+      />
 
       {/* Comparison Table */}
       <section className="py-16 md:py-24 bg-[#F9FAFB]">
@@ -407,7 +172,7 @@ export function PricingClient() {
             <div className="flex flex-col items-center md:items-start gap-3">
               <div className="flex items-center gap-2 font-bold text-base">
                 <Image
-                  src="/logos/logo-d-star-qr.svg"
+                  src="/icon.svg"
                   alt="Digital QR Menue"
                   width={28}
                   height={28}

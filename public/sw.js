@@ -70,7 +70,7 @@ self.addEventListener("push", (event) => {
   let body = "Your restaurant has a new update!"
   let url = "/dashboard/orders"
   let tag = "order-alert"
-  let icon = "/favicon.svg"
+  let icon = "/icon.svg"
   let notificationData = {}
 
   if (event.data) {

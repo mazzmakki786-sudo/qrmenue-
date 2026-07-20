@@ -57,6 +57,7 @@ export default function CheckoutPage() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [tables, setTables] = useState<TableOption[]>([])
   const [hasTables, setHasTables] = useState(true)
+  const [termsAccepted, setTermsAccepted] = useState(false)
 
   useEffect(() => {
     const saved = loadSavedInfo()
@@ -79,16 +80,16 @@ export default function CheckoutPage() {
       .catch(() => {})
   }, [restaurantId, clearCart, router])
 
-  // Fetch available tables for dine-in option
+  // Fetch available tables and check plan for dine-in option
   React.useEffect(() => {
     if (!restaurantId) { setTables([]); return }
     fetch(`/api/public/tables?restaurant_id=${restaurantId}`)
       .then((res) => res.json())
       .then((data) => {
-        if (data.tables) {
-          setTables(data.tables)
-          setHasTables(data.tables.length > 0)
-        }
+        const tablesAvailable = data.tables || []
+        const planAllows = data.can_have_tables !== false
+        setTables(tablesAvailable)
+        setHasTables(tablesAvailable.length > 0 && planAllows)
       })
       .catch(() => { setHasTables(false) })
   }, [restaurantId])
@@ -423,9 +424,30 @@ export default function CheckoutPage() {
       {/* Fixed Place Order Button */}
       <div className="fixed bottom-[60px] left-0 right-0 bg-white border-t border-border p-4 z-40">
         <div className="max-w-[600px] mx-auto">
+          <div className="mb-3">
+            <label className="flex items-start gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+                className="mt-0.5 w-4 h-4 rounded border-gray-300 accent-black shrink-0"
+              />
+              <span className="text-[10px] text-text-secondary leading-relaxed">
+                I agree to the{" "}
+                <Link href="/terms" target="_blank" className="text-primary underline">Terms of Service</Link>
+                ,{" "}
+                <Link href="/privacy" target="_blank" className="text-primary underline">Privacy Policy</Link>
+                ,{" "}
+                <Link href="/refund" target="_blank" className="text-primary underline">Return &amp; Refund Policy</Link>
+                , and{" "}
+                <Link href="/shipping" target="_blank" className="text-primary underline">Shipping Policy</Link>.
+                Orders are fulfilled by the restaurant. Estimated dispatch: 20–45 minutes.
+              </span>
+            </label>
+          </div>
           <button
             onClick={handlePlaceOrder}
-            disabled={!orderType || !customerName || localLoading}
+            disabled={!orderType || !customerName || !termsAccepted || localLoading}
             data-testid="place-order-btn-mobile"
             className="w-full h-12 rounded-xl bg-primary text-white font-semibold text-[13px] hover:bg-primary-hover transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99]"
           >
@@ -593,9 +615,30 @@ export default function CheckoutPage() {
                       <span className="text-sm text-text-secondary">Total</span>
                       <span className="text-lg font-bold text-text-primary">{formatPrice(getTotalPrice())}</span>
                     </div>
+                    <div className="mb-3">
+                      <label className="flex items-start gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={termsAccepted}
+                          onChange={(e) => setTermsAccepted(e.target.checked)}
+                          className="mt-0.5 w-4 h-4 rounded border-gray-300 accent-black shrink-0"
+                        />
+                        <span className="text-[10px] text-text-secondary leading-relaxed">
+                          I agree to the{" "}
+                          <Link href="/terms" target="_blank" className="text-primary underline">Terms of Service</Link>
+                          ,{" "}
+                          <Link href="/privacy" target="_blank" className="text-primary underline">Privacy Policy</Link>
+                          ,{" "}
+                          <Link href="/refund" target="_blank" className="text-primary underline">Return &amp; Refund Policy</Link>
+                          , and{" "}
+                          <Link href="/shipping" target="_blank" className="text-primary underline">Shipping Policy</Link>.
+                          Orders fulfilled by the restaurant. Estimated dispatch: 20–45 minutes.
+                        </span>
+                      </label>
+                    </div>
                     <button
                       onClick={handlePlaceOrder}
-                      disabled={!orderType || !customerName || localLoading}
+                      disabled={!orderType || !customerName || !termsAccepted || localLoading}
                       data-testid="place-order-btn-desktop"
                       className="w-full h-12 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-hover transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >

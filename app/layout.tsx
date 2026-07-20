@@ -123,7 +123,7 @@ export const metadata: Metadata = {
   },
   icons: [
     { rel: "icon", type: "image/png", url: "/favicon-96x96.png", sizes: "96x96" },
-    { rel: "icon", type: "image/svg+xml", url: "/favicon.svg" },
+    { rel: "icon", type: "image/svg+xml", url: "/icon.svg" },
     { rel: "shortcut icon", url: "/favicon.ico" },
     { rel: "apple-touch-icon", url: "/apple-touch-icon.png", sizes: "180x180" },
   ],

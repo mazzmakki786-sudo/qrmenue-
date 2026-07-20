@@ -5,6 +5,8 @@ import { createAdminClient } from "@/lib/supabase/server"
 import { checkRateLimit } from "@/lib/rate-limiter"
 import { logOwnerAction, getIpSimple } from "@/lib/owner-audit"
 
+const TABLES_ENABLED_PLANS = ["growth", "growth-yearly", "premium", "premium-yearly"]
+
 const createTableSchema = z.object({
   table_number: z.string().min(1, "Table number is required").max(10),
   capacity: z.number().int().positive().default(4),
@@ -48,6 +50,17 @@ export const POST = safeRoute(async (request) => {
   }
 
   const admin = createAdminClient()
+
+  // Check plan — tables only on growth+ plans
+  const { data: restaurant } = await admin
+    .from("restaurants")
+    .select("plan")
+    .eq("id", restaurantId)
+    .single()
+
+  if (restaurant && !TABLES_ENABLED_PLANS.includes(restaurant.plan)) {
+    return NextResponse.json({ error: "Tables are not available on your current plan. Upgrade to Growth or Premium to use table management." }, { status: 403 })
+  }
 
   const { data: existing } = await admin
     .from("restaurant_tables")

@@ -82,7 +82,7 @@ export default function CustomerSignupPage() {
       </div>
 
       <div className="flex flex-col items-center text-center mb-6">
-        <Image src="/favicon.svg" alt="Digital QR Menue" width={48} height={48} className="w-12 h-12 mb-4" />
+        <Image src="/icon.svg" alt="Digital QR Menue" width={48} height={48} className="w-12 h-12 mb-4" />
         <h1 className="text-2xl font-bold text-black mb-1">Create Account</h1>
         <p className="text-sm text-[#555]">Join as a customer to browse and order</p>
       </div>

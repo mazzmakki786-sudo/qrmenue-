@@ -101,20 +101,9 @@ export default function RestaurantSignupPage() {
       setLoading(false)
 
       if (hasPaidPlan) {
-        const paymentRes = await fetch("/api/payments/jazzcash/initiate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ plan: preselectedPlan, billingInterval: "monthly" }),
-        })
-        if (paymentRes.ok) {
-          const html = await paymentRes.text()
-          const blob = new Blob([html], { type: "text/html" })
-          window.open(URL.createObjectURL(blob), "_self")
-        } else {
-          router.push("/dashboard/onboarding")
-        }
+        router.replace("/dashboard/subscription")
       } else {
-        router.push("/dashboard/onboarding")
+        router.replace("/dashboard/onboarding")
       }
       return
     }
@@ -150,20 +139,9 @@ export default function RestaurantSignupPage() {
       setLoading(false)
 
       if (hasPaidPlan) {
-        const paymentRes = await fetch("/api/payments/jazzcash/initiate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ plan: preselectedPlan, billingInterval: "monthly" }),
-        })
-        if (paymentRes.ok) {
-          const html = await paymentRes.text()
-          const blob = new Blob([html], { type: "text/html" })
-          window.open(URL.createObjectURL(blob), "_self")
-        } else {
-          router.push("/dashboard/onboarding")
-        }
+        router.replace("/dashboard/subscription")
       } else {
-        router.push("/dashboard/onboarding")
+        router.replace("/dashboard/onboarding")
       }
     } catch {
       setError("Something went wrong. Please try again.")
@@ -197,7 +175,7 @@ export default function RestaurantSignupPage() {
       </div>
 
       <div className="flex flex-col items-center text-center mb-6">
-        <Image src="/favicon.svg" alt="Digital QR Menue" width={48} height={48} className="w-12 h-12 mb-4" />
+        <Image src="/icon.svg" alt="Digital QR Menue" width={48} height={48} className="w-12 h-12 mb-4" />
         <h1 className="text-2xl font-bold text-black mb-1">Register Your Restaurant</h1>
         <p className="text-sm text-[#555]">{preselectedPlan ? "Set up your account to continue" : "Start your 30-day free trial today"}</p>
       </div>

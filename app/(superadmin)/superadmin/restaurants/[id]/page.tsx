@@ -161,12 +161,22 @@ export default function RestaurantDetailPage() {
     } catch { setRestaurant({ ...restaurant, image_upload_allowed: !next }) }
   }
 
-  const handlePlanUpdate = async (plan: string, endDate: string) => {
+  const handlePlanUpdate = async (plan: string, endDate: string, extraDays?: number) => {
     setSaving(true)
     try {
+      // Compute effective end date: default 30 days, or explicit endDate, plus extraDays
+      let computedEnd: string | null = null
+      if (plan !== "trial") {
+        const baseDate = endDate
+          ? new Date(endDate)
+          : new Date(Date.now() + 30 * 86400000)
+        const extraMs = (extraDays || 0) * 86400000
+        computedEnd = new Date(baseDate.getTime() + extraMs).toISOString()
+      }
+
       await fetch(`/api/superadmin/restaurants/${id}/toggle`, {
         method: "PATCH", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan, plan_end_date: plan === "trial" ? null : endDate || null }),
+        body: JSON.stringify({ plan, plan_end_date: computedEnd }),
       })
       const amount = PLAN_PRICES[plan as keyof typeof PLAN_PRICES] ?? 0
       if (plan !== "trial" && amount > 0) {
@@ -177,7 +187,8 @@ export default function RestaurantDetailPage() {
             restaurant_id: id,
             plan_type: plan,
             price: amount,
-            status: endDate ? "active" : "inactive",
+            start_date: new Date().toISOString(),
+            end_date: computedEnd,
           }),
         })
       }

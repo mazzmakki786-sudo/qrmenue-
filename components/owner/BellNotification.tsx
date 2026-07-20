@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Bell, X, ChevronRight, Clock, Megaphone, BellRing } from "lucide-react"
 import { formatPrice, timeAgo } from "@/lib/utils"
@@ -48,6 +49,7 @@ export function BellNotification({ restaurantId }: Props) {
   const [dropdownLoading, setDropdownLoading] = useState(false)
   const [announcementQueue, setAnnouncementQueue] = useState<AnnouncementAlert[]>([])
   const [announcementModal, setAnnouncementModal] = useState<AnnouncementAlert | null>(null)
+  const [exitingAlerts, setExitingAlerts] = useState<Set<string>>(new Set())
   const dropdownRef = useRef<HTMLDivElement>(null)
   const addToast = useToastStore((s) => s.addToast)
 
@@ -95,9 +97,9 @@ export function BellNotification({ restaurantId }: Props) {
       ])
 
       setTodayOrders((ordersRes.data || []) as TodayOrder[])
-      const pending = (ordersRes.data || []).filter((o: any) => o.order_status === "received")
+      const activeToday = (ordersRes.data || []).filter((o: any) => o.order_status !== "cancelled")
       const announcementCount = announcementsRes.count ?? 0
-      setUnreadCount(pending.length + announcementCount)
+      setUnreadCount(activeToday.length + announcementCount)
     }
 
     fetchInitial()
@@ -115,9 +117,13 @@ export function BellNotification({ restaurantId }: Props) {
         (payload) => {
           const order = payload.new as any
           setTodayOrders((prev) => [order as TodayOrder, ...prev].slice(0, 50))
+          // Increment badge for every new non-cancelled order
+          if (order.order_status !== "cancelled") {
+            setUnreadCount((prev) => prev + 1)
+          }
+          // Show toast + play sound only for "received" (new) orders
           if (order.order_status === "received") {
             playOrderAlert()
-            setUnreadCount((prev) => prev + 1)
             const newAlert: OrderAlert = {
               id: order.id,
               order_number: order.order_number,
@@ -148,10 +154,12 @@ export function BellNotification({ restaurantId }: Props) {
           )
           const oldStatus = (payload.old as any)?.order_status
           const newStatus = newOrder.order_status
-          if (oldStatus === "received" && newStatus !== "received") {
+          const wasCancelled = oldStatus === "cancelled"
+          const nowCancelled = newStatus === "cancelled"
+          // Count all non-cancelled orders
+          if (!wasCancelled && nowCancelled) {
             setUnreadCount((prev) => Math.max(0, prev - 1))
-          }
-          if (oldStatus !== "received" && newStatus === "received") {
+          } else if (wasCancelled && !nowCancelled) {
             setUnreadCount((prev) => prev + 1)
           }
           if (oldStatus && oldStatus !== newStatus) {
@@ -249,7 +257,15 @@ export function BellNotification({ restaurantId }: Props) {
   }, [showDropdown])
 
   const dismissAlert = (id: string) => {
-    setAlerts((prev) => prev.filter((a) => a.id !== id))
+    setExitingAlerts((prev) => new Set(prev).add(id))
+    setTimeout(() => {
+      setAlerts((prev) => prev.filter((a) => a.id !== id))
+      setExitingAlerts((prev) => {
+        const next = new Set(prev)
+        next.delete(id)
+        return next
+      })
+    }, 250)
   }
 
   const navigateToOrder = (orderId: string) => {
@@ -310,8 +326,10 @@ export function BellNotification({ restaurantId }: Props) {
                   el.addEventListener('touchmove', onMove, { passive: true })
                   el.addEventListener('touchend', onEnd, { passive: true })
                 }}
-                className="bg-black text-white rounded-2xl p-4 shadow-2xl animate-slide-up cursor-pointer active:scale-[0.98] transition-transform duration-200"
-                style={{ touchAction: 'pan-y' }}
+                className={`bg-black text-white rounded-2xl p-4 shadow-2xl cursor-pointer active:scale-[0.98] transition-transform duration-150 ${
+                  exitingAlerts.has(alert.id) ? "animate-toast-exit" : "animate-toast-enter"
+                }`}
+                style={{ touchAction: 'pan-y', willChange: 'transform, opacity' }}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
@@ -375,12 +393,10 @@ export function BellNotification({ restaurantId }: Props) {
               ) : (
                 <div className="divide-y divide-[#F0F0F0]">
                   {todayOrders.map((order) => (
-                    <div
+                    <Link
                       key={order.id}
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => navigateToOrder(order.id)}
-                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); navigateToOrder(order.id) } }}
+                      href={`/dashboard/orders/${order.id}`}
+                      onClick={() => setShowDropdown(false)}
                       className="flex items-center justify-between p-4 hover:bg-[#F9FAFB] active:bg-[#F0F0F0] transition-colors cursor-pointer"
                     >
                       <div className="min-w-0 flex-1">
@@ -404,7 +420,7 @@ export function BellNotification({ restaurantId }: Props) {
                         <span className="text-sm font-bold text-black">{formatPrice(order.total_price)}</span>
                         <ChevronRight className="w-4 h-4 text-[#999]" />
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               )}

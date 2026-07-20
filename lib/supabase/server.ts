@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr"
+import { createClient as createSupabaseClient } from "@supabase/supabase-js"
 import { cookies } from "next/headers"
 import { NextResponse, type NextRequest } from "next/server"
 import { cache } from "react"
@@ -22,6 +23,42 @@ export async function createClient() {
             // Can only be modified in a Server Action or Route Handler
           }
         },
+      },
+    }
+  )
+}
+
+/**
+ * Creates a Supabase client using the pgBouncer connection pooler.
+ * Use this for serverless/edge contexts where direct connections are limited.
+ *
+ * The pooler multiplexes many short-lived connections over fewer persistent
+ * PostgreSQL connections, preventing connection exhaustion under high concurrency.
+ *
+ * Requires SUPABASE_POOL_URL env var:
+ *   postgres://postgres.[project-ref]:[password]@[project-ref]-pooler.supabase.co:6543/postgres?pgbouncer=true
+ *
+ * Falls back to createAdminClient() if pool URL is not configured.
+ */
+export function createPooledClient() {
+  const poolUrl = process.env.SUPABASE_POOL_URL
+  if (!poolUrl) {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("[supabase] SUPABASE_POOL_URL not set — falling back to direct admin client")
+    }
+    return createAdminClient()
+  }
+
+  return createSupabaseClient(
+    poolUrl,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+      db: {
+        schema: "public",
       },
     }
   )

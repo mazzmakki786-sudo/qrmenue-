@@ -616,7 +616,7 @@ export default async function BlogArticlePage({ params }: Props) {
             name: "Digital QR Menue",
             logo: {
               "@type": "ImageObject",
-              url: "https://www.digitalmenue.com/favicon.svg",
+              url: "https://www.digitalmenue.com/icon.svg",
             },
           },
           mainEntityOfPage: {

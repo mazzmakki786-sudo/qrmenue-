@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { LandingHeader } from "@/components/shared/LandingHeader"
 import { JsonLd } from "@/components/JsonLd"
+import { COMPANY_INFO } from "@/lib/company-info"
 
 export const metadata: Metadata = {
   title: "Privacy Policy — Digital QR Menue | Data Protection for Pakistani Restaurants",
@@ -45,10 +46,18 @@ We also automatically collect certain technical information when you use our pla
 • Other parties with your explicit consent`,
   },
   {
+    title: "Payment Processing via PayFast",
+    content: `When you make a payment through our platform, your payment is processed by PayFast (Pty) Ltd, a third-party payment processor. PayFast collects, processes, and stores your payment information in accordance with their own privacy policy, available at https://payfast.io/privacy-policy/.
+
+PayFast may transfer your data across borders for processing. By making a payment, you consent to your payment data being processed by PayFast in accordance with their policies. We do not store your full payment card details on our servers.
+
+PayFast is PCI-DSS compliant, meaning they meet the highest security standards for handling payment card information.`,
+  },
+  {
     title: "Data Storage & Security",
     content: `Your data is stored on secure servers with industry-standard encryption. We implement reasonable technical and organizational measures to protect your information against unauthorized access, alteration, disclosure, or destruction.
 
-We retain your data for as long as your account is active. If you close your account, we retain your data for 90 days before permanent deletion, unless we are required to retain it longer by law.`,
+We retain your data for as long as your account is active. If you close your account, we retain your data for 90 days before permanent deletion, unless we are required to retain it longer by law. Transaction records related to payments are retained for a minimum of 5 years from the date of the transaction, as required by our payment processor's terms.`,
   },
   {
     title: "Cookies & Tracking",
@@ -71,7 +80,7 @@ To exercise any of these rights, contact us at support@digitalmenue.com or via W
     title: "Updates to This Policy",
     content: `We may update this Privacy Policy from time to time. Material changes will be notified via email or through your dashboard. Continued use of Digital QR Menue after changes constitutes acceptance of the updated policy.
 
-This policy was last updated on July 5, 2026.`,
+This policy was last updated on July 20, 2026.`,
   },
 ]
 
@@ -121,7 +130,10 @@ export default function PrivacyPage() {
         <section className="py-16 md:py-24">
           <div className="max-w-3xl mx-auto px-5">
             <div className="mb-10">
-              <p className="text-xs text-[#888] mb-4">Last updated: July 5, 2026</p>
+              <p className="text-xs text-[#888] mb-4">Last updated: July 20, 2026</p>
+              <div className="p-4 bg-[#F9FAFB] rounded-xl border border-[#E8E8E8] mb-6">
+                <p className="text-sm font-semibold text-black">{COMPANY_INFO.ownershipStatement}</p>
+              </div>
               <p className="text-sm text-[#555] leading-relaxed">
                 This Privacy Policy explains how Digital QR Menue (&quot;we&quot;, &quot;our&quot;, &quot;us&quot;) collects, uses, discloses, and protects
                 your personal information when you use our QR menu and WhatsApp ordering platform. We are committed to
@@ -145,14 +157,25 @@ export default function PrivacyPage() {
                 If you have questions about this Privacy Policy or how we handle your data, contact us at:
               </p>
               <p className="text-sm text-[#555] mt-2">
-                <strong>Email:</strong> support@digitalmenue.com
+                <strong>Email:</strong> {COMPANY_INFO.support.email}
               </p>
               <p className="text-sm text-[#555]">
                 <strong>WhatsApp:</strong>{" "}
-                <a href="https://wa.me/923146325823" target="_blank" rel="noopener noreferrer" className="text-black underline">
-                  +92-314-6325823
+                <a href={`https://wa.me/${COMPANY_INFO.support.whatsapp.replace(/[^0-9]/g, "")}`} target="_blank" rel="noopener noreferrer" className="text-black underline">
+                  {COMPANY_INFO.support.whatsapp}
                 </a>
               </p>
+              <p className="text-sm text-[#555]">
+                <strong>Address:</strong> {COMPANY_INFO.address}
+              </p>
+              <p className="text-sm text-[#555]">
+                <strong>Operational Hours:</strong>
+              </p>
+              <ul className="text-sm text-[#555] list-disc list-inside mt-1">
+                {COMPANY_INFO.hours.full.map((h, i) => (
+                  <li key={i}>{h}</li>
+                ))}
+              </ul>
             </div>
 
             <div className="mt-10 text-center">
@@ -160,8 +183,16 @@ export default function PrivacyPage() {
                 Also read our{" "}
                 <Link href="/terms" className="text-black underline">
                   Terms of Service
-                </Link>{" "}
-                and{" "}
+                </Link>
+                ,{" "}
+                <Link href="/refund" className="text-black underline">
+                  Return &amp; Refund Policy
+                </Link>
+                ,{" "}
+                <Link href="/shipping" className="text-black underline">
+                  Shipping Policy
+                </Link>
+                , and{" "}
                 <Link href="/about" className="text-black underline">
                   About Us
                 </Link>

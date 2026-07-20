@@ -1,0 +1,28 @@
+- generic [active] [ref=f2e1]:
+  - generic [ref=f2e4]:
+    - button [ref=f2e6] [cursor=pointer]
+    - generic [ref=f2e10]:
+      - img "Digital QR Menue" [ref=f2e11]
+      - heading "Welcome back" [level=1] [ref=f2e12]
+      - paragraph [ref=f2e13]: Sign in to your account
+    - button "Continue with Google" [ref=f2e14] [cursor=pointer]
+    - generic [ref=f2e20]: or
+    - generic [ref=f2e24]:
+      - generic [ref=f2e25]:
+        - generic [ref=f2e26]: Email*
+        - textbox "Email*" [ref=f2e27]:
+          - /placeholder: your@email.com
+      - generic [ref=f2e28]:
+        - generic [ref=f2e29]: Password
+        - generic [ref=f2e30]:
+          - textbox "Password" [ref=f2e31]:
+            - /placeholder: Enter your password
+          - button [ref=f2e32] [cursor=pointer]
+      - button "Forgot Password?" [ref=f2e37] [cursor=pointer]
+      - button "Sign In" [ref=f2e38] [cursor=pointer]
+    - generic [ref=f2e39]:
+      - link "Don't have an account? Sign up" [ref=f2e40] [cursor=pointer]:
+        - /url: /signup
+      - link "Back to home" [ref=f2e41] [cursor=pointer]:
+        - /url: /
+  - alert [ref=f2e42]

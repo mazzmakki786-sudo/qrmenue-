@@ -35,6 +35,6 @@ export function buildTrialLimitsFromConfig(config: TrialLimitConfig): PlanLimits
     customBranding: false,
     canHaveQR: true,
     canHaveWhatsapp: true,
-    aiPostsPerMonth: 0,
+    canHaveTables: false,
   }
 }

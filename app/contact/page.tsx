@@ -4,6 +4,7 @@ import { LandingHeader } from "@/components/shared/LandingHeader"
 import { ContactForm } from "@/components/contact/ContactForm"
 import { createAdminClient } from "@/lib/supabase/server"
 import { JsonLd } from "@/components/JsonLd"
+import { COMPANY_INFO } from "@/lib/company-info"
 
 export const metadata: Metadata = {
   title: "Contact Us — Digital QR Menue | Get Support for Your QR Menu",
@@ -92,7 +93,7 @@ export default async function ContactPage() {
 
         <section className="py-16 md:py-24">
           <div className="max-w-2xl mx-auto px-5">
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-3 gap-6">
             <a
               href={whatsappLink}
               target="_blank"
@@ -108,8 +109,18 @@ export default async function ContactPage() {
               <h3 className="text-lg font-semibold mb-2">Email</h3>
               <p className="text-sm text-[#555] text-center">{companyEmail}</p>
             </div>
+            <div className="flex flex-col items-center p-10 md:p-12 bg-white border border-[#F0F0F0] rounded-2xl">
+              <svg className="w-10 h-10 md:w-12 md:h-12 mb-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <h3 className="text-lg font-semibold mb-2">Business Hours</h3>
+              <div className="text-sm text-[#555] text-center space-y-1">
+                {COMPANY_INFO.hours.full.map((h, i) => (
+                  <p key={i}>{h}</p>
+                ))}
+              </div>
+            </div>
           </div>
           </div>
+          <p className="text-xs text-[#999] mt-6 text-center">{COMPANY_INFO.address} | {COMPANY_INFO.ownershipStatement}</p>
 
           <div className="max-w-sm mx-auto px-5 mt-10 text-center">
             <p className="text-sm text-[#555] mb-5">Already have an account? Sign in to manage your restaurant.</p>

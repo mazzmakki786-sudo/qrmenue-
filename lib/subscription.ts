@@ -1,4 +1,12 @@
-export type Plan = "trial" | "starter" | "growth" | "premium"
+export type Plan = "trial" | "starter" | "growth" | "premium" | "starter-yearly" | "growth-yearly" | "premium-yearly"
+
+export function isYearlyPlan(slug: Plan): boolean {
+  return slug.endsWith("-yearly")
+}
+
+export function getBasePlan(slug: Plan): string {
+  return slug.replace("-yearly", "")
+}
 
 export interface PlanLimits {
   maxDishes: number
@@ -9,7 +17,7 @@ export interface PlanLimits {
   customBranding: boolean
   canHaveQR: boolean
   canHaveWhatsapp: boolean
-  aiPostsPerMonth: number
+  canHaveTables: boolean
 }
 
 export interface TrialLimitConfig {
@@ -76,7 +84,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     customBranding: false,
     canHaveQR: true,
     canHaveWhatsapp: true,
-    aiPostsPerMonth: 0,
+    canHaveTables: false,
   },
   starter: {
     maxDishes: 30,
@@ -87,7 +95,18 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     customBranding: false,
     canHaveQR: true,
     canHaveWhatsapp: true,
-    aiPostsPerMonth: 0,
+    canHaveTables: false,
+  },
+  "starter-yearly": {
+    maxDishes: 30,
+    maxImages: 10,
+    maxOrders: Infinity,
+    maxCategories: Infinity,
+    analytics: true,
+    customBranding: false,
+    canHaveQR: true,
+    canHaveWhatsapp: true,
+    canHaveTables: false,
   },
   growth: {
     maxDishes: 50,
@@ -98,7 +117,18 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     customBranding: true,
     canHaveQR: true,
     canHaveWhatsapp: true,
-    aiPostsPerMonth: 6,
+    canHaveTables: true,
+  },
+  "growth-yearly": {
+    maxDishes: 50,
+    maxImages: 20,
+    maxOrders: Infinity,
+    maxCategories: Infinity,
+    analytics: true,
+    customBranding: true,
+    canHaveQR: true,
+    canHaveWhatsapp: true,
+    canHaveTables: true,
   },
   premium: {
     maxDishes: 100,
@@ -109,7 +139,18 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     customBranding: true,
     canHaveQR: true,
     canHaveWhatsapp: true,
-    aiPostsPerMonth: 12,
+    canHaveTables: true,
+  },
+  "premium-yearly": {
+    maxDishes: 100,
+    maxImages: 100,
+    maxOrders: Infinity,
+    maxCategories: Infinity,
+    analytics: true,
+    customBranding: true,
+    canHaveQR: true,
+    canHaveWhatsapp: true,
+    canHaveTables: true,
   },
 }
 
@@ -118,6 +159,9 @@ export const PLAN_PRICES: Record<Plan, number> = {
   starter: 1500,
   growth: 2500,
   premium: 4500,
+  "starter-yearly": 12000,
+  "growth-yearly": 25000,
+  "premium-yearly": 50000,
 }
 
 export const PLAN_NAMES: Record<Plan, string> = {
@@ -125,6 +169,9 @@ export const PLAN_NAMES: Record<Plan, string> = {
   starter: "Starter",
   growth: "Growth",
   premium: "Premium",
+  "starter-yearly": "Starter Yearly",
+  "growth-yearly": "Growth Yearly",
+  "premium-yearly": "Premium Yearly",
 }
 
 export const TRIAL_DURATION_DAYS = 30
@@ -147,7 +194,6 @@ export interface PlanLimitsPartial {
   maxImages?: number
   maxOrders?: number
   maxCategories?: number
-  aiPostsPerMonth?: number
 }
 
 export interface StatusCounts {
@@ -167,7 +213,6 @@ export function getEffectiveLimits(
     if (override.maxImages !== undefined) base.maxImages = override.maxImages
     if (override.maxOrders !== undefined) base.maxOrders = override.maxOrders
     if (override.maxCategories !== undefined) base.maxCategories = override.maxCategories
-    if (override.aiPostsPerMonth !== undefined) base.aiPostsPerMonth = override.aiPostsPerMonth
   }
   return base
 }
@@ -323,7 +368,6 @@ export function getPlanFeatures(plan: Plan): string[] {
   if (limits.analytics) features.push("Analytics dashboard")
   if (limits.canHaveQR) features.push("QR code generation")
   if (limits.canHaveWhatsapp) features.push("WhatsApp orders")
-  if (limits.aiPostsPerMonth > 0) features.push(`${limits.aiPostsPerMonth} AI posts per month`)
 
   return features
 }

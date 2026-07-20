@@ -10,7 +10,6 @@
     "deploy": "vercel --prod"
   },
   "dependencies": {
-    "@ai-sdk/google": "^4.0.2",
     "@hookform/resolvers": "^4.1.0",
     "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-label": "^2.1.11",
@@ -22,7 +21,6 @@
     "@supabase/mcp-server-supabase": "^0.8.2",
     "@supabase/ssr": "^0.6.0",
     "@supabase/supabase-js": "^2.49.0",
-    "ai": "^7.0.4",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

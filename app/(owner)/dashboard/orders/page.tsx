@@ -31,12 +31,13 @@ export default function OrdersPage() {
   const sub = useSubscription()
   const { shouldBlurOrderDetails } = sub
   const [orders, setOrders] = useState<Order[]>([])
-  const [filter, setFilter] = useState<"all" | "today" | "week" | "month">("all")
+  const [filter, setFilter] = useState<"all" | "today" | "week" | "month">("today")
   const [currentPage, setCurrentPage] = useState(1)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [restaurantId, setRestaurantId] = useState<string | null>(null)
   const [lastUpdated, setLastUpdated] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState("")
   const [realtimeConnected, setRealtimeConnected] = useState(true)
   const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null)
   const lastRealtimeRef = useRef<number>(Date.now())
@@ -171,11 +172,17 @@ export default function OrdersPage() {
 
   const blur = (text: string) => "█".repeat(Math.max(4, Math.min(text?.length || 0, 14)))
 
-  const totalPages = Math.ceil(orders.length / PAGE_SIZE)
-  const paginatedOrders = orders.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+  // Client-side search by order number
+  const searchedOrders = searchQuery.trim()
+    ? orders.filter((o) => String(o.order_number).includes(searchQuery.trim()))
+    : orders
+
+  const totalPages = Math.ceil(searchedOrders.length / PAGE_SIZE)
+  const paginatedOrders = searchedOrders.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
   useEffect(() => {
     setCurrentPage(1)
+    setSearchQuery("")
   }, [filter])
 
   return (
@@ -216,7 +223,10 @@ export default function OrdersPage() {
             )}
           </div>
           <p className="text-sm text-[#999] mt-1">
-            {orders.length} order{orders.length !== 1 ? "s" : ""}
+            {searchQuery.trim()
+              ? `${searchedOrders.length} of ${orders.length} order${orders.length !== 1 ? "s" : ""}`
+              : `${orders.length} order${orders.length !== 1 ? "s" : ""}`
+            }
             {lastUpdated && <span className="text-xs text-[#BBB] ml-2">Updated {lastUpdated}</span>}
           </p>
         </div>
@@ -245,9 +255,34 @@ export default function OrdersPage() {
         </div>
       </div>
 
+      {/* Search by Order Number */}
+      <div className="relative">
+        <div className="relative">
+          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#999] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Search by order number..."
+            value={searchQuery}
+            onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1) }}
+            className="w-full h-10 pl-9 pr-9 rounded-xl border border-[#E0E0E0] bg-white text-sm text-black placeholder:text-[#BBB] focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-colors"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => { setSearchQuery(""); setCurrentPage(1) }}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#F0F0F0] flex items-center justify-center hover:bg-[#E0E0E0] transition-colors"
+            >
+              <svg className="w-3 h-3 text-[#666]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
+      </div>
 
 
-      {/* Error State */}
+
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3">
           <p className="text-sm text-red-700">{error}</p>
@@ -266,7 +301,9 @@ export default function OrdersPage() {
           <div className="w-16 h-16 bg-[#F0F0F0] rounded-2xl flex items-center justify-center">
             <ClipboardList className="w-8 h-8 text-[#999]" />
           </div>
-          <p className="text-sm text-[#555] text-center">No orders found</p>
+          <p className="text-sm text-[#555] text-center">
+            {searchQuery.trim() ? "No orders match your search" : "No orders found"}
+          </p>
         </div>
       ) : (
         <>
@@ -331,7 +368,7 @@ export default function OrdersPage() {
           {totalPages > 1 && (
             <div className="flex items-center justify-between pt-2">
               <span className="text-xs text-[#999]">
-                Showing {(currentPage - 1) * PAGE_SIZE + 1}-{Math.min(currentPage * PAGE_SIZE, orders.length)} of {orders.length}
+                Showing {(currentPage - 1) * PAGE_SIZE + 1}-{Math.min(currentPage * PAGE_SIZE, searchedOrders.length)} of {searchedOrders.length}
               </span>
               <div className="flex items-center gap-2">
                 <button

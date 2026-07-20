@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { useToastStore, type Toast } from "@/stores/toastStore"
 import { X, CheckCircle, AlertCircle, Info, BellRing } from "lucide-react"
 
@@ -12,30 +12,12 @@ const TYPE_STYLES: Record<string, { bg: string; icon: typeof CheckCircle }> = {
 }
 
 function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: (id: string) => void }) {
-  const [progress, setProgress] = useState(100)
   const [exiting, setExiting] = useState(false)
-  const startRef = useRef(Date.now())
-  const duration = toast.duration || 4000
-  const rafRef = useRef<number>(0)
 
-  useEffect(() => {
-    startRef.current = Date.now()
-    const animate = () => {
-      const elapsed = Date.now() - startRef.current
-      const remaining = Math.max(0, 100 - (elapsed / duration) * 100)
-      setProgress(remaining)
-      if (remaining > 0) {
-        rafRef.current = requestAnimationFrame(animate)
-      }
-    }
-    rafRef.current = requestAnimationFrame(animate)
-    return () => cancelAnimationFrame(rafRef.current)
-  }, [duration])
-
-  const handleDismiss = () => {
+  const handleDismiss = useCallback(() => {
     setExiting(true)
-    setTimeout(() => onDismiss(toast.id), 200)
-  }
+    setTimeout(() => onDismiss(toast.id), 250)
+  }, [toast.id, onDismiss])
 
   const style = TYPE_STYLES[toast.type] || TYPE_STYLES.info
   const Icon = style.icon
@@ -44,16 +26,24 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: (id: string)
     <div
       className={`
         pointer-events-auto w-full sm:w-[360px] rounded-2xl p-4 shadow-2xl
-        text-white animate-slide-up cursor-pointer select-none
-        active:scale-[0.98] transition-all duration-200
-        ${exiting ? "opacity-0 translate-x-full" : "opacity-100"}
+        text-white cursor-pointer select-none
+        active:scale-[0.98] transition-transform duration-150
+        ${exiting ? "animate-toast-exit" : "animate-toast-enter"}
         ${style.bg}
       `}
-      style={{ touchAction: "pan-y" }}
+      style={{
+        touchAction: "pan-y",
+        willChange: "transform, opacity",
+      }}
       onClick={handleDismiss}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleDismiss() } }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault()
+          handleDismiss()
+        }
+      }}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3 flex-1 min-w-0">
@@ -73,16 +63,22 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: (id: string)
           </div>
         </div>
         <button
-          onClick={(e) => { e.stopPropagation(); handleDismiss() }}
+          onClick={(e) => {
+            e.stopPropagation()
+            handleDismiss()
+          }}
           className="p-1 hover:bg-white/10 rounded-lg shrink-0"
         >
           <X className="w-4 h-4" />
         </button>
       </div>
+      {/* Pure CSS progress bar — no RAF, no React re-renders */}
       <div className="mt-2 h-0.5 bg-white/20 rounded-full overflow-hidden">
         <div
-          className="h-full bg-white/60 rounded-full transition-none"
-          style={{ width: `${progress}%` }}
+          className="h-full bg-white/60 rounded-full"
+          style={{
+            animation: `toast-progress ${toast.duration || 4000}ms linear forwards`,
+          }}
         />
       </div>
     </div>

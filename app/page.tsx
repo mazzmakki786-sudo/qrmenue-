@@ -5,7 +5,7 @@ import { ContactSection } from "@/components/shared/ContactSection"
 import { LandingHeader } from "@/components/shared/LandingHeader"
 import { PricingSection } from "@/components/pricing/PricingSection"
 import { AppFooter } from "@/components/shared/AppFooter"
-import { mapPlan, type DBPlan } from "@/lib/map-plans"
+import { mergeYearlyPlans, type DBPlan } from "@/lib/map-plans"
 import { FaqJsonLd } from "@/components/JsonLd"
 
 export default async function LandingPage() {
@@ -37,7 +37,7 @@ export default async function LandingPage() {
     .eq("is_active", true)
     .order("sort_order", { ascending: true })
 
-  const initialPlans = (dbPlans as DBPlan[] | null)?.map(mapPlan) || []
+  const initialPlans = dbPlans ? mergeYearlyPlans(dbPlans) : []
 
   return (
     <div className="min-h-screen bg-white">

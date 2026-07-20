@@ -10,7 +10,7 @@
   logo_url: string | null
   cuisine_type: string | null
   language: string
-  plan: "trial" | "starter" | "growth" | "premium"
+  plan: "trial" | "starter" | "growth" | "premium" | "starter-yearly" | "growth-yearly" | "premium-yearly"
   plan_start_date: string
   plan_end_date: string | null
   trial_start: string
@@ -85,7 +85,7 @@ export interface OrderItem {
 
 export type OrderType = "dine_in" | "takeaway" | "delivery"
 export type OrderStatus = "received" | "preparing" | "ready" | "completed" | "cancelled"
-export type PaymentMethod = "cod" | "bank_transfer" | "jazzcash" | "easypaisa"
+export type PaymentMethod = "cod" | "bank_transfer" | "easypaisa"
 export type PaymentStatus = "pending" | "paid" | "failed"
 
 export interface RestaurantTable {
@@ -127,7 +127,7 @@ export interface Order {
 export interface Subscription {
   id: string
   restaurant_id: string
-  plan: "trial" | "starter" | "growth" | "premium"
+  plan: "trial" | "starter" | "growth" | "premium" | "starter-yearly" | "growth-yearly" | "premium-yearly"
   amount_pkr: number
   payment_method: string | null
   payment_ref: string | null
@@ -207,28 +207,6 @@ export interface DealFormData {
   is_active?: boolean
 }
 
-export interface AiPost {
-  id: string
-  restaurant_id: string
-  prompt: string
-  language: string
-  ratio: string
-  caption: string | null
-  image_url: string | null
-  template_used: string | null
-  settings: Record<string, unknown>
-  created_at: string
-  images?: AiPostImage[]
-}
-
-export interface AiPostImage {
-  id: string
-  ai_post_id: string
-  dish_id: string
-  image_url: string
-  position: number
-}
-
 export interface ToastNotification {
   id: string
   type: "success" | "error" | "info" | "order"
@@ -254,9 +232,5 @@ export interface CustomerNotification {
   created_at: string
 }
 
-export interface AiUsage {
-  id: string
-  restaurant_id: string
-  month: string
-  count: number
-}
+
+

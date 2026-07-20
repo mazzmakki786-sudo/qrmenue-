@@ -7,7 +7,7 @@ import { AddDishForm } from "@/components/owner/AddDishForm"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Plus, Store, UtensilsCrossed, Eye, EyeOff, Pencil, Search, FolderPlus, Image as ImageIcon, AlertTriangle, ArrowRight, X, Undo2, Sparkles, Download, Loader2 } from "lucide-react"
+import { Plus, Store, UtensilsCrossed, Eye, EyeOff, Pencil, Search, FolderPlus, Image as ImageIcon, AlertTriangle, ArrowRight, X, Undo2 } from "lucide-react"
 import type { Category, Dish } from "@/types"
 import { useSubscription } from "@/lib/hooks/useSubscription"
 import Link from "next/link"
@@ -16,7 +16,6 @@ import Image from "next/image"
 export default function MenuManagementPage() {
   const sub = useSubscription()
   const { restaurant, dishCount, imageCount, canAddDish, canAddCategory, canUploadImage, planLimits, status, refresh, isSuspended } = sub
-  const hasAiAccess = (planLimits?.aiPostsPerMonth ?? 0) > 0
   const [categories, setCategories] = useState<Category[]>([])
   const [dishes, setDishes] = useState<Dish[]>([])
   const [editingDish, setEditingDish] = useState<Dish | null>(null)
@@ -34,10 +33,6 @@ export default function MenuManagementPage() {
   const [logoError, setLogoError] = useState(false)
   const [selectedDishes, setSelectedDishes] = useState<Set<string>>(new Set())
   const [undoToast, setUndoToast] = useState<{ message: string; undo: () => void } | null>(null)
-  const [posterCategory, setPosterCategory] = useState<Category | null>(null)
-  const [posterHeading, setPosterHeading] = useState("")
-  const [posterPrice, setPosterPrice] = useState("")
-  const [posterExporting, setPosterExporting] = useState(false)
 
   const fetchData = useCallback(async () => {
     if (!restaurant?.id) return
@@ -641,12 +636,6 @@ export default function MenuManagementPage() {
                       <span className="text-[10px] text-[#BBB] shrink-0">({catDishes.length})</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      {hasAiAccess && (
-                        <button onClick={() => { setPosterCategory(cat); setPosterHeading(""); setPosterPrice("") }}
-                          className="flex items-center gap-1 text-xs text-[#7C3AED] font-medium hover:underline">
-                          <Sparkles className="w-3 h-3" /> Poster
-                        </button>
-                      )}
                       <button onClick={() => handleDeleteCategory(cat.id)} className="text-xs text-[#DC2626] hover:underline">Delete</button>
                     </div>
                   </div>
@@ -780,81 +769,6 @@ export default function MenuManagementPage() {
           </div>
         </DialogContent>
       </Dialog>
-      {/* Poster Modal */}
-      {posterCategory && (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-3" onClick={() => setPosterCategory(null)}>
-          <div className="bg-white rounded-2xl p-4 sm:p-5 max-w-lg w-full max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-sm font-bold mb-1 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#7C3AED]" />
-              Create Poster — {posterCategory.name_en}
-            </h3>
-            <p className="text-xs text-[#999] mb-4">Dishes in this category will be featured on the poster</p>
-
-            {/* Heading */}
-            <div className="mb-3">
-              <label className="text-[10px] font-bold text-[#999] block mb-0.5">Poster Heading</label>
-              <input value={posterHeading} onChange={(e) => setPosterHeading(e.target.value)}
-                placeholder="e.g. Weekend Special"
-                className="w-full rounded-xl bg-[#F8F8F8] border border-[#E8E8E8] px-3 py-2 text-sm focus:outline-none focus:border-black" />
-            </div>
-
-            {/* Price */}
-            <div className="mb-3">
-              <label className="text-[10px] font-bold text-[#999] block mb-0.5">Price (optional)</label>
-              <input value={posterPrice} onChange={(e) => setPosterPrice(e.target.value)}
-                placeholder="e.g. Rs 499"
-                className="w-full rounded-xl bg-[#F8F8F8] border border-[#E8E8E8] px-3 py-2 text-sm focus:outline-none focus:border-black" />
-            </div>
-
-            {/* Dishes in category */}
-            <div className="mb-4">
-              <label className="text-[10px] font-bold text-[#999] block mb-1">Dishes ({dishes.filter((d) => d.category_id === posterCategory.id).length})</label>
-              <div className="space-y-1 max-h-40 overflow-y-auto">
-                {dishes.filter((d) => d.category_id === posterCategory.id).map((dish) => (
-                  <div key={dish.id} className="flex items-center gap-2 p-1.5 rounded-lg bg-[#F8F8F8]">
-                    {dish.image_url ? (
-                      <Image src={dish.image_url} alt="" width={32} height={32} className="w-8 h-8 rounded-lg object-cover" />
-                    ) : (
-                      <div className="w-8 h-8 rounded-lg bg-[#E8E8E8]" />
-                    )}
-                    <span className="text-xs flex-1">{dish.name_en}</span>
-                    <span className="text-[10px] text-[#999]">Rs {dish.price}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex gap-2">
-              <button onClick={() => setPosterCategory(null)}
-                className="flex-1 py-2.5 rounded-xl bg-[#F8F8F8] text-[#555] text-sm font-medium hover:bg-[#F0F0F0] transition-colors">Cancel</button>
-              <button onClick={async () => {
-                setPosterExporting(true)
-                try {
-                  const res = await fetch("/api/owner/ai/generate-text", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      prompt: `Create a poster for ${posterCategory.name_en}: ${posterHeading}`,
-                      language: "en",
-                      mode: "generate-caption",
-                    }),
-                  })
-                  const data = await res.json()
-                  if (res.ok) alert("AI caption generated: " + (data.caption || "Success"))
-                  else alert("AI generation failed. Daily quota may be exhausted.")
-                } catch { alert("Network error") }
-                setPosterExporting(false)
-                setPosterCategory(null)
-              }} disabled={posterExporting}
-                className="flex-1 py-2.5 rounded-xl bg-black text-white text-sm font-bold hover:opacity-90 transition-all disabled:opacity-40 flex items-center justify-center gap-2">
-                {posterExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                {posterExporting ? "Generating..." : "Generate Poster"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Undo Toast */}
       {undoToast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-black text-white rounded-xl px-4 py-3 flex items-center gap-3 shadow-2xl animate-slide-up max-w-sm w-[calc(100%-2rem)]">

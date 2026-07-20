@@ -1,0 +1,11 @@
+[    2534ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.digitalmenue.com/login:0
+[  132869ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://www.digitalmenue.com/api/auth/login:0
+[  195461ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://zkwwqcopkwbzbsqqxoiq.supabase.co/rest/v1/restaurants?select=id&owner_id=eq.a58a4338-f20a-43ac-bfb6-8ac40cab8e52:0
+[  205037ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ https://zkwwqcopkwbzbsqqxoiq.supabase.co/rest/v1/restaurants?select=id&owner_id=eq.a58a4338-f20a-43ac-bfb6-8ac40cab8e52:0
+[  207070ms] [ERROR] Failed to load resource: net::ERR_INTERNET_DISCONNECTED @ https://zkwwqcopkwbzbsqqxoiq.supabase.co/rest/v1/restaurants?select=id&owner_id=eq.a58a4338-f20a-43ac-bfb6-8ac40cab8e52:0
+[  211078ms] [ERROR] Failed to load resource: net::ERR_INTERNET_DISCONNECTED @ https://zkwwqcopkwbzbsqqxoiq.supabase.co/rest/v1/restaurants?select=id&owner_id=eq.a58a4338-f20a-43ac-bfb6-8ac40cab8e52:0
+[  211083ms] [ERROR] Failed to load resource: net::ERR_INTERNET_DISCONNECTED @ https://www.digitalmenue.com/restaurants?_rsc=nmyFLQq3sV5huFjw:0
+[  211083ms] [ERROR] Failed to fetch RSC payload for https://www.digitalmenue.com/restaurants. Falling back to browser navigation. TypeError: Failed to fetch
+    at y (https://www.digitalmenue.com/_next/static/chunks/1255-eae4096fb21f1304.js:1:44427)
+    at async _ (https://www.digitalmenue.com/_next/static/chunks/1255-eae4096fb21f1304.js:1:43285)
+    at async Object.o [as task] (https://www.digitalmenue.com/_next/static/chunks/1255-eae4096fb21f1304.js:1:123499) @ https://www.digitalmenue.com/_next/static/chunks/1255-eae4096fb21f1304.js:0

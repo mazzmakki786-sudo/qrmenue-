@@ -386,7 +386,6 @@ export type Database = {
       }
       plans: {
         Row: {
-          ai_posts_per_month: number
           analytics: boolean
           can_have_qr: boolean
           can_have_whatsapp: boolean
@@ -410,7 +409,6 @@ export type Database = {
           yearly_price_pkr: number | null
         }
         Insert: {
-          ai_posts_per_month?: number
           analytics?: boolean
           can_have_qr?: boolean
           can_have_whatsapp?: boolean
@@ -434,7 +432,6 @@ export type Database = {
           yearly_price_pkr?: number | null
         }
         Update: {
-          ai_posts_per_month?: number
           analytics?: boolean
           can_have_qr?: boolean
           can_have_whatsapp?: boolean

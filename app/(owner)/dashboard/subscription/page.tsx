@@ -9,7 +9,7 @@ import { SubscriptionBanner } from "@/components/shared/SubscriptionBanner"
 import { useCompanySettings } from "@/lib/hooks/useCompanySettings"
 import { useSubscription } from "@/lib/hooks/useSubscription"
 import { PLAN_NAMES, type Plan } from "@/lib/subscription"
-import { mapPlan, type PricingPlan } from "@/lib/map-plans"
+import { mergeYearlyPlans, type PricingPlan } from "@/lib/map-plans"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import { MessageCircle, Clock, ShoppingBag, Image as ImageIcon, Utensils, AlertTriangle, HelpCircle, Calendar, Sparkles, ShieldCheck } from "lucide-react"
@@ -37,7 +37,7 @@ export default function SubscriptionPage() {
       if (res.ok) {
         const data = await res.json()
         if (data.plans && Array.isArray(data.plans)) {
-          setPlans(data.plans.map(mapPlan))
+          setPlans(mergeYearlyPlans(data.plans))
         }
       }
     } catch {
@@ -59,30 +59,19 @@ export default function SubscriptionPage() {
     return () => { supabase.removeChannel(channel) }
   }, [fetchPlans])
 
-  const handleSelectPlan = async (planId: string) => {
+  const handleSelectPlan = async (planId: string, isYearly: boolean) => {
     if (planId === "trial") return
-    if (planId === currentPlan) return
-    setBuyError(null)
-    setBuyingPlan(planId)
-    try {
-      const res = await fetch("/api/payments/jazzcash/initiate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: planId }),
-      })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: "Payment initiation failed" }))
-        setBuyError(err.error || "Payment initiation failed. Please try again or contact support.")
-        return
-      }
-      const html = await res.text()
-      const blob = new Blob([html], { type: "text/html" })
-      window.open(URL.createObjectURL(blob), "_self")
-    } catch {
-      setBuyError("Unable to connect to payment gateway. Please try again.")
-    } finally {
-      setBuyingPlan(null)
+    if (planId === baseCurrentPlan) return
+    if (!whatsappDigits) {
+      setBuyError("WhatsApp support number not configured. Please contact support.")
+      return
     }
+    const plan = plans.find(p => p.id === planId)
+    if (!plan) return
+    const price = isYearly ? plan.yearlyPrice : plan.monthlyPrice
+    const period = isYearly ? "yearly" : "monthly"
+    const msg = `Hi, I'm interested in the ${plan.name} plan (${period}: ${price}). Please activate my plan.`
+    window.open(`https://wa.me/${whatsappDigits}?text=${encodeURIComponent(msg)}`, "_blank")
   }
 
   if (loading || settingsLoading) {
@@ -111,7 +100,8 @@ export default function SubscriptionPage() {
 
   const isSuspended = "is_suspended" in restaurant ? (restaurant as any).is_suspended : false
   const currentPlan = restaurant.plan as Plan
-  const currentPlanIndex = planOrder.indexOf(currentPlan)
+  const baseCurrentPlan = currentPlan.replace("-yearly", "") as Plan
+  const currentPlanIndex = planOrder.indexOf(baseCurrentPlan)
   const isExpired = sub.isExpired
 
   const jazzcashNumber = settings.jazzcash_number || ""
@@ -143,7 +133,7 @@ export default function SubscriptionPage() {
     .map(p => ({
       ...p,
       button: {
-        text: p.id === currentPlan
+        text: p.id === baseCurrentPlan
           ? (isExpired ? "Expired — Renew" : "Current Plan")
           : p.button.text,
         url: p.button.url,
@@ -191,18 +181,18 @@ export default function SubscriptionPage() {
         <div className="p-5 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-5">
             <div className="flex items-center gap-3">
-              <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${isExpired ? "bg-[#DC2626]/10" : currentPlan === "trial" ? "bg-[#2563EB]/10" : currentPlan === "starter" ? "bg-[#8B5CF6]/10" : currentPlan === "growth" ? "bg-black/10" : "bg-[#25D366]/10"}`}>
+              <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${isExpired ? "bg-[#DC2626]/10" : baseCurrentPlan === "trial" ? "bg-[#2563EB]/10" : baseCurrentPlan === "starter" ? "bg-[#8B5CF6]/10" : baseCurrentPlan === "growth" ? "bg-black/10" : "bg-[#25D366]/10"}`}>
                 {isExpired ? (
                   <AlertTriangle className="w-5 h-5 text-[#DC2626]" />
                 ) : (
-                  <Sparkles className={`w-5 h-5 ${currentPlan === "trial" ? "text-[#2563EB]" : currentPlan === "starter" ? "text-[#8B5CF6]" : currentPlan === "growth" ? "text-black" : "text-[#25D366]"}`} />
+                  <Sparkles className={`w-5 h-5 ${baseCurrentPlan === "trial" ? "text-[#2563EB]" : baseCurrentPlan === "starter" ? "text-[#8B5CF6]" : baseCurrentPlan === "growth" ? "text-black" : "text-[#25D366]"}`} />
                 )}
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-semibold text-[#555] uppercase tracking-wider">Current Plan</span>
-                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase ${isExpired ? "bg-[#DC2626]/10 text-[#DC2626]" : currentPlan === "trial" ? "bg-[#2563EB]/10 text-[#2563EB]" : currentPlan === "starter" ? "bg-[#8B5CF6]/10 text-[#8B5CF6]" : currentPlan === "growth" ? "bg-black/10 text-black" : "bg-[#25D366]/10 text-[#25D366]"}`}>
-                    {PLAN_NAMES[currentPlan]}
+                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase ${isExpired ? "bg-[#DC2626]/10 text-[#DC2626]" : baseCurrentPlan === "trial" ? "bg-[#2563EB]/10 text-[#2563EB]" : baseCurrentPlan === "starter" ? "bg-[#8B5CF6]/10 text-[#8B5CF6]" : baseCurrentPlan === "growth" ? "bg-black/10 text-black" : "bg-[#25D366]/10 text-[#25D366]"}`}>
+                    {PLAN_NAMES[baseCurrentPlan]}
                   </span>
                   {isExpired && (
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase bg-[#DC2626]/10 text-[#DC2626]">Expired</span>
@@ -212,12 +202,12 @@ export default function SubscriptionPage() {
                   {!isExpired && (
                     <span className="text-xs text-[#999] flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
-                      {currentPlan === "trial"
+                      {baseCurrentPlan === "trial"
                         ? `Started ${restaurant.trial_start ? formatDate(new Date(restaurant.trial_start)) : "recently"}`
                         : planEnd ? `Started ${restaurant.plan_start_date ? formatDate(new Date(restaurant.plan_start_date)) : "recently"}` : "Active plan"}
                     </span>
                   )}
-                  {currentPlan !== "trial" && planEnd && !isExpired && (
+                  {baseCurrentPlan !== "trial" && planEnd && !isExpired && (
                     <span className="text-xs text-[#999] flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       Ends {formatDate(planEnd)}
@@ -241,14 +231,14 @@ export default function SubscriptionPage() {
               ) : (
                 <>
                   <p className="text-lg font-bold text-black">
-                    {currentPlan === "trial"
+                    {baseCurrentPlan === "trial"
                       ? `${trialDaysRemaining} day${trialDaysRemaining === 1 ? "" : "s"}`
                       : planDaysRemaining !== null
                         ? `${planDaysRemaining} day${planDaysRemaining === 1 ? "" : "s"}`
                         : "Active"}
                   </p>
                   <p className="text-[10px] text-[#999] font-medium">
-                    {currentPlan === "trial" ? "remaining in trial" : "remaining"}
+                    {baseCurrentPlan === "trial" ? "remaining in trial" : "remaining"}
                   </p>
                 </>
               )}

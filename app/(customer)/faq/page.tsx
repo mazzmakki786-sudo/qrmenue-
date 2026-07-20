@@ -107,12 +107,37 @@ const categories: Array<{ title: string; faqs: FaqItem[] }> = [
         a: "Message us on WhatsApp at +92-314-6325823 or email support@digitalmenue.com. Paid plans include priority support with faster response times.",
       },
       {
+        q: "What are your operational hours?",
+        a: "Our team is available during business hours: Monday to Friday 9:00 AM - 6:00 PM, Saturday 9:00 AM - 2:00 PM. We are closed on Sundays. For urgent issues, you can always message us on WhatsApp and we'll respond as soon as possible.",
+      },
+      {
         q: "Is my data safe?",
         a: "Yes. We use industry-standard encryption. Your dishes, images, and order history are private and never shared. Data is preserved even if your plan expires.",
       },
       {
         q: "Can I pause my menu without deleting it?",
         a: "Yes. Toggle your restaurant to 'closed' from the dashboard. Your menu stays hidden until you toggle it back on. All data remains intact.",
+      },
+    ],
+  },
+  {
+    title: "Orders, Returns & Refunds",
+    faqs: [
+      {
+        q: "Can I cancel an order after placing it?",
+        a: "You can cancel an order within 5 minutes of placing it, provided the restaurant hasn't confirmed it yet. Go to your order confirmation page to cancel. If the restaurant has already started preparing, please contact them directly via WhatsApp — cancellation is at their discretion.",
+      },
+      {
+        q: "How do I get a refund for my order?",
+        a: "Since payments for food orders are handled directly between you and the restaurant (cash, JazzCash, Easypaisa), refunds are arranged directly with the restaurant. Contact them via the WhatsApp link in your order confirmation. If the issue is not resolved, contact Digital QR Menue support and we will mediate in good faith.",
+      },
+      {
+        q: "How long does delivery take?",
+        a: "Typical dispatch times are 20–45 minutes from order confirmation. This depends on the restaurant's workload and order complexity. The restaurant provides an estimated time on your order confirmation page and will notify you of any delays.",
+      },
+      {
+        q: "Can I change my delivery address after placing an order?",
+        a: "Contact the restaurant directly via the WhatsApp link in your order confirmation as soon as possible. The restaurant may be able to update the address if the order hasn't been dispatched yet.",
       },
     ],
   },

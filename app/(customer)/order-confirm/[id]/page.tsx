@@ -106,6 +106,60 @@ function PreparingCard({ order, restaurant }: { order: any; restaurant: any }) {
   )
 }
 
+function DesktopPreparingCard({ order, restaurant }: { order: any; restaurant: any }) {
+  const [remaining, setRemaining] = useState<number | null>(null)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+
+  const calcRemaining = useCallback(() => {
+    if (!order.ready_at) return null
+    const diff = Math.floor((new Date(order.ready_at).getTime() - Date.now()) / 1000)
+    return Math.max(0, diff)
+  }, [order.ready_at])
+
+  useEffect(() => {
+    if (!order.ready_at) {
+      setRemaining(null)
+      return
+    }
+
+    setRemaining(calcRemaining())
+    timerRef.current = setInterval(() => {
+      setRemaining(calcRemaining())
+    }, 1000)
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current)
+    }
+  }, [calcRemaining, order.ready_at])
+
+  return (
+    <section className="bg-[#EFF6FF] border border-[#BFDBFE] rounded-2xl p-10 text-center">
+      <div className="flex justify-center mb-5">
+        <div className="w-20 h-20 bg-[#2563EB] rounded-2xl flex items-center justify-center shadow-[0_4px_12px_rgba(37,99,235,0.3)]">
+          <ChefHat className="w-10 h-10 text-white" />
+        </div>
+      </div>
+      <h2 className="text-2xl font-bold text-[#1E40AF] mb-1">Preparing Your Order</h2>
+      <p className="text-base font-semibold text-[#1E40AF]/70 mb-4">#{order.order_number}</p>
+      <p className="text-[14px] text-text-secondary mb-4">
+        <span className="font-semibold text-text-primary">{restaurant?.name || "the restaurant"}</span> is preparing your order
+      </p>
+      {remaining !== null && remaining > 0 && (
+        <div>
+          <div className="text-4xl font-bold text-[#2563EB] tabular-nums">{formatCountdown(remaining)}</div>
+          <p className="text-xs text-[#1E40AF]/60 mt-1">Estimated time remaining</p>
+        </div>
+      )}
+      {remaining !== null && remaining <= 0 && (
+        <p className="text-sm font-semibold text-[#16A34A]">Almost done! Your order should be ready any moment.</p>
+      )}
+      {remaining === null && (
+        <p className="text-sm text-[#1E40AF]/70">Your order is being prepared. This should take about 30 minutes.</p>
+      )}
+    </section>
+  )
+}
+
 export default function OrderConfirmPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
@@ -117,6 +171,7 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
   const [cancelling, setCancelling] = useState(false)
   const [cancelError, setCancelError] = useState<string | null>(null)
+  const [signupToCancelDialogOpen, setSignupToCancelDialogOpen] = useState(false)
   const [pushSubscribed, setPushSubscribed] = useState(false)
   const clearCart = useCartStore((s) => s.clearCart)
   const addToast = useToastStore((s) => s.addToast)
@@ -328,9 +383,13 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
     }
   }
 
-  // Auto-send to WhatsApp on order confirmation
+  // Auto-send to WhatsApp — only once per order, only when freshly placed (received, not yet sent)
   useEffect(() => {
     if (!order) return
+    if (order.order_status !== "received") return
+    if (order.whatsapp_sent) return
+    if (whatsappSuccess) return
+
     const url = buildWhatsAppURL({
       orderNumber: order.order_number,
       items: order.items || [],
@@ -344,13 +403,12 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
       restaurantPhone: order.restaurants?.phone || "",
     })
     if (!url) return
-    if (!whatsappSuccess) {
-      const timer = setTimeout(() => {
-        window.open(url, "_blank")
-        setWhatsappSuccess(true)
-      }, 1500)
-      return () => clearTimeout(timer)
-    }
+
+    const timer = setTimeout(() => {
+      window.open(url, "_blank")
+      setWhatsappSuccess(true)
+    }, 1500)
+    return () => clearTimeout(timer)
   }, [order, whatsappSuccess])
 
   if (loading) {
@@ -638,10 +696,19 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
             Reorder
           </button>
 
-          {/* Cancel Order — only for pending orders owned by the customer */}
-          {user && isPending && order.customer_id === user.id && (
+          {/* Cancel Order — always show for pending orders */}
+          {isPending && user && order.customer_id === user.id && (
             <button
               onClick={() => setCancelDialogOpen(true)}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm text-error font-semibold border border-error/30 hover:bg-error/5 active:scale-[0.98] transition-all"
+            >
+              <X className="w-4 h-4" />
+              Cancel Order
+            </button>
+          )}
+          {isPending && !user && (
+            <button
+              onClick={() => setSignupToCancelDialogOpen(true)}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm text-error font-semibold border border-error/30 hover:bg-error/5 active:scale-[0.98] transition-all"
             >
               <X className="w-4 h-4" />
@@ -723,6 +790,38 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
         </DialogContent>
       </Dialog>
 
+      {/* Sign-up to Cancel Dialog — for guests wanting to cancel */}
+      <Dialog open={signupToCancelDialogOpen} onOpenChange={setSignupToCancelDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-error" />
+              Sign in to Cancel Order
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-text-secondary">
+              To cancel order <span className="font-semibold text-text-primary">#{order?.order_number}</span>, please sign up or log in to your account.
+            </p>
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => setSignupToCancelDialogOpen(false)}
+                className="flex-1 py-3 rounded-xl text-sm font-semibold border border-border text-text-secondary hover:bg-[#FAFAFA] transition-all"
+              >
+                Not Now
+              </button>
+              <Link
+                href={`/login/customer?redirect=/order-confirm/${order?.id}`}
+                onClick={() => setSignupToCancelDialogOpen(false)}
+                className="flex-1 py-3 rounded-xl text-sm font-semibold text-white bg-primary hover:bg-primary-hover flex items-center justify-center gap-2 transition-all"
+              >
+                Sign in / Sign up
+              </Link>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* ===== DESKTOP LAYOUT ===== */}
       <div className="hidden md:block min-h-screen bg-[#F8F8F8]">
         <header className="bg-white border-b border-border">
@@ -764,31 +863,7 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
             </section>
           )}
 
-          {isPreparing && (
-            <section className="bg-[#EFF6FF] border border-[#BFDBFE] rounded-2xl p-10 text-center">
-              <div className="flex justify-center mb-5">
-                <div className="w-20 h-20 bg-[#2563EB] rounded-2xl flex items-center justify-center shadow-[0_4px_12px_rgba(37,99,235,0.3)]">
-                  <ChefHat className="w-10 h-10 text-white" />
-                </div>
-              </div>
-              <h2 className="text-2xl font-bold text-[#1E40AF] mb-1">Preparing Your Order</h2>
-              <p className="text-base font-semibold text-[#1E40AF]/70 mb-4">#{order.order_number}</p>
-              <p className="text-[14px] text-text-secondary mb-4">
-                <span className="font-semibold text-text-primary">{restaurant?.name || "the restaurant"}</span> is preparing your order
-              </p>
-              {order.ready_at && (
-                <div>
-                  <div className="text-4xl font-bold text-[#2563EB] tabular-nums">
-                    {(() => {
-                      const diff = Math.max(0, Math.floor((new Date(order.ready_at).getTime() - Date.now()) / 1000))
-                      return formatCountdown(diff)
-                    })()}
-                  </div>
-                  <p className="text-xs text-[#1E40AF]/60 mt-1">Estimated time remaining</p>
-                </div>
-              )}
-            </section>
-          )}
+          {isPreparing && <DesktopPreparingCard order={order} restaurant={restaurant} />}
 
           {isPending && (
             <section className="bg-warning/5 border border-warning/15 rounded-2xl p-10 text-center">
@@ -890,10 +965,19 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
               Reorder
             </button>
 
-            {/* Cancel Order — only for pending orders owned by the customer */}
-            {user && isPending && order.customer_id === user.id && (
+            {/* Cancel Order — always show for pending orders */}
+            {isPending && user && order.customer_id === user.id && (
               <button
                 onClick={() => setCancelDialogOpen(true)}
+                className="flex items-center justify-center gap-2 py-3.5 px-5 rounded-xl text-[14px] text-error font-semibold border border-error/30 hover:bg-error/5 transition-all"
+              >
+                <X className="w-4 h-4" />
+                Cancel
+              </button>
+            )}
+            {isPending && !user && (
+              <button
+                onClick={() => setSignupToCancelDialogOpen(true)}
                 className="flex items-center justify-center gap-2 py-3.5 px-5 rounded-xl text-[14px] text-error font-semibold border border-error/30 hover:bg-error/5 transition-all"
               >
                 <X className="w-4 h-4" />

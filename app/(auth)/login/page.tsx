@@ -57,7 +57,7 @@ function LoginForm() {
       }
 
       if (redirectParam) {
-        router.push(redirectParam)
+        router.replace(redirectParam)
       } else if (data.user) {
         const supabase = (await import("@/lib/supabase/client")).createClient()
         const { data: restaurant } = await supabase
@@ -65,9 +65,9 @@ function LoginForm() {
           .select("id")
           .eq("owner_id", data.user.id)
           .maybeSingle()
-        router.push(restaurant ? "/dashboard" : "/restaurants")
+        router.replace(restaurant ? "/dashboard" : "/restaurants")
       } else {
-        router.push("/restaurants")
+        router.replace("/restaurants")
       }
     } catch {
       setError("Incorrect email or password")
@@ -91,7 +91,7 @@ function LoginForm() {
       </div>
 
       <div className="flex flex-col items-center text-center mb-6">
-        <Image src="/favicon.svg" alt="Digital QR Menue" width={48} height={48} className="w-12 h-12 mb-4" />
+        <Image src="/icon.svg" alt="Digital QR Menue" width={48} height={48} className="w-12 h-12 mb-4" />
         <h1 className="text-2xl font-bold text-black mb-1">Welcome back</h1>
         <p className="text-sm text-[#555]">Sign in to your account</p>
       </div>

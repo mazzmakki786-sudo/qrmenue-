@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
+import { Suspense } from "react"
 import { usePathname } from "next/navigation"
 import { ShoppingCart, Home, ClipboardList, Heart, Menu } from "lucide-react"
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary"
@@ -42,7 +43,7 @@ export default function CustomerLayout({
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
               <Link href="/restaurants" className="flex items-center gap-2.5 group">
                 <Image
-                  src="/logos/logo-d-star-qr.svg"
+                  src="/icon.svg"
                   alt="Digital QR Menue"
                   width={32}
                   height={32}
@@ -81,7 +82,9 @@ export default function CustomerLayout({
           </header>
 
           <main className="pb-16 md:pb-8">
-            {children}
+            <Suspense fallback={<div className="flex items-center justify-center min-h-[60vh]"><div className="animate-spin w-8 h-8 border-2 border-black border-t-transparent rounded-full" /></div>}>
+              {children}
+            </Suspense>
           </main>
           <div className="pb-16 md:pb-0">
             <AppFooter />

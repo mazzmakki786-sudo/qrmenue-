@@ -14,7 +14,7 @@ IF EXIST "scripts\.env-x-post" (
   FOR /F "tokens=1,2 delims==" %%A IN (scripts\.env-x-post) DO SET %%A=%%B
 ) ELSE (
   ECHO ERROR: scripts\.env-x-post not found! Create it with:
-  ECHO   GMAIL_USER=mazzmakki786@gmail.com
+  ECHO   GMAIL_USER=your-email@gmail.com
   ECHO   GMAIL_APP_PASS=your-app-password
   EXIT /B 1
 )

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
-import { Save, RotateCcw, GripVertical, Plus, X, Loader2 } from "lucide-react"
+import { Save, RotateCcw, GripVertical, Plus, X, Loader2, Tag } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 
@@ -10,13 +10,12 @@ interface Plan {
   slug: string
   name: string
   price_pkr: number
-  interval: "monthly" | "yearly"
   yearly_price_pkr: number | null
+  billing_interval: "monthly" | "yearly"
   max_dishes: number
   max_images: number
   max_orders: number
   max_categories: number
-  ai_posts_per_month: number
   analytics: boolean
   custom_branding: boolean
   can_have_qr: boolean
@@ -25,24 +24,9 @@ interface Plan {
   sort_order: number
   is_active: boolean
   custom_features: string[]
-}
-
-const defaultLimits: Omit<Plan, "id" | "slug" | "sort_order" | "is_active"> = {
-  name: "",
-  price_pkr: 0,
-  interval: "monthly",
-  yearly_price_pkr: null,
-  max_dishes: 20,
-  max_images: 10,
-  max_orders: 10,
-  max_categories: 20,
-  ai_posts_per_month: 0,
-  analytics: true,
-  custom_branding: false,
-  can_have_qr: true,
-  can_have_whatsapp: true,
-  description: "",
-  custom_features: [],
+  offer_price_pkr: number | null
+  offer_label: string | null
+  original_price_pkr: number | null
 }
 
 export function PlanManager() {
@@ -60,9 +44,12 @@ export function PlanManager() {
         const mapped = (data.plans || []).map((p: any) => ({
           ...p,
           interval: p.interval || "monthly",
+          billing_interval: p.billing_interval || "monthly",
           yearly_price_pkr: p.yearly_price_pkr ?? null,
           custom_features: Array.isArray(p.custom_features) ? p.custom_features : [],
-          ai_posts_per_month: p.ai_posts_per_month ?? 0,
+          offer_price_pkr: p.offer_price_pkr ?? null,
+          offer_label: p.offer_label ?? null,
+          original_price_pkr: p.original_price_pkr ?? null,
         }))
         setPlans(mapped)
       }
@@ -121,12 +108,16 @@ export function PlanManager() {
     )
   }
 
+  const trialPlan = plans.find((p) => p.slug === "trial")
+  const monthlyPlans = plans.filter((p) => p.billing_interval === "monthly" && p.slug !== "trial")
+  const yearlyPlans = plans.filter((p) => p.billing_interval === "yearly")
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-lg font-bold">Plans Management</h2>
-          <p className="text-xs text-[#555] mt-1">Edit plan prices, limits, and features. Changes apply in real-time.</p>
+          <p className="text-xs text-[#555] mt-1">Edit plan prices, limits, features, and offers. Changes apply in real-time.</p>
         </div>
         {success && (
           <span className="text-xs text-green-600 bg-green-50 px-3 py-1.5 rounded-lg font-medium">{success}</span>
@@ -136,15 +127,62 @@ export function PlanManager() {
         )}
       </div>
 
-      <div className="space-y-4">
-        {plans.map((plan) => (
-          <PlanCard
-            key={plan.slug}
-            plan={plan}
-            saving={saving === plan.slug}
-            onSave={(updates) => updatePlan(plan.slug, updates)}
-          />
-        ))}
+      <div className="space-y-8">
+        {/* Trial Section */}
+        {trialPlan && (
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <h3 className="text-xs font-bold text-[#888] uppercase tracking-wider">Trial</h3>
+              <div className="h-px flex-1 bg-[#F0F0F0]" />
+            </div>
+            <PlanCard
+              key={trialPlan.slug}
+              plan={trialPlan}
+              saving={saving === trialPlan.slug}
+              onSave={(updates) => updatePlan(trialPlan.slug, updates)}
+            />
+          </div>
+        )}
+
+        {/* Monthly Plans Section */}
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <h3 className="text-xs font-bold text-[#888] uppercase tracking-wider">Monthly Plans</h3>
+            <div className="h-px flex-1 bg-[#F0F0F0]" />
+          </div>
+          <div className="space-y-4">
+            {monthlyPlans.map((plan) => (
+              <PlanCard
+                key={plan.slug}
+                plan={plan}
+                saving={saving === plan.slug}
+                onSave={(updates) => updatePlan(plan.slug, updates)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Yearly Plans Section */}
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <h3 className="text-xs font-bold text-[#888] uppercase tracking-wider">Yearly Plans</h3>
+            <div className="h-px flex-1 bg-[#F0F0F0]" />
+          </div>
+          <div className="space-y-4">
+            {yearlyPlans.length > 0 ? yearlyPlans.map((plan) => (
+              <PlanCard
+                key={plan.slug}
+                plan={plan}
+                saving={saving === plan.slug}
+                onSave={(updates) => updatePlan(plan.slug, updates)}
+              />
+            )) : (
+              <div className="text-center py-8 text-sm text-[#999] bg-white border border-[#F0F0F0] rounded-xl">
+                No yearly plans found. Run the database migration to create them.
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -161,6 +199,10 @@ function PlanCard({ plan, saving, onSave }: { plan: Plan; saving: boolean; onSav
 
   const current = { ...plan, ...edited }
 
+  const isYearly = plan.slug.endsWith("-yearly")
+  const baseName = plan.slug.replace("-yearly", "")
+  const displayName = baseName.charAt(0).toUpperCase() + baseName.slice(1)
+
   return (
     <div className="bg-white border border-[#E8E8E8] rounded-xl overflow-hidden">
       <div
@@ -175,29 +217,35 @@ function PlanCard({ plan, saving, onSave }: { plan: Plan; saving: boolean; onSav
               <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${current.is_active ? "bg-green-50 text-green-600" : "bg-gray-100 text-gray-500"}`}>
                 {current.is_active ? "Active" : "Inactive"}
               </span>
-              {current.interval === "yearly" && (
-                <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-blue-50 text-blue-600">Yearly</span>
+              <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${isYearly ? "bg-blue-50 text-blue-600" : "bg-purple-50 text-purple-600"}`}>
+                {isYearly ? "Yearly" : "Monthly"}
+              </span>
+              {(current.offer_price_pkr && current.offer_price_pkr > 0) && (
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-amber-50 text-amber-600 flex items-center gap-1">
+                  <Tag className="w-2.5 h-2.5" />
+                  Offer Active
+                </span>
               )}
             </div>
             <p className="text-xs text-[#555] mt-0.5">
-              {current.interval === "yearly" && current.yearly_price_pkr
-                ? `PKR ${current.yearly_price_pkr.toLocaleString()}/yr`
-                : `PKR ${current.price_pkr.toLocaleString()}/mo`
-              }
+              PKR {current.price_pkr.toLocaleString()}/{isYearly ? "yr" : "mo"}
+              {current.offer_price_pkr && (
+                <span className="text-green-600 ml-2">→ PKR {current.offer_price_pkr.toLocaleString()}</span>
+              )}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
           {hasChanges && (
             <>
-                <button
-                  onClick={(e) => { e.stopPropagation(); onSave(edited); setEdited({}) }}
-                  disabled={saving}
-                  className="flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 bg-black text-white text-xs font-medium rounded-lg hover:opacity-90 disabled:opacity-50 transition-all"
-                >
-                  {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                  <span className="hidden md:inline">{saving ? "Saving..." : "Save"}</span>
-                </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); onSave(edited); setEdited({}) }}
+                disabled={saving}
+                className="flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 bg-black text-white text-xs font-medium rounded-lg hover:opacity-90 disabled:opacity-50 transition-all"
+              >
+                {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                <span className="hidden md:inline">{saving ? "Saving..." : "Save"}</span>
+              </button>
               <button
                 onClick={(e) => { e.stopPropagation(); setEdited({}) }}
                 className="p-1.5 text-[#999] hover:text-black transition-colors"
@@ -213,32 +261,33 @@ function PlanCard({ plan, saving, onSave }: { plan: Plan; saving: boolean; onSav
         <div className="border-t border-[#F0F0F0] p-3 md:p-4 space-y-4 bg-[#FAFAFA]">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <Field label="Display Name" value={current.name} onChange={(v) => handleChange("name", v)} />
-            <Field label="Price (PKR/mo)" type="number" value={current.price_pkr} onChange={(v) => handleChange("price_pkr", Number(v))} />
-            <div>
-              <label className="block text-[11px] font-medium text-[#555] mb-1">Interval</label>
-              <div className="flex rounded-lg border border-[#E8E8E8] overflow-hidden bg-white">
-                <button
-                  onClick={() => handleChange("interval", "monthly")}
-                  className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${current.interval === "monthly" ? "bg-black text-white" : "bg-white text-[#555] hover:bg-[#F5F5F5]"}`}
-                >
-                  Monthly
-                </button>
-                <button
-                  onClick={() => handleChange("interval", "yearly")}
-                  className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${current.interval === "yearly" ? "bg-black text-white" : "bg-white text-[#555] hover:bg-[#F5F5F5]"}`}
-                >
-                  Yearly
-                </button>
-              </div>
+            <Field label="Price (PKR)" type="number" value={current.price_pkr} onChange={(v) => handleChange("price_pkr", Number(v))} hint={isYearly ? "Yearly price" : "Monthly price"} />
+          </div>
+
+          {/* Offer / Discount Section */}
+          <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-3 space-y-3">
+            <div className="flex items-center gap-2">
+              <Tag className="w-4 h-4 text-amber-600" />
+              <span className="text-xs font-bold text-amber-800 uppercase tracking-wider">Offer / Discount</span>
             </div>
-            {current.interval === "yearly" && (
-              <Field label="Yearly Price (PKR)" type="number" value={current.yearly_price_pkr ?? current.price_pkr * 12} onChange={(v) => handleChange("yearly_price_pkr", Number(v))} hint="Leave empty for auto (12x monthly)" />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <Field label="Offer Price (PKR)" type="number" value={current.offer_price_pkr ?? ""} onChange={(v) => handleChange("offer_price_pkr", v === "" ? null : Number(v))} hint="Leave empty for no offer" />
+              <Field label="Offer Label" value={current.offer_label ?? ""} onChange={(v) => handleChange("offer_label", v || null)} hint='e.g. "50% OFF" or "Save Rs 2000"' />
+              <Field label="Original Price (PKR)" type="number" value={current.original_price_pkr ?? ""} onChange={(v) => handleChange("original_price_pkr", v === "" ? null : Number(v))} hint="For strikethrough comparison" />
+            </div>
+            {current.offer_price_pkr && current.offer_price_pkr > 0 && current.price_pkr > 0 && (
+              <div className="text-xs text-amber-700 bg-amber-100/50 rounded-lg px-3 py-2">
+                Discount: {Math.round((1 - current.offer_price_pkr / current.price_pkr) * 100)}% off —
+                Save PKR {(current.price_pkr - current.offer_price_pkr).toLocaleString()}!
+              </div>
             )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <Field label="Max Dishes" type="number" value={current.max_dishes} onChange={(v) => handleChange("max_dishes", Number(v))} hint="-1 for unlimited" />
             <Field label="Max Images" type="number" value={current.max_images} onChange={(v) => handleChange("max_images", Number(v))} hint="-1 for unlimited" />
             <Field label="Max Orders/mo" type="number" value={current.max_orders} onChange={(v) => handleChange("max_orders", Number(v))} hint="-1 for unlimited" />
             <Field label="Max Categories" type="number" value={current.max_categories} onChange={(v) => handleChange("max_categories", Number(v))} hint="-1 for unlimited" />
-            <Field label="AI Posts/mo" type="number" value={current.ai_posts_per_month} onChange={(v) => handleChange("ai_posts_per_month", Number(v))} hint="0 to disable" />
             <Field label="Sort Order" type="number" value={current.sort_order} onChange={(v) => handleChange("sort_order", Number(v))} />
           </div>
 

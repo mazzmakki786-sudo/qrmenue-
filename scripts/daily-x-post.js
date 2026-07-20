@@ -2,8 +2,8 @@
 /**
  * Daily X Post Generator — Digitalmenue.com
  *
- * Reads recent git activity, drafts a build-in-public post using the
- * project's x-build-in-public skill template, and emails it to the founder.
+ * Reads recent git activity, drafts a build-in-public post, and emails
+ * it to the founder.
  *
  * Schedule via Windows Task Scheduler (see: ../SCHEDULE-X-POST.md)
  *
@@ -19,19 +19,13 @@ const fs = require('fs');
 // ─── Config ──────────────────────────────────────────────────────────
 const CONFIG = {
   email: {
-    from: 'Digitalmenue X Post <mazzmakki786@gmail.com>',
-    to: 'mazzmakki786@gmail.com',
+    from: process.env.X_POST_FROM || 'Digitalmenue X Post <founder@digitalmenue.com>',
+    to: process.env.X_POST_TO || '',
     subject: '📱 Daily X Post Draft — Digitalmenue.com',
   },
-  // ─── Gmail App Password ──────────────────────────────
   // Uses env vars so credentials stay out of the codebase.
-  // Set these in Windows Env Vars or pass inline when scheduling:
-  //   GMAIL_USER=mazzmakki786@gmail.com
-  //   GMAIL_APP_PASS=ithv bxrj baaa yvyz
-  gmail: {
-    user: process.env.GMAIL_USER || 'mazzmakki786@gmail.com',
-    pass: process.env.GMAIL_APP_PASS || 'ithv bxrj baaa yvyz',
-  },
+  GMAIL_USER: process.env.GMAIL_USER || '',
+  GMAIL_APP_PASS: process.env.GMAIL_APP_PASS || '',
   repoPath: path.resolve(__dirname, '..'),
   dayCounterPath: path.resolve(__dirname, '..', '.x-post-day.json'),
 };
@@ -184,8 +178,8 @@ async function sendEmail(draft) {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: CONFIG.gmail.user,
-      pass: CONFIG.gmail.pass,
+      user: CONFIG.GMAIL_USER,
+      pass: CONFIG.GMAIL_APP_PASS,
     },
   });
 

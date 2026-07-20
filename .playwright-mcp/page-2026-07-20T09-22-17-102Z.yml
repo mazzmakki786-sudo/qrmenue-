@@ -1,0 +1,38 @@
+- generic [active] [ref=f7e1]:
+  - generic [ref=f7e4]:
+    - button [ref=f7e6] [cursor=pointer]
+    - generic [ref=f7e10]:
+      - img "Digital QR Menue" [ref=f7e11]
+      - heading "Register Your Restaurant" [level=1] [ref=f7e12]
+      - paragraph [ref=f7e13]: Start your 30-day free trial today
+    - generic [ref=f7e14]:
+      - generic [ref=f7e15]:
+        - generic [ref=f7e16]: Restaurant Name **
+        - textbox "Restaurant Name **" [ref=f7e17]:
+          - /placeholder: Al-Habib Grill
+      - generic [ref=f7e18]:
+        - generic [ref=f7e19]: City *
+        - combobox "City *" [ref=f7e20]
+      - generic [ref=f7e21]:
+        - generic [ref=f7e22]: Phone / WhatsApp **
+        - textbox "Phone / WhatsApp **" [ref=f7e23]:
+          - /placeholder: 0300-XXXXXXX
+      - generic [ref=f7e24]:
+        - generic [ref=f7e25]: Email **
+        - textbox "Email **" [ref=f7e26]:
+          - /placeholder: owner@restaurant.com
+      - generic [ref=f7e27]:
+        - generic [ref=f7e28]: Password *
+        - generic [ref=f7e29]:
+          - textbox "Password *" [ref=f7e30]:
+            - /placeholder: Create a strong password
+          - button [ref=f7e31] [cursor=pointer]
+      - button "Create Restaurant & Start Trial" [ref=f7e35] [cursor=pointer]
+    - generic [ref=f7e36]: or
+    - button "Continue with Google" [ref=f7e40] [cursor=pointer]
+    - generic [ref=f7e46]:
+      - link "Already have an account? Sign in" [ref=f7e47] [cursor=pointer]:
+        - /url: /login
+      - link "Back to home" [ref=f7e48] [cursor=pointer]:
+        - /url: /
+  - alert [ref=f7e49]

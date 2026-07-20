@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 export const metadata: Metadata = {
   title: "Checkout",
   description:
-    "Complete your order. Choose delivery, pickup, or dine-in and pay with JazzCash, Easypaisa, or cash on delivery.",
+    "Complete your order. Choose delivery, pickup, or dine-in and pay with Easypaisa or cash on delivery.",
   robots: {
     index: false,
     follow: false,

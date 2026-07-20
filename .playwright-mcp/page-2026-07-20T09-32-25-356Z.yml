@@ -1,0 +1,36 @@
+- generic [active] [ref=f4e1]:
+  - generic [ref=f4e2]:
+    - complementary [ref=f4e3]:
+      - generic [ref=f4e4]:
+        - img "Digital QR Menue" [ref=f4e6]
+        - generic [ref=f4e7]:
+          - generic [ref=f4e8]: Digital QR
+          - generic [ref=f4e9]: Menue
+      - navigation [ref=f4e10]:
+        - link "Dashboard" [ref=f4e11] [cursor=pointer]:
+          - /url: /dashboard
+        - link "Menu" [ref=f4e18] [cursor=pointer]:
+          - /url: /dashboard/menu
+        - link "Deals" [ref=f4e25] [cursor=pointer]:
+          - /url: /dashboard/deals
+        - link "Orders" [ref=f4e31] [cursor=pointer]:
+          - /url: /dashboard/orders
+        - link "Announcements" [ref=f4e36] [cursor=pointer]:
+          - /url: /dashboard/announcements
+        - link "Analytics" [ref=f4e41] [cursor=pointer]:
+          - /url: /dashboard/analytics
+        - link "Profile" [ref=f4e46] [cursor=pointer]:
+          - /url: /dashboard/settings
+        - link "Subscription" [ref=f4e51] [cursor=pointer]:
+          - /url: /dashboard/subscription
+        - link "QR Code" [ref=f4e55] [cursor=pointer]:
+          - /url: /dashboard/qr
+      - button "Sign Out" [ref=f4e65] [cursor=pointer]
+    - banner [ref=f4e70]:
+      - heading "Analytics" [level=1] [ref=f4e73]
+      - generic [ref=f4e74]:
+        - button "Enable push notifications" [ref=f4e75] [cursor=pointer]
+        - link "Profile" [ref=f4e79] [cursor=pointer]:
+          - /url: /dashboard/settings
+    - main [ref=f4e84]
+  - alert [ref=f4e92]

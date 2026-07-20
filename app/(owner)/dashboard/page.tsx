@@ -18,8 +18,7 @@ type PageState = "loading" | "ready" | "error" | "offline"
 export default function DashboardPage() {
   const router = useRouter()
   const sub = useSubscription()
-  const { restaurant, orderCount, planLimits, loading: subLoading } = sub
-  const hasAiAccess = (planLimits?.aiPostsPerMonth ?? 0) > 0
+  const { restaurant, orderCount, loading: subLoading } = sub
   const [pageState, setPageState] = useState<PageState>("loading")
   const [todayOrders, setTodayOrders] = useState(0)
   const [yesterdayOrders, setYesterdayOrders] = useState(0)
@@ -416,20 +415,6 @@ export default function DashboardPage() {
             <p className="text-[10px] text-white/60">Categories & dishes</p>
           </div>
         </Link>
-        {hasAiAccess && (
-          <Link
-            href="/dashboard/ai-posts"
-            className="bg-gradient-to-br from-[#7C3AED] to-[#2563EB] text-white p-4 rounded-2xl flex items-center gap-3 group cursor-pointer hover:shadow-lg transition-shadow"
-          >
-            <div className="bg-white/10 p-2.5 rounded-xl shrink-0">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold truncate">AI Posts</p>
-              <p className="text-[10px] text-white/60">Generate with AI</p>
-            </div>
-          </Link>
-        )}
         <Link
           href="/dashboard/settings"
           className="bg-white border border-[#F0F0F0] p-4 rounded-2xl flex items-center gap-3 group cursor-pointer hover:bg-[#F9FAFB] transition-colors"
@@ -505,7 +490,7 @@ export default function DashboardPage() {
             </div>
             <div className="bg-white border border-[#F0F0F0] p-4 rounded-2xl">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-[#555]">Today Revenue</span>
-              <span className="text-2xl font-bold text-black mt-1 block truncate">{formatPrice(todayRevenue)}</span>
+              <span className="text-2xl font-bold text-black mt-1 block">{formatPrice(todayRevenue)}</span>
               <span className={`text-[10px] font-medium mt-2 flex items-center gap-1 ${revenueTrend >= 0 ? "text-[#25D366]" : "text-[#DC2626]"}`}>
                 {revenueTrend >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                 {revenueTrend === 0 && todayRevenue === 0 ? "No data yet" : `${Math.abs(revenueTrend)}% vs yesterday`}
@@ -518,7 +503,7 @@ export default function DashboardPage() {
             </div>
             <div className="bg-white border border-[#F0F0F0] p-4 rounded-2xl">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-[#555]">Monthly Revenue</span>
-              <span className="text-2xl font-bold text-black mt-1 block truncate">{formatPrice(monthlyRevenue)}</span>
+              <span className="text-2xl font-bold text-black mt-1 block">{formatPrice(monthlyRevenue)}</span>
               <span className="text-[10px] font-medium mt-2 text-[#999]">This month</span>
             </div>
           </div>

@@ -1,0 +1,228 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - link "Digital QR Menue Digital QR Menue" [ref=e5] [cursor=pointer]:
+        - /url: /restaurants
+        - img "Digital QR Menue" [ref=e6]
+        - generic [ref=e7]: Digital QR Menue
+      - navigation [ref=e8]:
+        - link "Home" [ref=e9] [cursor=pointer]:
+          - /url: /restaurants
+        - link "Favorites" [ref=e13] [cursor=pointer]:
+          - /url: /favorites
+          - text: Favs
+        - link "Cart" [ref=e16] [cursor=pointer]:
+          - /url: /cart
+        - link "Orders" [ref=e21] [cursor=pointer]:
+          - /url: /account
+  - main [ref=e25]:
+    - generic [ref=e26]:
+      - generic [ref=e28]:
+        - generic [ref=e29]:
+          - generic [ref=e30]: Discover restaurants near you
+          - heading "Browse Restaurants" [level=1] [ref=e33]
+          - paragraph [ref=e34]: Explore digital menus from restaurants across Pakistan. Tap any restaurant to browse their menu and order directly via WhatsApp.
+        - textbox "Search restaurants, cuisines, or locations..." [ref=e42]
+      - main [ref=e43]:
+        - generic [ref=e45]:
+          - button "All Cities" [ref=e46] [cursor=pointer]
+          - button "D-Type" [ref=e47] [cursor=pointer]
+          - button "Faisalabad" [ref=e48] [cursor=pointer]
+          - button "Fasilabad" [ref=e49] [cursor=pointer]
+        - heading "9 restaurants" [level=2] [ref=e51]
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - link [ref=e54] [cursor=pointer]:
+              - /url: /menu/d-muaz-mptu9epf
+              - img "D MUAZ" [ref=e56]
+            - link [ref=e57] [cursor=pointer]:
+              - /url: /menu/d-muaz-mptu9epf
+              - generic [ref=e58]:
+                - heading "D MUAZ" [level=3] [ref=e59]
+                - generic [ref=e60]: Sealed
+              - generic [ref=e64]:
+                - generic [ref=e65]: testingg
+                - generic [ref=e71]: ·
+                - generic [ref=e72]: Faisalabad
+              - generic [ref=e76]:
+                - generic [ref=e77]: 30 min
+                - generic [ref=e81]: Rs 100
+            - generic [ref=e87]:
+              - button "Add to favorites" [ref=e88] [cursor=pointer]
+              - link "Menu" [ref=e91] [cursor=pointer]:
+                - /url: /menu/d-muaz-mptu9epf
+          - generic [ref=e94]:
+            - link "L" [ref=e95] [cursor=pointer]:
+              - /url: /menu/lovely-resuturent-mram0cnx
+            - link [ref=e97] [cursor=pointer]:
+              - /url: /menu/lovely-resuturent-mram0cnx
+              - generic [ref=e98]:
+                - heading "Lovely resuturent" [level=3] [ref=e99]
+                - generic [ref=e100]: Sealed
+              - generic [ref=e104]:
+                - generic [ref=e105]: ·
+                - generic [ref=e106]: Faisalabad
+              - generic [ref=e110]:
+                - generic [ref=e111]: 30 min
+                - generic [ref=e115]: Free
+            - generic [ref=e121]:
+              - button "Add to favorites" [ref=e122] [cursor=pointer]
+              - link "Menu" [ref=e125] [cursor=pointer]:
+                - /url: /menu/lovely-resuturent-mram0cnx
+          - generic [ref=e128]:
+            - link [ref=e129] [cursor=pointer]:
+              - /url: /menu/sher-hassan-mq40ywg7
+              - img "Maki" [ref=e131]
+            - link [ref=e132] [cursor=pointer]:
+              - /url: /menu/sher-hassan-mq40ywg7
+              - generic [ref=e133]:
+                - heading "Maki" [level=3] [ref=e134]
+                - generic [ref=e135]: Closed
+              - generic [ref=e137]:
+                - generic [ref=e138]: BBQ , FAST FOODS AND DINER etc
+                - generic [ref=e144]: ·
+                - generic [ref=e145]: Fasilabad
+              - generic [ref=e149]:
+                - generic [ref=e150]: 30 min
+                - generic [ref=e154]: Free
+            - generic [ref=e160]:
+              - button "Add to favorites" [ref=e161] [cursor=pointer]
+              - link "Menu" [ref=e164] [cursor=pointer]:
+                - /url: /menu/sher-hassan-mq40ywg7
+          - generic [ref=e167]:
+            - link [ref=e168] [cursor=pointer]:
+              - /url: /menu/maki-mr7kg2cu
+              - img "Maki" [ref=e170]
+            - link [ref=e171] [cursor=pointer]:
+              - /url: /menu/maki-mr7kg2cu
+              - generic [ref=e172]:
+                - heading "Maki" [level=3] [ref=e173]
+                - generic [ref=e174]: Open
+              - generic [ref=e176]:
+                - generic [ref=e177]: BBQ
+                - generic [ref=e183]: ·
+                - generic [ref=e184]: Faisalabad
+              - generic [ref=e188]:
+                - generic [ref=e189]: 5 min
+                - generic [ref=e193]: Rs 100
+            - generic [ref=e199]:
+              - button "Add to favorites" [ref=e200] [cursor=pointer]
+              - link "Menu" [ref=e203] [cursor=pointer]:
+                - /url: /menu/maki-mr7kg2cu
+          - generic [ref=e206]:
+            - link [ref=e207] [cursor=pointer]:
+              - /url: /menu/maz-makki-mqdd8oml
+              - img "Maz makki" [ref=e209]
+            - link [ref=e210] [cursor=pointer]:
+              - /url: /menu/maz-makki-mqdd8oml
+              - generic [ref=e211]:
+                - heading "Maz makki" [level=3] [ref=e212]
+                - generic [ref=e213]: Open
+              - generic [ref=e215]:
+                - generic [ref=e216]: alll theire avalible
+                - generic [ref=e222]: ·
+                - generic [ref=e223]: Fasilabad
+              - generic [ref=e227]:
+                - generic [ref=e228]: 30 min
+                - generic [ref=e232]: Free
+            - generic [ref=e238]:
+              - button "Add to favorites" [ref=e239] [cursor=pointer]
+              - link "Menu" [ref=e242] [cursor=pointer]:
+                - /url: /menu/maz-makki-mqdd8oml
+          - generic [ref=e245]:
+            - link "M" [ref=e246] [cursor=pointer]:
+              - /url: /menu/muhammad-maki-mpwnk0tl
+            - link [ref=e248] [cursor=pointer]:
+              - /url: /menu/muhammad-maki-mpwnk0tl
+              - generic [ref=e249]:
+                - heading "MUHAMMAD MAKI" [level=3] [ref=e250]
+                - generic [ref=e251]: Sealed
+              - generic [ref=e255]:
+                - generic [ref=e256]: ·
+                - generic [ref=e257]: D-Type
+              - generic [ref=e261]:
+                - generic [ref=e262]: 30 min
+                - generic [ref=e266]: Free
+            - generic [ref=e272]:
+              - button "Add to favorites" [ref=e273] [cursor=pointer]
+              - link "Menu" [ref=e276] [cursor=pointer]:
+                - /url: /menu/muhammad-maki-mpwnk0tl
+          - generic [ref=e279]:
+            - link "M" [ref=e280] [cursor=pointer]:
+              - /url: /menu/muhammad-muaz-maki-mraug71x
+            - link [ref=e282] [cursor=pointer]:
+              - /url: /menu/muhammad-muaz-maki-mraug71x
+              - generic [ref=e283]:
+                - heading "MUHAMMAD MUAZ MAKI" [level=3] [ref=e284]
+                - generic [ref=e285]: Sealed
+              - generic [ref=e289]:
+                - generic [ref=e290]: ·
+                - generic [ref=e291]: Faisalabad
+              - generic [ref=e295]:
+                - generic [ref=e296]: 30 min
+                - generic [ref=e300]: Free
+            - generic [ref=e306]:
+              - button "Add to favorites" [ref=e307] [cursor=pointer]
+              - link "Menu" [ref=e310] [cursor=pointer]:
+                - /url: /menu/muhammad-muaz-maki-mraug71x
+          - generic [ref=e313]:
+            - link "M" [ref=e314] [cursor=pointer]:
+              - /url: /menu/muhammad-muaz-maki-mraelp3v
+            - link [ref=e316] [cursor=pointer]:
+              - /url: /menu/muhammad-muaz-maki-mraelp3v
+              - generic [ref=e317]:
+                - heading "MUHAMMAD MUAZ MAKI" [level=3] [ref=e318]
+                - generic [ref=e319]: Sealed
+              - generic [ref=e323]:
+                - generic [ref=e324]: ·
+                - generic [ref=e325]: D-Type
+              - generic [ref=e329]:
+                - generic [ref=e330]: 30 min
+                - generic [ref=e334]: Free
+            - generic [ref=e340]:
+              - button "Add to favorites" [ref=e341] [cursor=pointer]
+              - link "Menu" [ref=e344] [cursor=pointer]:
+                - /url: /menu/muhammad-muaz-maki-mraelp3v
+          - generic [ref=e347]:
+            - link [ref=e348] [cursor=pointer]:
+              - /url: /menu/sher-hassan-mptsm32y
+              - img "Sher Hassan" [ref=e350]
+            - link [ref=e351] [cursor=pointer]:
+              - /url: /menu/sher-hassan-mptsm32y
+              - generic [ref=e352]:
+                - heading "Sher Hassan" [level=3] [ref=e353]
+                - generic [ref=e354]: Sealed
+              - generic [ref=e358]:
+                - generic [ref=e359]: Bdhdjdje
+                - generic [ref=e365]: ·
+                - generic [ref=e366]: Faisalabad
+              - generic [ref=e370]:
+                - generic [ref=e371]: 10 min
+                - generic [ref=e375]: Free
+            - generic [ref=e381]:
+              - button "Add to favorites" [ref=e382] [cursor=pointer]
+              - link "Menu" [ref=e385] [cursor=pointer]:
+                - /url: /menu/sher-hassan-mptsm32y
+  - contentinfo [ref=e389]:
+    - generic [ref=e390]:
+      - generic [ref=e391]:
+        - generic [ref=e392]:
+          - generic [ref=e393]:
+            - img "Digital QR Menue" [ref=e394]
+            - text: Digital QR Menue
+          - paragraph [ref=e395]: Made in Pakistan with 💚
+        - generic [ref=e396]:
+          - link "Pricing" [ref=e397] [cursor=pointer]:
+            - /url: /pricing
+          - link "Restaurants" [ref=e398] [cursor=pointer]:
+            - /url: /restaurants
+          - link "About" [ref=e399] [cursor=pointer]:
+            - /url: /about
+          - link "Contact" [ref=e400] [cursor=pointer]:
+            - /url: /contact
+        - generic [ref=e401]:
+          - link "Privacy Policy" [ref=e402] [cursor=pointer]:
+            - /url: /privacy
+          - link "Terms of Service" [ref=e403] [cursor=pointer]:
+            - /url: /terms
+      - generic [ref=e404]: © 2026 Digital QR Menue. All rights reserved.

@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { Dialog } from "@/components/ui/dialog"
-import { Plus, X, Trash2, Table2 } from "lucide-react"
+import { Plus, X, Trash2, Table2, Lock, Sparkles, ArrowUp } from "lucide-react"
+import Link from "next/link"
 
 type Table = {
   id: string
@@ -18,6 +19,8 @@ type Table = {
   created_at: string
 }
 
+const TABLES_ENABLED_PLANS = ["growth", "growth-yearly", "premium", "premium-yearly"]
+
 export default function TablesPage() {
   const { t } = useI18n()
   const [tables, setTables] = useState<Table[]>([])
@@ -27,12 +30,30 @@ export default function TablesPage() {
   const [capacity, setCapacity] = useState(4)
   const [error, setError] = useState("")
   const [saving, setSaving] = useState(false)
+  const [plan, setPlan] = useState<string>("trial")
+
+  const canHaveTables = TABLES_ENABLED_PLANS.includes(plan)
 
   const fetchTables = useCallback(async () => {
     try {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
+
+      // Fetch plan info first
+      const { data: restaurant } = await supabase
+        .from("restaurants")
+        .select("plan")
+        .eq("owner_id", user.id)
+        .maybeSingle()
+
+      if (restaurant) {
+        setPlan(restaurant.plan)
+        if (!TABLES_ENABLED_PLANS.includes(restaurant.plan)) {
+          setLoading(false)
+          return
+        }
+      }
 
       const res = await fetch("/api/owner/tables")
       if (res.ok) {
@@ -96,6 +117,35 @@ export default function TablesPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin w-6 h-6 border-2 border-black border-t-transparent rounded-full" />
+      </div>
+    )
+  }
+
+  // ── Plan upgrade prompt ──
+  if (!canHaveTables) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold">Table Management</h1>
+        </div>
+
+        <Card className="p-12 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center mx-auto mb-4">
+            <Lock className="w-8 h-8 text-amber-600" />
+          </div>
+          <h2 className="text-lg font-bold mb-2">Tables are locked</h2>
+          <p className="text-gray-500 text-sm max-w-md mx-auto mb-6">
+            Table management is available on <strong>Growth</strong> and <strong>Premium</strong> plans.
+            Upgrade to start adding tables for your customers.
+          </p>
+          <Link
+            href="/dashboard/subscription"
+            className="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-semibold text-sm hover:opacity-90 transition-all"
+          >
+            <ArrowUp className="w-4 h-4" />
+            Upgrade Plan
+          </Link>
+        </Card>
       </div>
     )
   }
