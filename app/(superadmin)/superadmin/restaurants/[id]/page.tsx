@@ -11,7 +11,13 @@ import { ArrowLeft, Phone, MapPin, Mail, Calendar, ExternalLink, ShoppingBag, Ut
 import Link from "next/link"
 import type { Restaurant } from "@/types"
 import { PLAN_PRICES, type PlanLimitsPartial } from "@/lib/subscription"
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts"
+import dynamic from "next/dynamic"
+
+// Dynamically import recharts components — huge bundle (~50KB gzipped)
+const OrderChart = dynamic(
+  () => import("./OrderChart"),
+  { ssr: false, loading: () => <div className="h-48 bg-gray-50 rounded-xl animate-pulse" /> }
+)
 
 export default function RestaurantDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -84,7 +90,7 @@ export default function RestaurantDetailPage() {
     }
   }
 
-  useEffect(() => { if (id) fetchData() }, [id])
+  useEffect(() => { if (id) fetchData() }, [id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const scheduleRefetch = () => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
@@ -103,6 +109,7 @@ export default function RestaurantDetailPage() {
       if (debounceRef.current) clearTimeout(debounceRef.current)
       supabase.removeChannel(channel)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
   const handleToggleActive = async () => {
@@ -237,7 +244,7 @@ export default function RestaurantDetailPage() {
             <code className="text-sm text-[#555]">/{restaurant.slug}</code>
           </div>
         </div>
-        <a href={`/menu/${restaurant.slug}`} target="_blank" rel="noopener"
+        <a href={`/${restaurant.slug}`} target="_blank" rel="noopener"
           className="px-6 py-2 border border-black text-black text-sm font-semibold rounded-lg hover:bg-[#F3F4F5] transition-colors flex items-center gap-2">
           <ExternalLink className="w-4 h-4" /> View Menu
         </a>
@@ -311,11 +318,20 @@ export default function RestaurantDetailPage() {
                 <p className="text-xs text-[#999] text-center py-8">No data</p>
               ) : (
                 <div className="h-20 w-full relative">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={chart7}>
-                      <Line type="monotone" dataKey="revenue" stroke="#006d2f" strokeWidth={2} dot={false} />
-                    </LineChart>
-                  </ResponsiveContainer>
+                  {/* Mini sparkline with absolute values */}
+                  {(() => {
+                    const maxRev = Math.max(...chart7.map((x) => x.revenue), 1)
+                    const points = chart7.map((d, i) => {
+                      const x = (i / Math.max(chart7.length - 1, 1)) * 100
+                      const y = 100 - (d.revenue / maxRev) * 100
+                      return `${x},${y}`
+                    }).join(" ")
+                    return (
+                      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full">
+                        <polyline fill="none" stroke="#006d2f" strokeWidth="2" points={points} />
+                      </svg>
+                    )
+                  })()}
                 </div>
               )}
             </div>

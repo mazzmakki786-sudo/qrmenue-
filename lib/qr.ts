@@ -1,6 +1,6 @@
 export function getMenuUrl(slug: string): string {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-  return `${baseUrl}/menu/${slug}`
+  return `${baseUrl}/${slug}`
 }
 
 export function downloadQRAsPNG(svgElement: SVGElement, filename: string): void {

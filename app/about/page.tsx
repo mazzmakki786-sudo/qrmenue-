@@ -7,14 +7,14 @@ import { COMPANY_INFO } from "@/lib/company-info"
 export const metadata: Metadata = {
   title: "About Us — Pakistan's Free QR Menu & WhatsApp Ordering Platform",
   description:
-    "Learn about Digital QR Menue — Pakistan's no-commission digital QR menu platform. We help restaurants create free digital menus, eliminate printing costs, and get orders directly on WhatsApp. Founded in Lahore, serving restaurants across Pakistan.",
+    "Learn about Digital QR Menue — Pakistan's no-commission digital QR menu platform. We help restaurants create free digital menus, eliminate printing costs, and get orders directly on WhatsApp. Founded in Faisalabad, serving restaurants across Pakistan.",
   alternates: {
     canonical: "https://www.digitalmenue.com/about",
   },
   openGraph: {
     title: "About Digital QR Menue — Free QR Menu Platform for Restaurants in Pakistan",
     description:
-      "Digital QR Menue helps Pakistani restaurants create digital QR menus, eliminate costly paper reprints, and receive commission-free orders via WhatsApp. Serving Lahore, Karachi, Islamabad, and all of Pakistan.",
+      "Digital QR Menue helps Pakistani restaurants create digital QR menus, eliminate costly paper reprints, and receive commission-free orders via WhatsApp. Serving Faisalabad, Karachi, Islamabad, and all of Pakistan.",
     url: "https://www.digitalmenue.com/about",
   },
 }
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 export const revalidate = 3600
 
 const milestones = [
-  { year: "2024", title: "Founded in Lahore", description: "Digital QR Menue was launched with a simple mission: help Pakistani restaurants go digital without expensive apps or hefty commissions." },
+  { year: "2024", title: "Founded in Faisalabad", description: "Digital QR Menue was launched with a simple mission: help Pakistani restaurants go digital without expensive apps or hefty commissions." },
   { year: "2025", title: "1,000+ Restaurants Onboarded", description: "Grew to serve restaurants, cafes, dhabas, cloud kitchens, and home-based food businesses across 20+ cities in Pakistan." },
   { year: "2026", title: "Pakistan's Leading QR Menu Platform", description: "Trusted by thousands of restaurants nationwide. Zero-commission WhatsApp ordering, free QR codes, and a complete digital ordering ecosystem." },
 ]
@@ -50,11 +50,11 @@ export default function AboutPage() {
             name: "Digital QR Menue",
             url: "https://digitalmenue.com",
             foundingDate: "2024",
-            foundingLocation: "Lahore, Pakistan",
+            foundingLocation: "Faisalabad, Pakistan",
             areaServed: "PK",
             address: {
               "@type": "PostalAddress",
-              addressLocality: "Lahore",
+              addressLocality: "Faisalabad",
               addressRegion: "Punjab",
               addressCountry: "PK",
             },
@@ -84,7 +84,7 @@ export default function AboutPage() {
             </h1>
             <p className="text-sm md:text-base text-[#AAA] max-w-xl mx-auto">
               Pakistan&apos;s no-commission QR menu and WhatsApp ordering platform.
-              Built in Lahore, for Pakistani restaurants.
+              Built in Faisalabad, for Pakistani restaurants.
             </p>
           </div>
         </section>
@@ -121,7 +121,7 @@ export default function AboutPage() {
                   no complexity.
                 </p>
                 <p>
-                  Today, thousands of restaurants across Lahore, Karachi, Islamabad, Faisalabad,
+                  Today, thousands of restaurants across Faisalabad, Karachi, Islamabad,
                   Rawalpindi, and every major city in Pakistan use Digital QR Menue to manage their
                   digital menus and receive orders directly on WhatsApp. From small home-based
                   bakers to multi-branch restaurant chains, our platform serves them all.

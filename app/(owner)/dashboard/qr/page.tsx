@@ -2,11 +2,16 @@
 
 import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { QRCodeSVG } from "qrcode.react"
+import dynamic from "next/dynamic"
 import { useSubscription } from "@/lib/hooks/useSubscription"
 import { Download, Printer, Copy, Check, ExternalLink, Info, Share2 } from "lucide-react"
 import type { Restaurant } from "@/types"
 import { escapeHtml } from "@/lib/utils"
+
+const QRCodeSVG = dynamic(
+  () => import("qrcode.react").then((m) => m.QRCodeSVG),
+  { ssr: false }
+)
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "")
 
@@ -53,7 +58,7 @@ export default function QRPage() {
     )
   }
 
-  const menuUrl = `${APP_URL}/menu/${restaurant.slug}`
+  const menuUrl = `${APP_URL}/${restaurant.slug}`
 
   const downloadQR = (filename: string) => {
     const svg = document.getElementById("restaurant-qr")

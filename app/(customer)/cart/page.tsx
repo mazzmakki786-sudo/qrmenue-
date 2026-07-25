@@ -52,7 +52,7 @@ export default function CartPage() {
 
   return (
     <>
-    <div className="min-h-screen bg-[#F9FAFB] md:hidden animate-fade-in">
+    <div className="min-h-screen bg-[#F9FAFB] md:hidden animate-fade-in pb-32">
       {/* Header */}
       <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-border">
         <div className="flex items-center justify-between px-4 h-14 max-w-[600px] mx-auto">
@@ -201,7 +201,7 @@ export default function CartPage() {
       </div>
 
       {/* Fixed Checkout Bar */}
-      <div className="fixed bottom-[60px] left-0 right-0 bg-white border-t border-border p-4 z-40">
+      <div className="fixed bottom-[56px] left-0 right-0 bg-white border-t border-border p-3 sm:p-4 z-40 safe-bottom md:bottom-0 md:z-40">
         <div className="max-w-[600px] mx-auto">
           <Link href="/checkout" className="block" data-testid="checkout-link-mobile">
             <div className="bg-primary text-white rounded-xl h-12 flex items-center justify-between px-5 hover:bg-primary-hover active:scale-[0.99] transition-all">

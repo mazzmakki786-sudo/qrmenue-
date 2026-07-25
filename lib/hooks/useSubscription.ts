@@ -57,12 +57,18 @@ export function useSubscription(): UseSubscriptionReturn {
   const [loading, setLoading] = useState(true)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null)
+  const loadingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const getSupabase = () => {
     if (!supabaseRef.current) supabaseRef.current = createClient()
     return supabaseRef.current
   }
 
   const fetchAll = useCallback(async () => {
+    // Safety timeout — ensure loading never stays true beyond 20s
+    if (loadingTimerRef.current) clearTimeout(loadingTimerRef.current)
+    loadingTimerRef.current = setTimeout(() => {
+      setLoading(false)
+    }, 20000)
     try {
       const supabase = getSupabase()
       const { data: { user } } = await supabase.auth.getUser()
@@ -114,6 +120,7 @@ export function useSubscription(): UseSubscriptionReturn {
       console.error("useSubscription fetch error", e)
     } finally {
       setLoading(false)
+      if (loadingTimerRef.current) clearTimeout(loadingTimerRef.current)
     }
   }, [])
 
@@ -170,8 +177,10 @@ export function useSubscription(): UseSubscriptionReturn {
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
+      if (loadingTimerRef.current) clearTimeout(loadingTimerRef.current)
       supabase.removeChannel(channel)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restaurant?.id, fetchAll])
 
   const plan: Plan = (restaurant?.plan as Plan) || "trial"

@@ -41,6 +41,7 @@ const createOrderSchema = z.object({
   payment_method: z.enum(["cod", "bank_transfer", "easypaisa"]).optional(),
   deal_id: z.string().uuid().nullable().optional(),
   discount_amount: z.number().int().nonnegative().optional(),
+  delivery_fee: z.number().int().nonnegative().optional(),
 }).refine(
   (data) => {
     if (data.order_type === "takeaway" || data.order_type === "delivery") {
@@ -221,7 +222,8 @@ export const POST = safeRoute(async (request) => {
   }
 
   const recalculatedSubtotal = recalculatedItems.reduce((sum, item) => sum + item.subtotal, 0)
-  const recalculatedTotal = recalculatedSubtotal - (parsed.data.discount_amount || 0)
+  const deliveryFee = parsed.data.delivery_fee ?? 0
+  const recalculatedTotal = recalculatedSubtotal - (parsed.data.discount_amount || 0) + deliveryFee
   if (recalculatedTotal <= 0) {
     return NextResponse.json({ error: "Invalid total price after discount" }, { status: 400 })
   }
@@ -307,6 +309,7 @@ export const POST = safeRoute(async (request) => {
         order_status: "received",
         deal_id: parsed.data.deal_id || null,
         discount_amount: parsed.data.discount_amount || 0,
+        delivery_fee: deliveryFee,
         whatsapp_sent: true,
       })
       .select()
@@ -343,6 +346,7 @@ export const POST = safeRoute(async (request) => {
       tableNumber: parsed.data.table_number ?? undefined,
       deliveryAddress: parsed.data.delivery_address ?? undefined,
       restaurantPhone: restaurant?.phone || "",
+      deliveryFee,
     })
 
     // ── Notification log (fire-and-forget, non-critical) ──

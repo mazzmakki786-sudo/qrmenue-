@@ -1,11 +1,11 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
 import { LogOut } from "lucide-react"
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
+import { LogoIcon } from "@/components/shared/LogoIcon"
 
 export default function SuperAdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -27,13 +27,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
           <div className="max-w-6xl mx-auto px-3 md:px-10 h-14 md:h-16 flex justify-between items-center">
             <div className="flex items-center gap-4 md:gap-8 min-w-0">
               <Link href="/superadmin" className="flex items-center gap-2 shrink-0">
-                <Image
-                  src="/icon.svg"
-                  alt="Digital QR Menue"
-                  width={22}
-                  height={22}
-                  className="w-[22px] h-[22px] rounded"
-                />
+                <LogoIcon className="w-[22px] h-[22px]" />
                 <div className="flex flex-col leading-tight">
                   <span className="font-black text-black text-sm md:text-base">Digital QR</span>
                   <span className="font-black text-black text-sm md:text-base -mt-1">Menue</span>

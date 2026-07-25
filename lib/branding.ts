@@ -25,17 +25,20 @@ export function buildBrandingConfig(
     banner_enabled?: boolean | null
     banner_image_url?: string | null
     banner_link_url?: string | null
+    brand_primary_color?: string | null
+    brand_accent_color?: string | null
   } | null
 ): BrandingConfig {
   const isPremium = plan === "premium"
+  const hasCustomBranding = planLimits.customBranding && isPremium
 
   return {
-    primaryColor: DEFAULT_BRANDING.primaryColor,
-    accentColor: DEFAULT_BRANDING.accentColor,
+    primaryColor: dbRow?.brand_primary_color || DEFAULT_BRANDING.primaryColor,
+    accentColor: dbRow?.brand_accent_color || DEFAULT_BRANDING.accentColor,
     bannerEnabled: isPremium ? (dbRow?.banner_enabled ?? false) : false,
     bannerImageUrl: isPremium ? (dbRow?.banner_image_url || null) : null,
     bannerLinkUrl: isPremium ? (dbRow?.banner_link_url || null) : null,
-    hasCustomBranding: false,
+    hasCustomBranding,
     isPremium,
   }
 }

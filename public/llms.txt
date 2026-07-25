@@ -9,39 +9,58 @@ Digital QR Menue (Digitalmenue.com) helps Pakistani restaurants create digital Q
 ## Key Pages
 
 - [Home](https://www.digitalmenue.com): Pakistan's #1 QR Code Menu Platform for Restaurants
+- [Digital Menu for Restaurants](https://www.digitalmenue.com/digital-menu-for-restaurants): Complete guide to digital menus in Pakistan
+- [Free Digital Menu](https://www.digitalmenue.com/free-digital-menu): Free QR code menu for Pakistani restaurants
+- [Best Digital Menu](https://www.digitalmenue.com/best-digital-menu-for-restaurants): Compare top digital menu platforms in Pakistan
+- [Free QR Code Menu](https://www.digitalmenue.com/qr-code-menu-free): Generate a free QR code menu
+- [Digital Menu QR Code](https://www.digitalmenue.com/digital-menu-qr-code): Create QR code menus for restaurants
+- [QR Code Restaurant Menu](https://www.digitalmenue.com/qr-code-restaurant-menu): Interactive QR code menus
+- [Digital Menu Design](https://www.digitalmenue.com/digital-menu-design): Tips and templates for menu design
+- [Digital Menu App](https://www.digitalmenue.com/digital-menu-app): Web-based menu app — no download needed
+- [QR Menu App](https://www.digitalmenue.com/qr-menu-app): QR menu app for restaurants
+- [Digital Menu Tablet](https://www.digitalmenue.com/digital-menu-tablet): Tablet/iPad menu system
+- [Digital Menu PDF](https://www.digitalmenue.com/digital-menu-pdf): Convert PDF menu to QR code
+- [Scan Menu Code Online Free](https://www.digitalmenue.com/scan-menu-code-online-free): How to scan QR code menus
+- [QR Menu Login](https://www.digitalmenue.com/qr-menu-login): Restaurant dashboard login
 - [Browse Restaurants](https://www.digitalmenue.com/restaurants): Find restaurants with digital menus across Pakistan
 - [Pricing](https://www.digitalmenue.com/pricing): Free Trial, Starter (PKR 1,200/mo), Growth (PKR 2,500/mo), Premium (PKR 4,500/mo)
 - [FAQ](https://www.digitalmenue.com/faq): Frequently asked questions about QR menus and WhatsApp ordering
+- [Blog](https://www.digitalmenue.com/blog): Restaurant tips & QR menu guides
 - [Contact](https://www.digitalmenue.com/contact): Get in touch via WhatsApp or email
 - [Privacy Policy](https://www.digitalmenue.com/privacy)
 - [Terms of Service](https://www.digitalmenue.com/terms)
 
+## City Pages
+
+
 ## Features
 
 - Digital menu with QR codes
-- WhatsApp order integration
+- WhatsApp order integration (zero commission)
 - QR code generation and management
 - Analytics dashboard
 - Urdu / English bilingual support
 - JazzCash & Easypaisa payment integration
 - Real-time order notifications
-- Staff management
 - Table management
+- Instant menu updates (30 seconds)
+- No app download for customers
 
 ## Pricing
 
-| Tier | Price | Dishes | Categories |
-|------|-------|--------|------------|
-| Trial | PKR 0 (7 days) | 20 | 5 |
-| Starter | PKR 1,200 / month | 30 | 10 |
-| Growth | PKR 2,500 / month | 50 | 20 |
-| Premium | PKR 4,500 / month | 100 | Unlimited |
+| Tier | Price | Best For |
+|------|-------|----------|
+| Trial | PKR 0 (30 days) | Testing all features |
+| Starter | PKR 1,500 / month | Small restaurants & cafes |
+| Growth | PKR 2,500 / month | Growing restaurants |
+| Premium | PKR 4,500 / month | High-volume restaurants |
 
 ## Key Facts
-- Pakistan's first QR-based digital menu and WhatsApp ordering platform for restaurants
-- Founded: 2024
-- Served cities: Lahore, Karachi, Islamabad, Faisalabad, and all Pakistan
-- Pricing: Free Trial (PKR 0, 30 days), Starter (PKR 1,200/mo), Growth (PKR 2,500/mo), Premium (PKR 4,500/mo)
+- Pakistan's #1 QR-based digital menu and WhatsApp ordering platform for restaurants
+- Founded: 2024 in Faisalabad, Pakistan
+- Used by 1,000+ restaurants across Pakistan
+- Served cities: Faisalabad, Lahore, Karachi, Islamabad, Rawalpindi, Peshawar, Multan, and all Pakistan
+- Pricing: Free Trial (PKR 0, 30 days), Starter (PKR 1,500/mo), Growth (PKR 2,500/mo), Premium (PKR 4,500/mo)
 - Payment integration: JazzCash, Easypaisa
 - Bilingual: English and Urdu
 - Zero commission on all orders
@@ -52,4 +71,4 @@ Digital QR Menue (Digitalmenue.com) helps Pakistani restaurants create digital Q
 
 - WhatsApp: +92-314-6325823
 - Email: dmenue@gmail.com
-- Cities served: Lahore, Karachi, Islamabad, Faisalabad, and all Pakistan
+- Office: Faisalabad, Punjab, Pakistan

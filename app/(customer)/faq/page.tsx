@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { LandingHeader } from "@/components/shared/LandingHeader"
-import { FaqJsonLd, JsonLd } from "@/components/JsonLd"
+import { FaqJsonLd, JsonLd, SpeakableJsonLd } from "@/components/JsonLd"
 
 export const metadata: Metadata = {
   title: "Frequently Asked Questions — Digital QR Menue | QR Menu & WhatsApp Ordering Help",
@@ -53,7 +53,7 @@ const categories: Array<{ title: string; faqs: FaqItem[] }> = [
       },
       {
         q: "What are the pricing plans?",
-        a: "Free Trial (PKR 0, 30 days), Starter (PKR 1,500/mo), Growth (PKR 2,500/mo), Premium (PKR 4,500/mo). All paid plans include unlimited orders, QR codes, WhatsApp ordering, and zero commission.",
+        a: 'Free Trial (PKR 0, 30 days), Starter (PKR 1,500/mo), Growth (PKR 2,500/mo), Premium (PKR 4,500/mo). All paid plans include unlimited orders, QR codes, WhatsApp ordering, and zero commission.\n\n| Plan | Monthly Fee | Trial | Commission | Dishes | WhatsApp |\n|---|---|---|---|---|---|\n| Free Trial | PKR 0 | 30 days | 0% | Up to 20 | Included |\n| Starter | PKR 1,500/mo | — | 0% | Up to 50 | Included |\n| Growth | PKR 2,500/mo | — | 0% | Up to 100 | Included |\n| Premium | PKR 4,500/mo | — | 0% | Unlimited | Included |',
       },
       {
         q: "Can I upgrade or downgrade anytime?",
@@ -194,6 +194,10 @@ export default function FaqPage() {
           ],
         }}
       />
+      <SpeakableJsonLd
+        cssSelector={[".speakable-faq-summary", ".speakable-faq-answer"]}
+        url="https://www.digitalmenue.com/faq"
+      />
       <div className="min-h-screen bg-white">
         <LandingHeader />
         <section className="bg-black text-white py-20 md:py-28">
@@ -201,9 +205,8 @@ export default function FaqPage() {
             <h1 className="text-3xl md:text-5xl font-bold mb-4">
               Frequently Asked Questions
             </h1>
-            <p className="text-sm md:text-base text-[#AAA] max-w-xl mx-auto">
-              Everything you need to know about Digital QR Menue — Pakistan&apos;s
-              no-commission QR menu and WhatsApp ordering platform.
+            <p className="speakable-faq-summary text-sm md:text-base text-[#AAA] max-w-xl mx-auto">
+              Digital QR Menue is Pakistan&apos;s QR code menu platform for restaurants. Create a digital menu in under 5 minutes, get a QR code, and customers scan it to browse dishes and order via WhatsApp. Free trial. Plans from PKR 1,500/month. Zero commission on orders. No app download needed.
             </p>
           </div>
         </section>

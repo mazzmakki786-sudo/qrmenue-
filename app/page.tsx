@@ -1,12 +1,22 @@
 import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { ContactSection } from "@/components/shared/ContactSection"
+import dynamic from "next/dynamic"
 import { LandingHeader } from "@/components/shared/LandingHeader"
-import { PricingSection } from "@/components/pricing/PricingSection"
 import { AppFooter } from "@/components/shared/AppFooter"
 import { mergeYearlyPlans, type DBPlan } from "@/lib/map-plans"
 import { FaqJsonLd } from "@/components/JsonLd"
+
+export const revalidate = 300
+
+const ContactSection = dynamic(() =>
+  import("@/components/shared/ContactSection").then((m) => ({ default: m.ContactSection })),
+  { ssr: true }
+)
+const PricingSection = dynamic(() =>
+  import("@/components/pricing/PricingSection").then((m) => ({ default: m.PricingSection })),
+  { ssr: true }
+)
 
 export default async function LandingPage() {
   const supabase = await createClient()
@@ -40,19 +50,21 @@ export default async function LandingPage() {
   const initialPlans = dbPlans ? mergeYearlyPlans(dbPlans) : []
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white flex flex-col">
       <LandingHeader />
-      {/* ─── Hero ─── */}
+      {/* ─── Hero ─── */
+      /* Main content flex-1 pushes footer to bottom */}
+      <div className="flex-1">
       <section className="relative bg-black">
         <div className="max-w-6xl mx-auto px-5 pt-28 pb-24 md:pt-40 md:pb-32">
           <div className="max-w-4xl mx-auto text-center">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/10 mb-8">
-              <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse" aria-hidden="true" />
               <span className="text-xs font-medium text-white/70 tracking-wide">Trusted by 1,000+ Restaurants in Pakistan</span>
             </div>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.05] mb-6 max-w-5xl mx-auto text-white">
-              From Menu to Order in Seconds &mdash;{" "}
+            <h1 className="text-[clamp(1.75rem,6vw,5rem)] sm:text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.05] mb-6 max-w-5xl mx-auto text-white">
+              Free Digital Menu for Restaurants &mdash;{" "}
               <span className="text-[#25D366]">Zero Commission</span>
             </h1>
             <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto leading-relaxed mb-10">
@@ -61,14 +73,14 @@ export default async function LandingPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/signup/restaurant"
-                className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-white text-black text-sm font-semibold hover:bg-[#25D366] hover:text-black transition-all hover:scale-[1.02] active:scale-[0.98] text-center shadow-lg shadow-white/10"
+                className="w-full sm:w-auto px-5 sm:px-8 py-3 sm:py-3.5 rounded-xl bg-white text-black text-xs sm:text-sm font-semibold hover:bg-[#25D366] hover:text-black transition-all hover:scale-[1.02] active:scale-[0.98] text-center shadow-lg shadow-white/10"
               >
                 Start Free Trial
               </Link>
               <Link
                 href="/restaurants"
                 data-testid="browse-restaurants-btn"
-                className="w-full sm:w-auto px-8 py-3.5 rounded-xl border border-white/20 text-sm font-semibold text-white/70 hover:bg-white/10 hover:text-white hover:border-white/40 transition-all text-center"
+                className="w-full sm:w-auto px-5 sm:px-8 py-3 sm:py-3.5 rounded-xl border border-white/20 text-xs sm:text-sm font-semibold text-white/70 hover:bg-white/10 hover:text-white hover:border-white/40 transition-all text-center"
               >
                 Browse Restaurants
               </Link>
@@ -81,7 +93,7 @@ export default async function LandingPage() {
       <section className="py-20 md:py-28">
         <div className="max-w-6xl mx-auto px-5">
           <div className="text-center mb-12 md:mb-20">
-            <p className="text-xs font-semibold tracking-widest uppercase text-[#999] mb-4">How It Works</p>
+            <p className="text-xs font-semibold tracking-widest uppercase text-[#666] mb-4">How It Works</p>
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight">Get started in 3 simple steps</h2>
           </div>
           {/* Mobile: stacked with timeline */}
@@ -191,7 +203,7 @@ export default async function LandingPage() {
               Why QR Code Menus Are Taking Over Pakistan&apos;s Restaurant Industry
             </h3>
             <p>
-              There&apos;s a reason more <strong>restaurants with QR code menus</strong> are appearing across Lahore, Karachi,
+              There&apos;s a reason more <strong>restaurants with QR code menus</strong> are appearing across Faisalabad, Lahore, Karachi,
               Islamabad, and every major Pakistani city. Food aggregators like Foodpanda charge 25&ndash;35% commission per order.
               A restaurant doing PKR 200,000 in monthly orders loses PKR 50,000+ to commissions. By switching to a
               <strong>menu QR code restaurant</strong> system with direct WhatsApp ordering, that commission disappears entirely.
@@ -201,8 +213,8 @@ export default async function LandingPage() {
               Digital QR Menue is the most comprehensive platform available.
             </p>
             <p>
-              Whether you run a <Link href="/restaurants?city=lahore" className="text-black underline underline-offset-2 hover:no-underline font-medium">caf&eacute; in Lahore</Link>,
-              a <Link href="/restaurants?city=karachi" className="text-black underline underline-offset-2 hover:no-underline font-medium">restaurant in Karachi</Link>,
+              Whether you run a <Link href="/restaurants?city=faisalabad" className="text-black underline underline-offset-2 hover:no-underline font-medium">restaurant in Faisalabad</Link>,
+              a <Link href="/restaurants?city=lahore" className="text-black underline underline-offset-2 hover:no-underline font-medium">caf&eacute; in Lahore</Link>,
               a <Link href="/restaurants?city=islamabad" className="text-black underline underline-offset-2 hover:no-underline font-medium">diner in Islamabad</Link>,
               or an eatery in <Link href="/restaurants?city=faisalabad" className="text-black underline underline-offset-2 hover:no-underline font-medium">Faisalabad</Link>,
               <Link href="/restaurants?city=rawalpindi" className="text-black underline underline-offset-2 hover:no-underline font-medium">Rawalpindi</Link>,
@@ -223,7 +235,7 @@ export default async function LandingPage() {
       <section className="py-20 md:py-28">
         <div className="max-w-6xl mx-auto px-5">
           <div className="text-center mb-14 md:mb-20">
-            <p className="text-xs font-semibold tracking-widest uppercase text-[#999] mb-4">Why Choose Us</p>
+            <p className="text-xs font-semibold tracking-widest uppercase text-[#555] mb-4">Why Choose Us</p>
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
               The smarter way to run your restaurant
             </h2>
@@ -261,8 +273,8 @@ export default async function LandingPage() {
                 <p className="text-sm text-[#555] leading-relaxed mb-4">{item.desc}</p>
                 <ul className="space-y-2">
                   {item.highlights.map((h, j) => (
-                    <li key={j} className="flex items-start gap-3 text-sm text-[#666]">
-                      <svg className="w-4 h-4 mt-0.5 text-[#25D366] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <li key={j} className="flex items-start gap-3 text-sm text-[#555]">
+                      <svg className="w-4 h-4 mt-0.5 text-[#1A8C3F] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
                       {h}
@@ -287,7 +299,7 @@ export default async function LandingPage() {
       <section className="py-20 md:py-28 bg-[#FAFAFA]">
         <div className="max-w-6xl mx-auto px-5">
           <div className="text-center mb-12">
-            <p className="text-xs font-semibold tracking-widest uppercase text-[#999] mb-4">Blog</p>
+            <p className="text-xs font-semibold tracking-widest uppercase text-[#555] mb-4">Blog</p>
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">Restaurant Tips &amp; Guides</h2>
             <p className="text-sm text-[#555] max-w-md mx-auto">
               Learn how to grow your restaurant with QR menus, WhatsApp ordering, and smart marketing strategies.
@@ -299,8 +311,8 @@ export default async function LandingPage() {
               className="group block bg-white rounded-2xl border border-[#F0F0F0] p-6 md:p-8 hover:border-[#D0D0D0] hover:shadow-sm transition-all mb-8"
             >
               <div className="flex items-center gap-3 mb-3">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#25D366]">QR Menu Guides</span>
-                <span className="text-[11px] text-[#999]">7 min read</span>
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#1BA94A]">QR Menu Guides</span>
+                <span className="text-[11px] text-[#555]">7 min read</span>
               </div>
               <h3 className="text-lg md:text-xl font-bold text-black mb-2 group-hover:text-[#25D366] transition-colors">
                 How to Make a QR Code Menu for Your Restaurant: Complete Step-by-Step Guide
@@ -329,7 +341,7 @@ export default async function LandingPage() {
       <FaqJsonLd faqs={[
         {
           question: "How can I order food online?",
-          answer: "Ordering food online is easy with Digital QR Menue. Simply visit any restaurant's digital menu by scanning their QR code with your phone camera, browse the menu, select your dishes, and tap 'Order via WhatsApp.' The order is sent directly to the restaurant — no app download, no sign-up required. You can pay via JazzCash, Easypaisa, or cash on delivery. Browse our restaurant directory to find digital menus near you in Lahore, Karachi, Islamabad, and across Pakistan."
+          answer: "Ordering food online is easy with Digital QR Menue. Simply visit any restaurant's digital menu by scanning their QR code with your phone camera, browse the menu, select your dishes, and tap 'Order via WhatsApp.' The order is sent directly to the restaurant — no app download, no sign-up required. You can pay via JazzCash, Easypaisa, or cash on delivery. Browse our restaurant directory to find digital menus near you in Faisalabad, Lahore, Karachi, Islamabad, and across Pakistan."
         },
         {
           question: "Which delivery app is best for food?",
@@ -371,7 +383,7 @@ export default async function LandingPage() {
       <section className="py-20 md:py-28">
         <div className="max-w-3xl mx-auto px-5">
           <div className="text-center mb-12">
-            <p className="text-xs font-semibold tracking-widest uppercase text-[#999] mb-4">FAQ</p>
+            <p className="text-xs font-semibold tracking-widest uppercase text-[#555] mb-4">FAQ</p>
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">Frequently Asked Questions</h2>
             <p className="text-sm text-[#555] max-w-md mx-auto">Got questions? We have answers.</p>
           </div>
@@ -387,7 +399,7 @@ export default async function LandingPage() {
               <details key={i} className="group bg-white border border-[#E8E8E8] rounded-xl p-4 md:p-5 open:bg-[#FAFAFA] transition-colors">
                 <summary className="flex items-center justify-between cursor-pointer font-semibold text-sm md:text-base list-none">
                   <span>{faq.q}</span>
-                  <span className="text-[#999] group-open:rotate-45 transition-transform text-xl leading-none shrink-0 ml-4">+</span>
+                  <span className="text-[#555] group-open:rotate-45 transition-transform text-xl leading-none shrink-0 ml-4">+</span>
                 </summary>
                 <p className="mt-3 text-sm text-[#555] leading-relaxed">{faq.a}</p>
               </details>
@@ -428,6 +440,7 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      </div>{/* end flex-1 */}
       <AppFooter />
     </div>
   )

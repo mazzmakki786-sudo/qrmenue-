@@ -10,6 +10,7 @@ interface WhatsAppOrder {
   tableNumber?: string
   deliveryAddress?: string
   restaurantPhone: string
+  deliveryFee?: number
 }
 
 export function buildWhatsAppURL(order: WhatsAppOrder): string {
@@ -33,6 +34,7 @@ export function buildWhatsAppURL(order: WhatsAppOrder): string {
     "Items:",
     itemsList,
     "",
+    order.deliveryFee ? `Delivery Fee: Rs ${order.deliveryFee}` : "Pickup / Dine-in",
     `Total: Rs ${order.totalPrice}`,
     `Payment: ${order.paymentMethod === "cod" ? "Cash on Delivery" : "Bank Transfer"}`,
     "",

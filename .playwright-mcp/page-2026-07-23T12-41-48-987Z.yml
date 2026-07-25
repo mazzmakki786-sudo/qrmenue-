@@ -1,0 +1,149 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - link "Digital QR Menue Digital QR Menue" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img "Digital QR Menue" [ref=e7]
+        - generic [ref=e8]: Digital QR Menue
+      - navigation "Main navigation" [ref=e10]:
+        - link "Restaurants" [ref=e11] [cursor=pointer]:
+          - /url: /restaurants
+        - link "Pricing" [ref=e12] [cursor=pointer]:
+          - /url: /pricing
+        - link "About" [ref=e13] [cursor=pointer]:
+          - /url: /about
+        - link "Blog" [ref=e14] [cursor=pointer]:
+          - /url: /blog
+        - link "FAQ" [ref=e15] [cursor=pointer]:
+          - /url: /faq
+        - link "Contact" [ref=e16] [cursor=pointer]:
+          - /url: /contact
+        - link "Sign In" [ref=e18] [cursor=pointer]:
+          - /url: /login
+        - link "Get Started" [ref=e19] [cursor=pointer]:
+          - /url: /signup/restaurant
+    - generic [ref=e21]:
+      - heading "Contact Us" [level=1] [ref=e22]
+      - paragraph [ref=e23]: We're here to help you get the most out of Digital QR Menue.
+    - generic [ref=e24]:
+      - generic [ref=e26]:
+        - link [ref=e27] [cursor=pointer]:
+          - /url: https://wa.me/03045451154
+          - heading "WhatsApp" [level=3] [ref=e30]
+          - paragraph [ref=e31]: Chat with us on WhatsApp for quick support
+        - generic [ref=e32]:
+          - heading "Email" [level=3] [ref=e35]
+          - paragraph [ref=e36]: maki2@gmail.com
+        - generic [ref=e37]:
+          - heading "Business Hours" [level=3] [ref=e40]
+          - generic [ref=e41]:
+            - paragraph [ref=e42]: "Monday – Friday: 9:00 AM – 6:00 PM"
+            - paragraph [ref=e43]: "Saturday: 9:00 AM – 2:00 PM"
+            - paragraph [ref=e44]: "Sunday: Closed"
+      - paragraph [ref=e45]: Lahore, Punjab, Pakistan | DIGITAL MENUE IS OWNED AND OPERATED BY MUHAMMAD MUAZ MAKI
+      - generic [ref=e46]:
+        - paragraph [ref=e47]: Already have an account? Sign in to manage your restaurant.
+        - generic [ref=e48]:
+          - link "Sign In" [ref=e49] [cursor=pointer]:
+            - /url: /login
+          - link "Get Started" [ref=e50] [cursor=pointer]:
+            - /url: /signup/restaurant
+    - generic [ref=e52]:
+      - heading "Send Us a Message" [level=2] [ref=e53]
+      - paragraph [ref=e54]: Have a question or feedback? We'd love to hear from you.
+      - generic [ref=e56]:
+        - generic [ref=e57]:
+          - generic [ref=e58]: Name
+          - textbox "Name" [ref=e59]:
+            - /placeholder: Your name
+        - generic [ref=e60]:
+          - generic [ref=e61]: Email
+          - textbox "Email" [ref=e62]:
+            - /placeholder: your@email.com
+        - generic [ref=e63]:
+          - generic [ref=e64]: Message
+          - textbox "Message" [ref=e65]:
+            - /placeholder: How can we help you?
+        - button "Send Message" [ref=e66] [cursor=pointer]
+    - generic [ref=e68]:
+      - heading "Follow Us" [level=2] [ref=e69]
+      - paragraph [ref=e70]: Stay connected on social media for updates, offers, and more.
+      - link [ref=e72] [cursor=pointer]:
+        - /url: https://www.youtube.com/@muazmaki
+  - generic [ref=e76]:
+    - generic [ref=e77]:
+      - generic [ref=e78]:
+        - generic [ref=e79]:
+          - img "Digital QR Menue" [ref=e80]
+          - generic [ref=e81]: Digital QR Menue
+        - paragraph [ref=e82]: Create a free digital QR menu for your restaurant in Pakistan. Eliminate printing costs, get orders directly on WhatsApp, and save 30% on Foodpanda commissions.
+        - paragraph [ref=e83]: Made in Pakistan with 💚
+      - generic [ref=e84]:
+        - heading "Quick Links" [level=4] [ref=e85]
+        - list [ref=e86]:
+          - listitem [ref=e87]:
+            - link "Browse Restaurants" [ref=e88] [cursor=pointer]:
+              - /url: /restaurants
+          - listitem [ref=e89]:
+            - link "Pricing & Plans" [ref=e90] [cursor=pointer]:
+              - /url: /pricing
+          - listitem [ref=e91]:
+            - link "About Us" [ref=e92] [cursor=pointer]:
+              - /url: /about
+          - listitem [ref=e93]:
+            - link "Blog" [ref=e94] [cursor=pointer]:
+              - /url: /blog
+          - listitem [ref=e95]:
+            - link "FAQ" [ref=e96] [cursor=pointer]:
+              - /url: /faq
+          - listitem [ref=e97]:
+            - link "Contact" [ref=e98] [cursor=pointer]:
+              - /url: /contact
+      - generic [ref=e99]:
+        - heading "Resources" [level=4] [ref=e100]
+        - list [ref=e101]:
+          - listitem [ref=e102]:
+            - link "Digital Menu" [ref=e103] [cursor=pointer]:
+              - /url: /digital-menu-for-restaurants
+          - listitem [ref=e104]:
+            - link "Free Digital Menu" [ref=e105] [cursor=pointer]:
+              - /url: /free-digital-menu
+          - listitem [ref=e106]:
+            - link "QR Code Menu" [ref=e107] [cursor=pointer]:
+              - /url: /digital-menu-qr-code
+          - listitem [ref=e108]:
+            - link "Menu Design" [ref=e109] [cursor=pointer]:
+              - /url: /digital-menu-design
+          - listitem [ref=e110]:
+            - link "Menu App" [ref=e111] [cursor=pointer]:
+              - /url: /digital-menu-app
+          - listitem [ref=e112]:
+            - link "Best Digital Menu" [ref=e113] [cursor=pointer]:
+              - /url: /best-digital-menu-for-restaurants
+          - listitem [ref=e114]:
+            - link "Free QR Menu" [ref=e115] [cursor=pointer]:
+              - /url: /qr-code-menu-free
+          - listitem [ref=e116]:
+            - link "PDF to QR Menu" [ref=e117] [cursor=pointer]:
+              - /url: /digital-menu-pdf
+      - generic [ref=e118]:
+        - heading "Contact" [level=4] [ref=e119]
+        - list [ref=e120]:
+          - listitem [ref=e121]:
+            - link "+92-314-6325823" [ref=e122] [cursor=pointer]:
+              - /url: https://wa.me/923146325823
+          - listitem [ref=e125]:
+            - link "support@digitalmenue.com" [ref=e126] [cursor=pointer]:
+              - /url: mailto:support@digitalmenue.com
+          - listitem [ref=e129]: Lahore, Punjab, Pakistan
+        - heading "Legal" [level=4] [ref=e133]
+        - list [ref=e134]:
+          - listitem [ref=e135]:
+            - link "Privacy Policy" [ref=e136] [cursor=pointer]:
+              - /url: /privacy
+          - listitem [ref=e137]:
+            - link "Terms of Service" [ref=e138] [cursor=pointer]:
+              - /url: /terms
+    - generic [ref=e140]:
+      - paragraph [ref=e141]: © 2026 Digital QR Menue. All rights reserved.
+      - paragraph [ref=e142]: DIGITAL MENUE IS OWNED AND OPERATED BY MUHAMMAD MUAZ MAKI

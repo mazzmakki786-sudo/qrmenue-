@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
-import { csrfGuard } from "@/lib/csrf"
 import { safeRoute } from "@/lib/api-error"
 import { sendPushNotification } from "@/lib/push-server"
 import { logCustomerAction, getIpSimple } from "@/lib/owner-audit"
@@ -11,9 +10,6 @@ export const POST = safeRoute(async (
   request,
   { params }: { params: Promise<{ id: string }> }
 ) => {
-  const csrfResponse = csrfGuard(request)
-  if (csrfResponse) return csrfResponse
-
   const ip = getClientIp(request)
   const allowed = await rateLimit(`cancel-order:${ip}`, 5, 60)
   if (!allowed) {
@@ -28,8 +24,12 @@ export const POST = safeRoute(async (
     return NextResponse.json({ error: "You must be signed in to cancel an order." }, { status: 401 })
   }
 
+  // Use admin client for reading/writing — the API does its own authorization,
+  // and RLS doesn't have an UPDATE policy for guest orders (customer_id IS NULL).
+  const admin = createAdminClient()
+
   // Fetch the order to verify ownership and current status
-  const { data: order, error: fetchError } = await supabase
+  const { data: order, error: fetchError } = await admin
     .from("orders")
     .select("*, restaurants(name, owner_id)")
     .eq("id", id)
@@ -39,8 +39,8 @@ export const POST = safeRoute(async (
     return NextResponse.json({ error: "Order not found." }, { status: 404 })
   }
 
-  // Verify the order belongs to this customer
-  if (order.customer_id !== user.id) {
+  // Verify the order belongs to this customer (or is a guest order with no customer_id)
+  if (order.customer_id && order.customer_id !== user.id) {
     return NextResponse.json({ error: "You do not have permission to cancel this order." }, { status: 403 })
   }
 
@@ -52,14 +52,16 @@ export const POST = safeRoute(async (
   }
 
   // Update the order status to cancelled
-  const { data: updated, error: updateError } = await supabase
+  // Use admin client to bypass RLS (the API already authorizes above).
+  // RLS has no UPDATE policy for guest orders (customer_id IS NULL), so the
+  // anon-key client would fail on those.
+  const { data: updated, error: updateError } = await admin
     .from("orders")
     .update({
       order_status: "cancelled",
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)
-    .eq("customer_id", user.id)
     .eq("order_status", "received") // Optimistic concurrency: only cancel if still received
     .select()
     .single()

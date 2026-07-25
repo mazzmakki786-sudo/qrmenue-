@@ -29,31 +29,82 @@ const securityHeaders = [
   },
 ]
 
+// Cache-Control headers for static assets — long max-age for immutable files
+const assetCacheHeaders = [
+  { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+]
+
+// Cache-Control for images (next/image optimized) — 30 days
+const imageCacheHeaders = [
+  { key: "Cache-Control", value: "public, max-age=2592000, stale-while-revalidate=86400" },
+]
+
+// Cache-Control for fonts — 1 year
+const fontCacheHeaders = [
+  { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+]
+
 const nextConfig: NextConfig = {
   outputFileTracingRoot: __dirname,
   poweredByHeader: false,
   reactStrictMode: true,
   compress: true,
   experimental: {
-    optimizePackageImports: ['lucide-react', 'recharts', '@radix-ui/react-dialog', '@radix-ui/react-tabs'],
+    optimizePackageImports: [
+      "lucide-react",
+      "recharts",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-tabs",
+      "@radix-ui/react-label",
+      "@radix-ui/react-separator",
+      "@radix-ui/react-switch",
+    ],
+    webpackBuildWorker: true,
   },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "*.supabase.co" },
     ],
-    formats: ['image/avif', 'image/webp'],
+    formats: ["image/avif", "image/webp"],
+    deviceSizes: [480, 640, 768, 1024, 1280],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
+    minimumCacheTTL: 2592000, // 30 days
   },
   redirects: async () => [
+    // SEO — consolidate competing landing pages into primary pillar hub
     {
-      source: "/:path*",
-      has: [{ type: "host", value: "qr-menue-one.vercel.app" }],
-      destination: "https://digitalmenue.com/:path*",
+      source: "/qr-code-menu-free",
+      destination: "/digital-menu-for-restaurants",
       permanent: true,
     },
     {
-      source: "/:path*",
-      has: [{ type: "host", value: "qrmenu.vercel.app" }],
-      destination: "https://digitalmenue.com/:path*",
+      source: "/digital-menu-qr-code",
+      destination: "/digital-menu-for-restaurants",
+      permanent: true,
+    },
+    {
+      source: "/qr-code-restaurant-menu",
+      destination: "/digital-menu-for-restaurants",
+      permanent: true,
+    },
+    {
+      source: "/free-digital-menu",
+      destination: "/digital-menu-for-restaurants",
+      permanent: true,
+    },
+    {
+      source: "/best-digital-menu-for-restaurants",
+      destination: "/digital-menu-for-restaurants",
+      permanent: true,
+    },
+    {
+      source: "/scan-menu-code-online-free",
+      destination: "/digital-menu-for-restaurants",
+      permanent: true,
+    },
+    {
+      source: "/qr-menu-app",
+      destination: "/digital-menu-app",
       permanent: true,
     },
   ],
@@ -62,7 +113,24 @@ const nextConfig: NextConfig = {
       source: "/(.*)",
       headers: securityHeaders,
     },
+    // Cache static assets aggressively
+    {
+      source: "/_next/static/:path*",
+      headers: assetCacheHeaders,
+    },
+    // Cache optimized images
+    {
+      source: "/_next/image/:path*",
+      headers: imageCacheHeaders,
+    },
+    // Cache fonts
+    {
+      source: "/fonts/:path*",
+      headers: fontCacheHeaders,
+    },
   ],
+  // Reduce unused JS by excluding heavy modules from server bundle
+  serverExternalPackages: ["bcryptjs", "nodemailer", "web-push"],
 }
 
 export default nextConfig

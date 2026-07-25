@@ -4,7 +4,8 @@ import { safeRoute } from "@/lib/api-error"
 import { csrfGuard } from "@/lib/csrf"
 import { checkRateLimit } from "@/lib/rate-limiter"
 import { restaurantSignupSchema, sanitize, logValidationFailure } from "@/lib/auth-validation"
-import { slugify } from "@/lib/utils"
+import { generateRestaurantSlug } from "@/lib/slug"
+import { TRIAL_DURATION_DAYS } from "@/lib/subscription"
 
 const VALID_PLANS = ["starter", "growth", "premium"]
 
@@ -52,7 +53,7 @@ export const POST = safeRoute(async (request) => {
   }
 
   const ownerId = authData.user.id
-  const slug = `${slugify(sanitize(name))}-${Date.now().toString(36)}`
+  const slug = await generateRestaurantSlug(sanitize(name), sanitize(city))
 
   const restaurantInsertData: Record<string, unknown> = {
     owner_id: ownerId,
@@ -62,7 +63,7 @@ export const POST = safeRoute(async (request) => {
     city: sanitize(city),
     plan: hasPaidPlan ? selectedPlan : "trial",
     trial_start: hasPaidPlan ? null : new Date().toISOString(),
-    trial_end: hasPaidPlan ? null : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    trial_end: hasPaidPlan ? null : new Date(Date.now() + TRIAL_DURATION_DAYS * 24 * 60 * 60 * 1000).toISOString(),
     image_upload_allowed: true,
     is_active: true,
     is_suspended: false,

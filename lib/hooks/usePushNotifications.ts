@@ -23,7 +23,14 @@ export function usePushNotifications(restaurantId: string | null) {
 
   useEffect(() => {
     setSupported("serviceWorker" in navigator && "PushManager" in window)
-    setPermission(Notification.permission)
+    // Notification may not exist or its permission may throw in some iOS web views
+    try {
+      if (typeof Notification !== "undefined" && typeof Notification.permission !== "undefined") {
+        setPermission(Notification.permission)
+      }
+    } catch {
+      // iOS web views may throw on Notification.access — fall back to default
+    }
   }, [])
 
   const registerServiceWorker = useCallback(async () => {
@@ -135,6 +142,11 @@ export function usePushNotifications(restaurantId: string | null) {
   const requestPermission = useCallback(async () => {
     if (!supported) {
       console.warn("[push] Not supported")
+      return false
+    }
+    // Check if Notification API is actually available (may not be in iOS web views)
+    if (typeof Notification === "undefined" || typeof Notification.requestPermission !== "function") {
+      console.warn("[push] Notification API not available")
       return false
     }
     try {

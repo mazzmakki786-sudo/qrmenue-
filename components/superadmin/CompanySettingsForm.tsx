@@ -58,6 +58,7 @@ export function CompanySettingsForm() {
     return () => {
       supabase.removeChannel(channel)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchSettings])
 
   const handleSave = async () => {

@@ -1,11 +1,14 @@
 "use client"
 
+export const dynamic = "force-dynamic"
+
 import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { useSubscription } from "@/lib/hooks/useSubscription"
 import { Check, Upload, ImageIcon, Info } from "lucide-react"
 import NextImage from "next/image"
+import Link from "next/link"
 
 export default function BrandingPage() {
   const { restaurant, loading } = useSubscription()
@@ -100,12 +103,12 @@ export default function BrandingPage() {
           <p className="text-sm text-[#555] max-w-sm mb-4">
             Add a promotional banner to your customer menu. This feature is exclusive to the <strong>Premium</strong> plan.
           </p>
-          <a
+          <Link
             href="/dashboard/subscription"
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white text-sm font-semibold rounded-full hover:opacity-90 transition-all"
           >
             Upgrade to Premium
-          </a>
+          </Link>
         </div>
       </div>
     )

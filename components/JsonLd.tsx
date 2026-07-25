@@ -16,30 +16,62 @@ export function OrganizationJsonLd() {
     <JsonLd
       data={{
         "@context": "https://schema.org",
-        "@type": "Organization",
-        name: "Digital QR Menue",
-        url: "https://digitalmenue.com",
-        logo: "https://digitalmenue.com/icon.svg",
-        description:
-          "Pakistan's leading QR-based digital menu and ordering platform for restaurants. Create a free QR code menu in under 5 minutes.",
-        foundingDate: "2024",
-        address: {
-          "@type": "PostalAddress",
-          addressCountry: "PK",
-        },
-        contactPoint: {
-          "@type": "ContactPoint",
-          telephone: "+92-314-6325823",
-          contactType: "customer service",
-          availableLanguage: ["English", "Urdu"],
-        },
-        sameAs: [
-          "https://www.facebook.com/digitalmenue",
-          "https://www.instagram.com/digitalmenue",
-          "https://www.linkedin.com/company/digitalmenue",
-          "https://www.tiktok.com/@digitalmenue",
-          "https://www.youtube.com/@digitalmenue",
-          "https://x.com/digitalmenue",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.digitalmenue.com/#organization",
+            name: "Digital QR Menue",
+            legalName: "Digital QR Menue",
+            url: "https://www.digitalmenue.com",
+            logo: "https://www.digitalmenue.com/favicon.ico",
+            description:
+              "Pakistan's leading QR-based digital menu and ordering platform for restaurants. Create a free QR code menu in under 5 minutes.",
+            foundingDate: "2024",
+            foundingLocation: {
+              "@type": "Place",
+              name: "Lahore, Pakistan",
+            },
+            founder: {
+              "@type": "Person",
+              "@id": "https://www.digitalmenue.com/#founder",
+            },
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: "Faisalabad",
+              addressRegion: "Punjab",
+              addressCountry: "PK",
+            },
+            contactPoint: {
+              "@type": "ContactPoint",
+              telephone: "+92-314-6325823",
+              contactType: "customer service",
+              email: "support@digitalmenue.com",
+              availableLanguage: ["English", "Urdu"],
+            },
+            areaServed: {
+              "@type": "Country",
+              name: "Pakistan",
+            },
+            sameAs: [
+              "https://www.facebook.com/digitalmenue",
+              "https://www.instagram.com/digitalmenue",
+              "https://www.linkedin.com/company/digitalmenue",
+              "https://www.tiktok.com/@digitalmenue",
+              "https://www.youtube.com/@digitalmenue",
+              "https://x.com/digitalmenue",
+            ],
+          },
+          {
+            "@type": "Person",
+            "@id": "https://www.digitalmenue.com/#founder",
+            name: "Muhammad Muaz Maki",
+            alternateName: "Maz Makki",
+            jobTitle: "Founder & Chief Executive Officer",
+            url: "https://www.digitalmenue.com",
+            sameAs: [
+              "https://www.linkedin.com/in/muazmaki2",
+            ],
+          },
         ],
       }}
     />
@@ -56,11 +88,6 @@ export function WebsiteJsonLd() {
         url: "https://digitalmenue.com",
         description:
           "Pakistan's #1 free digital QR menu platform for restaurants. Create a QR code menu, get orders on WhatsApp, and eliminate Foodpanda commissions.",
-        potentialAction: {
-          "@type": "SearchAction",
-          target: "https://digitalmenue.com/restaurants?q={search_term_string}",
-          "query-input": "required name=search_term_string",
-        },
       }}
     />
   )
@@ -73,11 +100,14 @@ export function SoftwareApplicationJsonLd() {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
         name: "Digital QR Menue Platform",
-        operatingSystem: "Web",
+        operatingSystem: "Android, iOS, Web",
         applicationCategory: "BusinessApplication",
+        applicationSubCategory: "Restaurant Management",
         description:
           "Pakistan's leading digital QR menu and WhatsApp online ordering platform for restaurants. Create a free QR code menu, eliminate printing costs, and get commission-free orders directly on WhatsApp with real-time updates.",
         url: "https://digitalmenue.com",
+        softwareHelp: "https://www.digitalmenue.com/faq",
+        countryOfOrigin: "PK",
         offers: [
           {
             "@type": "Offer",
@@ -85,11 +115,16 @@ export function SoftwareApplicationJsonLd() {
             price: 0,
             priceCurrency: "PKR",
             availability: "https://schema.org/InStock",
+            eligibleDuration: {
+              "@type": "QuantitativeValue",
+              value: 30,
+              unitCode: "DAY",
+            },
           },
           {
             "@type": "Offer",
             name: "Starter",
-            price: 1200,
+            price: 1500,
             priceCurrency: "PKR",
             availability: "https://schema.org/InStock",
           },
@@ -114,7 +149,6 @@ export function SoftwareApplicationJsonLd() {
           url: "https://digitalmenue.com",
         },
         applicationSuite: "QRMenu",
-        countryOfOrigin: "PK",
       }}
     />
   )
@@ -174,7 +208,7 @@ export function RestaurantJsonLd({
           description ||
           `${name} - ${cuisineType || "Restaurant"} in ${city || "Pakistan"}. View menu and order via WhatsApp.`,
         image: logoUrl || undefined,
-        url: `https://digitalmenue.com/menu/${slug}`,
+        url: `https://digitalmenue.com/${slug}`,
         address: {
           "@type": "PostalAddress",
           addressLocality: city || "Pakistan",
@@ -257,7 +291,7 @@ export function PricingJsonLd() {
           {
             "@type": "Offer",
             name: "Starter",
-            price: "1200",
+            price: "1500",
             priceCurrency: "PKR",
             priceValidUntil: "2026-12-31",
             availability: "https://schema.org/InStock",
@@ -341,7 +375,7 @@ export function LocalBusinessJsonLd() {
         description:
           "Pakistan's leading free digital QR menu and WhatsApp ordering platform for restaurants, cafes, and food businesses across Pakistan. Create a QR code menu, get orders on WhatsApp, and save on commissions.",
         url: "https://digitalmenue.com",
-        logo: "https://digitalmenue.com/icon.svg",
+        logo: "https://digitalmenue.com/favicon.ico",
         image: "https://www.digitalmenue.com/og-image.png",
         telephone: "+92-314-6325823",
         email: "dmenue@gmail.com",
@@ -351,10 +385,10 @@ export function LocalBusinessJsonLd() {
           addressCountry: "PK",
         },
         areaServed: [
+          { "@type": "City", name: "Faisalabad" },
           { "@type": "City", name: "Lahore" },
           { "@type": "City", name: "Karachi" },
           { "@type": "City", name: "Islamabad" },
-          { "@type": "City", name: "Faisalabad" },
           { "@type": "City", name: "Rawalpindi" },
           { "@type": "City", name: "Peshawar" },
           { "@type": "City", name: "Multan" },
@@ -377,7 +411,7 @@ export function LocalBusinessJsonLd() {
           name: "QR Menu Plans",
           itemListElement: [
             { "@type": "Offer", itemOffered: { "@type": "Service", name: "Free Trial" }, price: "0", priceCurrency: "PKR" },
-            { "@type": "Offer", itemOffered: { "@type": "Service", name: "Starter" }, price: "1200", priceCurrency: "PKR" },
+            { "@type": "Offer", itemOffered: { "@type": "Service", name: "Starter" }, price: "1500", priceCurrency: "PKR" },
             { "@type": "Offer", itemOffered: { "@type": "Service", name: "Growth" }, price: "2500", priceCurrency: "PKR" },
             { "@type": "Offer", itemOffered: { "@type": "Service", name: "Premium" }, price: "4500", priceCurrency: "PKR" },
           ],
@@ -462,6 +496,28 @@ export function VideoObjectJsonLd({
           "@type": "Organization",
           name: "Digital QR Menue",
           url: "https://digitalmenue.com",
+        },
+      }}
+    />
+  )
+}
+
+export function SpeakableJsonLd({
+  cssSelector,
+  url,
+}: {
+  cssSelector: string[]
+  url: string
+}) {
+  return (
+    <JsonLd
+      data={{
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "@id": url,
+        speakable: {
+          "@type": "SpeakableSpecification",
+          cssSelector,
         },
       }}
     />

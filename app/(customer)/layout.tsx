@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
 import { Suspense } from "react"
 import { usePathname } from "next/navigation"
 import { ShoppingCart, Home, ClipboardList, Heart, Menu } from "lucide-react"
@@ -9,6 +8,7 @@ import { ErrorBoundary } from "@/components/shared/ErrorBoundary"
 import { Toaster } from "@/components/shared/Toaster"
 import { AppFooter } from "@/components/shared/AppFooter"
 import { useCartStore } from "@/stores/cartStore"
+import { LogoIcon } from "@/components/shared/LogoIcon"
 
 export default function CustomerLayout({
   children,
@@ -18,7 +18,18 @@ export default function CustomerLayout({
   const pathname = usePathname()
   const items = useCartStore((s) => s.items)
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
-  const hideNav = pathname === "/faq"
+
+  // SEO landing pages use LandingHeader (marketing nav), not the customer layout nav
+  const seoLandingPaths = [
+    "/faq",
+    "/digital-menu-for-restaurants",
+    "/digital-menu-pdf",
+    "/digital-menu-design",
+    "/digital-menu-tablet",
+    "/digital-menu-app",
+    "/qr-menu-login",
+  ]
+  const hideNav = seoLandingPaths.includes(pathname)
 
   const nav = [
     { href: "/restaurants", label: "Home", icon: Home, ariaLabel: "Home" },
@@ -35,20 +46,14 @@ export default function CustomerLayout({
   return (
     <ErrorBoundary>
       <Toaster />
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white flex flex-col">
         {!hideNav && (
           <>
           {/* Desktop Top Navbar */}
-          <header className="hidden md:block sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-border">
+          <header className="hidden md:block fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-border">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
               <Link href="/restaurants" className="flex items-center gap-2.5 group">
-                <Image
-                  src="/icon.svg"
-                  alt="Digital QR Menue"
-                  width={32}
-                  height={32}
-                  className="w-8 h-8 rounded-lg shrink-0"
-                />
+                <LogoIcon className="w-7 h-7 shrink-0" />
                 <span className="text-base font-bold text-black group-hover:opacity-70 transition-opacity">
                   Digital QR Menue
                 </span>
@@ -81,12 +86,15 @@ export default function CustomerLayout({
             </div>
           </header>
 
-          <main className="pb-16 md:pb-8">
+          {/* Main content expands to push footer to bottom — pt-14 offsets the fixed header on desktop */}
+          <main className="flex-1 pt-0 md:pt-14 pb-14 md:pb-0">
             <Suspense fallback={<div className="flex items-center justify-center min-h-[60vh]"><div className="animate-spin w-8 h-8 border-2 border-black border-t-transparent rounded-full" /></div>}>
               {children}
             </Suspense>
           </main>
-          <div className="pb-16 md:pb-0">
+
+          {/* Footer — pushed to bottom by flex-1 on main, with safe space above mobile nav */}
+          <div className="pb-14 md:pb-0">
             <AppFooter />
           </div>
 
@@ -94,7 +102,7 @@ export default function CustomerLayout({
           <nav
             role="navigation"
             aria-label="Main navigation"
-            className="md:hidden fixed bottom-0 left-0 right-0 h-14 bg-white border-t border-border flex items-center justify-around z-50"
+            className="md:hidden fixed bottom-0 left-0 right-0 h-14 bg-white border-t border-border flex items-center justify-around z-50 safe-bottom"
           >
             {nav.map((item) => {
               const active = isActive(item.href)
@@ -103,7 +111,7 @@ export default function CustomerLayout({
                   key={item.href}
                   href={item.href}
                   aria-label={item.ariaLabel}
-                  className={`relative flex flex-col items-center justify-center min-w-[64px] h-full transition-colors ${
+                  className={`relative flex flex-col items-center justify-center min-w-0 flex-1 h-full transition-colors ${
                     active ? "text-primary" : "text-text-muted hover:text-text-secondary"
                   }`}
                 >
@@ -126,9 +134,12 @@ export default function CustomerLayout({
           </>
         )}
         {hideNav && (
-          <main>
-            {children}
-          </main>
+          <>
+            <main className="flex-1">
+              {children}
+            </main>
+            <AppFooter />
+          </>
         )}
       </div>
     </ErrorBoundary>

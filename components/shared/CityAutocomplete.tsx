@@ -19,7 +19,7 @@ export default function CityAutocomplete({
   onChange,
   label = "City *",
   id = "city",
-  placeholder = "Lahore",
+  placeholder = "Faisalabad",
   required = true,
   error,
 }: CityAutocompleteProps) {

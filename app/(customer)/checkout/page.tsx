@@ -36,6 +36,7 @@ const PHONE_REGEX = /^03\d{2}-?\d{7}$/
 export default function CheckoutPage() {
   const router = useRouter()
   const items = useCartStore((s) => s.items)
+  const deliveryFee = useCartStore((s) => s.deliveryFee)
   const getTotalPrice = useCartStore((s) => s.getTotalPrice)
   const getDiscount = useCartStore((s) => s.getDiscount)
   const restaurantId = useCartStore((s) => s.restaurantId)
@@ -57,13 +58,12 @@ export default function CheckoutPage() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [tables, setTables] = useState<TableOption[]>([])
   const [hasTables, setHasTables] = useState(true)
-  const [termsAccepted, setTermsAccepted] = useState(false)
-
   useEffect(() => {
     const saved = loadSavedInfo()
     if (saved.name) setCustomerName(saved.name)
     if (saved.phone) setCustomerPhone(saved.phone)
     if (saved.address) setDeliveryAddress(saved.address)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   React.useEffect(() => {
@@ -148,7 +148,7 @@ export default function CheckoutPage() {
 
       const res = await fetch("/api/orders", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-csrf-token": "1" },
           body: JSON.stringify({
             restaurant_id: restaurantId,
             customer_id: user?.id || null,
@@ -168,6 +168,7 @@ export default function CheckoutPage() {
             payment_method: paymentMethod,
             deal_id: selectedDeal?.id || null,
             discount_amount: discountAmount,
+            delivery_fee: deliveryFee,
           }),
       })
 
@@ -193,7 +194,7 @@ export default function CheckoutPage() {
     } finally {
       setLocalLoading(false)
     }
-  }, [orderType, customerName, customerPhone, tableNumber, deliveryAddress, paymentMethod, items, restaurantId, getTotalPrice, selectedDeal, discountAmount, router, setCurrentOrder, setError, validateForm])
+  }, [orderType, customerName, customerPhone, tableNumber, deliveryAddress, paymentMethod, items, restaurantId, getTotalPrice, selectedDeal, discountAmount, deliveryFee, router, setCurrentOrder, setError, validateForm])
 
   if (items.length === 0 || !restaurantId) {
     return (
@@ -223,7 +224,7 @@ export default function CheckoutPage() {
 
   return (
     <>
-    <div className="min-h-screen bg-[#F9FAFB] md:hidden animate-fade-in">
+    <div className="min-h-screen bg-[#F9FAFB] md:hidden animate-fade-in pb-32">
       {/* Header */}
       <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-border">
         <div className="flex items-center gap-3 px-4 h-14 max-w-[600px] mx-auto">
@@ -422,32 +423,11 @@ export default function CheckoutPage() {
       </div>
 
       {/* Fixed Place Order Button */}
-      <div className="fixed bottom-[60px] left-0 right-0 bg-white border-t border-border p-4 z-40">
+      <div className="fixed bottom-[56px] left-0 right-0 bg-white border-t border-border p-3 sm:p-4 z-40 safe-bottom md:bottom-0 md:z-40">
         <div className="max-w-[600px] mx-auto">
-          <div className="mb-3">
-            <label className="flex items-start gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={termsAccepted}
-                onChange={(e) => setTermsAccepted(e.target.checked)}
-                className="mt-0.5 w-4 h-4 rounded border-gray-300 accent-black shrink-0"
-              />
-              <span className="text-[10px] text-text-secondary leading-relaxed">
-                I agree to the{" "}
-                <Link href="/terms" target="_blank" className="text-primary underline">Terms of Service</Link>
-                ,{" "}
-                <Link href="/privacy" target="_blank" className="text-primary underline">Privacy Policy</Link>
-                ,{" "}
-                <Link href="/refund" target="_blank" className="text-primary underline">Return &amp; Refund Policy</Link>
-                , and{" "}
-                <Link href="/shipping" target="_blank" className="text-primary underline">Shipping Policy</Link>.
-                Orders are fulfilled by the restaurant. Estimated dispatch: 20–45 minutes.
-              </span>
-            </label>
-          </div>
           <button
             onClick={handlePlaceOrder}
-            disabled={!orderType || !customerName || !termsAccepted || localLoading}
+            disabled={!orderType || !customerName || localLoading}
             data-testid="place-order-btn-mobile"
             className="w-full h-12 rounded-xl bg-primary text-white font-semibold text-[13px] hover:bg-primary-hover transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99]"
           >
@@ -615,30 +595,9 @@ export default function CheckoutPage() {
                       <span className="text-sm text-text-secondary">Total</span>
                       <span className="text-lg font-bold text-text-primary">{formatPrice(getTotalPrice())}</span>
                     </div>
-                    <div className="mb-3">
-                      <label className="flex items-start gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={termsAccepted}
-                          onChange={(e) => setTermsAccepted(e.target.checked)}
-                          className="mt-0.5 w-4 h-4 rounded border-gray-300 accent-black shrink-0"
-                        />
-                        <span className="text-[10px] text-text-secondary leading-relaxed">
-                          I agree to the{" "}
-                          <Link href="/terms" target="_blank" className="text-primary underline">Terms of Service</Link>
-                          ,{" "}
-                          <Link href="/privacy" target="_blank" className="text-primary underline">Privacy Policy</Link>
-                          ,{" "}
-                          <Link href="/refund" target="_blank" className="text-primary underline">Return &amp; Refund Policy</Link>
-                          , and{" "}
-                          <Link href="/shipping" target="_blank" className="text-primary underline">Shipping Policy</Link>.
-                          Orders fulfilled by the restaurant. Estimated dispatch: 20–45 minutes.
-                        </span>
-                      </label>
-                    </div>
                     <button
                       onClick={handlePlaceOrder}
-                      disabled={!orderType || !customerName || !termsAccepted || localLoading}
+                      disabled={!orderType || !customerName || localLoading}
                       data-testid="place-order-btn-desktop"
                       className="w-full h-12 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-hover transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >

@@ -9,3 +9,4 @@
     at y (https://www.digitalmenue.com/_next/static/chunks/1255-eae4096fb21f1304.js:1:44427)
     at async _ (https://www.digitalmenue.com/_next/static/chunks/1255-eae4096fb21f1304.js:1:43285)
     at async Object.o [as task] (https://www.digitalmenue.com/_next/static/chunks/1255-eae4096fb21f1304.js:1:123499) @ https://www.digitalmenue.com/_next/static/chunks/1255-eae4096fb21f1304.js:0
+[ 1516987ms] [WARNING] Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}. @ https://www.digitalmenue.com/_next/static/chunks/7448-2cf8b01ae3e253ce.js:0

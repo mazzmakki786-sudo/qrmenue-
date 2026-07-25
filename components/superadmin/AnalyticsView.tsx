@@ -62,12 +62,14 @@ export function AnalyticsView() {
       .on("postgres_changes", { event: "*", schema: "public", table: "customers" }, () => scheduleRefetch())
       .subscribe()
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); supabase.removeChannel(channel) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // 15s polling fallback
   useEffect(() => {
     const interval = setInterval(() => scheduleRefetch(), 15000)
     return () => clearInterval(interval)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   if (loading) {

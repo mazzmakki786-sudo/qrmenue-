@@ -32,7 +32,7 @@ export interface DBPlan {
 // Plans data changes infrequently (only when superadmin updates pricing),
 // so a 5-minute TTL is safe and greatly reduces redundant DB queries.
 let plansCache: { data: DBPlan[]; timestamp: number } | null = null
-const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes (up from 60s)
+const CACHE_TTL_MS = 60 * 1000 // 1 minute — balances freshness with DB load
 
 /**
  * Load all plans from database with fallback to hardcoded values.
@@ -176,10 +176,10 @@ export function invalidatePlansCache(): void {
 function getFallbackPlans(): DBPlan[] {
   return [
     { id: "fallback-1", slug: "trial", name: "Free Trial", price_pkr: 0, yearly_price_pkr: 0, max_dishes: 20, max_images: 20, max_orders: 10, max_categories: 20, analytics: true, custom_branding: false, can_have_qr: true, can_have_whatsapp: true, can_have_tables: false, description: "Perfect for testing", sort_order: 0, is_active: true, custom_features: [] },
-    { id: "fallback-2", slug: "starter", name: "Starter", price_pkr: 1200, yearly_price_pkr: 12000, max_dishes: 30, max_images: 10, max_orders: -1, max_categories: -1, analytics: true, custom_branding: false, can_have_qr: true, can_have_whatsapp: true, can_have_tables: false, description: "For small restaurants", sort_order: 1, is_active: true, custom_features: [] },
+    { id: "fallback-2", slug: "starter", name: "Starter", price_pkr: 1500, yearly_price_pkr: 15000, max_dishes: 30, max_images: 10, max_orders: -1, max_categories: -1, analytics: true, custom_branding: false, can_have_qr: true, can_have_whatsapp: true, can_have_tables: false, description: "For small restaurants", sort_order: 1, is_active: true, custom_features: [] },
     { id: "fallback-3", slug: "growth", name: "Growth", price_pkr: 2500, yearly_price_pkr: 25000, max_dishes: 50, max_images: 20, max_orders: -1, max_categories: -1, analytics: true, custom_branding: true, can_have_qr: true, can_have_whatsapp: true, can_have_tables: true, description: "For growing restaurants", sort_order: 2, is_active: true, custom_features: [] },
     { id: "fallback-4", slug: "premium", name: "Premium", price_pkr: 4500, yearly_price_pkr: 45000, max_dishes: 100, max_images: 100, max_orders: -1, max_categories: -1, analytics: true, custom_branding: true, can_have_qr: true, can_have_whatsapp: true, can_have_tables: true, description: "Full features", sort_order: 3, is_active: true, custom_features: [] },
-    { id: "fallback-5", slug: "starter-yearly", name: "Starter Yearly", price_pkr: 12000, yearly_price_pkr: 0, max_dishes: 30, max_images: 10, max_orders: -1, max_categories: -1, analytics: true, custom_branding: false, can_have_qr: true, can_have_whatsapp: true, can_have_tables: false, description: "For small restaurants — yearly", sort_order: 4, is_active: true, custom_features: [] },
+    { id: "fallback-5", slug: "starter-yearly", name: "Starter Yearly", price_pkr: 15000, yearly_price_pkr: 0, max_dishes: 30, max_images: 10, max_orders: -1, max_categories: -1, analytics: true, custom_branding: false, can_have_qr: true, can_have_whatsapp: true, can_have_tables: false, description: "For small restaurants — yearly", sort_order: 4, is_active: true, custom_features: [] },
     { id: "fallback-6", slug: "growth-yearly", name: "Growth Yearly", price_pkr: 25000, yearly_price_pkr: 0, max_dishes: 50, max_images: 20, max_orders: -1, max_categories: -1, analytics: true, custom_branding: true, can_have_qr: true, can_have_whatsapp: true, can_have_tables: true, description: "For growing restaurants — yearly", sort_order: 5, is_active: true, custom_features: [] },
     { id: "fallback-7", slug: "premium-yearly", name: "Premium Yearly", price_pkr: 45000, yearly_price_pkr: 0, max_dishes: 100, max_images: 100, max_orders: -1, max_categories: -1, analytics: true, custom_branding: true, can_have_qr: true, can_have_whatsapp: true, can_have_tables: true, description: "Full features — yearly", sort_order: 6, is_active: true, custom_features: [] },
   ]

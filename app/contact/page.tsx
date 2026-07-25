@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { LandingHeader } from "@/components/shared/LandingHeader"
+import { AppFooter } from "@/components/shared/AppFooter"
 import { ContactForm } from "@/components/contact/ContactForm"
 import { createAdminClient } from "@/lib/supabase/server"
 import { JsonLd } from "@/components/JsonLd"
@@ -112,10 +113,10 @@ export default async function ContactPage() {
             <div className="flex flex-col items-center p-10 md:p-12 bg-white border border-[#F0F0F0] rounded-2xl">
               <svg className="w-10 h-10 md:w-12 md:h-12 mb-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
               <h3 className="text-lg font-semibold mb-2">Business Hours</h3>
-              <div className="text-sm text-[#555] text-center space-y-1">
-                {COMPANY_INFO.hours.full.map((h, i) => (
-                  <p key={i}>{h}</p>
-                ))}
+              <div className="text-sm text-[#555] text-center leading-relaxed">
+                {COMPANY_INFO.hours.weekday}<br />
+                {COMPANY_INFO.hours.saturday}<br />
+                {COMPANY_INFO.hours.sunday}
               </div>
             </div>
           </div>
@@ -177,6 +178,7 @@ export default async function ContactPage() {
           </section>
         )}
       </div>
+      <AppFooter />
     </>
   )
 }

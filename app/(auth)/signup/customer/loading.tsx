@@ -1,14 +1,6 @@
 export default function CustomerSignupLoading() {
   return (
     <div className="w-full flex flex-col items-center">
-      {/* Back button */}
-      <div className="w-full mb-6">
-        <div className="inline-flex items-center gap-2 min-h-[44px]">
-          <div className="w-8 h-8 rounded-full bg-[#F0F0F0] animate-pulse" />
-          <div className="h-4 w-12 bg-[#F0F0F0] rounded animate-pulse" />
-        </div>
-      </div>
-
       {/* Icon + Title + Subtitle */}
       <div className="flex flex-col items-center text-center mb-6">
         <div className="w-12 h-12 bg-[#F0F0F0] rounded-xl mb-4 animate-pulse" />

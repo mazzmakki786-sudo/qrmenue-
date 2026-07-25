@@ -1,14 +1,17 @@
 import type { Metadata, Viewport } from "next"
 import { Inter, Noto_Nastaliq_Urdu } from "next/font/google"
 import "./globals.css"
+import dynamic from "next/dynamic"
+import { Suspense } from "react"
 import { I18nProvider } from "@/lib/i18n/context"
 import { WebsiteJsonLd, SoftwareApplicationJsonLd, LocalBusinessJsonLd } from "@/components/JsonLd"
-import { DynamicBreadcrumb } from "@/components/shared/DynamicBreadcrumb"
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
+  preload: true,
+  adjustFontFallback: true,
 })
 
 const notoUrdu = Noto_Nastaliq_Urdu({
@@ -18,6 +21,9 @@ const notoUrdu = Noto_Nastaliq_Urdu({
   weight: ["400", "700"],
   preload: false,
 })
+
+// Dynamically import Google Analytics — the "use client" directive ensures it only runs on client
+const GoogleAnalytics = dynamic(() => import("@/components/shared/GoogleAnalytics").then((m) => m.GoogleAnalytics))
 
 const APP_NAME = "Digital QR Menue"
 const SITE_NAME = "Digitalmenue.com"
@@ -122,17 +128,14 @@ export const metadata: Metadata = {
     },
   },
   icons: [
-    { rel: "icon", type: "image/png", url: "/favicon-96x96.png", sizes: "96x96" },
-    { rel: "icon", type: "image/svg+xml", url: "/icon.svg" },
-    { rel: "shortcut icon", url: "/favicon.ico" },
-    { rel: "apple-touch-icon", url: "/apple-touch-icon.png", sizes: "180x180" },
+    { rel: "icon", url: "/favicon.ico" },
   ],
   appleWebApp: {
     capable: true,
     title: "Digital menu",
     statusBarStyle: "black-translucent",
   },
-  manifest: "/site.webmanifest",
+  manifest: "/manifest.json",
   other: { "mobile-web-app-capable": "yes" },
 }
 
@@ -153,57 +156,20 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://*.supabase.co" />
         <link rel="dns-prefetch" href="https://*.supabase.co" />
-        {/* Google Analytics */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-DH740HGMFX" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-DH740HGMFX', {
-                send_page_view: true,
-                anonymize_ip: true,
-              });
-            `,
-          }}
-        />
+        {/* Preconnect to Supabase storage */}
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
       </head>
       <body className="min-h-screen bg-white font-sans antialiased overflow-x-hidden">
         <WebsiteJsonLd />
         <SoftwareApplicationJsonLd />
         <LocalBusinessJsonLd />
-        <DynamicBreadcrumb />
-        <I18nProvider>{children}</I18nProvider>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', async function() {
-                  try {
-                    var reg = await navigator.serviceWorker.register('/sw.js')
-                    // If waiting, skip waiting so new SW takes over immediately
-                    if (reg.waiting) {
-                      reg.waiting.postMessage({ type: 'SKIP_WAITING' })
-                    }
-                    reg.addEventListener('updatefound', function() {
-                      var installing = reg.installing
-                      if (installing) {
-                        installing.addEventListener('statechange', function() {
-                          if (this.state === 'activated') {
-                            window.location.reload()
-                          }
-                        })
-                      }
-                    })
-                  } catch(err) {
-                    console.warn('SW registration failed:', err)
-                  }
-                })
-              }
-            `,
-          }}
-        />
+        <I18nProvider>
+          <Suspense fallback={null}>
+            <GoogleAnalytics />
+          </Suspense>
+          <main id="main-content">{children}</main>
+        </I18nProvider>
       </body>
     </html>
   )

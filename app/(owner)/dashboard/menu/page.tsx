@@ -1,5 +1,8 @@
 "use client"
 
+// Must be force-dynamic because child components use useSearchParams()
+export const dynamic = "force-dynamic"
+
 import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { DishCard } from "@/components/owner/DishCard"

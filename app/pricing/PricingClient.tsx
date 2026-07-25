@@ -6,7 +6,6 @@ import { mergeYearlyPlans, type DBPlan } from "@/lib/map-plans"
 import Link from "next/link"
 import Image from "next/image"
 import { Check, X } from "lucide-react"
-import { AppFooter } from "@/components/shared/AppFooter"
 import { useCompanySettings } from "@/lib/hooks/useCompanySettings"
 
 const comparisonFeatures = [
@@ -36,13 +35,29 @@ export function PricingClient() {
       .catch(() => {})
   }, [])
 
+  // Polling fallback — every 30s in case Realtime misses an update
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetch("/api/plans")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.plans) {
+            setPlans(mergeYearlyPlans(data.plans))
+          }
+        })
+        .catch(() => {})
+    }, 30000)
+    return () => clearInterval(interval)
+  }, [])
+
   const whatsapp = settings.whatsapp_support || "03001234567"
   const whatsappDigits = whatsapp.replace(/[^0-9]/g, "")
   const whatsappLink = `https://wa.me/${whatsappDigits.startsWith("0") ? "92" + whatsappDigits.slice(1) : whatsappDigits}`
 
   return (
-    <>
+    <div className="min-h-screen bg-white flex flex-col">
       {/* Reusable Pricing2 component with Monthly/Yearly toggle, offer badges, strikethrough pricing */}
+      <div className="flex-1">
       <Pricing2
         heading="Simple, Transparent Pricing"
         description="No hidden fees. No commission on orders. Cancel anytime."
@@ -166,32 +181,7 @@ export function PricingClient() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-[#F0F0F0]">
-        <div className="max-w-6xl mx-auto px-5 py-10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex flex-col items-center md:items-start gap-3">
-              <div className="flex items-center gap-2 font-bold text-base">
-                <Image
-                  src="/icon.svg"
-                  alt="Digital QR Menue"
-                  width={28}
-                  height={28}
-                  className="w-7 h-7 rounded-lg"
-                />
-                Digital QR Menue
-              </div>
-              <p className="text-xs text-[#999]">Made in Pakistan</p>
-            </div>
-            <div className="flex gap-6 text-xs text-[#555]">
-              <Link href="/pricing" className="hover:text-black transition-colors">Pricing</Link>
-              <Link href="/restaurants" className="hover:text-black transition-colors">Restaurants</Link>
-            </div>
-          </div>
-          <div className="text-center mt-6 text-[10px] text-[#BBB]">
-            &copy; 2026 Digital QR Menue. All rights reserved.
-          </div>
-        </div>
-      </footer>
-    </>
+      </div>{/* end flex-1 */}
+    </div>
   )
 }

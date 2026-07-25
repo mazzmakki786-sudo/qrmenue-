@@ -145,7 +145,7 @@ export function FavoritesClient() {
                 key={r.id}
                 className="flex items-center justify-between gap-3 p-4 sm:p-5 bg-white border border-gray-200 rounded-xl hover:border-black/30 hover:shadow-sm transition-all duration-200 group"
               >
-                <Link href={`/menu/${r.slug}`} className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                <Link href={`/${r.slug}`} className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
                   {r.logo_url ? (
                     <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden flex-shrink-0 ring-1 ring-black/5">
                       <Image

@@ -96,6 +96,7 @@ export function MenuHeader({ name, nameUr, logoUrl, coverUrl, city, cuisineType,
                   fill
                   className="object-cover"
                   sizes="56px"
+                  loading="lazy"
                   onError={() => setLogoError(true)}
                 />
               </div>

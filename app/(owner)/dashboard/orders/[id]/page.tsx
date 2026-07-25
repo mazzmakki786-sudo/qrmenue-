@@ -1,14 +1,15 @@
 "use client"
 
+export const dynamic = "force-dynamic"
+
 import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import { useParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { OrderReceipt } from "@/components/shared/OrderReceipt"
 import { formatPrice } from "@/lib/utils"
-import { ArrowLeft, Printer, X, Lock, Sparkles, ArrowRight, Download, Phone, Loader2, RefreshCw } from "lucide-react"
+import { ArrowLeft, X, Lock, Sparkles, ArrowRight, Phone, Loader2, RefreshCw } from "lucide-react"
 import Link from "next/link"
 import type { Order } from "@/types"
 import { useSubscription } from "@/lib/hooks/useSubscription"
@@ -47,11 +48,14 @@ export default function OrderDetailPage() {
         return
       }
 
-      const { data: restaurantData, error: restaurantError } = await supabase
-        .from("restaurants")
-        .select("*")
-        .eq("owner_id", user.id)
-        .maybeSingle()
+      // Run restaurant + order queries in parallel instead of sequential waterfall
+      const [restaurantResult, orderResult] = await Promise.all([
+        supabase.from("restaurants").select("*").eq("owner_id", user.id).maybeSingle(),
+        supabase.from("orders").select("*").eq("id", id).maybeSingle(),
+      ])
+
+      const { data: restaurantData, error: restaurantError } = restaurantResult
+      const { data: orderData, error: orderError } = orderResult
 
       if (restaurantError) {
         setFetchError("Failed to load restaurant data.")
@@ -65,27 +69,14 @@ export default function OrderDetailPage() {
         return
       }
 
-      setRestaurant(restaurantData)
-
-      const { data: orderData, error: orderError } = await supabase
-        .from("orders")
-        .select("*")
-        .eq("id", id)
-        .eq("restaurant_id", restaurantData.id)
-        .maybeSingle()
-
-      if (orderError) {
-        setFetchError("Failed to load order.")
-        setLoading(false)
-        return
-      }
-
-      if (!orderData) {
+      // Verify order belongs to this restaurant (security check)
+      if (orderError || !orderData || orderData.restaurant_id !== restaurantData.id) {
         setFetchError("Order not found.")
         setLoading(false)
         return
       }
 
+      setRestaurant(restaurantData)
       setOrder(orderData)
     } catch (err) {
       console.error("Order fetch error:", err)
@@ -94,7 +85,7 @@ export default function OrderDetailPage() {
     setLoading(false)
   }
 
-  useEffect(() => { fetchData() }, [id])
+  useEffect(() => { fetchData() }, [id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const supabase = createClient()
@@ -115,22 +106,6 @@ export default function OrderDetailPage() {
       .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [id])
-
-  const handlePrint = () => {
-    const content = receiptRef.current
-    if (!content) return
-    const printWindow = window.open("", "_blank")
-    if (!printWindow) return
-    const clone = content.cloneNode(true) as HTMLElement
-    printWindow.document.write(`
-      <html><head><title>Order ${order?.order_number}</title>
-      <style>body{font-family:sans-serif;padding:20px;max-width:400px;margin:auto;}table{width:100%;}td{padding:4px 0;font-size:14px;}</style>
-      </head><body><div id="receipt"></div></body></html>
-    `)
-    printWindow.document.close()
-    printWindow.document.getElementById("receipt")?.appendChild(clone)
-    printWindow.print()
-  }
 
   const updateOrderStatus = async (newStatus: Order["order_status"]) => {
     setUpdating(true)
@@ -156,17 +131,6 @@ export default function OrderDetailPage() {
 
   const handleCancelOrder = () => {
     updateOrderStatus("cancelled")
-  }
-
-  const handleDownloadPNG = async () => {
-    const content = receiptRef.current
-    if (!content) return
-    const { default: html2canvas } = await import("html2canvas")
-    const canvas = await html2canvas(content, { backgroundColor: "#ffffff", scale: 2 })
-    const link = document.createElement("a")
-    link.download = `order-${order?.order_number || "receipt"}.png`
-    link.href = canvas.toDataURL("image/png")
-    link.click()
   }
 
   if (loading) {
@@ -294,6 +258,12 @@ export default function OrderDetailPage() {
           <span className="text-[#555]">Payment</span>
           <span className="capitalize font-medium">{order.payment_method.replace("_", " ")}</span>
         </div>
+        {(order.delivery_fee ?? 0) > 0 && (
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-[#555]">Delivery Fee</span>
+            <span className="font-medium">{formatPrice(order.delivery_fee)}</span>
+          </div>
+        )}
         <div className="flex items-center justify-between text-sm">
           <span className="text-[#555]">Time</span>
           <span className="font-medium text-right text-xs">{new Date(order.created_at).toLocaleString("en-PK")}</span>
@@ -368,18 +338,6 @@ export default function OrderDetailPage() {
               <X className="w-4 h-4" />
               Cancel Order
             </button>
-          )}
-
-          {/* Print/Download for any status except cancelled */}
-          {order.order_status !== "cancelled" && (
-            <div className="flex gap-2">
-              <Button variant="primary" className="flex-1" onClick={handlePrint}>
-                <Printer className="w-4 h-4 mr-2" /> Print
-              </Button>
-              <Button variant="ghost" className="flex-1" onClick={handleDownloadPNG}>
-                <Download className="w-4 h-4 mr-2" /> Download PNG
-              </Button>
-            </div>
           )}
         </div>
       )}

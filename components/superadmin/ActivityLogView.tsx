@@ -73,7 +73,7 @@ export function ActivityLogView({ open, onClose }: Props) {
                   <div className="flex items-center justify-between">
                     <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
                       log.action === "login_success" || log.action === "subscription_created"
-                        ? "bg-[#25D366]/10 text-[#25D366]"
+                        ? "bg-[#0D7A33]/10 text-[#0D7A33]"
                         : "bg-red-50 text-[#DC2626]"
                     }`}>{actionLabel(log.action)}</span>
                     <span className="text-[10px] text-[#999]">

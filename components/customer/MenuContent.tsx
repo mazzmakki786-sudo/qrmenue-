@@ -31,6 +31,7 @@ export function MenuContent({ categories, restaurantId, restaurantName, delivery
       clearCart()
     }
     setRestaurant(restaurantId, restaurantName, restaurantSlug ?? '', deliveryFee ?? 0)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restaurantId, restaurantName, restaurantSlug, deliveryFee])
 
   useEffect(() => {

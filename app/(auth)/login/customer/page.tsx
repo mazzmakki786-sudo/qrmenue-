@@ -2,12 +2,10 @@
 
 import { Suspense, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { PasswordInput, validatePassword } from "@/components/ui/password-input"
 import Link from "next/link"
-import { ArrowLeft, Loader2 } from "lucide-react"
 
 function CustomerLoginForm() {
   const router = useRouter()
@@ -25,7 +23,8 @@ function CustomerLoginForm() {
 
   const handleGoogleAuth = async () => {
     const supabase = (await import("@/lib/supabase/client")).createClient()
-    const cb = `${location.origin}/auth/callback?redirect=${redirectTo}`
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || location.origin
+    const cb = `${baseUrl}/auth/callback?redirect=${redirectTo}`
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: cb },
@@ -107,21 +106,17 @@ function CustomerLoginForm() {
 
   return (
     <div className="w-full flex flex-col items-center">
-      <div className="w-full mb-6">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="inline-flex items-center gap-2 text-sm text-[#555] hover:text-black transition-colors min-h-[44px]"
-        >
-          <div className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center shrink-0">
-            <ArrowLeft className="w-4 h-4" />
-          </div>
-          Back
-        </button>
-      </div>
-
       <div className="flex flex-col items-center text-center mb-6">
-        <Image src="/icon.svg" alt="Digital QR Menue" width={48} height={48} className="w-12 h-12 mb-4" />
+        <svg className="w-12 h-12 mb-4" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="28" height="28" rx="6" fill="#22C55E" />
+          <rect x="4" y="4" width="5" height="5" rx="1" fill="#fff" />
+          <rect x="13" y="4" width="5" height="5" rx="1" fill="#fff" />
+          <rect x="4" y="13" width="5" height="5" rx="1" fill="#fff" />
+          <rect x="13" y="13" width="5" height="5" rx="1" fill="#fff" />
+          <rect x="18" y="18" width="6" height="6" rx="1" fill="#fff" opacity="0.9" />
+          <rect x="4" y="20" width="3" height="4" rx="0.8" fill="#fff" opacity="0.7" />
+          <rect x="20" y="4" width="4" height="3" rx="0.8" fill="#fff" opacity="0.7" />
+        </svg>
         <h1 className="text-2xl font-bold text-black mb-1">
           {mode === "signin" ? "Welcome back" : "Create an Account"}
         </h1>

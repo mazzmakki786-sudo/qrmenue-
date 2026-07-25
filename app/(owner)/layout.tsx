@@ -1,16 +1,16 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
-import { Suspense } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import { LayoutDashboard, UtensilsCrossed, ClipboardList, BarChart3, User, CreditCard, QrCode, Menu, X, LogOut, Megaphone, Percent, Table2, Bell, ChevronLeft } from "lucide-react"
+import { Suspense } from "react"
+import { LayoutDashboard, UtensilsCrossed, ClipboardList, BarChart3, User, CreditCard, QrCode, Menu, X, LogOut, Megaphone, Percent, Table2, BellRing, ChevronLeft } from "lucide-react"
 import { BellNotification } from "@/components/owner/BellNotification"
 import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary"
 import { Toaster } from "@/components/shared/Toaster"
 import { usePushNotifications } from "@/lib/hooks/usePushNotifications"
+import { LogoIcon } from "@/components/shared/LogoIcon"
 
 const ALL_NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -41,13 +41,15 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     if (typeof window !== "undefined" && (window as any).__ownerRestaurantCache) {
       const cached = (window as any).__ownerRestaurantCache
-      setRestaurantId(cached.id)
-      setPlan(cached.plan)
-      return
+      if (cached && typeof cached.id === "string" && typeof cached.plan === "string") {
+        setRestaurantId(cached.id)
+        setPlan(cached.plan)
+        return
+      }
     }
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return
+      if (!user?.id) return
       supabase
         .from("restaurants")
         .select("id, plan")
@@ -55,12 +57,14 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
         .maybeSingle()
         .then(({ data }) => {
           if (data) {
-            (window as any).__ownerRestaurantCache = { id: data.id, plan: data.plan }
+            try {
+              (window as any).__ownerRestaurantCache = { id: data.id, plan: data.plan }
+            } catch {}
             setRestaurantId(data.id)
             setPlan(data.plan)
           }
         })
-    })
+    }).catch(() => {})
   }, [])
 
   // Body scroll lock when drawer is open
@@ -114,13 +118,7 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
         {/* Brand */}
         <div className="flex items-center gap-3 px-5 h-16 border-b border-[#EDEDED] shrink-0">
           <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center shrink-0">
-            <Image
-              src="/icon.svg"
-              alt="Digital QR Menue"
-              width={18}
-              height={18}
-              className="w-[18px] h-[18px]"
-            />
+            <LogoIcon className="w-[18px] h-[18px]" />
           </div>
           <div className="flex flex-col">
             <span className="text-[15px] font-bold text-[#111] leading-tight">Digital QR</span>
@@ -202,7 +200,7 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
               ) : (
-                <Bell className="w-[18px] h-[18px]" />
+                <BellRing className="w-[18px] h-[18px]" />
               )}
             </button>
           )}
@@ -229,13 +227,7 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
           <Menu className="w-5 h-5 text-[#333]" />
         </button>
         <Link href="/dashboard" className="flex items-center gap-2 font-semibold text-sm">
-          <Image
-            src="/icon.svg"
-            alt="Digital QR Menue"
-            width={20}
-            height={20}
-            className="w-5 h-5 rounded"
-          />
+          <LogoIcon className="w-5 h-5" />
           <span className="text-[#333]">Digital QR Menue</span>
         </Link>
         <div className="flex items-center gap-1">
@@ -270,13 +262,7 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
             <div className="flex items-center justify-between px-4 mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-black flex items-center justify-center">
-                  <Image
-                    src="/icon.svg"
-                    alt="Digital QR Menue"
-                    width={20}
-                    height={20}
-                    className="w-5 h-5"
-                  />
+                  <LogoIcon className="w-5 h-5" />
                 </div>
                 <div>
                   <div className="font-bold text-base leading-tight text-[#111]">Digital QR</div>

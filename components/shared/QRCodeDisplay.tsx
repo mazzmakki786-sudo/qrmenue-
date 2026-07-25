@@ -1,7 +1,12 @@
 "use client"
 
-import { QRCodeSVG } from "qrcode.react"
+import dynamic from "next/dynamic"
 import { Button } from "@/components/ui/button"
+
+const QRCodeSVG = dynamic(
+  () => import("qrcode.react").then((m) => m.QRCodeSVG),
+  { ssr: false }
+)
 
 interface Props {
   restaurantSlug: string
@@ -13,7 +18,7 @@ interface Props {
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "")
 
 export function QRCodeDisplay({ restaurantSlug, restaurantName, fgColor = "#000000", bgColor = "#FFFFFF" }: Props) {
-  const menuUrl = `${APP_URL}/menu/${restaurantSlug}`
+  const menuUrl = `${APP_URL}/${restaurantSlug}`
 
   const downloadQR = () => {
     const svg = document.getElementById("restaurant-qr")

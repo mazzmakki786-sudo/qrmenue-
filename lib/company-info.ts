@@ -1,7 +1,6 @@
 /**
  * Company information constants shared across policy pages, footer, etc.
- * These are used to satisfy PayFast merchant requirements for ownership
- * disclosure, operational hours, and permanent address.
+ * These are used for ownership disclosure, operational hours, and permanent address.
  */
 export const COMPANY_INFO = {
   name: "Digital QR Menue",
@@ -9,7 +8,7 @@ export const COMPANY_INFO = {
   ownershipStatement:
     "DIGITAL MENUE IS OWNED AND OPERATED BY MUHAMMAD MUAZ MAKI",
 
-  address: "Lahore, Punjab, Pakistan",
+  address: "Faisalabad, Punjab, Pakistan",
 
   hours: {
     weekday: "Monday – Friday: 9:00 AM – 6:00 PM",
@@ -24,12 +23,12 @@ export const COMPANY_INFO = {
 
   support: {
     whatsapp: "+92-314-6325823",
-    email: "support@digitalmenue.com",
+    email: "maki2@gmail.com",
   },
 
   founding: {
     year: "2024",
-    location: "Lahore, Pakistan",
+    location: "Faisalabad, Pakistan",
   },
 } as const
 

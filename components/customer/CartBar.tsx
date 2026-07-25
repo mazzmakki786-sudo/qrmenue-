@@ -19,7 +19,7 @@ export function CartBar({ closed }: { closed?: boolean }) {
 
   if (closed) {
     return (
-      <div className="fixed bottom-12 left-3 right-3 z-[60] max-w-[568px] mx-auto">
+      <div className="fixed bottom-3 left-3 right-3 z-[60] max-w-[568px] mx-auto">
         <div className="bg-gray-800/80 text-white/60 rounded-2xl shadow-lg overflow-hidden ring-1 ring-white/5">
           <div className="flex items-center justify-center px-5 py-3.5">
             <div className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center mr-3">
@@ -36,7 +36,7 @@ export function CartBar({ closed }: { closed?: boolean }) {
     <Link
       href="/cart"
       data-testid="cart-bar-link"
-      className="fixed bottom-12 left-3 right-3 z-[60] max-w-[568px] mx-auto animate-slide-up"
+      className="fixed bottom-3 left-3 right-3 z-[60] max-w-[568px] mx-auto animate-slide-up"
     >
       <div className="bg-black text-white rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] overflow-hidden ring-1 ring-white/10">
         <div className="flex items-center justify-between px-5 py-3.5">

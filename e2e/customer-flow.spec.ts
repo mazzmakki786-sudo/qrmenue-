@@ -35,7 +35,7 @@ test.describe("Customer Ordering Flow", () => {
     // ================================================================
     // 2. RESTAURANTS LIST
     // ================================================================
-    const menuLinks = page.locator('a[href^="/menu/"]')
+    const menuLinks = page.locator('a[href^="/"]:not([href^="//"]):not([href^="/api"]):not([href^="/auth"]):not([href^="/blog"]):not([href^="/cart"]):not([href^="/checkout"]):not([href^="/pricing"]):not([href^="/about"]):not([href^="/contact"]):not([href^="/privacy"]):not([href^="/terms"]):not([href^="/faq"]):not([href^="/favorites"]):not([href^="/account"]):not([href^="/dashboard"]):not([href^="/superadmin"]):not([href^="/signup"]):not([href^="/login"])')
     await menuLinks.first().waitFor({ state: "visible", timeout: 10000 }).catch(() => {})
     const restaurantCount = await menuLinks.count()
     console.log("Restaurant menu link count:", restaurantCount)
@@ -53,7 +53,7 @@ test.describe("Customer Ordering Flow", () => {
       const card = cards.nth(i)
       const text = await card.innerText()
       if (text.includes("Open") && !text.includes("Sealed") && (text.toLowerCase().includes("maki") || text.toLowerCase().includes("maz"))) {
-        const link = card.locator('a[href^="/menu/"]').first()
+        const link = card.locator('a[data-testid^="menu-link-"]').first()
         selectedMenuHref = await link.getAttribute("href")
         console.log(`Found open/unsealed restaurant card ${i} linking to:`, selectedMenuHref)
         break
@@ -65,7 +65,7 @@ test.describe("Customer Ordering Flow", () => {
         const card = cards.nth(i)
         const text = await card.innerText()
         if (text.includes("Open") && !text.includes("Sealed")) {
-          const link = card.locator('a[href^="/menu/"]').first()
+          const link = card.locator('a[data-testid^="menu-link-"]').first()
           selectedMenuHref = await link.getAttribute("href")
           console.log(`Found fallback open/unsealed restaurant card ${i} linking to:`, selectedMenuHref)
           break
@@ -74,8 +74,9 @@ test.describe("Customer Ordering Flow", () => {
     }
 
     if (!selectedMenuHref) {
-      // Fallback to first menu link if no open/unsealed is found
-      selectedMenuHref = await menuLinks.first().getAttribute("href")
+      // Fallback to first restaurant link if no open/unsealed is found
+      const firstLink = page.locator('a[data-testid^="menu-link-"]').first()
+      selectedMenuHref = await firstLink.getAttribute("href")
       console.log("No open/unsealed restaurant found. Falling back to first:", selectedMenuHref)
     }
 

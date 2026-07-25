@@ -50,7 +50,7 @@ function RestaurantCard({
   return (
     <div data-testid={`restaurant-card-${r.slug}`} className={`flex items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white border border-border rounded-xl hover:border-black/20 hover:shadow-md hover:shadow-black/[0.03] transition-all duration-200 ${sealed ? "opacity-50" : ""}`}>
       {/* Logo */}
-      <Link href={`/menu/${r.slug}`} className="shrink-0">
+      <Link href={`/${r.slug}`} className="shrink-0">
         {r.logo_url ? (
           <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl overflow-hidden bg-[#F5F5F5] ring-1 ring-black/5">
             <Image src={r.logo_url} alt={r.name} width={48} height={48} className="w-full h-full object-cover" />
@@ -63,7 +63,7 @@ function RestaurantCard({
       </Link>
 
       {/* Info */}
-      <Link href={`/menu/${r.slug}`} className="min-w-0 flex-1">
+      <Link href={`/${r.slug}`} className="min-w-0 flex-1">
         <div className="flex items-center gap-2 flex-wrap">
           <h3 className="text-[13px] sm:text-[14px] font-bold text-text-primary truncate max-w-[110px] sm:max-w-[220px]">{r.name}</h3>
           {sealed ? (
@@ -123,7 +123,7 @@ function RestaurantCard({
           <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors ${isFav ? "fill-red-500 text-red-500" : "text-text-muted/30 hover:text-red-400"}`} />
         </button>
         <Link
-          href={`/menu/${r.slug}`}
+          href={`/${r.slug}`}
           data-testid={`menu-link-${r.slug}`}
           className="inline-flex items-center gap-0.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl bg-primary text-white text-[11px] sm:text-[12px] font-semibold hover:bg-primary-hover active:scale-[0.97] transition-all shadow-[0_1px_3px_rgba(0,0,0,0.1)]"
         >

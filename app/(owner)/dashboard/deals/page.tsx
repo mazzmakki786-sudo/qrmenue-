@@ -1,5 +1,8 @@
 "use client"
 
+// Must be force-dynamic because child components use useSearchParams()
+export const dynamic = "force-dynamic"
+
 import { useEffect, useState, useCallback } from "react"
 import { DealCard } from "@/components/owner/DealCard"
 import { AddDealForm } from "@/components/owner/AddDealForm"

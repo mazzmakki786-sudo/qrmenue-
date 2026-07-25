@@ -1,8 +1,9 @@
 import type { Metadata } from "next"
 import { PricingSection } from "@/components/pricing/PricingSection"
 import { LandingHeader } from "@/components/shared/LandingHeader"
+import { AppFooter } from "@/components/shared/AppFooter"
 import { mergeYearlyPlans, type DBPlan } from "@/lib/map-plans"
-import { PricingJsonLd, FaqJsonLd } from "@/components/JsonLd"
+import { PricingJsonLd, FaqJsonLd, SpeakableJsonLd } from "@/components/JsonLd"
 import { createAdminClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
 }
 
 // Revalidate every hour — static page with periodic regeneration
-export const revalidate = 3600
+export const revalidate = 300
 
 const pricingFaqs = [
   {
@@ -71,16 +72,23 @@ export default async function PricingPage() {
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-white flex flex-col">
       <PricingJsonLd />
       <FaqJsonLd faqs={pricingFaqs} />
-      <LandingHeader />
-      <PricingSection
-        heading="Plans & Pricing"
-        description="No hidden fees. No commission on orders. Cancel anytime."
-        initialPlans={initialPlans}
-        whatsappNumber={whatsappNumber}
+      <SpeakableJsonLd
+        cssSelector={[".speakable-pricing-desc"]}
+        url="https://www.digitalmenue.com/pricing"
       />
-    </>
+      <LandingHeader />
+      <div className="flex-1">
+        <PricingSection
+          heading="Plans & Pricing"
+          description="No hidden fees. No commission on orders. Cancel anytime."
+          initialPlans={initialPlans}
+          whatsappNumber={whatsappNumber}
+        />
+      </div>
+      <AppFooter />
+    </div>
   )
 }

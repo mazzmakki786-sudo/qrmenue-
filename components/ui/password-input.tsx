@@ -25,11 +25,11 @@ function PasswordRequirements({ value }: { value: string }) {
         return (
           <div key={c.label} className="flex items-center gap-1.5">
             {pass ? (
-              <Check className="w-3.5 h-3.5 text-[#25D366] shrink-0" />
+              <Check className="w-3.5 h-3.5 text-[#0D7A33] shrink-0" />
             ) : (
               <X className="w-3.5 h-3.5 text-[#999] shrink-0" />
             )}
-            <span className={cn("text-[11px]", pass ? "text-[#25D366]" : "text-[#999]")}>
+            <span className={cn("text-[11px]", pass ? "text-[#0D7A33]" : "text-[#999]")}>
               {c.label}
             </span>
           </div>

@@ -46,12 +46,10 @@ We also automatically collect certain technical information when you use our pla
 • Other parties with your explicit consent`,
   },
   {
-    title: "Payment Processing via PayFast",
-    content: `When you make a payment through our platform, your payment is processed by PayFast (Pty) Ltd, a third-party payment processor. PayFast collects, processes, and stores your payment information in accordance with their own privacy policy, available at https://payfast.io/privacy-policy/.
+    title: "Payment Processing",
+    content: `When you make a payment through our platform, your payment is processed securely through our payment providers. We do not store your full payment card details on our servers.
 
-PayFast may transfer your data across borders for processing. By making a payment, you consent to your payment data being processed by PayFast in accordance with their policies. We do not store your full payment card details on our servers.
-
-PayFast is PCI-DSS compliant, meaning they meet the highest security standards for handling payment card information.`,
+Our payment processing partners are PCI-DSS compliant, meaning they meet the highest security standards for handling payment card information.`,
   },
   {
     title: "Data Storage & Security",
@@ -183,14 +181,6 @@ export default function PrivacyPage() {
                 Also read our{" "}
                 <Link href="/terms" className="text-black underline">
                   Terms of Service
-                </Link>
-                ,{" "}
-                <Link href="/refund" className="text-black underline">
-                  Return &amp; Refund Policy
-                </Link>
-                ,{" "}
-                <Link href="/shipping" className="text-black underline">
-                  Shipping Policy
                 </Link>
                 , and{" "}
                 <Link href="/about" className="text-black underline">

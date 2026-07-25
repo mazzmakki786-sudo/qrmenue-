@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server"
 export const metadata: Metadata = {
   title: "Restaurants in Pakistan — Browse Menus | Digital QR Menue",
   description:
-    "Find restaurants in Lahore, Karachi, Islamabad and more. Browse digital menus, view dishes, and order via WhatsApp.",
+    "Find restaurants in Faisalabad, Karachi, Islamabad and more. Browse digital menus, view dishes, and order via WhatsApp.",
   openGraph: {
     title: "Restaurants | Digital QR Menue",
     description: "Browse restaurant menus in Pakistan",
@@ -31,7 +31,7 @@ export default async function RestaurantsPage() {
   const items =
     restaurants?.map((r) => ({
       name: r.name,
-      url: `https://www.digitalmenue.com/menu/${r.slug}`,
+      url: `https://www.digitalmenue.com/${r.slug}`,
       description: r.description || undefined,
     })) ?? []
 

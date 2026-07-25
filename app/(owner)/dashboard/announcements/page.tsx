@@ -1,5 +1,7 @@
 "use client"
 
+export const dynamic = "force-dynamic"
+
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
@@ -58,6 +60,7 @@ export default function AnnouncementsPage() {
 
   useEffect(() => {
     fetchAnnouncements()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restaurantId, filter])
 
   useEffect(() => {
@@ -79,6 +82,7 @@ export default function AnnouncementsPage() {
       )
       .subscribe()
     return () => { supabase.removeChannel(channel) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restaurantId])
 
   const markAsRead = async (id: string) => {

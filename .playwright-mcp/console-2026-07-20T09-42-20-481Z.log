@@ -1,0 +1,8 @@
+[     769ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.digitalmenue.com/login?redirect=%2Fdashboard:0
+[   17394ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.digitalmenue.com/login:0
+[   22762ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://www.digitalmenue.com/api/auth/login:0
+[   24770ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.digitalmenue.com/login?redirect=%2Fdashboard:0
+[   28324ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.digitalmenue.com/login?redirect=%2Fdashboard:0
+[   31645ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.digitalmenue.com/login?redirect=%2Fdashboard:0
+[   35092ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.digitalmenue.com/login?redirect=%2Fdashboard:0
+[   38344ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.digitalmenue.com/login?redirect=%2Fdashboard:0

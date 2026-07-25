@@ -1,0 +1,110 @@
+[    8634ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3005/contact:0
+[    9221ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ webpack-internal:///(pages-dir-browser)/./node_modules/react-dom/cjs/react-dom-client.development.js:28004
+[    9575ms] TypeError: __webpack_modules__[moduleId] is not a function
+    at __webpack_require__ (file://C:\Users\Administrator\Desktop\qr_menue\.next\server\webpack-runtime.js:25:42)
+    at eval (webpack-internal:///(rsc)/./node_modules/next/dist/server/app-render/entry-base.js:123:39)
+    at <unknown> (rsc)/./node_modules/next/dist/server/app-render/entry-base.js (C:\Users\Administrator\Desktop\qr_menue\.next\server\vendor-chunks\next.js:1926:1)
+    at __webpack_require__ (file://C:\Users\Administrator\Desktop\qr_menue\.next\server\webpack-runtime.js:25:42)
+    at eval (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fcontact%2Fpage&page=%2Fcontact%2Fpage&appPaths=%2Fcontact%2Fpage&pagePath=private-next-app-dir%2Fcontact%2Fpage.tsx&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cqr_menue%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cqr_menue&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:55:97)
+    at <unknown> (rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fcontact%2Fpage&page=%2Fcontact%2Fpage&appPaths=%2Fcontact%2Fpage&pagePath=private-next-app-dir%2Fcontact%2Fpage.tsx&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cqr_menue%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cqr_menue&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=! (C:\Users\Administrator\Desktop\qr_menue\.next\server\app\contact\page.js:176:1)
+    at __webpack_require__ (file://C:\Users\Administrator\Desktop\qr_menue\.next\server\webpack-runtime.js:25:42)
+    at __webpack_exec__ (file://C:\Users\Administrator\Desktop\qr_menue\.next\server\app\contact\page.js:559:39)
+    at <unknown> (file://C:\Users\Administrator\Desktop\qr_menue\.next\server\app\contact\page.js:560:231)
+    at __webpack_require__.X (file://C:\Users\Administrator\Desktop\qr_menue\.next\server\webpack-runtime.js:160:21)
+    at <unknown> (file://C:\Users\Administrator\Desktop\qr_menue\.next\server\app\contact\page.js:560:47)
+    at Object.<anonymous> (file://C:\Users\Administrator\Desktop\qr_menue\.next\server\app\contact\page.js:563:3)
+    at Module._compile (node:internal/modules/cjs/loader:1830:14)
+    at Object..js (node:internal/modules/cjs/loader:1961:10)
+    at Module.load (node:internal/modules/cjs/loader:1553:32)
+    at Module._load (node:internal/modules/cjs/loader:1355:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1576:12)
+    at mod.require (file://C:\Users\Administrator\Desktop\qr_menue\node_modules\next\dist\server\require-hook.js:68:28)
+    at require (node:internal/modules/helpers:153:16)
+    at requirePage (file://C:\Users\Administrator\Desktop\qr_menue\node_modules\next\dist\server\require.js:99:80)
+    at loadComponentsImpl (file://C:\Users\Administrator\Desktop\qr_menue\node_modules\next\dist\server\load-components.js:132:57)
+    at async DevServer.findPageComponentsImpl (file://C:\Users\Administrator\Desktop\qr_menue\node_modules\next\dist\server\next-server.js:900:36)
+    at async DevServer.findPageComponents (file://C:\Users\Administrator\Desktop\qr_menue\node_modules\next\dist\server\dev\next-dev-server.js:706:16)
+    at async DevServer.renderPageComponent (file://C:\Users\Administrator\Desktop\qr_menue\node_modules\next\dist\server\base-server.js:1468:24)
+    at async DevServer.renderToResponseImpl (file://C:\Users\Administrator\Desktop\qr_menue\node_modules\next\dist\server\base-server.js:1522:32)
+    at async DevServer.pipeImpl (file://C:\Users\Administrator\Desktop\qr_menue\node_modules\next\dist\server\base-server.js:1026:25)
+    at async NextNodeServer.handleCatchallRenderRequest (file://C:\Users\Administrator\Desktop\qr_menue\node_modules\next\dist\server\next-server.js:394:17)
+    at async DevServer.handleRequestImpl (file://C:\Users\Administrator\Desktop\qr_menue\node_modules\next\dist\server\base-server.js:917:17)
+    at async (file://C:\Users\Administrator\Desktop\qr_menue\node_modules\next\dist\server\dev\next-dev-server.js:400:20)
+    at async Span.traceAsyncFn (file://C:\Users\Administrator\Desktop\qr_menue\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (file://C:\Users\Administrator\Desktop\qr_menue\node_modules\next\dist\server\dev\next-dev-server.js:396:24)
+    at async invokeRender (file://C:\Users\Administrator\Desktop\qr_menue\node_modules\next\dist\server\lib\router-server.js:240:21)
+    at async handleRequest (file://C:\Users\Administrator\Desktop\qr_menue\node_modules\next\dist\server\lib\router-server.js:437:24)
+    at async requestHandlerImpl (file://C:\Users\Administrator\Desktop\qr_menue\node_modules\next\dist\server\lib\router-server.js:485:13)
+    at async Server.requestListener (file://C:\Users\Administrator\Desktop\qr_menue\node_modules\next\dist\server\lib\start-server.js:226:13)
+[    9548ms] [LOG] [HMR] connected @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/client/dev/hot-reloader/pages/websocket.js:45
+[   86681ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:25630
+[   87060ms] Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
+      <RedirectBoundary>
+        <RedirectErrorBoundary router={{...}}>
+          <InnerLayoutRouter url="/contact" tree={[...]} cacheNode={{lazyData:null, ...}} segmentPath={[...]}>
+            <SegmentViewNode type="page" pagePath="contact/pa...">
+              <SegmentTrieNode>
+              <ContactPage>
+                <script>
+                <script>
+                <div>
+                <AppFooter>
+                  <footer className="bg-[#0A0A0...">
+                    <div className="max-w-6xl ...">
+                      <div className="grid grid-...">
+                        <div>
+                        <div>
+                        <div>
+                        <div>
+                          <h4>
+                          <ul className="space-y-2....">
+                            <li>
+                            <li>
+                            <li className="text-xs te...">
+                              <svg>
++                             Lahore, Punjab, Pakistan
+-                             Faisalabad, Punjab, Pakistan
+                          ...
+                      ...
+            ...
+          ...
+
+    at throwOnHydrationMismatch (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:4506:11)
+    at completeWork (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:11825:26)
+    at runWithFiberInDEV (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:872:30)
+    at completeUnitOfWork (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:15863:19)
+    at performUnitOfWork (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:15744:11)
+    at workLoopConcurrentByScheduler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:15721:9)
+    at renderRootConcurrent (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:15696:15)
+    at performWorkOnRoot (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14990:13)
+    at performWorkOnRootViaSchedulerTask (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:16816:7)
+    at MessagePort.performWorkUntilDeadline (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/scheduler/cjs/scheduler.development.js:45:48)
+[  193022ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/dev/hot-reloader/app/hot-reloader-app.js:196
+[  196293ms] [LOG] [Fast Refresh] done in 3271ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/dev/report-hmr-latency.js:13
+[  206741ms] [WARNING] Detected `scroll-behavior: smooth` on the `<html>` element. In a future version, Next.js will no longer automatically disable smooth scrolling during route transitions. To prepare for this change, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/shared/lib/utils/warn-once.js:15
+[  207050ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/dev/hot-reloader/app/hot-reloader-app.js:196
+[  208389ms] [LOG] [Fast Refresh] done in 1340ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/dev/report-hmr-latency.js:13
+[  307540ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_CLOSED @ https://zkwwqcopkwbzbsqqxoiq.supabase.co/rest/v1/company_settings?select=*:0
+[  307541ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_CLOSED @ https://zkwwqcopkwbzbsqqxoiq.supabase.co/rest/v1/company_settings?select=*:0
+[  322840ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:25630
+[  403189ms] [WARNING] Detected `scroll-behavior: smooth` on the `<html>` element. In a future version, Next.js will no longer automatically disable smooth scrolling during route transitions. To prepare for this change, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/shared/lib/utils/warn-once.js:15
+[  403232ms] [ERROR] WebSocket connection to 'wss://zkwwqcopkwbzbsqqxoiq.supabase.co/realtime/v1/websocket?apikey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inprd3dxY29wa3diemJzcXF4b2lxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMzgwODksImV4cCI6MjA5NTcxNDA4OX0.EXgpeq8APDIrRcBIUuXJtcxqc_IdZeggjYHMWLrw0SI&vsn=2.0.0' failed: Error in connection establishment: net::ERR_INTERNET_DISCONNECTED @ webpack-internal:///(app-pages-browser)/./node_modules/@supabase/phoenix/priv/static/phoenix.mjs:1446
+[  403258ms] [ERROR] Failed to load resource: net::ERR_INTERNET_DISCONNECTED @ https://zkwwqcopkwbzbsqqxoiq.supabase.co/rest/v1/company_settings?select=*:0
+[  403261ms] [ERROR] Failed to load resource: net::ERR_INTERNET_DISCONNECTED @ https://zkwwqcopkwbzbsqqxoiq.supabase.co/rest/v1/company_settings?select=*:0
+[  406551ms] [ERROR] Failed to load resource: net::ERR_INTERNET_DISCONNECTED @ https://zkwwqcopkwbzbsqqxoiq.supabase.co/rest/v1/company_settings?select=*:0
+[  406551ms] [ERROR] WebSocket connection to 'wss://zkwwqcopkwbzbsqqxoiq.supabase.co/realtime/v1/websocket?apikey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inprd3dxY29wa3diemJzcXF4b2lxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMzgwODksImV4cCI6MjA5NTcxNDA4OX0.EXgpeq8APDIrRcBIUuXJtcxqc_IdZeggjYHMWLrw0SI&vsn=2.0.0' failed: Error in connection establishment: net::ERR_INTERNET_DISCONNECTED @ webpack-internal:///(app-pages-browser)/./node_modules/@supabase/phoenix/priv/static/phoenix.mjs:1446
+[  406552ms] [ERROR] Failed to load resource: net::ERR_INTERNET_DISCONNECTED @ https://zkwwqcopkwbzbsqqxoiq.supabase.co/rest/v1/company_settings?select=*:0

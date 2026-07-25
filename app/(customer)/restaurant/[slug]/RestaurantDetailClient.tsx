@@ -5,7 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
-import { MapPin, Phone, ArrowLeft, UtensilsCrossed, Clock, Navigation, Truck, Timer, ShoppingCart, Minus, Plus, Trash2, Percent, ImageOff, Store } from "lucide-react"
+import { MapPin, Phone, ArrowLeft, UtensilsCrossed, Clock, Navigation, Truck, Timer, ShoppingCart, Minus, Plus, Trash2, Percent, ImageOff, Store, ExternalLink } from "lucide-react"
 import { formatTo12Hour, formatPrice } from "@/lib/utils"
 import { isRestaurantOpen } from "@/lib/restaurant-hours"
 import { useRouter } from "next/navigation"
@@ -13,7 +13,9 @@ import { useCartStore } from "@/stores/cartStore"
 import { CartBar } from "@/components/customer/CartBar"
 import { DealBanner } from "@/components/customer/DealBanner"
 import { DishBadges } from "@/components/customer/DishBadges"
+import { LogoIcon } from "@/components/shared/LogoIcon"
 import type { Category, Deal, Dish } from "@/types"
+import type { BrandingConfig } from "@/lib/branding"
 
 interface Restaurant {
   id: string
@@ -34,11 +36,15 @@ interface Restaurant {
   opening_hours?: Record<string, { open: string; close: string; closed: boolean }> | null
   lat?: number | null
   lng?: number | null
+  banner_enabled?: boolean | null
+  banner_image_url?: string | null
+  banner_link_url?: string | null
 }
 
 interface Props {
   restaurant: Restaurant
   categories: (Category & { dishes: Dish[] })[]
+  branding?: BrandingConfig
 }
 
 function DesktopCartPanel({ effectivelyClosed, liveOpenTime, liveCloseTime }: { effectivelyClosed?: boolean; liveOpenTime?: string; liveCloseTime?: string }) {
@@ -160,7 +166,7 @@ function DesktopDishCard({ dish, deals, unavailable, closed }: { dish: Dish; dea
     : null
 
   return (
-    <div className={`group bg-white rounded-2xl border border-border overflow-hidden transition-all duration-200 hover:shadow-[0_4px_24px_rgba(0,0,0,0.07)] hover:border-border-strong ${unavailable ? "opacity-50" : ""}`}>
+    <div className={`group bg-white rounded-2xl border border-border overflow-hidden transition-all duration-200 hover:shadow-[0_4px_24px_rgba(0,0,0,0.07)] hover:border-border-strong flex flex-col ${unavailable ? "opacity-50" : ""}`}>
       {/* Image */}
       <div className="relative w-full aspect-[16/9] bg-surface overflow-hidden">
         {dish.image_url && !imgError ? (
@@ -194,8 +200,8 @@ function DesktopDishCard({ dish, deals, unavailable, closed }: { dish: Dish; dea
         )}
       </div>
 
-      {/* Info */}
-      <div className="p-4">
+      {/* Info — flex-1 + mt-auto on action to push to bottom */}
+      <div className="p-4 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-3 mb-1.5">
           <h3 className="text-sm font-semibold text-text-primary leading-snug">{dish.name_en}</h3>
           <div className="text-right shrink-0">
@@ -224,8 +230,8 @@ function DesktopDishCard({ dish, deals, unavailable, closed }: { dish: Dish; dea
 
         {!dish.description_en && <div className="mb-3" />}
 
-        {/* Add/Quantity */}
-        <div className="flex justify-end">
+        {/* Add/Quantity — mt-auto pushes to bottom */}
+        <div className="flex justify-end mt-auto">
           {cartItem ? (
             <div className="inline-flex items-center gap-1.5 bg-surface-dark rounded-full px-1.5 py-1">
               <button onClick={() => updateQuantity(dish.id, cartItem.quantity - 1)} className="w-8 h-8 rounded-full flex items-center justify-center text-primary font-bold hover:bg-white/60 transition-colors text-[18px]">−</button>
@@ -260,7 +266,7 @@ function MobileDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deal
     : null
 
   return (
-    <div className={`group bg-white rounded-xl border border-border overflow-hidden transition-all duration-200 ${unavailable ? "opacity-50" : ""}`}>
+    <div className={`group bg-white rounded-xl border border-border overflow-hidden transition-all duration-200 flex flex-col ${unavailable ? "opacity-50" : ""}`}>
       {/* Image */}
       <div className="relative w-full aspect-[4/3] bg-surface overflow-hidden">
         {dish.image_url && !imgError ? (
@@ -294,8 +300,8 @@ function MobileDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deal
         )}
       </div>
 
-      {/* Info */}
-      <div className="p-2.5">
+      {/* Info — flex-1 + mt-auto on action to push to bottom */}
+      <div className="p-2.5 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-1 mb-1">
           <h3 className="text-[12px] font-semibold text-text-primary line-clamp-1 leading-tight flex-1">{dish.name_en}</h3>
           <span className="text-[12px] font-bold text-text-primary shrink-0 ml-1">
@@ -321,7 +327,7 @@ function MobileDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deal
 
         {!dish.description_en && <div className="mb-2" />}
 
-        <div className="flex justify-end">
+        <div className="flex justify-end mt-auto">
           {cartItem ? (
             <div className="inline-flex items-center gap-1 bg-surface-dark rounded-full px-1.5 py-0.5 min-h-[30px]">
               <button onClick={() => updateQuantity(dish.id, cartItem.quantity - 1)} className="w-7 h-7 rounded-full flex items-center justify-center text-primary font-bold hover:bg-white/60 transition-colors text-[15px]">−</button>
@@ -339,10 +345,9 @@ function MobileDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deal
   )
 }
 
-export function RestaurantDetailClient({ restaurant, categories }: Props) {
+export function RestaurantDetailClient({ restaurant, categories, branding }: Props) {
   const router = useRouter()
   const [logoError, setLogoError] = useState(false)
-  const [coverError, setCoverError] = useState(false)
   const [liveIsOpen, setLiveIsOpen] = useState(restaurant.is_open ?? true)
   const [liveOpenTime, setLiveOpenTime] = useState(restaurant.opening_time ? restaurant.opening_time.slice(0, 5) : undefined)
   const [liveCloseTime, setLiveCloseTime] = useState(restaurant.closing_time ? restaurant.closing_time.slice(0, 5) : undefined)
@@ -398,6 +403,7 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
       clearCart()
     }
     setRestaurant(restaurant.id, restaurant.name, restaurant.slug, restaurant.delivery_fee ?? 0)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restaurant.id, restaurant.name, restaurant.slug])
 
   function scrollToCategory(categoryId: string) {
@@ -410,33 +416,57 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* ===== MOBILE HEADER ===== */}
-      <div
-        className="fixed top-0 left-0 right-0 z-40 bg-white/80 safe-top md:hidden"
+      {/* ===== UNIFIED TOP BAR ===== */}
+      <header
+        className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-sm border-b border-border/30 h-12 md:h-9 flex items-center safe-top"
         style={{ backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}
       >
-        <div className="flex items-center justify-between px-4 h-12 mx-auto max-w-7xl md:px-6">
-          <button
-            onClick={() => router.back()}
-            className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center active:scale-95 transition-transform"
-            aria-label="Go back"
-          >
-            <ArrowLeft className="w-4 h-4 text-text-primary" />
-          </button>
-          <h2 className="text-[13px] font-semibold text-text-primary mx-2 truncate">
-            {restaurant.name}
-          </h2>
-          <div className="w-8" />
+        <div className="flex items-center justify-between w-full px-4 max-w-7xl mx-auto">
+          <Link href="/restaurants" className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary hover:text-text-primary transition-colors shrink-0">
+            <LogoIcon className="w-3.5 h-3.5 shrink-0" />
+            <span className="hidden sm:inline text-[11px]">Digital QR Menue</span>
+          </Link>
+          <div className="flex items-center gap-2">
+            {/* Mobile: back button + restaurant name */}
+            <div className="flex items-center gap-2 md:hidden">
+              <button
+                onClick={() => router.back()}
+                className="w-7 h-7 rounded-full bg-[#F5F5F5] flex items-center justify-center active:scale-95 transition-transform"
+                aria-label="Go back"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 text-text-primary" />
+              </button>
+              <span className="text-[12px] font-semibold text-text-primary truncate max-w-[160px]">
+                {restaurant.name}
+              </span>
+            </div>
+            {/* Desktop: restaurants link */}
+            <Link href="/restaurants" className="hidden md:block text-[10px] font-medium text-text-muted hover:text-text-secondary transition-colors">
+              Restaurants
+            </Link>
+          </div>
         </div>
-      </div>
+      </header>
 
       {/* ===== MOBILE LAYOUT ===== */}
       <div className="md:hidden pt-12">
         <main className="pb-[100px] mx-auto">
-          {/* Hero Image */}
-          {restaurant.logo_url && !logoError && (
-            <div className="relative w-full h-44 bg-surface overflow-hidden">
-              {!coverError ? (
+          {/* Hero Section — Banner or Logo background */}
+          <div className="relative w-full h-48 bg-surface overflow-hidden">
+            {(restaurant.banner_enabled && restaurant.banner_image_url) ? (
+              <>
+                <Image
+                  src={restaurant.banner_image_url}
+                  alt={restaurant.name}
+                  fill
+                  className="object-cover"
+                  sizes="100vw"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+              </>
+            ) : (restaurant.logo_url && !logoError ? (
+              <>
                 <Image
                   src={restaurant.logo_url}
                   alt={restaurant.name}
@@ -444,45 +474,31 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
                   className="object-cover"
                   sizes="100vw"
                   priority
-                  onError={() => setCoverError(true)}
+                  onError={() => setLogoError(true)}
                 />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-primary to-primary/60" />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4 z-10">
-                <div className="flex items-end gap-3">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+              </>
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-primary via-primary-hover to-primary/60" />
+            ))}
+            {/* Always show logo overlay */}
+            <div className="absolute bottom-4 left-4 right-4 z-10">
+              <div className="flex items-end gap-3">
+                {restaurant.logo_url && (
                   <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-white/90 shadow-lg relative shrink-0 bg-white">
                     <Image src={restaurant.logo_url} alt={restaurant.name} fill className="object-cover" sizes="56px" />
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <h1 className="text-white text-lg font-bold leading-tight drop-shadow-sm">{restaurant.name_ur || restaurant.name}</h1>
-                    <div className="flex items-center gap-1.5 text-white/80 text-[11px] mt-0.5">
-                      {restaurant.cuisine_type && <span>{restaurant.cuisine_type}</span>}
-                      {restaurant.city && <><span className="text-white/40">·</span><span>{restaurant.city}</span></>}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {(!restaurant.logo_url || logoError) && (
-            <div className="px-4 pt-4 pb-3">
-              <div className="flex items-start gap-3">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-[#8F2E19] text-white flex items-center justify-center font-bold text-xl shrink-0 shadow-sm">
-                  {restaurant.name.charAt(0).toUpperCase()}
-                </div>
+                )}
                 <div className="min-w-0 flex-1">
-                  <h1 className="text-lg font-bold text-text-primary leading-tight">{restaurant.name_ur || restaurant.name}</h1>
-                  <div className="flex items-center gap-1.5 text-[11px] text-text-secondary mt-0.5">
+                  <h1 className="text-white text-lg font-bold leading-tight drop-shadow-sm">{restaurant.name_ur || restaurant.name}</h1>
+                  <div className="flex items-center gap-1.5 text-white/80 text-[11px] mt-0.5">
                     {restaurant.cuisine_type && <span>{restaurant.cuisine_type}</span>}
-                    {restaurant.city && <><span className="text-border">·</span><span>{restaurant.city}</span></>}
+                    {restaurant.city && <><span className="text-white/40">·</span><span>{restaurant.city}</span></>}
                   </div>
                 </div>
               </div>
             </div>
-          )}
+          </div>
 
           {/* Status + Info chips */}
           <div className="px-4 pt-3 pb-2">
@@ -516,8 +532,8 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
             )}
           </div>
 
-          {/* Description — if no hero image */}
-          {restaurant.description && !restaurant.logo_url && (
+          {/* Description — only if no hero image or banner */}
+          {restaurant.description && !restaurant.logo_url && !restaurant.banner_enabled && (
             <p className="px-4 text-[13px] text-text-secondary leading-relaxed pb-3 border-b border-border/40">{restaurant.description}</p>
           )}
 
@@ -594,7 +610,7 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
                         <h2 className="text-[14px] font-bold text-text-primary">{category.name_en}</h2>
                         <span className="h-px flex-1 bg-border/50" />
                       </div>
-                      <div className="grid grid-cols-2 gap-2.5">
+                      <div className="grid grid-cols-2 gap-2.5 auto-rows-fr">
                         {availableDishes.map((dish) => <MobileDishCard key={dish.id} dish={dish} closed={effectivelyClosed} deals={deals} />)}
                         {unavailableDishes.map((dish) => <MobileDishCard key={dish.id} dish={dish} unavailable closed={effectivelyClosed} deals={deals} />)}
                       </div>
@@ -617,8 +633,47 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
 
       {/* ===== DESKTOP LAYOUT ===== */}
       <div className="hidden md:block">
+        {/* Desktop Banner Promo */}
+        {restaurant.banner_enabled && restaurant.banner_image_url && (
+          <div className="pt-[36px]">
+            {restaurant.banner_link_url ? (
+              <a
+                href={restaurant.banner_link_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block relative w-full h-48 overflow-hidden group"
+              >
+                <Image
+                  src={restaurant.banner_image_url}
+                  alt="Promotional banner"
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  sizes="100vw"
+                  priority
+                />
+                <div className="absolute inset-0 bg-black/10 flex items-end justify-end p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="text-white text-xs bg-black/50 px-3 py-1.5 rounded-full flex items-center gap-1">
+                    Learn more <ExternalLink className="w-3 h-3" />
+                  </span>
+                </div>
+              </a>
+            ) : (
+              <div className="relative w-full h-48 overflow-hidden">
+                <Image
+                  src={restaurant.banner_image_url}
+                  alt="Promotional banner"
+                  fill
+                  className="object-cover"
+                  sizes="100vw"
+                  priority
+                />
+              </div>
+            )}
+          </div>
+        )}
+
         {/* HERO SECTION */}
-        <div className="bg-white pt-16 pb-10 border-b border-border/60">
+        <div className={`bg-white pb-10 border-b border-border/60 ${restaurant.banner_enabled && restaurant.banner_image_url ? "pt-6" : "pt-12"}`}>
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex items-start gap-6">
               {restaurant.logo_url && !logoError ? (
@@ -760,7 +815,7 @@ export function RestaurantDetailClient({ restaurant, categories }: Props) {
                           <h2 className="text-lg font-bold text-text-primary">{category.name_en}</h2>
                           <span className="h-px flex-1 bg-border/60" />
                         </div>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 auto-rows-fr">
                           {availableDishes.map((dish) => <DesktopDishCard key={dish.id} dish={dish} closed={effectivelyClosed} deals={deals} />)}
                           {unavailableDishes.map((dish) => <DesktopDishCard key={dish.id} dish={dish} unavailable closed={effectivelyClosed} deals={deals} />)}
                         </div>

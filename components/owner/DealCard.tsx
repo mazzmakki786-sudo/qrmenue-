@@ -47,7 +47,7 @@ export function DealCard({ deal, linkedDish, onEdit, onDelete, onToggleActive }:
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
             deal.is_active && !isExpired ? "bg-[#25D366]/10" : "bg-[#F0F0F0]"
           }`}>
-            <Icon className={`w-5 h-5 ${deal.is_active && !isExpired ? "text-[#25D366]" : "text-[#999]"}`} />
+            <Icon className={`w-5 h-5 text-[#0D7A33]`} />
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
@@ -77,7 +77,7 @@ export function DealCard({ deal, linkedDish, onEdit, onDelete, onToggleActive }:
               <p className="text-xs text-[#555] mt-1 line-clamp-2">{deal.description_en}</p>
             )}
             {linkedDish && (
-              <p className="text-[10px] text-[#25D366] font-medium mt-1">
+              <p className="text-[10px] text-[#0D7A33] font-medium mt-1">
                 Linked to: {linkedDish.name_en}
               </p>
             )}
@@ -97,7 +97,7 @@ export function DealCard({ deal, linkedDish, onEdit, onDelete, onToggleActive }:
             className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg hover:bg-[#F0F0F0] transition-colors"
             title={deal.is_active ? "Disable" : "Enable"}
           >
-            <Power className={`w-4 h-4 ${deal.is_active ? "text-[#25D366]" : "text-[#999]"}`} />
+            <Power className={`w-4 h-4 ${deal.is_active ? "text-[#0D7A33]" : "text-[#888]"}`} />
           </button>
           <button
             onClick={() => onEdit(deal)}

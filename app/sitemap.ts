@@ -2,15 +2,6 @@ import type { MetadataRoute } from "next"
 import { createClient } from "@/lib/supabase/server"
 import { blogSlugs, publicRoutes, baseUrl } from "@/lib/blog-articles"
 
-const testSlugs = new Set([
-  "sher-hassan-mq40ywg7",
-  "sher-hassan-mptsm32y",
-  "maz-makki-mqdd8oml",
-  "maki-mr7kg2cu",
-  "muhammad-maki-mpwnk0tl",
-  "d-muaz-mptu9epf",
-])
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = await createClient()
 
@@ -30,9 +21,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .eq("is_active", true)
         .eq("is_suspended", false))
         .data ?? [])
-        .filter((r) => !testSlugs.has(r.slug))
         .map((r) => ({
-          url: `${baseUrl}/menu/${r.slug}`,
+          url: `${baseUrl}/${r.slug}`,
           lastModified: new Date(r.updated_at),
         }))
     : []

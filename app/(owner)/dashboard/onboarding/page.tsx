@@ -1,5 +1,7 @@
 "use client"
 
+export const dynamic = "force-dynamic"
+
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { QRCodeDisplay } from "@/components/shared/QRCodeDisplay"
@@ -33,7 +35,7 @@ export default function OnboardingPage() {
     )
   }
 
-  const menuUrl = `${process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "")}/menu/${restaurant.slug}`
+  const menuUrl = `${process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "")}/${restaurant.slug}`
 
   const handleCopyUrl = () => {
     if (typeof navigator !== "undefined" && navigator.clipboard) {

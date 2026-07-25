@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import Image from "next/image"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { PasswordInput, validatePassword } from "@/components/ui/password-input"
 import CityAutocomplete from "@/components/shared/CityAutocomplete"
-import { ArrowLeft, Sparkles } from "lucide-react"
+import { Sparkles } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 
 export default function RestaurantSignupPage() {
@@ -33,12 +32,14 @@ export default function RestaurantSignupPage() {
       }
       setCheckingAuth(false)
     }).catch(() => setCheckingAuth(false))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleGoogleSignup = async () => {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || location.origin
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${location.origin}/auth/callback?redirect=/signup/restaurant` },
+      options: { redirectTo: `${baseUrl}/auth/callback?redirect=/signup/restaurant` },
     })
   }
 
@@ -70,7 +71,18 @@ export default function RestaurantSignupPage() {
 
     if (user) {
       // User already signed in via Google — create restaurant directly
-      const slug = `${form.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")}-${Date.now().toString(36)}`
+      const slugRes = await fetch("/api/auth/signup/slug", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: form.name, city: form.city }),
+      })
+      const slugData = await slugRes.json()
+      if (!slugRes.ok) {
+        setError(slugData.error || "Failed to generate slug. Please try again.")
+        setLoading(false)
+        return
+      }
+      const slug = slugData.slug
       const insertData: Record<string, unknown> = {
         owner_id: user.id,
         name: form.name,
@@ -131,18 +143,33 @@ export default function RestaurantSignupPage() {
         return
       }
 
-      await supabase.auth.signInWithPassword({
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email: form.email,
         password: form.password,
       })
 
+      if (signInError) {
+        console.error("[Signup] Post-signin failed:", signInError)
+        // If immediate signin fails, wait a bit and retry
+        await new Promise((resolve) => setTimeout(resolve, 1500))
+        await supabase.auth.signInWithPassword({
+          email: form.email,
+          password: form.password,
+        })
+      }
+
+      // Verify session is established before navigating
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+      }
+
       setLoading(false)
 
-      if (hasPaidPlan) {
-        router.replace("/dashboard/subscription")
-      } else {
-        router.replace("/dashboard/onboarding")
-      }
+      const dest = hasPaidPlan ? "/dashboard/subscription" : "/dashboard/onboarding"
+      // Use hard navigation for reliable cookie delivery
+      window.location.href = dest
+      return
     } catch {
       setError("Something went wrong. Please try again.")
       setLoading(false)
@@ -151,7 +178,7 @@ export default function RestaurantSignupPage() {
 
   const restaurantFields = [
     { id: "name", label: "Restaurant Name *", placeholder: "Al-Habib Grill", type: "text" },
-    { id: "city", label: "City *", placeholder: "Lahore", type: "text" },
+    { id: "city", label: "City *", placeholder: "Faisalabad", type: "text" },
     { id: "phone", label: "Phone / WhatsApp *", placeholder: "0300-XXXXXXX", type: "tel" },
   ]
 
@@ -161,21 +188,17 @@ export default function RestaurantSignupPage() {
 
   return (
     <div className="w-full flex flex-col items-center">
-      <div className="w-full mb-6">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="inline-flex items-center gap-2 text-sm text-[#555] hover:text-black transition-colors min-h-[44px]"
-        >
-          <div className="w-8 h-8 rounded-full bg-[#F5F5F5] flex items-center justify-center shrink-0">
-            <ArrowLeft className="w-4 h-4" />
-          </div>
-          Back
-        </button>
-      </div>
-
       <div className="flex flex-col items-center text-center mb-6">
-        <Image src="/icon.svg" alt="Digital QR Menue" width={48} height={48} className="w-12 h-12 mb-4" />
+        <svg className="w-12 h-12 mb-4" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="28" height="28" rx="6" fill="#22C55E" />
+          <rect x="4" y="4" width="5" height="5" rx="1" fill="#fff" />
+          <rect x="13" y="4" width="5" height="5" rx="1" fill="#fff" />
+          <rect x="4" y="13" width="5" height="5" rx="1" fill="#fff" />
+          <rect x="13" y="13" width="5" height="5" rx="1" fill="#fff" />
+          <rect x="18" y="18" width="6" height="6" rx="1" fill="#fff" opacity="0.9" />
+          <rect x="4" y="20" width="3" height="4" rx="0.8" fill="#fff" opacity="0.7" />
+          <rect x="20" y="4" width="4" height="3" rx="0.8" fill="#fff" opacity="0.7" />
+        </svg>
         <h1 className="text-2xl font-bold text-black mb-1">Register Your Restaurant</h1>
         <p className="text-sm text-[#555]">{preselectedPlan ? "Set up your account to continue" : "Start your 30-day free trial today"}</p>
       </div>

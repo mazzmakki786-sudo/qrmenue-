@@ -23,6 +23,7 @@ interface OrderData {
   table_number?: string | null
   customer_name: string
   order_status: string
+  delivery_fee?: number
 }
 
 interface RestaurantData {
@@ -140,6 +141,12 @@ export function OrderReceipt({ order, restaurant }: Props) {
 
         {/* Totals */}
         <div className="border-t border-dashed border-[#CCC] pt-2 mb-2 space-y-1">
+          {(order.delivery_fee ?? 0) > 0 && (
+            <div className="flex justify-between px-1 text-sm">
+              <span>Delivery Fee</span>
+              <span>Rs {order.delivery_fee}</span>
+            </div>
+          )}
           <div className="flex justify-between px-1 text-sm">
             <span>Total</span>
             <span className="font-bold">Rs {order.total_price}</span>

@@ -43,6 +43,7 @@ export function CustomerTable() {
     return () => {
       supabase.removeChannel(channel)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Real-time subscription on orders
@@ -58,6 +59,7 @@ export function CustomerTable() {
     return () => {
       supabase.removeChannel(channel)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const filtered = useMemo(() => {

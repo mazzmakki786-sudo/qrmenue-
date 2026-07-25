@@ -4,17 +4,23 @@ import { useEffect, useState, useCallback, useRef } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
-import Image from "next/image"
+import dynamic from "next/dynamic"
 import { Eye, EyeOff, Users, BarChart3, Settings as SettingsIcon, Store, Megaphone, Clock, CreditCard, Loader2, Mail } from "lucide-react"
+import { LogoIcon } from "@/components/shared/LogoIcon"
 import { RestaurantTable } from "@/components/superadmin/RestaurantTable"
 import { CustomerTable } from "@/components/superadmin/CustomerTable"
-import { AnalyticsView } from "@/components/superadmin/AnalyticsView"
 import { CompanySettingsForm } from "@/components/superadmin/CompanySettingsForm"
 import { TrialLimitsEditor } from "@/components/superadmin/TrialLimitsEditor"
 import { AnnouncementsPanel } from "@/components/superadmin/AnnouncementsPanel"
 import { ActivityLogView } from "@/components/superadmin/ActivityLogView"
 import { PlanManager } from "@/components/superadmin/PlanManager"
 import { ContactInquiriesPanel } from "@/components/superadmin/ContactInquiriesPanel"
+
+// Dynamic import for heavy analytics view with recharts
+const AnalyticsView = dynamic(
+  () => import("@/components/superadmin/AnalyticsView").then((m) => m.AnalyticsView),
+  { ssr: false, loading: () => <div className="h-96 bg-gray-50 rounded-2xl animate-pulse flex items-center justify-center"><span className="text-xs text-gray-400">Loading analytics...</span></div> }
+)
 
 type Tab = "restaurants" | "customers" | "analytics" | "announcements" | "plans" | "settings" | "inquiries"
 
@@ -49,13 +55,7 @@ function LoginForm({ onLogin, locked }: { onLogin: () => void; locked: boolean }
     return (
       <div className="fixed inset-0 z-[60] bg-white flex items-center justify-center px-4">
         <div className="text-center max-w-sm">
-          <Image
-            src="/icon.svg"
-            alt="Digital QR Menue"
-            width={48}
-            height={48}
-            className="w-12 h-12 mb-4 mx-auto rounded-lg"
-          />
+          <LogoIcon className="w-12 h-12 mb-4 mx-auto" />
           <h1 className="text-xl font-bold mb-2">Access Denied</h1>
           <p className="text-sm text-[#555] mb-6">
             You do not have permission to access this panel.
@@ -75,13 +75,7 @@ function LoginForm({ onLogin, locked }: { onLogin: () => void; locked: boolean }
     <div className="fixed inset-0 z-[60] bg-white flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <Image
-            src="/icon.svg"
-            alt="Digital QR Menue"
-            width={56}
-            height={56}
-            className="w-14 h-14 mx-auto mb-4 rounded-xl"
-          />
+          <LogoIcon className="w-14 h-14 mx-auto mb-4" />
           <h1 className="text-2xl font-bold">Super Admin</h1>
           <p className="text-sm text-[#555] mt-1">Company access only</p>
         </div>
@@ -114,13 +108,7 @@ function AccessDenied({ onLogout }: { onLogout: () => void }) {
   return (
     <div className="fixed inset-0 z-[60] bg-white flex items-center justify-center px-4">
       <div className="text-center max-w-sm">
-        <Image
-          src="/icon.svg"
-          alt="Digital QR Menue"
-          width={48}
-          height={48}
-          className="w-12 h-12 mx-auto mb-4 rounded-xl"
-        />
+        <LogoIcon className="w-12 h-12 mx-auto mb-4" />
         <h1 className="text-xl font-bold mb-2">Access Denied</h1>
         <p className="text-sm text-[#555] mb-6">
           You do not have permission to access this panel.
@@ -196,6 +184,7 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
         router.replace("/superadmin")
       }, SESSION_TIMEOUT_MS)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuperAdmin, supabase])
 
   useEffect(() => {
@@ -243,6 +232,7 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
   useEffect(() => {
     if (isSuperAdmin && user?.email) { loadData() }
     else if (!checking) { setLoading(false) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuperAdmin, user, checking])
 
   const scheduleRefetch = useCallback(() => {

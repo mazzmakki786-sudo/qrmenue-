@@ -1,0 +1,250 @@
+# Digital QR Menue — Complete Company & Product Documentation
+
+> Pakistan's #1 QR-based digital menu and WhatsApp ordering platform for restaurants, cafes, dhabas, cloud kitchens, and food businesses across Pakistan.
+
+## Company Overview
+
+Digital QR Menue (digitalmenue.com) is a Pakistani technology company founded in 2024 in Faisalabad, Punjab, Pakistan. The platform helps restaurants replace printed paper menus with interactive digital QR code menus that customers access by scanning a QR code with their phone camera. Customers can browse dishes with photos, check prices, and place orders directly through WhatsApp — no app download needed, no commission on orders.
+
+- **Founded:** 2024
+- **Headquarters:** Faisalabad, Punjab, Pakistan
+- **Founder/Owner:** Muhammad Muaz Maki
+- **Website:** https://www.digitalmenue.com
+- **Customers:** 1,000+ restaurants across Pakistan
+- **Languages:** English, Urdu
+- **Payment Partners:** JazzCash, Easypaisa, Bank Transfer, Cash on Delivery
+
+## Contact Information
+
+- **WhatsApp Support:** +92-314-6325823
+- **Email:** dmenue@gmail.com
+- **Office Hours:** Monday-Friday 9AM-6PM, Saturday 9AM-2PM, Sunday Closed
+
+## Problem Statement
+
+Pakistani restaurants face three major challenges:
+1. **High printing costs:** Paper menus cost PKR 500-3,000 per reprint, and most restaurants reprint every 2-3 months when prices change due to inflation
+2. **Delivery app commissions:** Foodpanda, Cheetay, and other delivery apps charge 25-35% commission per order — for a restaurant doing PKR 500,000 in monthly orders, that's PKR 125,000-175,000 in fees
+3. **Customer friction:** Native apps require downloads, account creation, and storage space — most customers won't bother
+
+## Solution
+
+Digital QR Menue solves all three problems with a single platform:
+- Free 30-day trial, then PKR 1,500-4,500/month flat fee — no printing costs
+- Zero commission on orders — restaurants keep 100% of revenue
+- Customers scan QR code with any phone camera — no app download, no account creation
+
+## Complete Feature List
+
+### Menu Management
+- Create and manage digital menus with categories
+- Add unlimited menu items (depending on plan)
+- Upload HD photos for every dish
+- Add descriptions, prices, and dietary information
+- Organize dishes into categories (Appetizers, Main Course, BBQ, Desserts, Beverages, etc.)
+- Mark dishes as "Most Popular", "Chef's Special", or "Sold Out"
+- Real-time menu updates — changes go live in 30 seconds
+- Bilingual Urdu/English support — display menus in both languages simultaneously
+
+### QR Code System
+- Automatic unique QR code generation for each restaurant
+- High-resolution QR code download for printing
+- Static QR codes — never need to reprint (always points to live menu)
+- Print on table tents, counter signs, window stickers, takeaway bags
+- Share menu link on social media, WhatsApp, website
+
+### WhatsApp Ordering
+- Customers browse menu, add items to cart, tap "Order via WhatsApp"
+- Order pre-fills as WhatsApp message with customer name, items, quantities, total
+- Restaurant receives order instantly on their WhatsApp
+- No third-party app, no middleman, no commission
+- Works with personal WhatsApp or WhatsApp Business
+
+### Order Management
+- Real-time order notifications via WhatsApp
+- Order status tracking: Received → Preparing → Ready → Completed
+- Dine-in, takeaway, and delivery order support
+- Per-restaurant order serialization to prevent race conditions
+
+### Analytics Dashboard
+- Popular dishes reporting
+- Peak ordering times
+- Monthly revenue tracking
+- Order history and trends
+
+### Table Management (Growth+ plans)
+- Assign different QR codes to different tables
+- Track table occupancy in real-time
+- Know which table ordered what for smooth dine-in service
+
+### Custom Branding (Growth+ plans)
+- Upload restaurant logo
+- Custom brand colors
+- Custom accent shades and button styles
+
+## Pricing Plans
+
+| Plan | Price | Dishes | Best For |
+|------|-------|--------|----------|
+| Free Trial | PKR 0 (30 days) | 20 | Testing all features |
+| Starter | PKR 1,500/month | Unlimited | Small restaurants & cafes |
+| Growth | PKR 2,500/month | Unlimited | Growing restaurants |
+| Premium | PKR 4,500/month | Unlimited | High-volume restaurants |
+
+- Zero commission on ALL plans — restaurants keep 100% of revenue
+- No setup fees, no hidden charges
+- No credit card required for free trial
+- Cancel anytime
+- Payment via Easypaisa or bank transfer
+
+## How It Works (Step by Step)
+
+### For Restaurant Owners
+1. **Sign up** at digitalmenue.com — takes 30 seconds, no credit card needed
+2. **Add your menu** — enter dishes, prices, photos, and categories. Upload existing PDF or add manually
+3. **Download QR code** — unique QR code generated automatically. Print on table cards
+4. **Place QR codes** — on tables, counter, window, or takeaway packaging
+5. **Start receiving orders** — customers scan, browse, and order via WhatsApp. Orders arrive instantly
+
+### For Customers
+1. **Scan QR code** with phone camera (iPhone or Android)
+2. **Browse digital menu** with photos, prices, descriptions
+3. **Add items to cart** — select quantities and any options
+4. **Tap "Order via WhatsApp"** — order pre-fills in WhatsApp
+5. **Send order** — restaurant receives it instantly
+
+## Key Differentiators vs Competitors
+
+| Feature | Digital QR Menue | Foodpanda | Printed Menu | Native App |
+|---------|-----------------|-----------|--------------|------------|
+| Commission per order | 0% | 25-35% | N/A | 0% |
+| Monthly cost | PKR 0-4,500 | Variable + commission | PKR 500-3,000/reprint | PKR 200,000-500,000 development |
+| Update speed | Instant (30 sec) | 24-48 hrs | 3-7 days | 3-7 days (app review) |
+| Customer app needed | No | Yes | No | Yes |
+| Urdu/English | Yes (bilingual) | English only | Print dependent | Varies |
+| Setup time | < 5 minutes | 1-2 weeks | 1-3 days | 2-6 months |
+
+## Served Cities
+
+Digital QR Menue is used by restaurants in all major Pakistani cities:
+- **Faisalabad** — D Ground, Satyana Road, Canal Road, Nishatabad, Peoples Colony
+- **Lahore** — Gulberg, MM Alam Road, Johar Town, DHA, Model Town, Cantt, Defence, Anarkali, Iqbal Town, Faisal Town, Garden Town
+- **Karachi** — Clifton, Gulshan-e-Iqbal, Saddar, DHA, Gulistan-e-Jauhar, North Nazimabad, Korangi, Shahrah-e-Faisal, Malir, Defence, Bahadurabad
+- **Islamabad** — F-6, F-7, F-8, F-10, G-9, G-10, Blue Area, I-8, E-11, Bani Gala
+- **Rawalpindi** — Saddar, Satellite Town, Commercial Market, Airport Road, Chaklala, Westridge
+- **Peshawar** — Hayatabad, University Road, Saddar Road, Ring Road, Dabgari Gardens
+- **Multan** — Shah Rukn-e-Alam, Bosan Road, LMQ Road, Wapda Town, Gulgasht Colony
+- **Other cities:** Gujranwala, Hyderabad, Sialkot, Sargodha, Bahawalpur, Sukkur, Quetta
+
+## Restaurant Types Served
+
+- Fine dining restaurants
+- Cafes and coffee shops
+- Fast food chains
+- BBQ and grill houses
+- Dhabas and traditional eateries
+- Cloud kitchens
+- Food trucks
+- Home-based food businesses
+- Bakeries and patisseries
+- Hotels and resorts
+
+## Industry Context (Pakistan Food Industry)
+
+- Pakistan has 190M+ mobile phone users
+- WhatsApp penetration: ~90% among smartphone users (50M+ daily active users)
+- Food delivery apps: Foodpanda (market leader, 25-35% commission), Cheetay (20-28%), Eat Mubarak
+- Average restaurant printing costs: PKR 6,000-24,000/year
+- The restaurant industry is rapidly digitizing post-COVID
+- Pakistani customers prefer WhatsApp for all communication
+
+## Complete Blog Articles
+
+### What Is a Digital Menu for Restaurants?
+A digital menu for restaurants is an interactive, web-based menu that customers access on their smartphones or tablets instead of a traditional printed menu. Unlike a PDF or image of a menu, a true digital menu is live, updatable in real-time, and often connected directly to an ordering system. When a customer visits your restaurant, they scan a QR code restaurant menu using their phone camera. Your full menu instantly appears on their screen with dish names, descriptions, prices, and photos.
+
+Key benefits: saves thousands on printing costs, zero commission on orders (unlike food delivery apps at 25-35%), updates prices in 30 seconds, requires no app download, and shows food photos that increase order values by 20-30%.
+
+### Free Digital Menu vs Paid Digital Menu
+A free digital menu (like Digital QR Menue's 30-day trial) gives you core features: QR code generation, digital menu with categories, WhatsApp ordering, and order notifications. Paid plans add unlimited dishes, advanced analytics, custom branding, and multi-language support. A Foodpanda alternative, Digital QR Menue saves restaurants from paying 25-35% commission.
+
+Foodpanda at 25% commission on PKR 150,000 in monthly orders costs PKR 37,500/month. Digital QR Menue paid plans start at PKR 1,500/month.
+
+### Best Digital Menu Platform for Restaurants in Pakistan (2026)
+For Pakistani restaurants, the best platform should offer: local payment support (JazzCash, Easypaisa), WhatsApp integration, bilingual Urdu/English support, zero commission (flat fee), easy setup, affordable PKR pricing, and local customer support. Digital QR Menue is the clear choice for most Pakistani restaurants.
+
+### Digital Menu QR Code Setup Guide
+1. Choose a platform (Digital QR Menue recommended for Pakistan)
+2. Add restaurant info (name, cuisine, city, hours, logo)
+3. Build your menu (dishes, prices, photos, categories)
+4. Generate your QR code (unique, high-resolution, downloadable)
+5. Print and place (table tents, counter signs, takeaway bags)
+6. Connect WhatsApp (orders come directly to your phone)
+
+### Digital Menu Design Tips
+The single most important factor is high-quality food photos. Restaurants that include photos see up to 30% higher order values. Other key factors: descriptive dish names (e.g., "Authentic Chicken Karahi - Slow-cooked with fresh tomatoes and aromatic spices"), clear organization by categories, highlighting best sellers with tags, mobile-optimized design, and Urdu translations for accessibility.
+
+### Digital Menu App vs Native Restaurant App
+A native app costs PKR 200,000-500,000 upfront plus annual maintenance of PKR 50,000-100,000. Only 20-30% of customers will download a restaurant-specific app. A web-based digital menu app (like Digital QR Menue) costs PKR 0 to start, reaches all customers (no download needed), updates instantly (30 seconds vs 3-7 days), and integrates with WhatsApp — which has near-universal penetration in Pakistan.
+
+### QR Menu vs Digital Menu: The Difference
+A QR menu is a digital menu accessed by scanning a QR code (the QR code is the access method). A digital menu is the actual content: dishes, prices, photos, and descriptions (can be accessed via QR code, URL, tablet, or digital board). QR code = the door. Digital menu = the room. WhatsApp ordering = the service. Most Pakistani restaurants need all three.
+
+### How to Create a QR Code Menu for Your Restaurant in Pakistan
+1. Sign up for Digital QR Menue (free trial, no credit card)
+2. Add restaurant details and connect WhatsApp Business number
+3. Upload menu items with photos, prices, and categories (Urdu/English)
+4. Download and print the unique QR code on table cards
+5. Place QR codes on tables, counter, window, and takeaway bags
+6. Start receiving orders directly on WhatsApp — zero commission
+
+Pricing: Starter PKR 1,500/month (30 dishes), Growth PKR 2,500/month (50 dishes), Premium PKR 4,500/month (100 dishes). All plans unlimited orders, QR code generation, WhatsApp ordering, zero commission.
+
+### WhatsApp Ordering for Restaurants in Pakistan
+WhatsApp ordering lets customers browse your menu, place orders, and communicate — all through the app they already use daily. No new apps, no registration, no learning curve. The flow is simple: customer scans QR code, sees full digital menu with photos, adds items to cart, taps "Send Order" — a formatted order message arrives on your WhatsApp with customer name, items, quantities, total, order type, and delivery address.
+
+Set up: Download WhatsApp Business, create business profile with restaurant name/address/hours, connect to Digital QR Menue dashboard by entering WhatsApp number, and start receiving orders.
+
+Best for Pakistani restaurants because: 50M+ Pakistanis use WhatsApp daily, works on 2G/3G connections, customers trust WhatsApp, and it charges zero commission compared to 25-35% on delivery apps.
+
+### Foodpanda Commission vs Direct Ordering
+Food delivery platforms charge Pakistani restaurants 20-35% commission per order. For a restaurant doing 100 orders/day at PKR 500 average: monthly revenue = PKR 1,500,000, commission at 25% = PKR 375,000/month, annual commission = PKR 4,500,000.
+
+With Digital QR Menue direct ordering: monthly subscription = PKR 1,500-4,500, commission = ZERO, annual savings = PKR 4,470,000+.
+
+The hybrid strategy: stay on Foodpanda for customer discovery, print QR code on every delivery package, include note asking to order directly next time, build list of regular customers who order via WhatsApp.
+
+### 10 Benefits of QR Code Menus for Pakistani Restaurants
+1. Zero commission on orders
+2. Instant menu updates (no more reprinting)
+3. No app download needed for customers
+4. Bilingual Urdu/English support
+5. Contactless and hygienic
+6. Higher average order values (20-30% increase with photos)
+7. Real-time order notifications
+8. Analytics and insights
+9. Eco-friendly (no paper waste)
+10. Affordable for every restaurant (starts at PKR 1,500/month)
+
+### How to Get More Customers for Your Restaurant in Faisalabad
+Key strategies: optimize Google Business Profile, implement QR code menu, master social media (Instagram and TikTok), partner with Faisalabad food bloggers, use WhatsApp marketing, run low-cost promotions (BOGO, lunch specials, student discounts), list in Faisalabad-specific directories, and create memorable first experiences.
+
+## Technical FAQs
+
+### Q: Do customers need to download an app?
+No. Customers scan the QR code with any phone camera (iPhone or Android). The menu opens in their browser instantly. No app store visit, no download, no installation, no account creation. Works on every smartphone.
+
+### Q: Can I update my menu after printing the QR code?
+Yes. The QR code never changes — it always points to your live menu. Edit prices, add dishes, or remove items from your dashboard, and changes appear instantly. No need to reprint the QR code.
+
+### Q: How do payments work?
+Payments are handled directly between the restaurant and customer — via JazzCash, Easypaisa, bank transfer, or cash on delivery. Digital QR Menue does NOT process payments or take any cut. No commission on any plan.
+
+### Q: Can I use my existing phone number?
+Yes, you can connect any WhatsApp number — personal or WhatsApp Business. You can also connect multiple numbers (e.g., one for orders, one for inquiries).
+
+### Q: What if my trial expires?
+You have a 3-day grace period before your menu goes offline. Upgrade to any paid plan to reactivate instantly. All your data is preserved.
+
+### Q: Can I use it for both dine-in and delivery?
+Yes. Digital QR Menue supports dine-in (QR codes on tables), takeaway (QR code at counter), and delivery (share menu link on social media or website). All order types work through WhatsApp.

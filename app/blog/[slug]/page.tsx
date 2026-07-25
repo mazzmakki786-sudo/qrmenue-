@@ -362,18 +362,18 @@ const articles: Record<string, { title: string; content: string[]; date: string;
       "Start your 30-day free trial today — no credit card required. Join hundreds of Pakistani restaurants already using Digital QR Menue.",
     ],
   },
-  "restaurant-marketing-lahore-guide": {
-    title: "How to Get More Customers for Your Restaurant in Lahore (2026 Guide)",
+  "restaurant-marketing-faisalabad-guide": {
+    title: "How to Get More Customers for Your Restaurant in Faisalabad (2026 Guide)",
     date: "2026-07-01",
     author: "Maz Makki",
     content: [
-      "Lahore is Pakistan's undisputed food capital. From Anarkali's historic eateries to Gulberg's trendy cafés and DHA's fine dining restaurants — the competition for customers is fierce. Standing out requires more than just good food. You need smart marketing.",
+      "Faisalabad is one of Pakistan's most vibrant food cities. From D-Ground's bustling eateries to Canal Road's trendy cafés and Jinnah Colony's fine dining restaurants — the competition for customers is fierce. Standing out requires more than just good food. You need smart marketing.",
 
-      "In this guide, we'll share practical, budget-friendly strategies that Lahore restaurant owners can use to attract more customers — starting today.",
+      "In this guide, we'll share practical, budget-friendly strategies that Faisalabad restaurant owners can use to attract more customers — starting today.",
 
       "## 1. Optimize Your Google Business Profile",
 
-      "When someone in Lahore searches \"best BBQ near me\" or \"café in Gulberg,\" Google Business Profile (GBP) is the first thing they see. A well-optimized GBP can bring dozens of new customers every week.",
+      "When someone in Faisalabad searches \"best BBQ near me\" or \"café near D-Ground,\" Google Business Profile (GBP) is the first thing they see. A well-optimized GBP can bring dozens of new customers every week.",
 
       "Start by claiming your profile at google.com/business. Add accurate information — your restaurant name, address, phone number, hours, and cuisine type. Use high-quality photos of your dishes, interior, and exterior.",
 
@@ -383,25 +383,25 @@ const articles: Record<string, { title: string; content: string[]; date: string;
 
       "## 2. Implement a QR Code Menu",
 
-      "Lahore customers are tech-savvy. They appreciate the convenience of scanning a QR code to see your full menu without waiting for a waiter.",
+      "Faisalabad customers are tech-savvy. They appreciate the convenience of scanning a QR code to see your full menu without waiting for a waiter.",
 
       "QR menus also speed up service. Waiters spend less time taking orders and more time serving food. Faster service means more table turns — especially during lunch rush when customers are on a schedule.",
 
       "And when customers have a great experience, they leave better reviews, come back sooner, and tell their friends.",
 
-      "## 3. Master Social Media for Lahore",
+      "## 3. Master Social Media for Faisalabad",
 
-      "Lahore's food scene thrives on Instagram and TikTok. A single viral reel can bring hundreds of new customers to your restaurant.",
+      "Faisalabad's food scene thrives on Instagram and TikTok. A single viral reel can bring hundreds of new customers to your restaurant.",
 
       "Post high-quality photos of your most Instagrammable dishes. Biryani shots, sizzling platters, colorful desserts — these perform well. Behind-the-scenes content also works: show your chefs preparing food, the grill firing up, or fresh ingredients arriving.",
 
-      "Use location tags (Gulberg, MM Alam Road, DHA, Johar Town, Anarkali) and relevant hashtags like #LahoreFoodies, #LahoreRestaurants, #LahoreFood, #FoodLahore, and #LahoreDiaries. Engage with customers who tag your restaurant.",
+      "Use location tags (D-Ground, Canal Road, Jinnah Colony, Madina Town, Peoples Colony) and relevant hashtags like #FaisalabadFoodies, #FaisalabadRestaurants, #FaisalabadFood, #FoodFaisalabad. Engage with customers who tag your restaurant.",
 
-      "TikTok is especially powerful in Lahore. Short videos of food preparation, plating, or customer reactions can get thousands of views. A restaurant in DHA gained 50,000 followers in a month by posting 30-second videos of their BBQ preparation.",
+      "TikTok is especially powerful in Faisalabad. Short videos of food preparation, plating, or customer reactions can get thousands of views. A restaurant in D-Ground gained 50,000 followers in a month by posting 30-second videos of their BBQ preparation.",
 
-      "## 4. Partner with Lahore Food Bloggers",
+      "## 4. Partner with Faisalabad Food Bloggers",
 
-      "Lahore has hundreds of food bloggers and influencers with engaged local audiences. A single visit from a popular blogger can bring dozens of new customers.",
+      "Faisalabad has hundreds of food bloggers and influencers with engaged local audiences. A single visit from a popular blogger can bring dozens of new customers.",
 
       "Start with micro-influencers (5,000-20,000 followers) — they have higher engagement rates and are often affordable or even willing to visit for a free meal. Invite them for a tasting of your signature dishes.",
 
@@ -411,7 +411,7 @@ const articles: Record<string, { title: string; content: string[]; date: string;
 
     "## 5. Use WhatsApp Marketing",
 
-      "WhatsApp is where Lahore's residents spend most of their phone time. Use it to reach them directly.",
+      "WhatsApp is where Faisalabad's residents spend most of their phone time. Use it to reach them directly.",
 
       "Collect customer numbers (with permission) and organize them into broadcast lists. Send your daily specials on WhatsApp Status every morning. Post photos of lunch specials around 11 AM to catch the lunch crowd.",
 
@@ -421,17 +421,17 @@ const articles: Record<string, { title: string; content: string[]; date: string;
 
       "## 6. Run Low-Cost Promotions",
 
-      "You don't need a big budget to attract Lahore customers. Try these low-cost ideas:",
+      "You don't need a big budget to attract Faisalabad customers. Try these low-cost ideas:",
 
       "Buy One Get One Free — on slow days (Monday-Thursday)\nLunch Special — discounted menu between 12-4 PM\nStudent Discount — with valid ID (works great near universities)\nFamily Deals — combo offers for 4-6 people\nReferral Discount — existing customer brings a friend, both get 10% off",
 
       "These promotions cost you margin but bring in new customers who may become regulars. Use QR menu analytics to track which promotions work best.",
 
-      "## 7. List in Lahore-Specific Directories",
+      "## 7. List in Faisalabad-Specific Directories",
 
       "Make sure your restaurant appears on local listing sites:",
 
-      "• Google Maps (essential)\n• Facebook Pages (essential)\n• Instagram (essential for Lahore)\n• Zameen.com Restaurant Listings\n• Lahore Food Guides and blogs\n• Local Facebook Groups (Lahore Foodies, Foodies of Lahore)",
+      "• Google Maps (essential)\n• Facebook Pages (essential)\n• Instagram (essential for Faisalabad)\n• Zameen.com Restaurant Listings\n• Faisalabad Food Guides and blogs\n• Local Facebook Groups (Faisalabad Foodies, Foodies of Faisalabad)",
 
       "Being listed on multiple platforms increases your chances of being discovered by new customers.",
 
@@ -441,7 +441,7 @@ const articles: Record<string, { title: string; content: string[]; date: string;
 
       "Greet them warmly. Offer a complimentary welcome drink or a small appetizer. Introduce your signature dishes. Make sure service is fast and attentive.",
 
-      "After their meal, ask if they'd like to join your WhatsApp list for updates and exclusive offers. Follow up the next day with a thank-you message. Small gestures build loyalty in Lahore's competitive restaurant scene.",
+      "After their meal, ask if they'd like to join your WhatsApp list for updates and exclusive offers. Follow up the next day with a thank-you message. Small gestures build loyalty in Faisalabad's competitive restaurant scene.",
 
       "## Measure What Works",
 
@@ -451,9 +451,9 @@ const articles: Record<string, { title: string; content: string[]; date: string;
 
       "Double down on what works and drop what doesn't. Marketing is an experiment — keep testing, keep improving.",
 
-      "## Ready to Grow Your Lahore Restaurant?",
+      "## Ready to Grow Your Faisalabad Restaurant?",
 
-      "Digital QR Menue helps Lahore restaurants attract more customers with QR code menus, WhatsApp ordering, and built-in analytics. Start your 30-day free trial today and see how digital tools can grow your restaurant business.",
+      "Digital QR Menue helps Faisalabad restaurants attract more customers with QR code menus, WhatsApp ordering, and built-in analytics. Start your 30-day free trial today and see how digital tools can grow your restaurant business.",
     ],
   },
   "how-to-make-qr-code-menu-for-restaurant": {
@@ -562,6 +562,210 @@ const articles: Record<string, { title: string; content: string[]; date: string;
       "Start your 30-day free trial today at digitalmenue.com. No credit card required. No commitment. Just a smarter way to run your restaurant.",
     ],
   },
+
+  // ═══════════════════════════════════════════════
+  //  NEW SEO GUIDES (Jul 2026) -- link to landing pages
+  // ═══════════════════════════════════════════════
+  "what-is-digital-menu-for-restaurants": {
+    title: "What Is a Digital Menu for Restaurants? Complete Guide (2026)",
+    date: "2026-07-21",
+    author: "Maz Makki",
+    content: [
+      "If you run a restaurant, cafe, or any food business in Pakistan, you have likely heard the term \"digital menu\". But what exactly is a digital menu for restaurants, and does your business need one?",
+
+      "In this complete guide, we will explain everything you need to know about digital menus from how they work to how they can save your restaurant thousands of rupees every month.",
+
+      "## What Is a Digital Menu for Restaurants?",
+
+      "A digital menu for restaurants is an interactive, web-based menu that customers access on their smartphones or tablets instead of a traditional printed menu. Unlike a PDF or image of a menu, a true digital menu is live, updatable in real-time, and often connected directly to an ordering system.",
+
+      "When a customer visits your restaurant, they scan a <a href='/qr-code-restaurant-menu'>QR code restaurant menu</a> using their phone camera. Your full menu instantly appears on their screen with dish names, descriptions, prices, and mouth-watering photos. They can browse categories and place orders directly through WhatsApp without waiting for a waiter.",
+
+      "## Types of Digital Menus",
+
+      "Not all digital menus are the same. Here are the most common types:",
+
+      "QR Code Menu: Customers scan a QR code to view the menu on their phone. This is the most popular type for Pakistani restaurants because it requires zero hardware. See our <a href='/qr-code-menu-free'>free QR code menu</a> page.",
+
+      "Tablet Menu: A tablet or iPad is placed on each table with the menu displayed. See our <a href='/digital-menu-tablet'>digital menu tablet</a> guide.",
+
+      "Digital Menu Board: Large TV screens display rotating menu items. Common in fast food restaurants.",
+
+      "Web-Based Menu: A shareable link to your menu. Post it on social media or WhatsApp. Check our <a href='/digital-menu-app'>digital menu app</a> page.",
+
+      "## Benefits of a Digital Menu",
+
+      "Digital menus save thousands on printing costs, charge zero commission on orders (unlike food delivery apps at 25-35%), let you update prices in 30 seconds, require no app download, and show beautiful food photos that increase order values by 20-30%.",
+
+      "Ready to create your digital menu? <a href='/digital-menu-for-restaurants'>Visit our digital menu for restaurants page</a> to get started.",
+    ],
+  },
+  "free-digital-menu-vs-paid-comparison": {
+    title: "Free Digital Menu vs Paid Digital Menu: Which Is Better?",
+    date: "2026-07-21",
+    author: "Maz Makki",
+    content: [
+      "One of the most common questions Pakistani restaurant owners ask is: should I use a free digital menu or pay for a premium solution?",
+
+      "The answer depends on your restaurant size, budget, and needs. In this guide, we compare free and paid options so you can make the right choice.",
+
+      "## What Does a Free Digital Menu Include?",
+
+      "A <a href='/free-digital-menu'>free digital menu</a> gives you core features: QR code generation, digital menu with categories, menu items and prices, WhatsApp ordering, and order notifications.",
+
+      "With Digital QR Menue free trial, you get full access to all features for 30 days. No credit card required.",
+
+      "## When to Choose Free",
+
+      "A free trial is ideal if you are testing digital menus for the first time, want to see how WhatsApp ordering works, or run a small cafe with low order volume.",
+
+      "## When to Upgrade",
+
+      "Consider a paid plan if you handle more than 15 orders per month, need more than 20 dishes, want advanced analytics, or need custom branding.",
+
+      "## Cost Comparison",
+
+      "Foodpanda at 25% commission on PKR 150,000 in monthly orders costs PKR 37,500/month. Digital QR Menue paid plans start at PKR 1,500/month. The choice is clear.",
+
+      "Ready to start? <a href='/free-digital-menu'>Start your free digital menu trial today</a>.",
+    ],
+  },
+  "best-digital-menu-platform-pakistan": {
+    title: "Best Digital Menu Platform for Restaurants in Pakistan (2026)",
+    date: "2026-07-21",
+    author: "Maz Makki",
+    content: [
+      "With dozens of digital menu platforms available, choosing the right one for your restaurant in Pakistan can be overwhelming. Here is our comparison to help you find the <a href='/best-digital-menu-for-restaurants'>best digital menu for restaurants</a>.",
+
+      "## What Makes a Great Platform?",
+
+      "For Pakistani restaurants, look for: local payment support (JazzCash, Easypaisa), WhatsApp integration, bilingual Urdu/English support, zero commission (flat fee), easy setup, affordable PKR pricing, and local support.",
+
+      "## Top Platforms Compared",
+
+      "Digital QR Menue: Free trial then PKR 1,500/month. 0% commission. WhatsApp ordering built in. Urdu/English. Local payments. 30-day free trial. Best for all Pakistani restaurants.",
+
+      "GloriaFood (Oracle): Free but no local payment integration, limited Urdu support, global support not Pakistan-based.",
+
+      "MenuForma (Europe): Pricing in USD, no Pakistan-specific features.",
+
+      "MenuPe (India): Payment in INR, no JazzCash/Easypaisa, limited Urdu support.",
+
+      "For Pakistani restaurants, <a href='/best-digital-menu-for-restaurants'>Digital QR Menue</a> is the clear choice.",
+    ],
+  },
+  "digital-menu-qr-code-setup-guide": {
+    title: "Digital Menu QR Code Setup Guide for Restaurants",
+    date: "2026-07-21",
+    author: "Maz Makki",
+    content: [
+      "Setting up a digital menu QR code for your restaurant is one of the smartest investments you can make. This guide walks you through the complete setup process.",
+
+      "## Step 1: Choose Your Platform",
+
+      "Select a platform to create your <a href='/digital-menu-qr-code'>digital menu QR code</a>. For Pakistani restaurants, Digital QR Menue is built for the local market.",
+
+      "## Step 2: Add Your Restaurant Info",
+
+      "Enter your restaurant name, cuisine type, city, opening hours, phone number, WhatsApp number, and logo.",
+
+      "## Step 3: Build Your Menu",
+
+      "Add each dish with name (English and Urdu), price, description, category, photo, and availability.",
+
+      "## Step 4: Generate Your QR Code",
+
+      "Your unique QR code is automatically generated. Download in high resolution and test it.",
+
+      "## Step 5: Print and Place",
+
+      "Print on table tents, counter signs, window stickers, or takeaway bags.",
+
+      "## Step 6: Connect WhatsApp",
+
+      "Enter your WhatsApp number in the dashboard. Customers scan your <a href='/qr-code-restaurant-menu'>QR code restaurant menu</a> and order with one tap.",
+
+      "Ready to set up your <a href='/digital-menu-qr-code'>digital menu QR code</a>? Start your free trial today.",
+    ],
+  },
+  "digital-menu-design-tips-restaurants": {
+    title: "Digital Menu Design Tips for Restaurants",
+    date: "2026-07-21",
+    author: "Maz Makki",
+    content: [
+      "Your digital menu design directly impacts how much customers order. A well-designed menu can increase average order values by 20-30%.",
+
+      "## 1. Use High-Quality Food Photos",
+
+      "This is the single most important factor. Natural lighting, clean backgrounds, and consistency matter most. See our <a href='/digital-menu-design'>digital menu design</a> page for more.",
+
+      "## 2. Write Descriptive Names",
+
+      "Instead of \"Chicken Karahi,\" write \"Authentic Chicken Karahi - Slow-cooked with fresh tomatoes and aromatic spices.\"",
+
+      "## 3. Organize by Categories",
+
+      "Start with popular categories like BBQ. Use clear names. Place high-margin items at the top.",
+
+      "## 4. Highlight Best Sellers",
+
+      "Use tags like Most Popular or Chef Special to guide customers. These increase sales of profitable items.",
+
+      "## 5. Optimize for Mobile",
+
+      "Ensure text is readable, buttons are tappable, and pages load fast. Digital QR Menue is automatically optimized.",
+
+      "## 6. Add Urdu Translations",
+
+      "Many customers prefer reading menus in Urdu. It makes your menu more accessible.",
+
+      "Ready to design your menu? <a href='/digital-menu-design'>Start creating your digital menu design</a> today.",
+    ],
+  },
+  "digital-menu-app-vs-native-app": {
+    title: "Digital Menu App vs Native Restaurant App: Which Is Better?",
+    date: "2026-07-21",
+    author: "Maz Makki",
+    content: [
+      "Should you build a native mobile app or use a <a href='/digital-menu-app'>digital menu app</a>? A native app costs PKR 200,000-500,000 upfront plus maintenance. A digital menu costs PKR 0 to start.",
+
+      "## The Installation Barrier",
+
+      "Only 20-30% of customers will download a restaurant-specific app. A QR code menu works for everyone with zero friction.",
+
+      "## Instant Updates",
+
+      "Native apps need 3-7 days for updates. Digital menus update in 30 seconds.",
+
+      "## WhatsApp vs Push Notifications",
+
+      "In Pakistan, WhatsApp has near-universal penetration. A <a href='/qr-menu-app'>QR menu app</a> that sends orders via WhatsApp fits naturally into customer behavior.",
+
+      "## The Verdict",
+
+      "For 95% of Pakistani restaurants, a digital menu app is better: costs 95% less, reaches all customers, updates instantly, works with WhatsApp, and needs no maintenance.",
+
+      "Ready to start? <a href='/free-digital-menu'>Start your free digital menu trial</a> today.",
+    ],
+  },
+  "qr-menu-vs-digital-menu-difference": {
+    title: "QR Menu vs Digital Menu: What Is the Difference?",
+    date: "2026-07-21",
+    author: "Maz Makki",
+    content: [
+      "People use the terms QR menu and digital menu interchangeably, but there are important differences.",
+
+      "A QR menu is a digital menu accessed by scanning a QR code. The QR code is the access method.",
+
+      "A digital menu is the actual content: dishes, prices, photos, and descriptions. It can be accessed via QR code, URL, tablet, or digital board.",
+
+      "Think of it this way: QR code = the door. Digital menu = the room. WhatsApp ordering = the service. You need all three.",
+
+      "| Type | Best For |\n|------|----------|\n| <a href='/qr-code-restaurant-menu'>QR Code Menu</a> | Most restaurants |\n| <a href='/digital-menu-tablet'>Tablet Menu</a> | Fine dining |\n| <a href='/digital-menu-pdf'>PDF Menu</a> | Simple display |\n| <a href='/digital-menu-app'>Web Menu</a> | Social media/delivery |",
+
+      "For most Pakistani restaurants, combine a QR code with a digital menu and WhatsApp ordering. <a href='/free-digital-menu'>Start your free trial</a> today.",
+    ],
+  },
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -570,7 +774,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!article) return { title: "Article Not Found" }
 
   return {
-    title: `${article.title} | Digital QR Menue Blog`,
+    title: `${article.title}`,
     description: article.content[0].slice(0, 155) + "...",
     alternates: {
       canonical: `https://www.digitalmenue.com/blog/${slug}`,
@@ -616,7 +820,7 @@ export default async function BlogArticlePage({ params }: Props) {
             name: "Digital QR Menue",
             logo: {
               "@type": "ImageObject",
-              url: "https://www.digitalmenue.com/icon.svg",
+              url: "https://www.digitalmenue.com/favicon.ico",
             },
           },
           mainEntityOfPage: {

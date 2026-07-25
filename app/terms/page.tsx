@@ -112,7 +112,7 @@ Upon termination, your data will be retained for 90 days before permanent deleti
   },
   {
     title: "12. Governing Law",
-    content: `These Terms are governed by the laws of the Islamic Republic of Pakistan. Any disputes arising from these Terms shall be subject to the exclusive jurisdiction of the courts of Lahore, Pakistan.
+    content: `These Terms are governed by the laws of the Islamic Republic of Pakistan. Any disputes arising from these Terms shall be subject to the exclusive jurisdiction of the courts of Faisalabad, Pakistan.
 
 This agreement shall be construed in accordance with the Prevention of Electronic Crimes Act (PECA) 2016 and other applicable Pakistani laws.`,
   },
@@ -216,14 +216,6 @@ export default function TermsPage() {
                 Also read our{" "}
                 <Link href="/privacy" className="text-black underline">
                   Privacy Policy
-                </Link>
-                ,{" "}
-                <Link href="/refund" className="text-black underline">
-                  Return &amp; Refund Policy
-                </Link>
-                ,{" "}
-                <Link href="/shipping" className="text-black underline">
-                  Shipping Policy
                 </Link>
                 , and{" "}
                 <Link href="/about" className="text-black underline">

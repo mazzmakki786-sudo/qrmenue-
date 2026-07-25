@@ -120,6 +120,7 @@ export interface Order {
   email_sent: boolean
   deal_id: string | null
   discount_amount: number
+  delivery_fee: number
   created_at: string
   updated_at: string
 }

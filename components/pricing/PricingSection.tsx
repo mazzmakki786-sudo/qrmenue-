@@ -17,6 +17,7 @@ export { type DBPlan, type PricingPlan, mapPlan }
 
 export function PricingSection({ heading, description, initialPlans, whatsappNumber }: PricingSectionProps) {
   const [plans, setPlans] = useState<PricingPlan[]>(initialPlans || [])
+  const [mounted, setMounted] = useState(false)
   const [whatsapp, setWhatsapp] = useState(whatsappNumber || "")
 
   const fetchPlans = useCallback(async () => {
@@ -25,7 +26,12 @@ export function PricingSection({ heading, description, initialPlans, whatsappNum
       if (res.ok) {
         const data = await res.json()
         if (data.plans && Array.isArray(data.plans)) {
-          setPlans(mergeYearlyPlans(data.plans))
+          const merged = mergeYearlyPlans(data.plans)
+          setPlans((prev) => {
+            // Only update if data actually differs to avoid infinite loops
+            if (JSON.stringify(prev) === JSON.stringify(merged)) return prev
+            return merged
+          })
         }
       }
     } catch {
@@ -33,11 +39,17 @@ export function PricingSection({ heading, description, initialPlans, whatsappNum
     }
   }, [])
 
+  // Always fetch from API on mount to ensure fresh data (bypasses ISR)
   useEffect(() => {
-    if (!initialPlans) {
-      fetchPlans()
-    }
-  }, [initialPlans, fetchPlans])
+    fetchPlans()
+    setMounted(true)
+  }, [fetchPlans])
+
+  // Polling fallback — every 30s in case Realtime misses an update
+  useEffect(() => {
+    const interval = setInterval(() => fetchPlans(), 30000)
+    return () => clearInterval(interval)
+  }, [fetchPlans])
 
   // Fetch WhatsApp number from settings
   useEffect(() => {
@@ -93,8 +105,8 @@ export function PricingSection({ heading, description, initialPlans, whatsappNum
 
   if (!plans.length) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
-        <div className="text-zinc-400 text-lg animate-pulse">Loading plans...</div>
+      <div className="min-h-[400px] bg-white flex items-center justify-center">
+        <div className="text-[#999] text-sm animate-pulse">Loading plans...</div>
       </div>
     )
   }

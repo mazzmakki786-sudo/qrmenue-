@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Bell, X, ChevronRight, Clock, Megaphone, BellRing } from "lucide-react"
 import { formatPrice, timeAgo } from "@/lib/utils"
@@ -31,6 +30,7 @@ interface TodayOrder {
   order_type: string
   created_at: string
   items: { name_en: string; quantity: number }[]
+  order_status: string
 }
 
 interface AnnouncementAlert {
@@ -42,14 +42,16 @@ interface AnnouncementAlert {
 
 export function BellNotification({ restaurantId }: Props) {
   const router = useRouter()
-  const [unreadCount, setUnreadCount] = useState(0)
   const [showDropdown, setShowDropdown] = useState(false)
   const [alerts, setAlerts] = useState<OrderAlert[]>([])
   const [todayOrders, setTodayOrders] = useState<TodayOrder[]>([])
-  const [dropdownLoading, setDropdownLoading] = useState(false)
   const [announcementQueue, setAnnouncementQueue] = useState<AnnouncementAlert[]>([])
   const [announcementModal, setAnnouncementModal] = useState<AnnouncementAlert | null>(null)
   const [exitingAlerts, setExitingAlerts] = useState<Set<string>>(new Set())
+  const [unreadAnnouncements, setUnreadAnnouncements] = useState(0)
+
+  // Derive badge count from today's orders + unread announcements
+  const unreadCount = todayOrders.filter((o) => o.order_status !== "cancelled").length + unreadAnnouncements
   const dropdownRef = useRef<HTMLDivElement>(null)
   const addToast = useToastStore((s) => s.addToast)
 
@@ -97,9 +99,7 @@ export function BellNotification({ restaurantId }: Props) {
       ])
 
       setTodayOrders((ordersRes.data || []) as TodayOrder[])
-      const activeToday = (ordersRes.data || []).filter((o: any) => o.order_status !== "cancelled")
-      const announcementCount = announcementsRes.count ?? 0
-      setUnreadCount(activeToday.length + announcementCount)
+      setUnreadAnnouncements(announcementsRes.count ?? 0)
     }
 
     fetchInitial()
@@ -117,10 +117,6 @@ export function BellNotification({ restaurantId }: Props) {
         (payload) => {
           const order = payload.new as any
           setTodayOrders((prev) => [order as TodayOrder, ...prev].slice(0, 50))
-          // Increment badge for every new non-cancelled order
-          if (order.order_status !== "cancelled") {
-            setUnreadCount((prev) => prev + 1)
-          }
           // Show toast + play sound only for "received" (new) orders
           if (order.order_status === "received") {
             playOrderAlert()
@@ -154,14 +150,6 @@ export function BellNotification({ restaurantId }: Props) {
           )
           const oldStatus = (payload.old as any)?.order_status
           const newStatus = newOrder.order_status
-          const wasCancelled = oldStatus === "cancelled"
-          const nowCancelled = newStatus === "cancelled"
-          // Count all non-cancelled orders
-          if (!wasCancelled && nowCancelled) {
-            setUnreadCount((prev) => Math.max(0, prev - 1))
-          } else if (wasCancelled && !nowCancelled) {
-            setUnreadCount((prev) => prev + 1)
-          }
           if (oldStatus && oldStatus !== newStatus) {
             const statusLabels: Record<string, string> = {
               received: "New Order",
@@ -207,7 +195,7 @@ export function BellNotification({ restaurantId }: Props) {
               created_at: n.created_at,
             }
             setAnnouncementQueue((prev) => [...prev, alert])
-            setUnreadCount((prev) => prev + 1)
+            setUnreadAnnouncements((prev) => prev + 1)
             setAnnouncementModal((current) => {
               if (!current) return alert
               return current
@@ -221,39 +209,43 @@ export function BellNotification({ restaurantId }: Props) {
       supabase.removeChannel(channel)
       supabase.removeChannel(announcementChannel)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restaurantId])
 
   const fetchTodayOrders = useCallback(async () => {
-    setDropdownLoading(true)
     const supabase = createClient()
-
     const { data } = await supabase
       .from("orders")
-      .select("id, order_number, customer_name, total_price, order_type, created_at, items")
+      .select("id, order_number, customer_name, total_price, order_type, created_at, items, order_status")
       .eq("restaurant_id", restaurantId)
       .gte("created_at", getStartOfTodayPK())
       .order("created_at", { ascending: false })
       .limit(50)
 
-    setTodayOrders(data || [])
-    setDropdownLoading(false)
+    if (data) setTodayOrders(data)
   }, [restaurantId])
 
   const handleToggleDropdown = () => {
-    const next = !showDropdown
-    setShowDropdown(next)
-    if (next) fetchTodayOrders()
+    setShowDropdown((prev) => {
+      const next = !prev
+      if (next) {
+        // Already have data from Realtime — show it instantly, refresh silently in background
+        fetchTodayOrders()
+      }
+      return next
+    })
   }
 
   useEffect(() => {
     if (!showDropdown) return
-    function handleClickOutside(e: MouseEvent) {
+    function handlePointerDown(e: PointerEvent) {
+      // Close dropdown when clicking outside the entire component (bell + dropdown panel)
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setShowDropdown(false)
       }
     }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
+    document.addEventListener("pointerdown", handlePointerDown)
+    return () => document.removeEventListener("pointerdown", handlePointerDown)
   }, [showDropdown])
 
   const dismissAlert = (id: string) => {
@@ -269,16 +261,18 @@ export function BellNotification({ restaurantId }: Props) {
   }
 
   const navigateToOrder = (orderId: string) => {
-    setShowDropdown(false)
+    // Navigate FIRST, then close dropdown — avoids race where
+    // React unmounts the dropdown on state change, cancelling the router push
     router.push(`/dashboard/orders/${orderId}`)
+    setShowDropdown(false)
   }
 
 
 
   return (
     <>
-      {/* Bell Icon */}
       <div className="relative" ref={dropdownRef}>
+        {/* Bell Icon */}
         <button onClick={handleToggleDropdown} className="relative w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#F0F0F0] transition-colors">
           <Bell className="w-5 h-5 text-[#555]" />
           {unreadCount > 0 && (
@@ -296,36 +290,8 @@ export function BellNotification({ restaurantId }: Props) {
                 key={alert.id}
                 role="button"
                 tabIndex={0}
-                onClick={() => { dismissAlert(alert.id); router.push(`/dashboard/orders/${alert.id}`) }}
-                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); dismissAlert(alert.id); router.push(`/dashboard/orders/${alert.id}`) } }}
-                onTouchStart={(e) => {
-                  const touch = e.touches[0]
-                  const el = e.currentTarget
-                  let startX = touch.clientX
-                  let startY = touch.clientY
-
-                  const onMove = (ev: TouchEvent) => {
-                    const dx = ev.touches[0].clientX - startX
-                    const dy = ev.touches[0].clientY - startY
-                    if (Math.abs(dx) > Math.abs(dy)) {
-                      el.style.transform = `translateX(${dx}px)`
-                      el.style.opacity = `${1 - Math.min(Math.abs(dx) / 200, 1)}`
-                    }
-                  }
-                  const onEnd = (ev: TouchEvent) => {
-                    const dx = ev.changedTouches[0].clientX - startX
-                    el.removeEventListener('touchmove', onMove)
-                    el.removeEventListener('touchend', onEnd)
-                    if (Math.abs(dx) > 100) {
-                      dismissAlert(alert.id)
-                    } else {
-                      el.style.transform = ''
-                      el.style.opacity = '1'
-                    }
-                  }
-                  el.addEventListener('touchmove', onMove, { passive: true })
-                  el.addEventListener('touchend', onEnd, { passive: true })
-                }}
+                onClick={() => { dismissAlert(alert.id); navigateToOrder(alert.id) }}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); dismissAlert(alert.id); navigateToOrder(alert.id) } }}
                 className={`bg-black text-white rounded-2xl p-4 shadow-2xl cursor-pointer active:scale-[0.98] transition-transform duration-150 ${
                   exitingAlerts.has(alert.id) ? "animate-toast-exit" : "animate-toast-enter"
                 }`}
@@ -363,71 +329,75 @@ export function BellNotification({ restaurantId }: Props) {
             ))}
           </div>
         )}
-      </div>
 
-      {/* Dropdown - Today's Orders */}
-      {showDropdown && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
-          <div className="fixed top-14 right-4 sm:absolute sm:top-full sm:right-0 sm:mt-2 z-50 w-80 max-h-[70vh] bg-white rounded-2xl shadow-2xl border border-[#F0F0F0] flex flex-col overflow-hidden animate-scale-up">
-            <div className="p-4 border-b border-[#F0F0F0] flex items-center justify-between shrink-0">
-              <p className="text-sm font-bold">Today&apos;s Orders</p>
-              <button
-                onClick={() => setShowDropdown(false)}
-                className="p-1.5 hover:bg-[#F0F0F0] rounded-lg transition-colors"
-              >
-                <X className="w-4 h-4 text-[#555]" />
-              </button>
-            </div>
-            <div className="overflow-y-auto flex-1">
-              {dropdownLoading ? (
-                <div className="flex flex-col gap-2 p-4">
-                  {[...Array(3)].map((_, i) => (
-                    <div key={i} className="h-16 bg-[#F5F5F5] rounded-xl animate-pulse" />
-                  ))}
-                </div>
-              ) : todayOrders.length === 0 ? (
-                <div className="text-center py-10 text-sm text-[#999]">
-                  No orders today
-                </div>
-              ) : (
-                <div className="divide-y divide-[#F0F0F0]">
-                  {todayOrders.map((order) => (
-                    <Link
-                      key={order.id}
-                      href={`/dashboard/orders/${order.id}`}
-                      onClick={() => setShowDropdown(false)}
-                      className="flex items-center justify-between p-4 hover:bg-[#F9FAFB] active:bg-[#F0F0F0] transition-colors cursor-pointer"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold text-black">
-                            #{order.order_number}
-                          </span>
-                          <span className="text-[10px] text-[#999] flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {timeAgo(order.created_at)}
-                          </span>
+        {/* Dropdown - Today's Orders */}
+        {showDropdown && (
+          <>
+            <div className="fixed inset-0 z-40" onPointerDown={() => setShowDropdown(false)} />
+            <div className="fixed top-14 right-4 sm:absolute sm:top-full sm:right-0 sm:mt-2 z-50 w-80 max-h-[70vh] bg-white rounded-2xl shadow-2xl border border-[#F0F0F0] flex flex-col overflow-hidden animate-scale-up">
+              <div className="p-4 border-b border-[#F0F0F0] flex items-center justify-between shrink-0">
+                <p className="text-sm font-bold">Today&apos;s Orders</p>
+                <button
+                  onClick={() => setShowDropdown(false)}
+                  className="p-1.5 hover:bg-[#F0F0F0] rounded-lg transition-colors"
+                >
+                  <X className="w-4 h-4 text-[#555]" />
+                </button>
+              </div>
+              <div className="overflow-y-auto flex-1">
+                {todayOrders.length === 0 ? (
+                  <div className="text-center py-10 text-sm text-[#999]">
+                    No orders today
+                  </div>
+                ) : (
+                  <div className="divide-y divide-[#F0F0F0]">
+                    {todayOrders.map((order) => (
+                      <div
+                        key={order.id}
+                        role="button"
+                        tabIndex={0}
+                        onClick={(e) => {
+                          e.preventDefault()
+                          navigateToOrder(order.id)
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault()
+                            navigateToOrder(order.id)
+                          }
+                        }}
+                        className="flex items-center justify-between p-4 hover:bg-[#F9FAFB] active:bg-[#F0F0F0] transition-colors cursor-pointer min-h-[48px]"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold text-black">
+                              #{order.order_number}
+                            </span>
+                            <span className="text-[10px] text-[#999] flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {timeAgo(order.created_at)}
+                            </span>
+                          </div>
+                          <p className="text-xs text-[#555] mt-0.5">
+                            {order.customer_name} &bull; {order.order_type.replace("_", " ")}
+                          </p>
+                          <p className="text-xs text-[#999]">
+                            {(order.items || []).length} item{(order.items || []).length !== 1 ? "s" : ""}
+                          </p>
                         </div>
-                        <p className="text-xs text-[#555] mt-0.5">
-                          {order.customer_name} &bull; {order.order_type.replace("_", " ")}
-                        </p>
-                        <p className="text-xs text-[#999]">
-                          {(order.items || []).length} item{(order.items || []).length !== 1 ? "s" : ""}
-                        </p>
+                        <div className="flex items-center gap-2 shrink-0 ml-3">
+                          <span className="text-sm font-bold text-black">{formatPrice(order.total_price)}</span>
+                          <ChevronRight className="w-4 h-4 text-[#999]" />
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 shrink-0 ml-3">
-                        <span className="text-sm font-bold text-black">{formatPrice(order.total_price)}</span>
-                        <ChevronRight className="w-4 h-4 text-[#999]" />
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </div> {/* end ref={dropdownRef} */}
 
       {/* Announcement Center Modal */}
       {announcementModal && (
@@ -436,7 +406,7 @@ export function BellNotification({ restaurantId }: Props) {
           <div className="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 animate-scale-up" style={{ maxHeight: "calc(100vh - 32px)", overflowY: "auto" }}>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-[#25D366]/10 flex items-center justify-center shrink-0">
-                <Megaphone className="w-5 h-5 text-[#25D366]" />
+                <Megaphone className="w-5 h-5 text-[#0D7A33]" />
               </div>
               <div>
                 <h3 className="font-bold text-black text-sm">New Announcement</h3>

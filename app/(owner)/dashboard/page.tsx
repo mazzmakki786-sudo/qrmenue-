@@ -1,5 +1,7 @@
 "use client"
 
+export const dynamic = "force-dynamic"
+
 import { useEffect, useState, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { formatPrice, timeAgo, formatTo12Hour } from "@/lib/utils"
@@ -162,6 +164,16 @@ export default function DashboardPage() {
       setPageState("error")
     }
   }, [restaurant?.id])
+
+  // Timeout to prevent infinite loading — show error after 20s
+  useEffect(() => {
+    if (pageState !== "loading") return
+    const timeout = setTimeout(() => {
+      setPageState("error")
+      setError("Loading timed out. Please check your connection and try again.")
+    }, 20000)
+    return () => clearTimeout(timeout)
+  }, [pageState])
 
   // Central loading orchestrator — waits for subscription + dashboard data
   useEffect(() => {

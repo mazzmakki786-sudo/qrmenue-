@@ -1,8 +1,8 @@
 "use client"
 
-export const dynamic = "force-dynamic"
-
 import { useEffect, useState, useCallback, startTransition } from "react"
+
+export const dynamic = "force-dynamic"
 import { Button } from "@/components/ui/button"
 import { Pricing2 } from "@/components/ui/pricing-cards"
 import { SubscriptionBanner } from "@/components/shared/SubscriptionBanner"
@@ -57,6 +57,12 @@ export default function SubscriptionPage() {
       })
       .subscribe()
     return () => { supabase.removeChannel(channel) }
+  }, [fetchPlans])
+
+  // Polling fallback — every 30s in case Realtime misses an update
+  useEffect(() => {
+    const interval = setInterval(() => fetchPlans(), 30000)
+    return () => clearInterval(interval)
   }, [fetchPlans])
 
   const handleSelectPlan = async (planId: string, isYearly: boolean) => {
@@ -267,6 +273,8 @@ export default function SubscriptionPage() {
           description=""
           plans={showPlans}
           onSelectPlan={handleSelectPlan}
+          currentPlanId={baseCurrentPlan}
+          isExpired={isExpired}
         />
       </div>
 

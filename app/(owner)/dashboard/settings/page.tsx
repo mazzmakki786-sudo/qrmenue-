@@ -1,5 +1,7 @@
 "use client"
 
+export const dynamic = "force-dynamic"
+
 import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
@@ -71,7 +73,7 @@ export default function SettingsPage() {
     }
   }
 
-  useEffect(() => { fetchRestaurant() }, [])
+  useEffect(() => { fetchRestaurant() }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]

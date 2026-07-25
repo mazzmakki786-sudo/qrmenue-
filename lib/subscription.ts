@@ -61,7 +61,7 @@ export const DEFAULT_TRIAL_LIMITS: TrialLimitConfig = {
   maxDishes: 20,
   maxCategories: 20,
   maxOrders: 10,
-  trialDurationDays: 7,
+  trialDurationDays: 30,
   gracePeriodDays: 3,
 }
 

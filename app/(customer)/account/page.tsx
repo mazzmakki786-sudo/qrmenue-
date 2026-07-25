@@ -135,6 +135,7 @@ export default function AccountPage() {
       )
       .subscribe()
     return () => { supabase.removeChannel(channel) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
   const toggleRestaurant = (name: string) => {

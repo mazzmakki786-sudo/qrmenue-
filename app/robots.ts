@@ -28,6 +28,9 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: "ChatGPT-User", allow: "/" },
       { userAgent: "Applebot-Extended", allow: "/" },
       // Training crawlers — explicitly blocked
+      // Dynamic search parameter URLs — prevent infinite crawl traps
+      { userAgent: "*", disallow: "/restaurants?q=" },
+      { userAgent: "*", disallow: "/restaurants?city=" },
       { userAgent: "anthropic-ai", disallow: "/" },
       { userAgent: "CCBot", disallow: "/" },
       { userAgent: "Bytespider", disallow: "/" },

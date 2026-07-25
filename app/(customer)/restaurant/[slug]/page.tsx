@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation"
+import { permanentRedirect } from "next/navigation"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -6,6 +6,6 @@ interface Props {
 
 export default async function RestaurantDetailPage({ params }: Props) {
   const { slug } = await params
-  // Redirect to canonical /menu/[slug] to eliminate duplicate content
-  redirect(`/menu/${slug}`)
+  // Redirect to canonical root-level URL to eliminate duplicate content
+  permanentRedirect(`/${slug}`)
 }

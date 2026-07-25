@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap');
+/* No render-blocking font imports — all fonts loaded via next/font in layout */
 
 @tailwind base;
 @tailwind components;
