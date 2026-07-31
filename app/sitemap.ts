@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next"
 import { createClient } from "@/lib/supabase/server"
-import { blogSlugs, publicRoutes, baseUrl } from "@/lib/blog-articles"
+import { blogArticles, publicRoutes, baseUrl } from "@/lib/blog-articles"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = await createClient()
@@ -11,26 +11,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(lastModified),
   }))
 
-  // Restaurant menu pages — only if not disabled via env flag
-  const noindexAll = process.env.NEXT_PUBLIC_NOINDEX_MENU_PAGES === "true"
-
-  const menuPages: MetadataRoute.Sitemap = !noindexAll
-    ? ((await supabase
+  // Restaurant menu pages — only restaurants with at least one dish (empty menus are thin content, not index-worthy)
+  const menuPages: MetadataRoute.Sitemap =
+    ((await supabase
         .from("restaurants")
-        .select("slug, updated_at")
+        .select("slug, updated_at, dishes(count)")
         .eq("is_active", true)
         .eq("is_suspended", false))
         .data ?? [])
+        .filter((r) => (r.dishes?.[0]?.count ?? 0) > 0)
         .map((r) => ({
           url: `${baseUrl}/${r.slug}`,
           lastModified: new Date(r.updated_at),
         }))
-    : []
 
-  // Blog article pages
-  const blogPages: MetadataRoute.Sitemap = blogSlugs.map((slug) => ({
+  // Blog article pages — use each article's own date
+  const blogPages: MetadataRoute.Sitemap = blogArticles.map(({ slug, date }) => ({
     url: `${baseUrl}/blog/${slug}`,
-    lastModified: new Date("2026-07-16"),
+    lastModified: new Date(date),
   }))
 
   return [...staticPages, ...menuPages, ...blogPages]

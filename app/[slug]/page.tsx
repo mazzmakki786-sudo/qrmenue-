@@ -22,22 +22,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const { data: restaurant } = await supabase
     .from("restaurants")
-    .select("name, description, city, cuisine_type, logo_url")
+    .select("name, description, city, cuisine_type, logo_url, dishes(count)")
     .eq("slug", slug)
     .eq("is_active", true)
     .single()
 
   if (!restaurant) {
-    return { title: "Menu Not Found" }
+    notFound()
   }
 
-  const noindex = process.env.NEXT_PUBLIC_NOINDEX_MENU_PAGES === "true"
-  const title = `${restaurant.name} — ${restaurant.cuisine_type || "Restaurant"} in ${restaurant.city} | Digital QR Menue`
+  // Empty menus (no dishes) are thin content — don't let Google index them
+  const dishCount = (restaurant.dishes?.[0]?.count ?? 0) as number
+
+  const cityPart = restaurant.city?.trim() ? ` in ${restaurant.city.trim()}` : ""
+  const typePart = restaurant.cuisine_type?.trim() || "Restaurant"
+  const title = `${restaurant.name} — ${typePart}${cityPart} | Digital QR Menue`
 
   return {
     title,
-    robots: noindex ? { index: false, follow: false } : undefined,
     description: restaurant.description || `View ${restaurant.name}'s digital menu. Browse dishes, prices, and order directly via WhatsApp. Powered by Digital QR Menue — Pakistan's #1 QR menu platform.`,
+    robots: dishCount === 0 ? { index: false, follow: true } : undefined,
     openGraph: {
       title,
       description: restaurant.description || `View ${restaurant.name}'s digital menu. Browse dishes, prices, and order directly via WhatsApp.`,

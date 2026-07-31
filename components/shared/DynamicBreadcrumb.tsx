@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation"
 import { BreadcrumbListJsonLd } from "@/components/JsonLd"
 
-const SITE_URL = "https://digitalmenue.com"
+const SITE_URL = "https://www.digitalmenue.com"
 
 const routeMap: Record<string, { name: string }> = {
   "/pricing": { name: "Pricing" },

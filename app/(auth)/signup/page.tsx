@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation"
+import { permanentRedirect } from "next/navigation"
 
 export default function SignupPage() {
-  redirect("/signup/restaurant")
+  permanentRedirect("/signup/restaurant")
 }

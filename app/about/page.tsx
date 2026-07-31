@@ -48,7 +48,7 @@ export default function AboutPage() {
           mainEntity: {
             "@type": "Organization",
             name: "Digital QR Menue",
-            url: "https://digitalmenue.com",
+            url: "https://www.digitalmenue.com",
             foundingDate: "2024",
             foundingLocation: "Faisalabad, Pakistan",
             areaServed: "PK",
