@@ -72,7 +72,7 @@ We do not use tracking cookies for advertising or third-party marketing.`,
 • Withdraw consent where processing is based on consent
 • Lodge a complaint with the relevant authority
 
-To exercise any of these rights, contact us at support@digitalmenue.com or via WhatsApp.`,
+To exercise any of these rights, contact us at maki2@gmail.com or via WhatsApp.`,
   },
   {
     title: "Updates to This Policy",

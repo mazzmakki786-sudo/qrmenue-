@@ -13,7 +13,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/account") ||
     pathname.startsWith("/api/owner") ||
     pathname.startsWith("/api/superadmin") ||
-    pathname === "/signup/restaurant"
+    pathname === "/signup/restaurant" ||
+    pathname.startsWith("/onboarding")
   ) {
     return await updateSession(request)
   }
@@ -30,5 +31,6 @@ export const config = {
     "/api/owner/:path*",
     "/api/superadmin/:path*",
     "/signup/restaurant",
+    "/onboarding/:path*",
   ],
 }

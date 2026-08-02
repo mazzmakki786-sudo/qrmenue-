@@ -44,7 +44,7 @@ export default async function ContactPage() {
 
   const whatsappNumber = settings.whatsapp_support || "923146325823"
   const whatsappLink = `https://wa.me/${whatsappNumber}`
-  const companyEmail = settings.company_email || "support@digitalmenue.com"
+  const companyEmail = settings.company_email || "maki2@gmail.com"
 
   const activeSocials = socialPlatforms.filter((p) => settings[p.key])
 
@@ -65,7 +65,7 @@ export default async function ContactPage() {
               "@type": "ContactPoint",
               telephone: "+92-314-6325823",
               contactType: "customer support",
-              email: "support@digitalmenue.com",
+              email: "maki2@gmail.com",
               availableLanguage: ["English", "Urdu"],
             },
           },

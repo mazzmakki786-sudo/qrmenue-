@@ -1,0 +1,154 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - link "Digital QR Menue" [ref=e6] [cursor=pointer]:
+        - /url: /
+      - navigation "Main navigation" [ref=e18]:
+        - link "Restaurants" [ref=e19] [cursor=pointer]:
+          - /url: /restaurants
+        - link "Pricing" [ref=e20] [cursor=pointer]:
+          - /url: /pricing
+        - link "About" [ref=e21] [cursor=pointer]:
+          - /url: /about
+        - link "Blog" [ref=e22] [cursor=pointer]:
+          - /url: /blog
+        - link "FAQ" [ref=e23] [cursor=pointer]:
+          - /url: /faq
+        - link "Contact" [ref=e24] [cursor=pointer]:
+          - /url: /contact
+        - link "Sign In" [ref=e26] [cursor=pointer]:
+          - /url: /login
+        - link "Get Started" [ref=e27] [cursor=pointer]:
+          - /url: /signup/restaurant
+    - generic [ref=e29]:
+      - heading "Contact Us" [level=1] [ref=e30]
+      - paragraph [ref=e31]: We're here to help you get the most out of Digital QR Menue.
+    - generic [ref=e32]:
+      - generic [ref=e34]:
+        - link [ref=e35] [cursor=pointer]:
+          - /url: https://wa.me/03146325823
+          - heading "WhatsApp" [level=3] [ref=e38]
+          - paragraph [ref=e39]: Chat with us on WhatsApp for quick support
+        - generic [ref=e40]:
+          - heading "Email" [level=3] [ref=e43]
+          - paragraph [ref=e44]: maki2@gmail.com
+        - generic [ref=e45]:
+          - heading "Business Hours" [level=3] [ref=e48]
+          - generic [ref=e49]: "Monday – Friday: 9:00 AM – 6:00 PMSaturday: 9:00 AM – 2:00 PMSunday: Closed"
+      - paragraph [ref=e50]: Faisalabad, Punjab, Pakistan | DIGITAL MENUE IS OWNED AND OPERATED BY MUHAMMAD MUAZ MAKI
+      - generic [ref=e51]:
+        - paragraph [ref=e52]: Already have an account? Sign in to manage your restaurant.
+        - generic [ref=e53]:
+          - link "Sign In" [ref=e54] [cursor=pointer]:
+            - /url: /login
+          - link "Get Started" [ref=e55] [cursor=pointer]:
+            - /url: /signup/restaurant
+    - generic [ref=e57]:
+      - heading "Send Us a Message" [level=2] [ref=e58]
+      - paragraph [ref=e59]: Have a question or feedback? We'd love to hear from you.
+      - generic [ref=e61]:
+        - generic [ref=e62]:
+          - generic [ref=e63]: Name
+          - textbox "Name" [ref=e64]:
+            - /placeholder: Your name
+        - generic [ref=e65]:
+          - generic [ref=e66]: Email
+          - textbox "Email" [ref=e67]:
+            - /placeholder: your@email.com
+        - generic [ref=e68]:
+          - generic [ref=e69]: Message
+          - textbox "Message" [ref=e70]:
+            - /placeholder: How can we help you?
+        - button "Send Message" [ref=e71] [cursor=pointer]
+    - generic [ref=e73]:
+      - heading "Follow Us" [level=2] [ref=e74]
+      - paragraph [ref=e75]: Stay connected on social media for updates, offers, and more.
+      - generic [ref=e76]:
+        - link [ref=e77] [cursor=pointer]:
+          - /url: https://www.linkedin.com/in/muazmaki2/
+        - link [ref=e80] [cursor=pointer]:
+          - /url: https://x.com/muazmaki
+  - generic [ref=e84]:
+    - generic [ref=e85]:
+      - generic [ref=e86]:
+        - generic [ref=e87]: Digital QR Menue
+        - paragraph [ref=e98]: Free digital QR menus for Pakistani restaurants. No printing, direct WhatsApp orders.
+        - paragraph [ref=e99]: Made in Pakistan 💚
+      - generic [ref=e100]:
+        - heading "Links" [level=4] [ref=e101]
+        - list [ref=e102]:
+          - listitem [ref=e103]:
+            - link "Browse Restaurants" [ref=e104] [cursor=pointer]:
+              - /url: /restaurants
+          - listitem [ref=e105]:
+            - link "Pricing" [ref=e106] [cursor=pointer]:
+              - /url: /pricing
+          - listitem [ref=e107]:
+            - link "About" [ref=e108] [cursor=pointer]:
+              - /url: /about
+          - listitem [ref=e109]:
+            - link "Blog" [ref=e110] [cursor=pointer]:
+              - /url: /blog
+          - listitem [ref=e111]:
+            - link "Contact" [ref=e112] [cursor=pointer]:
+              - /url: /contact
+      - generic [ref=e113]:
+        - heading "Resources" [level=4] [ref=e114]
+        - list [ref=e115]:
+          - listitem [ref=e116]:
+            - link "Digital Menu for Restaurants" [ref=e117] [cursor=pointer]:
+              - /url: /digital-menu-for-restaurants
+          - listitem [ref=e118]:
+            - link "PDF Menu to QR" [ref=e119] [cursor=pointer]:
+              - /url: /digital-menu-pdf
+          - listitem [ref=e120]:
+            - link "Digital Menu App" [ref=e121] [cursor=pointer]:
+              - /url: /digital-menu-app
+          - listitem [ref=e122]:
+            - link "Tablet Menu" [ref=e123] [cursor=pointer]:
+              - /url: /digital-menu-tablet
+          - listitem [ref=e124]:
+            - link "Digital Menu Design" [ref=e125] [cursor=pointer]:
+              - /url: /digital-menu-design
+          - listitem [ref=e126]:
+            - link "QR Menu Login" [ref=e127] [cursor=pointer]:
+              - /url: /qr-menu-login
+      - generic [ref=e128]:
+        - heading "Pakistan" [level=4] [ref=e129]
+        - list [ref=e130]:
+          - listitem [ref=e131]:
+            - link "Digital Menu Pakistan" [ref=e132] [cursor=pointer]:
+              - /url: /digital-menu-pakistan
+          - listitem [ref=e133]:
+            - link "QR Menu Pakistan" [ref=e134] [cursor=pointer]:
+              - /url: /qr-menu-pakistan
+          - listitem [ref=e135]:
+            - link "Digital Menu Islamabad" [ref=e136] [cursor=pointer]:
+              - /url: /digital-menu-islamabad
+          - listitem [ref=e137]:
+            - link "Digital Menu Lahore" [ref=e138] [cursor=pointer]:
+              - /url: /digital-menu-lahore
+          - listitem [ref=e139]:
+            - link "Digital Menu Karachi" [ref=e140] [cursor=pointer]:
+              - /url: /digital-menu-karachi
+      - generic [ref=e141]:
+        - heading "Contact" [level=4] [ref=e142]
+        - list [ref=e143]:
+          - listitem [ref=e144]:
+            - link "+92-314-6325823" [ref=e145] [cursor=pointer]:
+              - /url: https://wa.me/923146325823
+          - listitem [ref=e148]:
+            - link "maki2@gmail.com" [ref=e149] [cursor=pointer]:
+              - /url: mailto:maki2@gmail.com
+          - listitem [ref=e152]: Faisalabad, Punjab, Pakistan
+        - heading "Legal" [level=4] [ref=e156]
+        - list [ref=e157]:
+          - listitem [ref=e158]:
+            - link "Privacy Policy" [ref=e159] [cursor=pointer]:
+              - /url: /privacy
+          - listitem [ref=e160]:
+            - link "Terms of Service" [ref=e161] [cursor=pointer]:
+              - /url: /terms
+    - generic [ref=e163]:
+      - paragraph [ref=e164]: © 2026 Digital QR Menue. All rights reserved.
+      - paragraph [ref=e165]: DIGITAL MENUE IS OWNED AND OPERATED BY MUHAMMAD MUAZ MAKI

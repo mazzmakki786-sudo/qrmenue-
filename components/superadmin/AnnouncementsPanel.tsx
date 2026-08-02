@@ -5,11 +5,27 @@ import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import { Megaphone, Plus, Send, Trash2, X, Loader2 } from "lucide-react"
 
+export type AnnouncementAudience = "all" | "trial" | "starter" | "growth" | "premium"
+
+export const AUDIENCE_LABELS: Record<AnnouncementAudience, string> = {
+  all: "All plans",
+  trial: "Free trial",
+  starter: "Starter",
+  growth: "Growth",
+  premium: "Premium",
+}
+
+export const AUDIENCE_OPTIONS: AnnouncementAudience[] = ["all", "trial", "starter", "growth", "premium"]
+
+const AUDIENCE_LABEL_FOR = (value: string) =>
+  AUDIENCE_LABELS[value as AnnouncementAudience] ?? value
+
 export function AnnouncementsPanel() {
   const [announcements, setAnnouncements] = useState<any[]>([])
   const [showForm, setShowForm] = useState(false)
   const [title, setTitle] = useState("")
   const [body, setBody] = useState("")
+  const [audience, setAudience] = useState<AnnouncementAudience>("all")
   const [saving, setSaving] = useState(false)
   const [publishing, setPublishing] = useState<string | null>(null)
   const [deleting, setDeleting] = useState<string | null>(null)
@@ -63,11 +79,12 @@ export function AnnouncementsPanel() {
       const res = await fetch("/api/superadmin/announcements", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, body }),
+        body: JSON.stringify({ title, body, audience }),
       })
       if (res.ok) {
         setTitle("")
         setBody("")
+        setAudience("all")
         setShowForm(false)
         fetchAnnouncements()
       }
@@ -86,7 +103,8 @@ export function AnnouncementsPanel() {
         if (json.emailNotified > 0) parts.push(`${json.emailNotified} emails`)
         if (json.pushNotified > 0) parts.push(`${json.pushNotified} push`)
         const delivery = parts.length ? ` (${parts.join(", ")})` : ""
-        alert(`Published! Delivered to all ${json.total} restaurant owners${delivery}.`)
+        const audienceLabel = AUDIENCE_LABEL_FOR(json.audience || "all")
+        alert(`Published! Delivered to ${json.total} restaurant owner(s) on "${audienceLabel}"${delivery}.`)
         fetchAnnouncements()
       }
     } finally {
@@ -133,6 +151,27 @@ export function AnnouncementsPanel() {
             rows={4}
             className="w-full px-3 py-2 rounded-xl border border-[#F0F0F0] text-sm outline-none focus:border-black resize-none"
           />
+          <div>
+            <p className="text-[11px] font-medium text-[#555] mb-1.5">
+              Send to members on
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {AUDIENCE_OPTIONS.map((a) => (
+                <button
+                  key={a}
+                  type="button"
+                  onClick={() => setAudience(a)}
+                  className={`px-3 py-1.5 rounded-full text-[11px] font-semibold transition-colors ${
+                    audience === a
+                      ? "bg-black text-white"
+                      : "bg-[#F0F0F0] text-[#555] hover:bg-[#E5E5E5]"
+                  }`}
+                >
+                  {AUDIENCE_LABELS[a]}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="flex justify-end">
             <button
               onClick={handleCreate}
@@ -159,7 +198,7 @@ export function AnnouncementsPanel() {
               className="bg-white rounded-xl border border-[#F0F0F0] p-4 flex items-start justify-between gap-3"
             >
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
                   <h3 className="text-sm font-semibold truncate">{a.title}</h3>
                   {a.is_published ? (
                     <span className="text-[10px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-medium">
@@ -170,6 +209,9 @@ export function AnnouncementsPanel() {
                       Draft
                     </span>
                   )}
+                  <span className="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-medium">
+                    {AUDIENCE_LABEL_FOR(a.audience || "all")}
+                  </span>
                 </div>
                 <p className="text-xs text-[#555] line-clamp-2 whitespace-pre-wrap">{a.body}</p>
                 <p className="text-[10px] text-[#555] mt-1">

@@ -1,0 +1,103 @@
+- main [ref=f3e2]:
+  - generic [ref=f3e3]:
+    - link "Back to Blog" [ref=f3e6] [cursor=pointer]:
+      - /url: /blog
+    - main [ref=f3e9]:
+      - generic [ref=f3e10]:
+        - time [ref=f3e11]: 28 June 2026
+        - generic [ref=f3e12]: "|"
+        - generic [ref=f3e13]: By Maz Makki
+      - 'heading "How to Make a QR Code Menu for Your Restaurant: Complete Step-by-Step Guide" [level=1] [ref=f3e14]'
+      - generic [ref=f3e15]:
+        - paragraph [ref=f3e16]: "If you run a restaurant, café, or dhaba in Pakistan, you've probably wondered: how to make a QR code menu for my restaurant? The answer is simpler and cheaper than you think."
+        - paragraph [ref=f3e17]: A QR code menu lets customers scan a code at their table, browse your full menu with prices and photos, and place orders directly through WhatsApp. No app download. No commission fees. No menu reprinting costs. Just a faster, smarter way to run your business.
+        - paragraph [ref=f3e18]: In this guide, we'll walk you through exactly how to create a digital menu card for your restaurant in Pakistan — covering the WhatsApp ordering system, costs, and pro tips to maximize your sales.
+        - heading "What Is a QR Code Menu and Why Does Your Restaurant Need One?" [level=2] [ref=f3e19]
+        - paragraph [ref=f3e20]: A QR code menu is a digital version of your restaurant menu that customers access by scanning a QR code with their phone camera. Unlike a printed menu card or static PDF, it's interactive, always up to date, and connected directly to your WhatsApp ordering system.
+        - paragraph [ref=f3e21]: When a customer scans your code, they see your full menu with dish names, descriptions, prices, and photos. They add items to their cart and send the order to your WhatsApp — formatted cleanly with their name, items, and total.
+        - paragraph [ref=f3e22]: For Pakistani restaurant owners, the benefits are massive. Food delivery apps charge 20-35% commission per order. A digital menu card for restaurant costs a flat monthly fee with zero commission. Every rupee your customer spends stays with you.
+        - heading "How to Make a QR Code Menu for Your Restaurant in 5 Steps" [level=2] [ref=f3e23]
+        - 'heading "Step 1: Sign Up for Digital QR Menue" [level=3] [ref=f3e24]'
+        - paragraph [ref=f3e25]: Visit digitalmenue.com and create your free account. You get a 30-day free trial with full access — no credit card required, no hidden charges. Add up to 20 dishes, test the WhatsApp ordering flow, and see how it works before committing.
+        - 'heading "Step 2: Add Your Restaurant Details" [level=3] [ref=f3e26]'
+        - paragraph [ref=f3e27]: Enter your restaurant name, cuisine type, city, opening hours, and delivery info. Upload your logo so your digital menu reflects your brand. Connect your WhatsApp Business number — this is where every order arrives.
+        - 'heading "Step 3: Build Your Digital Menu" [level=3] [ref=f3e28]'
+        - paragraph [ref=f3e29]: Add each dish with its name (in English and Urdu), price, description, and a mouth-watering photo. Group items by category — BBQ, Karahi, Biryani, Desserts, Beverages, etc.
+        - paragraph [ref=f3e30]: "Pro tip: Restaurants with photos on their digital menu see 20-30% higher order values. Take clear, well-lit photos of your best dishes. A picture of your sizzling chicken tikka will sell itself."
+        - 'heading "Step 4: Generate and Print Your QR Code" [level=3] [ref=f3e31]'
+        - paragraph [ref=f3e32]: "Digital QR Menue creates a unique QR code for your restaurant. Download it in high resolution and place it where customers can easily scan:"
+        - paragraph [ref=f3e33]: • Table tents or acrylic stands on every dining table
+        - paragraph [ref=f3e34]: • The front counter near the cash register
+        - paragraph [ref=f3e35]: • Takeaway bags and delivery packaging
+        - paragraph [ref=f3e36]: • Your restaurant entrance or window
+        - paragraph [ref=f3e37]: • Your Instagram bio, Facebook page, and Google Business Profile
+        - 'heading "Step 5: Start Receiving Orders on WhatsApp" [level=3] [ref=f3e38]'
+        - paragraph [ref=f3e39]: "Once your QR code is live, customers scan, browse, and send their order directly to your WhatsApp. Each order arrives as a cleanly formatted message:"
+        - paragraph [ref=f3e40]: • Customer name and phone number
+        - paragraph [ref=f3e41]: • Items ordered with quantities
+        - paragraph [ref=f3e42]: • Total bill amount
+        - paragraph [ref=f3e43]: "• Order type: Delivery, Pickup, or Dine-in"
+        - paragraph [ref=f3e44]: • Delivery address (if applicable)
+        - paragraph [ref=f3e45]: • Special instructions
+        - paragraph [ref=f3e46]: That's it. You've just set up a complete WhatsApp ordering system for your restaurant in Pakistan — without paying a single rupee in commission.
+        - heading "How Much Does a QR Code Menu Cost in Pakistan?" [level=2] [ref=f3e47]
+        - paragraph [ref=f3e48]: "The QR code menu card price in Pakistan depends on the features you need. Here's what Digital QR Menue offers:"
+        - table [ref=f3e50]:
+          - rowgroup [ref=f3e51]:
+            - row [ref=f3e52]:
+              - columnheader "Plan" [ref=f3e53]
+              - columnheader "Monthly Price" [ref=f3e54]
+              - columnheader "Dishes" [ref=f3e55]
+              - columnheader "Best For" [ref=f3e56]
+          - rowgroup [ref=f3e57]:
+            - row [ref=f3e58]:
+              - cell "Starter" [ref=f3e59]
+              - cell "PKR 1,500" [ref=f3e60]
+              - cell "30 dishes" [ref=f3e61]
+              - cell "Small restaurants & cafés" [ref=f3e62]
+            - row [ref=f3e63]:
+              - cell "Growth" [ref=f3e64]
+              - cell "PKR 2,500" [ref=f3e65]
+              - cell "50 dishes" [ref=f3e66]
+              - cell "Growing restaurants" [ref=f3e67]
+            - row [ref=f3e68]:
+              - cell "Premium" [ref=f3e69]
+              - cell "PKR 4,500" [ref=f3e70]
+              - cell "100 dishes" [ref=f3e71]
+              - cell "High-volume restaurants" [ref=f3e72]
+        - paragraph [ref=f3e73]: Every plan includes unlimited orders, QR code generation, WhatsApp ordering, and detailed analytics. No setup fees. No hidden costs. Zero commission on orders.
+        - paragraph [ref=f3e74]: Compare PKR 1,500/month with the 25-35% commission delivery apps charge. If your restaurant does PKR 200,000 in monthly orders, you'd pay PKR 50,000-70,000 in commission to Foodpanda or Cheetay. With Digital QR Menue, you save over PKR 48,000-68,000 every single month.
+        - heading "Why Pakistani Restaurants Are Switching to Contactless Menu Cards" [level=2] [ref=f3e75]
+        - paragraph [ref=f3e76]: "The shift to contactless menu cards in Pakistan is accelerating. Here's why smart restaurant owners are making the switch:"
+        - paragraph [ref=f3e77]: First, hygiene matters more than ever. A contactless menu card puts your menu on the customer's own phone — no shared surfaces, no plastic-laminated cards that dozens of hands have touched.
+        - paragraph [ref=f3e78]: Second, updates are instant. When chicken or oil prices change, update your digital menu in seconds. No more paying PKR 500-2,000 per reprint every time a price changes.
+        - paragraph [ref=f3e79]: Third, you get real business data. See which dishes are most popular, what times orders peak, and how customers find you. This data helps you make smarter decisions about your menu and marketing.
+        - heading "5 Tips to Maximize Sales with Your Digital Menu" [level=2] [ref=f3e80]
+        - paragraph [ref=f3e81]: "Now that you know how to make a QR code menu for your restaurant, here's how to get the most out of it:"
+        - paragraph [ref=f3e82]: "1. Use great food photos. This is the #1 factor driving order value. Restaurants with high-quality dish photos see 20-30% higher average orders. Invest 10 minutes in good lighting."
+        - paragraph [ref=f3e83]: 2. Highlight your bestsellers. Tag dishes as "Most Popular" or "Chef's Special" to guide customers toward your signature items. This naturally lifts the average order value.
+        - paragraph [ref=f3e84]: 3. Create combo deals. Bundle popular items at a slight discount. Customers love feeling they're getting value, and combos increase what each customer spends.
+        - paragraph [ref=f3e85]: 4. Share your QR code everywhere. Put it on Instagram, Facebook, WhatsApp status, receipts, and delivery packaging. Every scan is a potential order.
+        - paragraph [ref=f3e86]: 5. Track what works. Use your dashboard analytics to see which dishes sell best, adjust pricing, and double down on what's working.
+        - heading "Frequently Asked Questions" [level=2] [ref=f3e87]
+        - paragraph [ref=f3e88]: "Q: Do I need technical skills to set this up? No. If you can use WhatsApp, you can set up your QR menu in under 10 minutes."
+        - paragraph [ref=f3e89]: "Q: What if a customer doesn't have WhatsApp? Almost every smartphone user in Pakistan has WhatsApp. For those who don't, they can still view your menu in their browser and call your restaurant."
+        - paragraph [ref=f3e90]: "Q: Can I update prices after printing the QR code? Yes. The QR code never changes — it always points to your live menu. Edit prices, add dishes, or remove items from your dashboard, and changes appear instantly."
+        - paragraph [ref=f3e91]: "Q: Is a digital menu card for restaurant really better than printed menus? Absolutely. You save thousands on reprints, eliminate commission fees, get real-time analytics, and present a modern, professional image to your customers."
+        - paragraph [ref=f3e92]: "Q: What is the QR code menu card price in Pakistan with Digital QR Menue? Plans start at PKR 1,500/month for the Starter plan, with a 30-day free trial. No hidden fees, no setup charges."
+        - paragraph [ref=f3e93]: "Q: Can I use this as a WhatsApp ordering system for restaurants in Pakistan? Yes. That's exactly what it is. Every order goes directly to your WhatsApp — no middleman, no commission."
+        - heading "Ready to Create Your QR Code Menu?" [level=2] [ref=f3e94]
+        - paragraph [ref=f3e95]: Now you know exactly how to make a QR code menu for your restaurant. It takes less than 10 minutes, costs a fraction of what you're paying in delivery commissions, and your customers will love the convenience.
+        - paragraph [ref=f3e96]: Hundreds of restaurants across Lahore, Karachi, Islamabad, Faisalabad, and Rawalpindi are already using Digital QR Menue to accept direct orders through WhatsApp — saving thousands of rupees every month.
+        - paragraph [ref=f3e97]: Start your 30-day free trial today at digitalmenue.com. No credit card required. No commitment. Just a smarter way to run your restaurant.
+      - generic [ref=f3e98]:
+        - generic [ref=f3e99]:
+          - generic [ref=f3e100]: MM
+          - generic [ref=f3e101]:
+            - paragraph [ref=f3e102]: Maz Makki
+            - paragraph [ref=f3e103]: Digital Marketing Lead, Digital QR Menue
+        - generic [ref=f3e104]:
+          - heading "Ready to create your digital menu?" [level=2] [ref=f3e105]
+          - paragraph [ref=f3e106]: Start your free trial today — no credit card required.
+          - link "Start Free Trial" [ref=f3e107] [cursor=pointer]:
+            - /url: /signup/restaurant

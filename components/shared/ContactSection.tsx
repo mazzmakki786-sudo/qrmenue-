@@ -6,7 +6,7 @@ interface Props {
 
 export function ContactSection({ settings }: Props) {
   const whatsapp = settings.whatsapp_support || "03001234567"
-  const companyEmail = settings.company_email || "support@digitalmenue.com"
+  const companyEmail = settings.company_email || "maki2@gmail.com"
 
   const whatsappDigits = whatsapp.replace(/[^0-9]/g, "")
   const whatsappLink = `https://wa.me/${whatsappDigits.startsWith("0") ? "92" + whatsappDigits.slice(1) : whatsappDigits}`

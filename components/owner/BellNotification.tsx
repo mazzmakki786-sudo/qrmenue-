@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation"
 import { Bell, X, ChevronRight, Clock, Megaphone, BellRing } from "lucide-react"
 import { formatPrice, timeAgo } from "@/lib/utils"
 import { useToastStore } from "@/stores/toastStore"
-import { playOrderAlert, playStatusChange, playNotification } from "@/lib/sound"
+import { playOrderAlert, playStatusChange, playAnnouncement } from "@/lib/sound"
 
 interface Props {
   restaurantId: string
@@ -49,6 +49,10 @@ export function BellNotification({ restaurantId }: Props) {
   const [announcementModal, setAnnouncementModal] = useState<AnnouncementAlert | null>(null)
   const [exitingAlerts, setExitingAlerts] = useState<Set<string>>(new Set())
   const [unreadAnnouncements, setUnreadAnnouncements] = useState(0)
+
+  // Tracks the newest announcement id seen — used by the fallback poll to
+  // surface announcements that missed the realtime event.
+  const lastAnnouncementRef = useRef<string | null>(null)
 
   // Derive badge count from active today's orders + unread announcements
   // Only show orders that need attention: received (new) + preparing (in progress)
@@ -210,19 +214,33 @@ export function BellNotification({ restaurantId }: Props) {
         (payload) => {
           const n = payload.new as any
           if (n.type === "announcement") {
-            playNotification()
+            // Distinct alert sound for announcements (3-strike tone)
+            playAnnouncement()
+            addToast({
+              type: "announcement",
+              title: "📢 " + (n.title || "New Announcement"),
+              message: n.body || "",
+              duration: 6000,
+              sound: false,
+            })
             const alert: AnnouncementAlert = {
               id: n.id,
               title: n.title,
               body: n.body,
               created_at: n.created_at,
             }
+            lastAnnouncementRef.current = n.id
             setAnnouncementQueue((prev) => [...prev, alert])
             setUnreadAnnouncements((prev) => prev + 1)
-            setAnnouncementModal((current) => {
-              if (!current) return alert
-              return current
-            })
+            // Only auto-open the modal for system broadcasts (play_sound: true).
+            // Announcements that were created before the sound flag existed
+            // (or that are marked not-to-beep) still bump the bell badge + toast.
+            if (n.play_sound === true) {
+              setAnnouncementModal((current) => {
+                if (!current) return alert
+                return current
+              })
+            }
           }
         }
       )
@@ -241,6 +259,44 @@ export function BellNotification({ restaurantId }: Props) {
         .limit(50)
         .then(({ data }) => {
           if (data) setTodayOrders(data)
+        })
+      // Also refresh unread announcement count — catches missed realtime
+      // events (e.g. RLS-filtered delivery) without a full page reload.
+      supabase
+        .from("owner_notifications")
+        .select("id, created_at", { count: "exact", head: false })
+        .eq("restaurant_id", restaurantId)
+        .eq("type", "announcement")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .then(({ data, count }) => {
+          const newest = (data as any[] | null)?.[0]
+          // If a realtime event was missed, surface the newest announcement
+          // (badge count + modal + sound) so nothing is lost.
+          if (newest && newest.id !== lastAnnouncementRef.current) {
+            lastAnnouncementRef.current = newest.id
+            playAnnouncement()
+            addToast({
+              type: "announcement",
+              title: "📢 " + (newest.title || "New Announcement"),
+              message: newest.body || "",
+              duration: 6000,
+              sound: false,
+            })
+            const alert: AnnouncementAlert = {
+              id: newest.id,
+              title: newest.title,
+              body: newest.body,
+              created_at: newest.created_at,
+            }
+            setAnnouncementQueue((prev) =>
+              prev.some((a) => a.id === newest.id) ? prev : [...prev, alert]
+            )
+            if (newest.play_sound === true) {
+              setAnnouncementModal((current) => current ?? alert)
+            }
+          }
+          if (typeof count === "number") setUnreadAnnouncements(count)
         })
     }, 60_000)
 

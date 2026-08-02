@@ -1,0 +1,243 @@
+{
+  "version": "1.9.0",
+  "seed_keyword": "digital menu",
+  "created_at": "2026-08-02",
+  "notes": "Volumes are ESTIMATES (live SERP unavailable this session). Existing posts marked status:written. New posts marked status:planned. SERP overlap classified by intent + shared head term (WebSearch outage).",
+  "pillar": {
+    "title": "Digital Menu — The Complete Guide for Restaurants (2026)",
+    "keyword": "digital menu",
+    "volume": 60000,
+    "template": "ultimate-guide",
+    "wordCount": 3200,
+    "url": "/blog/digital-menu-complete-guide-restaurants",
+    "status": "planned"
+  },
+  "clusters": [
+    {
+      "name": "QR Menu & Ordering",
+      "posts": [
+        {
+          "title": "Digital QR Menu for Restaurants: The Complete How-To",
+          "keyword": "digital qr menu",
+          "secondary": ["restaurant digital qr menu"],
+          "volume": 1300,
+          "template": "how-to",
+          "wordCount": 1600,
+          "url": "/blog/digital-qr-menu-for-restaurants",
+          "status": "planned",
+          "differentiation": "Head-term 'digital qr menu' — the product post. Funnels to /digital-menu-for-restaurants landing."
+        },
+        {
+          "title": "Restaurant QR Menu: How to Create One Free (Step-by-Step)",
+          "keyword": "restaurant qr menu",
+          "secondary": ["qr menu code", "how to create a qr code menu for free"],
+          "volume": 2600,
+          "template": "how-to",
+          "wordCount": 1500,
+          "url": "/blog/restaurant-qr-menu-free-guide",
+          "status": "planned",
+          "differentiation": "Emphasis on FREE + QR menu code generation. Links to /qr-menu-login and free trial."
+        },
+        {
+          "title": "What Is a Digital Menu for Restaurants? Complete Guide",
+          "keyword": "what is a digital menu",
+          "secondary": [],
+          "volume": 6600,
+          "template": "explainer",
+          "wordCount": 1200,
+          "url": "/blog/what-is-digital-menu-for-restaurants",
+          "status": "written"
+        },
+        {
+          "title": "Digital Menu QR Code Setup Guide for Restaurants",
+          "keyword": "how to create digital menu with qr code",
+          "secondary": [],
+          "volume": 1900,
+          "template": "how-to",
+          "wordCount": 1200,
+          "url": "/blog/digital-menu-qr-code-setup-guide",
+          "status": "written"
+        }
+      ]
+    },
+    {
+      "name": "Digital Menu Boards",
+      "posts": [
+        {
+          "title": "Digital Menu Boards for Restaurants: Complete Guide",
+          "keyword": "digital menu boards for restaurant",
+          "secondary": ["digital menu boards", "digital menu board"],
+          "volume": 1800,
+          "template": "explainer",
+          "wordCount": 1800,
+          "url": "/blog/digital-menu-boards-for-restaurants",
+          "status": "planned",
+          "differentiation": "Cluster anchor. Covers TV-screen menu board types + positions QR-menu SaaS as the cheaper, easier alternative."
+        },
+        {
+          "title": "What Is a Digital Menu Board & How Do They Work?",
+          "keyword": "what is a digital menu board",
+          "secondary": ["how do digital menu boards work"],
+          "volume": 1400,
+          "template": "explainer",
+          "wordCount": 1400,
+          "url": "/blog/what-is-a-digital-menu-board",
+          "status": "planned",
+          "differentiation": "Definition + hardware mechanics (screen, software, content). Educational."
+        },
+        {
+          "title": "How Much Do Digital Menu Boards Cost? (2026 Prices in Pakistan)",
+          "keyword": "how much do digital menu boards cost",
+          "secondary": ["how much does a digital menu board cost", "digital menu board price in pakistan"],
+          "volume": 2900,
+          "template": "comparison",
+          "wordCount": 1600,
+          "url": "/blog/digital-menu-board-cost-pakistan",
+          "status": "planned",
+          "differentiation": "THE money question. Hardware cost breakdown (PKR screen + setup) then pivots to QR-menu alternative. Highest conversion potential."
+        },
+        {
+          "title": "How to Design a Digital Menu Board",
+          "keyword": "how to design a digital menu board",
+          "secondary": ["how to design digital menu board"],
+          "volume": 1000,
+          "template": "how-to",
+          "wordCount": 1400,
+          "url": "/blog/how-to-design-digital-menu-board",
+          "status": "planned",
+          "differentiation": "Layout, typography, photo, category design. Cross-link to existing digital-menu-design post."
+        },
+        {
+          "title": "How to Set Up a Digital Menu Board (Step-by-Step)",
+          "keyword": "how to set up a digital menu board",
+          "secondary": ["how to use digital menu boards", "how to set up digital menu board"],
+          "volume": 900,
+          "template": "how-to",
+          "wordCount": 1400,
+          "url": "/blog/how-to-set-up-digital-menu-board",
+          "status": "planned",
+          "differentiation": "Hardware install + software config + content rotation."
+        },
+        {
+          "title": "Coffee Shop Digital Menu: Boards, QR Codes & Menu App Ideas",
+          "keyword": "coffee digital menu",
+          "secondary": ["coffee digital menu board"],
+          "volume": 1300,
+          "template": "listicle",
+          "wordCount": 1300,
+          "url": "/blog/coffee-shop-digital-menu",
+          "status": "planned",
+          "differentiation": "Coffee-shop niche angle — boards vs QR menu vs iPad kiosk. Cross-sell to cafés."
+        }
+      ]
+    },
+    {
+      "name": "QR Scanning & Customer Experience",
+      "posts": [
+        {
+          "title": "How to Scan a QR Code for a Menu (iPhone, Android & Camera)",
+          "keyword": "how to scan qr code",
+          "secondary": ["how to scan qr for menu", "how to scan qr code for hotel menu"],
+          "volume": 5400,
+          "template": "how-to",
+          "wordCount": 1400,
+          "url": "/blog/how-to-scan-qr-code-menu",
+          "status": "planned",
+          "differentiation": "CUSTOMER-side intent (person searching how to scan). Educational + surfaces the brand as the menu behind the code."
+        },
+        {
+          "title": "QR Menu vs Digital Menu: What's the Difference?",
+          "keyword": "qr menu vs digital menu",
+          "secondary": [],
+          "volume": 2100,
+          "template": "comparison",
+          "wordCount": 1000,
+          "url": "/blog/qr-menu-vs-digital-menu-difference",
+          "status": "written"
+        },
+        {
+          "title": "How to Make a QR Code Menu for Your Restaurant",
+          "keyword": "how to make a qr code menu",
+          "secondary": ["how to make online menu with qr code"],
+          "volume": 3200,
+          "template": "how-to",
+          "wordCount": 1500,
+          "url": "/blog/how-to-make-qr-code-menu-for-restaurant",
+          "status": "written"
+        }
+      ]
+    }
+  ],
+  "links": [
+    { "from": "pillar", "to": "cluster-0-post-0", "type": "mandatory", "anchor": "digital QR menu for restaurants" },
+    { "from": "pillar", "to": "cluster-0-post-1", "type": "mandatory", "anchor": "how to create a QR menu for free" },
+    { "from": "pillar", "to": "cluster-0-post-2", "type": "mandatory", "anchor": "what is a digital menu" },
+    { "from": "pillar", "to": "cluster-0-post-3", "type": "mandatory", "anchor": "digital menu QR code setup" },
+    { "from": "pillar", "to": "cluster-1-post-0", "type": "mandatory", "anchor": "digital menu boards for restaurants" },
+    { "from": "pillar", "to": "cluster-1-post-1", "type": "mandatory", "anchor": "what is a digital menu board" },
+    { "from": "pillar", "to": "cluster-1-post-2", "type": "mandatory", "anchor": "how much do digital menu boards cost" },
+    { "from": "pillar", "to": "cluster-1-post-3", "type": "mandatory", "anchor": "how to design a digital menu board" },
+    { "from": "pillar", "to": "cluster-1-post-4", "type": "mandatory", "anchor": "how to set up a digital menu board" },
+    { "from": "pillar", "to": "cluster-1-post-5", "type": "mandatory", "anchor": "coffee shop digital menu" },
+    { "from": "pillar", "to": "cluster-2-post-0", "type": "mandatory", "anchor": "how to scan a QR code for a menu" },
+    { "from": "pillar", "to": "cluster-2-post-1", "type": "mandatory", "anchor": "QR menu vs digital menu" },
+    { "from": "pillar", "to": "cluster-2-post-2", "type": "mandatory", "anchor": "how to make a QR code menu" },
+    { "from": "cluster-0-post-0", "to": "pillar", "type": "mandatory", "anchor": "digital menu guide" },
+    { "from": "cluster-0-post-1", "to": "pillar", "type": "mandatory", "anchor": "digital menu guide" },
+    { "from": "cluster-0-post-2", "to": "pillar", "type": "mandatory", "anchor": "digital menu guide" },
+    { "from": "cluster-0-post-3", "to": "pillar", "type": "mandatory", "anchor": "digital menu guide" },
+    { "from": "cluster-1-post-0", "to": "pillar", "type": "mandatory", "anchor": "digital menu guide" },
+    { "from": "cluster-1-post-1", "to": "pillar", "type": "mandatory", "anchor": "digital menu guide" },
+    { "from": "cluster-1-post-2", "to": "pillar", "type": "mandatory", "anchor": "digital menu guide" },
+    { "from": "cluster-1-post-3", "to": "pillar", "type": "mandatory", "anchor": "digital menu guide" },
+    { "from": "cluster-1-post-4", "to": "pillar", "type": "mandatory", "anchor": "digital menu guide" },
+    { "from": "cluster-1-post-5", "to": "pillar", "type": "mandatory", "anchor": "digital menu guide" },
+    { "from": "cluster-2-post-0", "to": "pillar", "type": "mandatory", "anchor": "digital menu guide" },
+    { "from": "cluster-2-post-1", "to": "pillar", "type": "mandatory", "anchor": "digital menu guide" },
+    { "from": "cluster-2-post-2", "to": "pillar", "type": "mandatory", "anchor": "digital menu guide" },
+    { "from": "cluster-0-post-0", "to": "cluster-0-post-1", "type": "recommended", "anchor": "create a free QR menu" },
+    { "from": "cluster-0-post-1", "to": "cluster-0-post-0", "type": "recommended", "anchor": "digital QR menu platform" },
+    { "from": "cluster-0-post-1", "to": "cluster-0-post-3", "type": "recommended", "anchor": "QR code setup guide" },
+    { "from": "cluster-1-post-2", "to": "cluster-0-post-0", "type": "recommended", "anchor": "digital QR menu alternative" },
+    { "from": "cluster-1-post-2", "to": "cluster-1-post-0", "type": "recommended", "anchor": "digital menu board guide" },
+    { "from": "cluster-1-post-0", "to": "cluster-1-post-2", "type": "recommended", "anchor": "menu board costs" },
+    { "from": "cluster-1-post-1", "to": "cluster-1-post-4", "type": "recommended", "anchor": "set up a digital menu board" },
+    { "from": "cluster-1-post-3", "to": "cluster-1-post-0", "type": "recommended", "anchor": "digital menu board basics" },
+    { "from": "cluster-1-post-5", "to": "cluster-1-post-2", "type": "recommended", "anchor": "menu board cost" },
+    { "from": "cluster-2-post-0", "to": "cluster-0-post-1", "type": "recommended", "anchor": "create a QR menu" },
+    { "from": "cluster-2-post-1", "to": "cluster-1-post-0", "type": "recommended", "anchor": "digital menu boards" },
+    { "from": "cluster-2-post-2", "to": "cluster-0-post-3", "type": "recommended", "anchor": "QR code menu setup" }
+  ],
+  "serp_matrix": {
+    "keywords": ["digital menu", "digital qr menu", "restaurant qr menu", "what is a digital menu", "digital menu boards for restaurant", "how much do digital menu boards cost", "how to scan qr code"],
+    "scores": [
+      [10, 6, 6, 7, 5, 4, 3],
+      [6, 10, 8, 6, 3, 2, 2],
+      [6, 8, 10, 5, 2, 2, 3],
+      [7, 6, 5, 10, 4, 3, 2],
+      [5, 3, 2, 4, 10, 8, 1],
+      [4, 2, 2, 3, 8, 10, 1],
+      [3, 2, 3, 2, 1, 1, 10]
+    ]
+  },
+  "scorecard": {
+    "coverage": 0.31,
+    "linkDensity": 0,
+    "orphanPages": 0,
+    "cannibalization": 0,
+    "contentGaps": 9
+  },
+  "existing_linked_content": [
+    { "url": "/digital-menu-for-restaurants", "role": "landing pillar — conversion target for all cluster posts" },
+    { "url": "/digital-menu-pakistan", "role": "location hub — conversion target" },
+    { "url": "/digital-menu-design", "role": "landing — design post cross-link" },
+    { "url": "/qr-menu-login", "role": "landing — free-menu post cross-link" },
+    { "url": "/blog/how-to-create-digital-menu-restaurant", "role": "existing how-to (answers how to make/design digital menu)" },
+    { "url": "/blog/create-qr-code-menu-restaurant-pakistan", "role": "existing how-to (Pakistan QR menu)" },
+    { "url": "/blog/digital-menu-design-tips-restaurants", "role": "existing design post" },
+    { "url": "/blog/free-digital-menu-vs-paid-comparison", "role": "existing comparison" },
+    { "url": "/blog/best-digital-menu-platform-pakistan", "role": "existing comparison" },
+    { "url": "/blog/qr-menu-vs-digital-menu-difference", "role": "existing comparison (in map)" },
+    { "url": "/blog/whatsapp-ordering-restaurant-pakistan-guide", "role": "existing how-to" }
+  ]
+}

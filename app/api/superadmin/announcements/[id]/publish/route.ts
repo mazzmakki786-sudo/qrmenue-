@@ -33,9 +33,23 @@ export const POST = safeRoute(async (request, { params }: { params: Promise<{ id
     return NextResponse.json({ error: "Already published" }, { status: 400 })
   }
 
+  // Resolve target audience → list of plan slugs.
+  // 'all' → every active restaurant. Otherwise a plan slug or a
+  // comma-separated list of plan slugs ('trial','starter','growth',
+  // 'premium'). 'free-trial' maps to plan = 'trial'.
+  const audience = (announcement.audience || "all").trim()
+  let targetPlans: string[] | null = null
+  if (audience !== "all") {
+    targetPlans = audience
+      .split(",")
+      .map((p: string) => p.trim().toLowerCase())
+      .filter(Boolean)
+      .map((p: string) => (p === "free-trial" ? "trial" : p))
+  }
+
   const { error: publishError } = await admin
     .from("qr_announcements")
-    .update({ is_published: true })
+    .update({ is_published: true, updated_at: new Date().toISOString() })
     .eq("id", id)
 
   if (publishError) {
@@ -45,28 +59,48 @@ export const POST = safeRoute(async (request, { params }: { params: Promise<{ id
   const { data: authUsers } = await admin.auth.admin.listUsers()
   const userEmailMap = new Map((authUsers?.users || []).map((u: any) => [u.id, u.email]))
 
-  const { data: restaurants } = await admin
+  let query = admin
     .from("restaurants")
-    .select("id, owner_id, name")
+    .select("id, owner_id, plan, name")
     .eq("is_active", true)
+    .eq("is_suspended", false)
 
-  if (!restaurants) {
-    await logAudit(user.email || "", "announcement_published", { id, notified: 0 })
-    return NextResponse.json({ success: true, notified: 0 })
+  if (targetPlans) {
+    query = query.in("plan", targetPlans)
+  }
+
+  const { data: restaurants } = await query
+
+  if (!restaurants || restaurants.length === 0) {
+    await logAudit(user.email || "", "announcement_published", { id, notified: 0, audience })
+    return NextResponse.json({ success: true, notified: 0, total: 0, audience })
   }
 
   let emailNotified = 0
   let pushNotified = 0
 
   for (const r of restaurants) {
-    // Always insert into owner_notifications for real-time in-app delivery
+    // Insert into owner_notifications only if this announcement hasn't
+    // already been delivered to this restaurant (dedupe on re-publish).
+    // play_sound: true lets the owner dashboard play the alert sound.
     try {
-      await admin.from("owner_notifications").insert({
-        restaurant_id: r.id,
-        type: "announcement",
-        title: announcement.title,
-        body: announcement.body,
-      })
+      const { data: existing } = await admin
+        .from("owner_notifications")
+        .select("id")
+        .eq("restaurant_id", r.id)
+        .eq("announcement_id", id)
+        .maybeSingle()
+
+      if (!existing) {
+        await admin.from("owner_notifications").insert({
+          restaurant_id: r.id,
+          type: "announcement",
+          announcement_id: id,
+          title: announcement.title,
+          body: announcement.body,
+          play_sound: true,
+        })
+      }
     } catch {}
 
     // Send push notification to subscribed owners (works even when tab is backgrounded)
@@ -109,6 +143,7 @@ export const POST = safeRoute(async (request, { params }: { params: Promise<{ id
     emailNotified,
     pushNotified,
     total: restaurants.length,
+    audience,
   })
 
   return NextResponse.json({
@@ -116,5 +151,6 @@ export const POST = safeRoute(async (request, { params }: { params: Promise<{ id
     emailNotified,
     pushNotified,
     total: restaurants.length,
+    audience,
   })
 })

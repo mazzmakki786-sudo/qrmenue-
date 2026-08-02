@@ -12,7 +12,7 @@ const settingKeys = [
   { key: "account_title", label: "Account Title", placeholder: "QRMenu Pakistan" },
   { key: "account_number", label: "Account Number", placeholder: "01234567890123" },
   { key: "whatsapp_support", label: "WhatsApp Support", placeholder: "923001234567" },
-  { key: "company_email", label: "Company Email", placeholder: "support@digitalmenue.com", type: "email" },
+  { key: "company_email", label: "Company Email", placeholder: "maki2@gmail.com", type: "email" },
 ]
 
 const socialKeys = [

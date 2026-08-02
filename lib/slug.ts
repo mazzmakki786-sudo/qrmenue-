@@ -17,6 +17,8 @@ export const RESERVED_SLUGS = new Set([
   "superadmin",
   // Setup post-confirmation
   "setup-restaurant",
+  // Standalone owner onboarding wizard
+  "onboarding",
   // Blog & content
   "blog", "pricing", "about", "contact", "privacy", "terms",
   // SEO landing pages

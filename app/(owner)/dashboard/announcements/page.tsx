@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import { Megaphone, Check, ChevronRight, CheckCheck } from "lucide-react"
@@ -14,6 +14,8 @@ interface Announcement {
   body: string
   is_read: boolean
   created_at: string
+  audience?: string
+  play_sound?: boolean
 }
 
 type Filter = "all" | "unread" | "read"
@@ -24,8 +26,18 @@ export default function AnnouncementsPage() {
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<Filter>("all")
   const [restaurantId, setRestaurantId] = useState<string | null>(null)
+  const restaurantIdRef = useRef<string | null>(null)
 
+  // Resolve restaurantId immediately on mount. The bell + layout cache it on
+  // window.__ownerRestaurantCache, so read that first to avoid a flash of
+  // empty state.
   useEffect(() => {
+    const cached = typeof window !== "undefined" ? (window as any).__ownerRestaurantCache : null
+    if (cached && typeof cached.id === "string") {
+      restaurantIdRef.current = cached.id
+      setRestaurantId(cached.id)
+      return
+    }
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return
@@ -35,13 +47,17 @@ export default function AnnouncementsPage() {
         .eq("owner_id", user.id)
         .maybeSingle()
         .then(({ data }) => {
-          if (data) setRestaurantId(data.id)
+          if (data) {
+            restaurantIdRef.current = data.id
+            setRestaurantId(data.id)
+          }
         })
     })
   }, [])
 
   const fetchAnnouncements = async () => {
-    if (!restaurantId) return
+    const id = restaurantIdRef.current
+    if (!id) return
     setLoading(true)
     setError(null)
     try {
@@ -200,6 +216,11 @@ export default function AnnouncementsPage() {
                     <h3 className={`text-sm font-bold truncate ${a.is_read ? "text-[#555]" : "text-black"}`}>
                       {a.title}
                     </h3>
+                    {a.audience && a.audience !== "all" && (
+                      <span className="text-[9px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded-full font-medium uppercase shrink-0">
+                        {a.audience === "trial" ? "Free trial" : a.audience}
+                      </span>
+                    )}
                   </div>
                   <p className={`text-xs mt-1 leading-relaxed whitespace-pre-wrap ${a.is_read ? "text-[#999]" : "text-[#555]"}`}>
                     {a.body}

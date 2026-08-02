@@ -45,7 +45,7 @@ export function OrganizationJsonLd() {
               "@type": "ContactPoint",
               telephone: "+92-314-6325823",
               contactType: "customer service",
-              email: "support@digitalmenue.com",
+              email: "maki2@gmail.com",
               availableLanguage: ["English", "Urdu"],
             },
             areaServed: {
@@ -378,7 +378,7 @@ export function LocalBusinessJsonLd() {
         logo: "https://www.digitalmenue.com/favicon.ico",
         image: "https://www.digitalmenue.com/og-image.png",
         telephone: "+92-314-6325823",
-        email: "dmenue@gmail.com",
+        email: "maki2@gmail.com",
         priceRange: "PKR 0 — 4,500",
         address: {
           "@type": "PostalAddress",

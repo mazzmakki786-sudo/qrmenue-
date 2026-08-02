@@ -65,6 +65,28 @@ export function playStatusChange() {
   } catch {}
 }
 
+export function playAnnouncement() {
+  if (!soundEnabled) return
+  try {
+    const ctx = getAudioContext()
+    const now = ctx.currentTime
+    // Three-strike alert — a distinct "announcement" tone (higher, more urgent)
+    // that stands apart from order alerts and status-change beeps.
+    const notes = [1046, 1318, 1568] // C6, E6, G6
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.type = "triangle"
+      osc.frequency.setValueAtTime(freq, now + i * 0.1)
+      gain.gain.setValueAtTime(0.22, now + i * 0.1)
+      gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.28)
+      osc.connect(gain).connect(ctx.destination)
+      osc.start(now + i * 0.1)
+      osc.stop(now + i * 0.1 + 0.3)
+    })
+  } catch {}
+}
+
 export function playNotification() {
   if (!soundEnabled) return
   try {

@@ -7,8 +7,9 @@ import { useRouter } from "next/navigation"
 import { QRCodeDisplay } from "@/components/shared/QRCodeDisplay"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Check, Copy, ArrowRight, Store, UtensilsCrossed, Printer, Smartphone, Share2, Pencil, CheckCircle2, Sparkles, Loader2 } from "lucide-react"
+import { Check, Copy, ArrowRight, Store, UtensilsCrossed, Printer, Share2, Pencil, CheckCircle2, Sparkles, Loader2, LogOut } from "lucide-react"
 import { useSubscription } from "@/lib/hooks/useSubscription"
+import { createClient } from "@/lib/supabase/client"
 import Image from "next/image"
 
 type Step = "welcome" | "menu" | "qr" | "done"
@@ -34,6 +35,15 @@ export default function OnboardingPage() {
       setRestaurantPhone(restaurant.phone || "")
     }
   }, [restaurant])
+
+  const handleLogout = async () => {
+    try {
+      const supabase = createClient()
+      await supabase.auth.signOut()
+    } catch {}
+    try { await fetch("/api/auth/logout", { method: "POST" }) } catch {}
+    router.replace("/login")
+  }
 
   if (loading) {
     return (
@@ -120,10 +130,30 @@ export default function OnboardingPage() {
   // ── STEP 1: Welcome ──
   if (currentStep === "welcome") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#FAFAFA] to-white md:bg-[#FAFAFA] animate-fade-in">
-        <div className="max-w-2xl mx-auto px-4 py-8 md:py-16">
+      <div className="min-h-screen bg-gradient-to-br from-[#F6F8F7] to-white md:bg-[#FAFAFA] animate-fade-in safe-top safe-bottom">
+        <div className="max-w-2xl mx-auto px-4 py-6 md:py-16">
+          {/* Brand + logout (top row) */}
+          <div className="flex items-center justify-between mb-6 md:mb-10">
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 rounded-xl bg-black flex items-center justify-center">
+                <Sparkles className="w-[18px] h-[18px] text-white" />
+              </div>
+              <div className="leading-tight">
+                <p className="text-sm font-bold text-black">Digital QR Menue</p>
+                <p className="text-[11px] text-[#999]">Owner setup</p>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 text-xs font-medium text-[#888] hover:text-[#DC2626] transition-colors px-3 py-2 rounded-lg hover:bg-white min-h-[36px]"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              Sign out
+            </button>
+          </div>
+
           {/* Progress Steps - Desktop */}
-          <div className="hidden md:flex items-center justify-center gap-4 mb-16">
+          <div className="hidden md:flex items-center justify-center gap-4 mb-10">
             {steps.map((s, i) => (
               <div key={s.key} className="flex items-center gap-2">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold transition-all ${
@@ -316,10 +346,30 @@ export default function OnboardingPage() {
   // ── STEP 2: Menu Setup ──
   if (currentStep === "menu") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#FAFAFA] to-white md:bg-[#FAFAFA] animate-fade-in">
-        <div className="max-w-2xl mx-auto px-4 py-8 md:py-16">
+      <div className="min-h-screen bg-gradient-to-br from-[#F6F8F7] to-white md:bg-[#FAFAFA] animate-fade-in safe-top safe-bottom">
+        <div className="max-w-2xl mx-auto px-4 py-6 md:py-16">
+          {/* Brand + logout */}
+          <div className="flex items-center justify-between mb-6 md:mb-10">
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 rounded-xl bg-black flex items-center justify-center">
+                <Sparkles className="w-[18px] h-[18px] text-white" />
+              </div>
+              <div className="leading-tight">
+                <p className="text-sm font-bold text-black">Digital QR Menue</p>
+                <p className="text-[11px] text-[#999]">Owner setup</p>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 text-xs font-medium text-[#888] hover:text-[#DC2626] transition-colors px-3 py-2 rounded-lg hover:bg-white min-h-[36px]"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              Sign out
+            </button>
+          </div>
+
           {/* Desktop progress */}
-          <div className="hidden md:flex items-center justify-center gap-4 mb-16">
+          <div className="hidden md:flex items-center justify-center gap-4 mb-10">
             {steps.map((s, i) => (
               <div key={s.key} className="flex items-center gap-2">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold transition-all ${
@@ -426,10 +476,30 @@ export default function OnboardingPage() {
 
   // ── STEP 3: QR & Share ──
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FAFAFA] to-white md:bg-[#FAFAFA] animate-fade-in">
-      <div className="max-w-2xl mx-auto px-4 py-8 md:py-16">
+    <div className="min-h-screen bg-gradient-to-br from-[#F6F8F7] to-white md:bg-[#FAFAFA] animate-fade-in safe-top safe-bottom">
+      <div className="max-w-2xl mx-auto px-4 py-6 md:py-16">
+        {/* Brand + logout */}
+        <div className="flex items-center justify-between mb-6 md:mb-10">
+          <div className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-xl bg-black flex items-center justify-center">
+              <Sparkles className="w-[18px] h-[18px] text-white" />
+            </div>
+            <div className="leading-tight">
+              <p className="text-sm font-bold text-black">Digital QR Menue</p>
+              <p className="text-[11px] text-[#999]">Owner setup</p>
+            </div>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-1.5 text-xs font-medium text-[#888] hover:text-[#DC2626] transition-colors px-3 py-2 rounded-lg hover:bg-white min-h-[36px]"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            Sign out
+          </button>
+        </div>
+
         {/* Desktop progress */}
-        <div className="hidden md:flex items-center justify-center gap-4 mb-16">
+        <div className="hidden md:flex items-center justify-center gap-4 mb-10">
           {steps.map((s, i) => (
             <div key={s.key} className="flex items-center gap-2">
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold transition-all ${

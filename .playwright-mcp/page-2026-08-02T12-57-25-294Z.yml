@@ -1,0 +1,181 @@
+- main [ref=f7e2]:
+  - generic [ref=f7e3]:
+    - link "Back to Blog" [ref=f7e6] [cursor=pointer]:
+      - /url: /blog
+    - main [ref=f7e9]:
+      - generic [ref=f7e10]:
+        - time [ref=f7e11]: 2 August 2026
+        - generic [ref=f7e12]: "|"
+        - generic [ref=f7e13]: By Maz Makki
+      - heading "How Much Do Digital Menu Boards Cost in Pakistan? (2026)" [level=1] [ref=f7e14]
+      - generic [ref=f7e15]:
+        - paragraph [ref=f7e16]: "If you are shopping for a digital menu board in Pakistan, the honest answer to \"how much does it cost?\" is: anywhere from PKR 80,000 to PKR 500,000+ once you add everything up. And that is before the monthly software bill. This guide breaks down every cost — screen, media player, mounting, software, and maintenance — and compares it with the QR code menu alternative so you can decide with real numbers."
+        - heading "The Cost of the Screen" [level=2] [ref=f7e17]
+        - paragraph [ref=f7e18]: "The screen is the biggest line item. Prices in Pakistan depend on size and whether it is a commercial-grade display:"
+        - table [ref=f7e20]:
+          - rowgroup [ref=f7e21]:
+            - row [ref=f7e22]:
+              - columnheader "Screen Size" [ref=f7e23]
+              - columnheader "Typical Price (PKR)" [ref=f7e24]
+              - columnheader "Notes" [ref=f7e25]
+          - rowgroup [ref=f7e26]:
+            - row [ref=f7e27]:
+              - cell "32-inch consumer TV" [ref=f7e28]
+              - cell "PKR 45,000-70,000" [ref=f7e29]
+              - cell "Cheapest, but not built for 24/7 use" [ref=f7e30]
+            - row [ref=f7e31]:
+              - cell "32-inch commercial display" [ref=f7e32]
+              - cell "PKR 80,000-120,000" [ref=f7e33]
+              - cell "Bright enough for a counter" [ref=f7e34]
+            - row [ref=f7e35]:
+              - cell "43-inch commercial display" [ref=f7e36]
+              - cell "PKR 120,000-180,000" [ref=f7e37]
+              - cell "Common size for a menu board" [ref=f7e38]
+            - row [ref=f7e39]:
+              - cell "55-inch commercial display" [ref=f7e40]
+              - cell "PKR 180,000-250,000" [ref=f7e41]
+              - cell "Best for larger counters" [ref=f7e42]
+            - row [ref=f7e43]:
+              - cell "Professional signage package" [ref=f7e44]
+              - cell "PKR 300,000-500,000" [ref=f7e45]
+              - cell "Screen + player + mounting + software" [ref=f7e46]
+        - paragraph [ref=f7e47]: "Commercial displays cost more than consumer TVs for a reason: they run 24/7, stay bright in daylight, and last years. A consumer TV will work but burns out faster under constant use. The prices above are typical street prices in Lahore, Karachi, and Islamabad — shop around and you may find better deals."
+        - heading "The Cost of the Media Player" [level=2] [ref=f7e48]
+        - paragraph [ref=f7e49]: "You need a small computer to run the menu software. Options:"
+        - paragraph [ref=f7e50]: "• Android TV box: PKR 8,000-15,000 — the budget choice"
+        - paragraph [ref=f7e51]: "• Dedicated digital signage player (BrightSign, etc.): PKR 25,000-60,000 — more reliable"
+        - paragraph [ref=f7e52]: "• Built into a professional package: already included in the PKR 300,000+ price"
+        - heading "The Cost of Mounting and Installation" [level=2] [ref=f7e53]
+        - paragraph [ref=f7e54]: A proper wall mount plus installation runs PKR 5,000-15,000 depending on the wall and height. Add cabling and a surge protector if the location lacks clean power.
+        - heading "The Monthly Software Cost" [level=2] [ref=f7e55]
+        - paragraph [ref=f7e56]: "This is the ongoing bill people forget. Most menu board software charges a subscription:"
+        - paragraph [ref=f7e57]: "• Basic single-screen plans: PKR 5,000-10,000 per month"
+        - paragraph [ref=f7e58]: "• Multi-screen and premium plans: PKR 15,000-30,000+ per month"
+        - paragraph [ref=f7e59]: • Some Pakistani providers bundle hardware + software at a higher upfront price
+        - heading "The Total Cost of Ownership" [level=2] [ref=f7e60]
+        - paragraph [ref=f7e61]: "Let's add it up for a typical single-screen setup:"
+        - table [ref=f7e63]:
+          - rowgroup [ref=f7e64]:
+            - row [ref=f7e65]:
+              - columnheader "Item" [ref=f7e66]
+              - columnheader "One-Time (PKR)" [ref=f7e67]
+          - rowgroup [ref=f7e68]:
+            - row [ref=f7e69]:
+              - cell "43-inch commercial display" [ref=f7e70]
+              - cell "150,000" [ref=f7e71]
+            - row [ref=f7e72]:
+              - cell "Media player" [ref=f7e73]
+              - cell "15,000" [ref=f7e74]
+            - row [ref=f7e75]:
+              - cell "Mounting + install" [ref=f7e76]
+              - cell "10,000" [ref=f7e77]
+            - row [ref=f7e78]:
+              - cell "Setup/content design" [ref=f7e79]
+              - cell "10,000" [ref=f7e80]
+            - row [ref=f7e81]:
+              - cell "Total upfront" [ref=f7e82]
+              - cell "185,000" [ref=f7e83]
+            - row [ref=f7e84]:
+              - cell "Software (PKR 8,000/month × 12)" [ref=f7e85]
+              - cell "96,000/year" [ref=f7e86]
+            - row [ref=f7e87]:
+              - cell "Year-one total" [ref=f7e88]
+              - cell "281,000" [ref=f7e89]
+        - paragraph [ref=f7e90]: "That is a real number: around PKR 280,000 in year one for one screen — and you still cannot take orders with it. A menu board is a display, not an ordering system."
+        - heading "What You Are Really Paying For" [level=2] [ref=f7e91]
+        - paragraph [ref=f7e92]: "Break down the PKR 280,000 and you see the cost is not the screen — it is the ongoing operation. The screen is a one-time asset, but the media player, the software subscription, the content design, and the maintenance recur. You are paying a monthly fee for a display that cannot take an order, reach a customer outside your store, or share a menu link on WhatsApp. That recurring cost is the silent budget-killer: it shows up on your books every single month, long after the excitement of the new screen fades."
+        - paragraph [ref=f7e93]: "Compare that with what the same money could do elsewhere in your restaurant: a QR code menu for a full year, plus a real marketing budget, plus better ingredients. The opportunity cost of a menu board is not just its price tag — it is everything that money no longer buys."
+        - heading "Hidden Costs People Forget" [level=2] [ref=f7e94]
+        - paragraph [ref=f7e95]: "Three costs surprise most buyers:"
+        - paragraph [ref=f7e96]: "• Electricity: a commercial display running 12-16 hours a day adds a noticeable monthly power bill, especially in summer when AC is already running"
+        - paragraph [ref=f7e97]: "• Content design: someone has to design the menu layouts, update prices, and keep the screens accurate — that is hours of staff time every month"
+        - paragraph [ref=f7e98]: "• Breakdowns and replacement: commercial screens fail, and consumer TVs used as menu boards fail faster; a replacement is another PKR 80,000-200,000"
+        - paragraph [ref=f7e99]: None of these appear on the sticker price, but all of them are real. A QR menu has none of them — customers bring their own screens and their own power.
+        - heading "How to Reduce the Cost" [level=2] [ref=f7e100]
+        - paragraph [ref=f7e101]: "You can cut costs three ways:"
+        - paragraph [ref=f7e102]: • Use an existing TV you already own and pay only for software (PKR 5,000-10,000/month)
+        - paragraph [ref=f7e103]: • Buy a slightly smaller screen
+        - paragraph [ref=f7e104]: • Choose a single-screen plan instead of a multi-screen package
+        - paragraph [ref=f7e105]: Even at minimum cost, you are still paying a recurring software fee for a display-only tool.
+        - 'heading "Digital Menu Board vs QR Code Menu: The Cost Comparison" [level=2] [ref=f7e106]'
+        - paragraph [ref=f7e107]: "Now the comparison that matters for Pakistani restaurant owners:"
+        - table [ref=f7e109]:
+          - rowgroup [ref=f7e110]:
+            - row [ref=f7e111]:
+              - columnheader [ref=f7e112]
+              - columnheader "Digital Menu Board" [ref=f7e113]
+              - columnheader "QR Code Menu (Digital QR Menue)" [ref=f7e114]
+          - rowgroup [ref=f7e115]:
+            - row [ref=f7e116]:
+              - cell "Upfront cost" [ref=f7e117]
+              - cell "PKR 80,000-185,000+" [ref=f7e118]
+              - cell "PKR 0" [ref=f7e119]
+            - row [ref=f7e120]:
+              - cell "Monthly cost" [ref=f7e121]
+              - cell "PKR 5,000-30,000 software" [ref=f7e122]
+              - cell "PKR 1,500-4,500" [ref=f7e123]
+            - row [ref=f7e124]:
+              - cell "Year-one cost" [ref=f7e125]
+              - cell "PKR 180,000-280,000+" [ref=f7e126]
+              - cell "PKR 18,000-54,000" [ref=f7e127]
+            - row [ref=f7e128]:
+              - cell "Takes WhatsApp orders" [ref=f7e129]
+              - cell "No" [ref=f7e130]
+              - cell "Yes" [ref=f7e131]
+            - row [ref=f7e132]:
+              - cell "Updates reach" [ref=f7e133]
+              - cell "Only the screen" [ref=f7e134]
+              - cell "Every customer's phone" [ref=f7e135]
+            - row [ref=f7e136]:
+              - cell "Customer reach outside store" [ref=f7e137]
+              - cell "No" [ref=f7e138]
+              - cell "Yes, via link" [ref=f7e139]
+        - paragraph [ref=f7e140]:
+          - text: A
+          - link "QR code digital menu" [ref=f7e141] [cursor=pointer]:
+            - /url: /digital-menu-for-restaurants
+          - text: costs a fraction, works on every customer's phone, updates instantly everywhere, and takes WhatsApp orders. The only thing the board does better is display your menu to people already standing at your counter — and even then, a QR menu can be printed on a poster for pennies.
+        - heading "When the Board Is Still Worth It" [level=2] [ref=f7e142]
+        - paragraph [ref=f7e143]:
+          - text: "Be fair to the board: it wins in high-volume fast food and drive-throughs where counter display drives impulse purchases and speed matters. If you are that kind of outlet, the investment can pay for itself. Read"
+          - link "the full digital menu boards guide" [ref=f7e144] [cursor=pointer]:
+            - /url: /blog/digital-menu-boards-for-restaurants
+          - text: for when they earn their keep.
+        - heading "How to Get a Quote for Your Restaurant" [level=2] [ref=f7e145]
+        - paragraph [ref=f7e146]: Menu board pricing is quoted per setup, so the fastest way to know your exact cost is to ask two or three signage vendors in your city. Ask for a written quote that separates screen, player, mounting, installation, and monthly software — vendors who bundle them hide the ongoing cost. Then add 20% for cabling, power, and unforeseen install work. Once you have that number, compare it against the tables above before signing.
+        - heading "Frequently Asked Questions" [level=2] [ref=f7e147]
+        - paragraph [ref=f7e148]: Can I use my existing TV as a menu board? Yes, to save the biggest cost. A consumer TV works with menu board software, but it is not built to run 24/7 — expect a shorter lifespan and dimmer daytime readability. It is a fine way to test the concept before committing to a commercial display.
+        - paragraph [ref=f7e149]: Do menu board prices include software? Usually not. Hardware quotes and software subscriptions are separate. Read the quote line by line and confirm the monthly software fee before you sign.
+        - paragraph [ref=f7e150]:
+          - text: Is a digital menu board worth it for a small restaurant? Rarely. For a small or medium restaurant, the six-figure cost and display-only capability rarely pay back. A
+          - link "digital menu board" [ref=f7e151] [cursor=pointer]:
+            - /url: /blog/digital-menu-boards-for-restaurants
+          - text: makes sense for high-volume fast food and drive-throughs where counter display drives impulse sales.
+        - paragraph [ref=f7e152]:
+          - text: What is the cheapest digital menu option? A QR code menu. Zero hardware, PKR 0 upfront, PKR 1,500-4,500 per month, and it takes WhatsApp orders. See
+          - link "how to create a restaurant QR menu for free" [ref=f7e153] [cursor=pointer]:
+            - /url: /blog/restaurant-qr-menu-free-guide
+          - text: .
+        - paragraph [ref=f7e154]: How long do menu boards last? A commercial display typically runs 40,000-50,000 hours — roughly 5-6 years at 16 hours a day. Consumer TVs used as boards last much less. Factor replacement into your cost.
+        - heading "The Verdict for Pakistani Restaurants" [level=2] [ref=f7e155]
+        - paragraph [ref=f7e156]:
+          - text: For most restaurants — dine-in, dhabas, biryani houses, casual cafés — a digital menu board is a six-figure display that cannot take orders. The cheaper, smarter move is a
+          - link "digital menu board alternative" [ref=f7e157] [cursor=pointer]:
+            - /url: /blog/digital-menu-boards-for-restaurants
+          - text: ": a QR code menu at PKR 1,500-4,500 per month, zero upfront, with WhatsApp ordering built in. You can always add a screen later if your volume justifies it."
+        - paragraph [ref=f7e158]:
+          - text: Want the numbers for your own restaurant?
+          - link "Start your free trial" [ref=f7e159] [cursor=pointer]:
+            - /url: /signup/restaurant
+          - text: and see how much a QR menu saves you.
+      - generic [ref=f7e160]:
+        - generic [ref=f7e161]:
+          - generic [ref=f7e162]: MM
+          - generic [ref=f7e163]:
+            - paragraph [ref=f7e164]: Maz Makki
+            - paragraph [ref=f7e165]: Digital Marketing Lead, Digital QR Menue
+        - generic [ref=f7e166]:
+          - heading "Ready to create your digital menu?" [level=2] [ref=f7e167]
+          - paragraph [ref=f7e168]: Start your free trial today — no credit card required.
+          - link "Start Free Trial" [ref=f7e169] [cursor=pointer]:
+            - /url: /signup/restaurant

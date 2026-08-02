@@ -1,0 +1,201 @@
+- main [ref=f4e2]:
+  - generic [ref=f4e3]:
+    - link "Back to Blog" [ref=f4e6] [cursor=pointer]:
+      - /url: /blog
+    - main [ref=f4e9]:
+      - generic [ref=f4e10]:
+        - time [ref=f4e11]: 2 August 2026
+        - generic [ref=f4e12]: "|"
+        - generic [ref=f4e13]: By Maz Makki
+      - 'heading "Digital Menu for Restaurants: The Complete Guide (2026)" [level=1] [ref=f4e14]'
+      - generic [ref=f4e15]:
+        - paragraph [ref=f4e16]: A digital menu is the single biggest upgrade a restaurant can make this year. It replaces printed cards that cost thousands in reprints, kills the 25-35% commission of delivery apps, shows your food in mouth-watering photos, and takes orders directly on WhatsApp. This guide covers everything — what a digital menu is, every type available, what it costs in Pakistan, and exactly how to set one up in under 30 minutes.
+        - heading "What Is a Digital Menu?" [level=2] [ref=f4e17]
+        - paragraph [ref=f4e18]:
+          - text: A digital menu is a web-based version of your restaurant menu that customers open on their phone. Instead of a printed card, they scan a
+          - link "QR code restaurant menu" [ref=f4e19] [cursor=pointer]:
+            - /url: /digital-menu-for-restaurants
+          - text: with their camera (or tap a link) and your full menu appears instantly — dishes, descriptions, prices, and photos, organized into categories. It is always up to date, never needs reprinting, and can be connected directly to ordering.
+        - paragraph [ref=f4e20]: "The best part for Pakistani restaurants: a digital menu is not a photo of your old card. It is a live system. Change a price from your phone and every customer sees the new price immediately. Add a dish and it is on the menu before the kitchen even starts cooking."
+        - heading "Types of Digital Menus" [level=2] [ref=f4e21]
+        - paragraph [ref=f4e22]: "Not every digital menu is the same. Here are the main types and where each fits:"
+        - table [ref=f4e24]:
+          - rowgroup [ref=f4e25]:
+            - row [ref=f4e26]:
+              - columnheader "Type" [ref=f4e27]
+              - columnheader "What It Is" [ref=f4e28]
+              - columnheader "Best For" [ref=f4e29]
+          - rowgroup [ref=f4e30]:
+            - row [ref=f4e31]:
+              - cell "QR code menu" [ref=f4e32]
+              - cell "Customers scan a code to open the menu on their phone" [ref=f4e33]
+              - cell "Most restaurants" [ref=f4e34]
+            - row [ref=f4e35]:
+              - cell "Digital menu board" [ref=f4e36]
+              - cell "A TV screen showing rotating menu items" [ref=f4e37]
+              - cell "Fast food, coffee shops, drive-through" [ref=f4e38]
+            - row [ref=f4e39]:
+              - cell "Tablet menu" [ref=f4e40]
+              - cell "An iPad on the table with the menu loaded" [ref=f4e41]
+              - cell "Fine dining" [ref=f4e42]
+            - row [ref=f4e43]:
+              - cell "Web-based menu" [ref=f4e44]
+              - cell "A shareable link you post on WhatsApp and social media" [ref=f4e45]
+              - cell "Delivery, cafés" [ref=f4e46]
+            - row [ref=f4e47]:
+              - cell "PDF menu" [ref=f4e48]
+              - cell "A static file, better than nothing but not live" [ref=f4e49]
+              - cell "Simple display" [ref=f4e50]
+        - paragraph [ref=f4e51]:
+          - text: For the vast majority of restaurants, a
+          - link "QR code digital menu" [ref=f4e52] [cursor=pointer]:
+            - /url: /digital-menu-for-restaurants
+          - text: "is the right choice: zero hardware, works on every phone, and connects to WhatsApp ordering. Menu boards and tablets have their place — we cover those below."
+        - 'heading "Digital Menu vs Printed Menu: Why Restaurants Are Switching" [level=2] [ref=f4e53]'
+        - paragraph [ref=f4e54]:
+          - text: The cost comparison is stark for restaurants in Pakistan. A laminated colour menu card costs PKR 500-2,000, and most restaurants reprint every 2-3 months because prices change. A restaurant printing 100 cards twice a year spends PKR 100,000-200,000 annually — before a single order comes in. See the full breakdown in our
+          - link "digital vs printed menu guide" [ref=f4e55] [cursor=pointer]:
+            - /url: /blog/digital-vs-printed-menu-pakistan
+          - text: .
+        - paragraph [ref=f4e56]: A digital menu from Digital QR Menue starts at PKR 1,500 per month — a fraction of reprint costs — and updates instantly, shows photos on every dish, includes Urdu and English side by side, and takes WhatsApp orders a printed card never could.
+        - 'heading "Digital Menu vs QR Menu: Same Thing?" [level=2] [ref=f4e57]'
+        - paragraph [ref=f4e58]:
+          - text: "People use the terms interchangeably, but they are slightly different. A QR menu is a digital menu accessed by scanning a QR code — the QR code is the door. A digital menu is the content: dishes, prices, photos, and ordering. You can open a digital menu via QR code, a link, a tablet, or a board. Learn the full distinction in"
+          - link "QR menu vs digital menu" [ref=f4e59] [cursor=pointer]:
+            - /url: /blog/qr-menu-vs-digital-menu-difference
+          - text: .
+        - paragraph [ref=f4e60]: "For your restaurant you want both: a real digital menu with the QR code as the access method."
+        - heading "How Much Does a Digital Menu Cost in Pakistan?" [level=2] [ref=f4e61]
+        - paragraph [ref=f4e62]: "Digital QR Menue offers a 30-day free trial, then paid plans from PKR 1,500 per month:"
+        - table [ref=f4e64]:
+          - rowgroup [ref=f4e65]:
+            - row [ref=f4e66]:
+              - columnheader "Plan" [ref=f4e67]
+              - columnheader "Price" [ref=f4e68]
+              - columnheader "Dishes" [ref=f4e69]
+              - columnheader "Zero Commission" [ref=f4e70]
+          - rowgroup [ref=f4e71]:
+            - row [ref=f4e72]:
+              - cell "Free Trial" [ref=f4e73]
+              - cell "PKR 0 for 30 days" [ref=f4e74]
+              - cell "Up to 50 items" [ref=f4e75]
+              - cell "Yes" [ref=f4e76]
+            - row [ref=f4e77]:
+              - cell "Starter" [ref=f4e78]
+              - cell "PKR 1,500/month" [ref=f4e79]
+              - cell "30 dishes" [ref=f4e80]
+              - cell "Yes" [ref=f4e81]
+            - row [ref=f4e82]:
+              - cell "Growth" [ref=f4e83]
+              - cell "PKR 2,500/month" [ref=f4e84]
+              - cell "50 dishes" [ref=f4e85]
+              - cell "Yes" [ref=f4e86]
+            - row [ref=f4e87]:
+              - cell "Premium" [ref=f4e88]
+              - cell "PKR 4,500/month" [ref=f4e89]
+              - cell "100 dishes" [ref=f4e90]
+              - cell "Yes" [ref=f4e91]
+        - paragraph [ref=f4e92]:
+          - text: Compare that with the 25-35% commission delivery apps charge on every order. If your restaurant does PKR 200,000 in monthly orders through Foodpanda, that is PKR 50,000-70,000 in fees every month. Your entire digital menu — unlimited orders, WhatsApp ordering, analytics — costs less than 5% of that. See how the numbers stack up in our
+          - link "free vs paid digital menu comparison" [ref=f4e93] [cursor=pointer]:
+            - /url: /blog/free-digital-menu-vs-paid-comparison
+          - text: .
+        - paragraph [ref=f4e94]:
+          - text: "If you are comparing hardware-based digital menu boards instead, the picture is very different: screens and software can run into six figures. See"
+          - link "how much digital menu boards really cost" [ref=f4e95] [cursor=pointer]:
+            - /url: /blog/digital-menu-board-cost-pakistan
+          - text: before you buy.
+        - heading "How to Create a Digital Menu (Step-by-Step)" [level=2] [ref=f4e96]
+        - paragraph [ref=f4e97]: "Creating your digital menu takes under 30 minutes. Here is the complete process:"
+        - 'heading "Step 1: Sign Up" [level=3] [ref=f4e98]'
+        - paragraph [ref=f4e99]:
+          - text: Visit
+          - link "digitalmenue.com and create your free account" [ref=f4e100] [cursor=pointer]:
+            - /url: /signup/restaurant
+          - text: . You get a 30-day free trial with full access — no credit card required.
+        - 'heading "Step 2: Add Your Restaurant Details" [level=3] [ref=f4e101]'
+        - paragraph [ref=f4e102]: Enter your restaurant name, city, cuisine type, opening hours, and delivery details. Upload your logo and connect your WhatsApp number — this is where every order arrives.
+        - 'heading "Step 3: Build Your Menu" [level=3] [ref=f4e103]'
+        - paragraph [ref=f4e104]: "Add each dish with its name (English and Urdu), price, description, and a mouth-watering photo. Organize into categories: BBQ, Karahi, Biryani, Fast Food, Desserts, Beverages. Tag bestsellers as Most Popular or Chef's Special."
+        - paragraph [ref=f4e105]:
+          - text: For design guidance that lifts order values 20-30%, see our
+          - link "digital menu design tips" [ref=f4e106] [cursor=pointer]:
+            - /url: /blog/digital-menu-design-tips-restaurants
+          - text: .
+        - 'heading "Step 4: Generate and Print Your QR Code" [level=3] [ref=f4e107]'
+        - paragraph [ref=f4e108]:
+          - text: Your unique QR code is generated automatically. Download it in high resolution and print it once — on table tents, counter signs, or stickers. The code never changes, so you never reprint. Full placement advice in our
+          - link "QR code setup guide" [ref=f4e109] [cursor=pointer]:
+            - /url: /blog/digital-menu-qr-code-setup-guide
+          - text: .
+        - 'heading "Step 5: Start Receiving WhatsApp Orders" [level=3] [ref=f4e110]'
+        - paragraph [ref=f4e111]: When a customer scans and orders, a cleanly formatted message arrives on your WhatsApp with their name, items, total, and order type. You confirm, prepare, and serve. No commission, no middleman.
+        - paragraph [ref=f4e112]:
+          - text: For the Pakistan-specific walkthrough, see
+          - link "how to create a digital menu for your restaurant" [ref=f4e113] [cursor=pointer]:
+            - /url: /blog/how-to-create-digital-menu-restaurant
+          - text: and
+          - link "the full QR menu guide for Pakistan" [ref=f4e114] [cursor=pointer]:
+            - /url: /blog/create-qr-code-menu-restaurant-pakistan
+          - text: .
+        - 'heading "Digital Menu Boards: A Quick Reality Check" [level=2] [ref=f4e115]'
+        - paragraph [ref=f4e116]: "A digital menu board is a TV screen mounted behind the counter showing rotating menu items — common in fast food and coffee chains. They look impressive, but they cost real money: a good screen starts around PKR 80,000-200,000 in Pakistan plus software and setup. And a board only displays your menu — it does not take orders."
+        - paragraph [ref=f4e117]:
+          - text: For most Pakistani restaurants, a
+          - link "digital menu board" [ref=f4e118] [cursor=pointer]:
+            - /url: /blog/digital-menu-boards-for-restaurants
+          - text: is overkill. A QR code menu costs a fraction, updates instantly, works on every customer's own phone, and takes WhatsApp orders. If you are weighing the two, read the honest cost comparison in
+          - link "digital menu board cost in Pakistan" [ref=f4e119] [cursor=pointer]:
+            - /url: /blog/digital-menu-board-cost-pakistan
+          - text: before spending on hardware.
+        - heading "Digital Menu for Coffee Shops and Cafés" [level=2] [ref=f4e120]
+        - paragraph [ref=f4e121]:
+          - text: Coffee shops have a special relationship with digital menus. A café's menu changes with seasonal drinks and specials, and customers order repeatedly — which makes a live, photo-rich menu extremely effective. Whether you choose a board behind the counter, a QR code on every table, or both, see
+          - link "coffee shop digital menu ideas" [ref=f4e122] [cursor=pointer]:
+            - /url: /blog/coffee-shop-digital-menu
+          - text: for the options.
+        - heading "How Customers Scan and Order" [level=2] [ref=f4e123]
+        - paragraph [ref=f4e124]:
+          - text: Curious about the customer experience? Scanning a QR code menu takes one tap on any iPhone or Android — the camera opens the menu in the browser instantly, no app download. For a friendly walkthrough, including how guests scan for hotel and restaurant menus, see
+          - link "how to scan a QR code for a menu" [ref=f4e125] [cursor=pointer]:
+            - /url: /blog/how-to-scan-qr-code-menu
+          - text: .
+        - heading "Which Type Should You Choose?" [level=2] [ref=f4e126]
+        - paragraph [ref=f4e127]: "Here is the honest summary for a typical Pakistani restaurant:"
+        - paragraph [ref=f4e128]: Choose a QR code menu if you want zero hardware, WhatsApp ordering, and instant updates — the right call for 9 out of 10 restaurants.
+        - paragraph [ref=f4e129]: Choose a digital menu board only if you are a high-volume fast food or coffee outlet that needs counter display for impulse ordering — and budget for the hardware.
+        - paragraph [ref=f4e130]: Choose a tablet menu for fine dining where the experience matters more than cost.
+        - paragraph [ref=f4e131]:
+          - text: Start with a
+          - link "free QR code digital menu" [ref=f4e132] [cursor=pointer]:
+            - /url: /digital-menu-for-restaurants
+          - text: — you can test everything for 30 days and see the savings before spending a rupee.
+        - heading "Ready to Create Your Digital Menu?" [level=2] [ref=f4e133]
+        - paragraph [ref=f4e134]: A digital menu saves you thousands in reprints, keeps 100% of your orders, shows your food beautifully, and takes WhatsApp orders around the clock. It takes 30 minutes to set up and costs less than 5% of what delivery apps take in commission.
+        - paragraph [ref=f4e135]:
+          - text: Start your 30-day free trial today at
+          - link "digitalmenue.com" [ref=f4e136] [cursor=pointer]:
+            - /url: /signup/restaurant
+          - text: . No credit card required. Your customers are ready to scan — make sure your menu is ready too.
+      - generic [ref=f4e137]:
+        - heading "Related Guides" [level=2] [ref=f4e138]
+        - generic [ref=f4e139]:
+          - link "What Is a Digital Menu for Restaurants? Complete Guide (2026) Read guide →" [ref=f4e140] [cursor=pointer]:
+            - /url: /blog/what-is-digital-menu-for-restaurants
+            - text: What Is a Digital Menu for Restaurants? Complete Guide (2026)
+            - generic [ref=f4e141]: Read guide →
+          - link "Digital Menu QR Code Setup Guide for Restaurants Read guide →" [ref=f4e142] [cursor=pointer]:
+            - /url: /blog/digital-menu-qr-code-setup-guide
+            - text: Digital Menu QR Code Setup Guide for Restaurants
+            - generic [ref=f4e143]: Read guide →
+      - generic [ref=f4e144]:
+        - generic [ref=f4e145]:
+          - generic [ref=f4e146]: MM
+          - generic [ref=f4e147]:
+            - paragraph [ref=f4e148]: Maz Makki
+            - paragraph [ref=f4e149]: Digital Marketing Lead, Digital QR Menue
+        - generic [ref=f4e150]:
+          - heading "Ready to create your digital menu?" [level=2] [ref=f4e151]
+          - paragraph [ref=f4e152]: Start your free trial today — no credit card required.
+          - link "Start Free Trial" [ref=f4e153] [cursor=pointer]:
+            - /url: /signup/restaurant

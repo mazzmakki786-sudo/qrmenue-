@@ -104,7 +104,7 @@ const categories: Array<{ title: string; faqs: FaqItem[] }> = [
     faqs: [
       {
         q: "How do I contact support?",
-        a: "Message us on WhatsApp at +92-314-6325823 or email support@digitalmenue.com. Paid plans include priority support with faster response times.",
+        a: "Message us on WhatsApp at +92-314-6325823 or email maki2@gmail.com. Paid plans include priority support with faster response times.",
       },
       {
         q: "What are your operational hours?",

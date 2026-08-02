@@ -72,6 +72,7 @@ export const PATCH = safeRoute(async (request, { params }: { params: Promise<{ i
   if (body.title !== undefined) updates.title = body.title
   if (body.body !== undefined) updates.body = body.body
   if (body.is_published !== undefined) updates.is_published = body.is_published
+  if (body.audience !== undefined) updates.audience = body.audience
 
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: "No valid fields to update" }, { status: 400 })

@@ -329,36 +329,50 @@ export type Database = {
       }
       owner_notifications: {
         Row: {
+          announcement_id: string | null
           body: string | null
           created_at: string | null
           id: string
           is_read: boolean | null
           link_url: string | null
+          play_sound: boolean | null
           restaurant_id: string | null
           title: string
           type: string
         }
         Insert: {
+          announcement_id?: string | null
           body?: string | null
           created_at?: string | null
           id?: string
           is_read?: boolean | null
           link_url?: string | null
+          play_sound?: boolean | null
           restaurant_id?: string | null
           title: string
           type?: string
         }
         Update: {
+          announcement_id?: string | null
           body?: string | null
           created_at?: string | null
           id?: string
           is_read?: boolean | null
           link_url?: string | null
+          play_sound?: boolean | null
           restaurant_id?: string | null
           title?: string
           type?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "owner_notifications_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "qr_announcements"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       parent_students: {
         Row: {
@@ -503,6 +517,7 @@ export type Database = {
       }
       qr_announcements: {
         Row: {
+          audience: string
           body: string
           created_at: string | null
           created_by: string | null
@@ -512,6 +527,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          audience?: string
           body: string
           created_at?: string | null
           created_by?: string | null
@@ -521,6 +537,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          audience?: string
           body?: string
           created_at?: string | null
           created_by?: string | null

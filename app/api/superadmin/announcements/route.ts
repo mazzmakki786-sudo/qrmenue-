@@ -46,10 +46,17 @@ export const POST = safeRoute(async (request) => {
     return NextResponse.json({ error: "title and body are required" }, { status: 400 })
   }
 
+  // Audience targets which restaurant plans receive this announcement.
+  // 'all' → every active restaurant; otherwise a single plan slug
+  // ('trial' | 'starter' | 'growth' | 'premium' | 'free-trial') or a
+  // comma-separated list of plan slugs.
+  const rawAudience = typeof body.audience === "string" ? body.audience.trim() : "all"
+  const audience = rawAudience.length > 0 ? rawAudience : "all"
+
   const admin = createAdminClient()
   const { data, error } = await admin
     .from("qr_announcements")
-    .insert({ title: body.title.trim(), body: body.body.trim(), created_by: user.id })
+    .insert({ title: body.title.trim(), body: body.body.trim(), created_by: user.id, audience })
     .select()
     .single()
 

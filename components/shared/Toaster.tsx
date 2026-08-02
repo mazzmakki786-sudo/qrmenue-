@@ -2,14 +2,15 @@
 
 import { useEffect, useState, useCallback } from "react"
 import { useToastStore, type Toast } from "@/stores/toastStore"
-import { X, CheckCircle, AlertCircle, Info, BellRing } from "lucide-react"
-import { playNotification, playStatusChange, playOrderConfirmed } from "@/lib/sound"
+import { X, CheckCircle, AlertCircle, Info, BellRing, Megaphone } from "lucide-react"
+import { playNotification, playStatusChange, playOrderConfirmed, playAnnouncement } from "@/lib/sound"
 
 const TYPE_STYLES: Record<string, { bg: string; icon: typeof CheckCircle }> = {
   success: { bg: "bg-black", icon: CheckCircle },
   error: { bg: "bg-[#DC2626]", icon: AlertCircle },
   info: { bg: "bg-[#2563EB]", icon: Info },
   order: { bg: "bg-[#25D366]", icon: BellRing },
+  announcement: { bg: "bg-[#7C3AED]", icon: Megaphone },
 }
 
 function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: (id: string) => void }) {
@@ -103,6 +104,8 @@ export function Toaster() {
         setPlayedIds((prev) => new Set(prev).add(toast.id))
         if (toast.type === "order") {
           playOrderConfirmed()
+        } else if (toast.type === "announcement") {
+          playAnnouncement()
         } else if (toast.type === "success") {
           playStatusChange()
         } else {

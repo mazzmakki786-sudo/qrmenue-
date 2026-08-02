@@ -84,6 +84,33 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
+  // Standalone owner onboarding wizard (outside dashboard chrome).
+  // Must be signed in; signed-in users without a restaurant are sent to signup.
+  if (pathname.startsWith("/onboarding")) {
+    if (!user) {
+      return NextResponse.redirect(new URL("/login", request.url))
+    }
+    let cachedId = getCachedRestaurant(user.id)
+    if (!cachedId) {
+      try {
+        const { data: restaurant } = await supabase
+          .from("restaurants")
+          .select("id")
+          .eq("owner_id", user.id)
+          .maybeSingle()
+        if (restaurant) {
+          cachedId = restaurant.id
+          setCachedRestaurant(user.id, restaurant.id)
+        }
+      } catch (err) {
+        console.error("[middleware] onboarding restaurant check failed:", err)
+      }
+    }
+    if (!cachedId) {
+      return NextResponse.redirect(new URL("/signup/restaurant", request.url))
+    }
+  }
+
   if (pathname.startsWith("/account")) {
     if (!user) {
       return NextResponse.redirect(new URL("/login/customer?redirect=/account", request.url))

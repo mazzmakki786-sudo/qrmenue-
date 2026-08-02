@@ -1,0 +1,156 @@
+- main [ref=f5e2]:
+  - generic [ref=f5e3]:
+    - link "Back to Blog" [ref=f5e6] [cursor=pointer]:
+      - /url: /blog
+    - main [ref=f5e9]:
+      - generic [ref=f5e10]:
+        - time [ref=f5e11]: 2 August 2026
+        - generic [ref=f5e12]: "|"
+        - generic [ref=f5e13]: By Maz Makki
+      - heading "How Much Do Digital Menu Boards Cost in Pakistan? (2026)" [level=1] [ref=f5e14]
+      - generic [ref=f5e15]:
+        - paragraph [ref=f5e16]: "If you are shopping for a digital menu board in Pakistan, the honest answer to \"how much does it cost?\" is: anywhere from PKR 80,000 to PKR 500,000+ once you add everything up. And that is before the monthly software bill. This guide breaks down every cost — screen, media player, mounting, software, and maintenance — and compares it with the QR code menu alternative so you can decide with real numbers."
+        - heading "The Cost of the Screen" [level=2] [ref=f5e17]
+        - paragraph [ref=f5e18]: "The screen is the biggest line item. Prices in Pakistan depend on size and whether it is a commercial-grade display:"
+        - table [ref=f5e20]:
+          - rowgroup [ref=f5e21]:
+            - row [ref=f5e22]:
+              - columnheader "Screen Size" [ref=f5e23]
+              - columnheader "Typical Price (PKR)" [ref=f5e24]
+              - columnheader "Notes" [ref=f5e25]
+          - rowgroup [ref=f5e26]:
+            - row [ref=f5e27]:
+              - cell "32-inch consumer TV" [ref=f5e28]
+              - cell "PKR 45,000-70,000" [ref=f5e29]
+              - cell "Cheapest, but not built for 24/7 use" [ref=f5e30]
+            - row [ref=f5e31]:
+              - cell "32-inch commercial display" [ref=f5e32]
+              - cell "PKR 80,000-120,000" [ref=f5e33]
+              - cell "Bright enough for a counter" [ref=f5e34]
+            - row [ref=f5e35]:
+              - cell "43-inch commercial display" [ref=f5e36]
+              - cell "PKR 120,000-180,000" [ref=f5e37]
+              - cell "Common size for a menu board" [ref=f5e38]
+            - row [ref=f5e39]:
+              - cell "55-inch commercial display" [ref=f5e40]
+              - cell "PKR 180,000-250,000" [ref=f5e41]
+              - cell "Best for larger counters" [ref=f5e42]
+            - row [ref=f5e43]:
+              - cell "Professional signage package" [ref=f5e44]
+              - cell "PKR 300,000-500,000" [ref=f5e45]
+              - cell "Screen + player + mounting + software" [ref=f5e46]
+        - paragraph [ref=f5e47]: "Commercial displays cost more than consumer TVs for a reason: they run 24/7, stay bright in daylight, and last years. A consumer TV will work but burns out faster under constant use. The prices above are typical street prices in Lahore, Karachi, and Islamabad — shop around and you may find better deals."
+        - heading "The Cost of the Media Player" [level=2] [ref=f5e48]
+        - paragraph [ref=f5e49]: "You need a small computer to run the menu software. Options:"
+        - paragraph [ref=f5e50]: "• Android TV box: PKR 8,000-15,000 — the budget choice"
+        - paragraph [ref=f5e51]: "• Dedicated digital signage player (BrightSign, etc.): PKR 25,000-60,000 — more reliable"
+        - paragraph [ref=f5e52]: "• Built into a professional package: already included in the PKR 300,000+ price"
+        - heading "The Cost of Mounting and Installation" [level=2] [ref=f5e53]
+        - paragraph [ref=f5e54]: A proper wall mount plus installation runs PKR 5,000-15,000 depending on the wall and height. Add cabling and a surge protector if the location lacks clean power.
+        - heading "The Monthly Software Cost" [level=2] [ref=f5e55]
+        - paragraph [ref=f5e56]: "This is the ongoing bill people forget. Most menu board software charges a subscription:"
+        - paragraph [ref=f5e57]: "• Basic single-screen plans: PKR 5,000-10,000 per month"
+        - paragraph [ref=f5e58]: "• Multi-screen and premium plans: PKR 15,000-30,000+ per month"
+        - paragraph [ref=f5e59]: • Some Pakistani providers bundle hardware + software at a higher upfront price
+        - heading "The Total Cost of Ownership" [level=2] [ref=f5e60]
+        - paragraph [ref=f5e61]: "Let's add it up for a typical single-screen setup:"
+        - table [ref=f5e63]:
+          - rowgroup [ref=f5e64]:
+            - row [ref=f5e65]:
+              - columnheader "Item" [ref=f5e66]
+              - columnheader "One-Time (PKR)" [ref=f5e67]
+          - rowgroup [ref=f5e68]:
+            - row [ref=f5e69]:
+              - cell "43-inch commercial display" [ref=f5e70]
+              - cell "150,000" [ref=f5e71]
+            - row [ref=f5e72]:
+              - cell "Media player" [ref=f5e73]
+              - cell "15,000" [ref=f5e74]
+            - row [ref=f5e75]:
+              - cell "Mounting + install" [ref=f5e76]
+              - cell "10,000" [ref=f5e77]
+            - row [ref=f5e78]:
+              - cell "Setup/content design" [ref=f5e79]
+              - cell "10,000" [ref=f5e80]
+            - row [ref=f5e81]:
+              - cell "Total upfront" [ref=f5e82]
+              - cell "185,000" [ref=f5e83]
+            - row [ref=f5e84]:
+              - cell "Software (PKR 8,000/month × 12)" [ref=f5e85]
+              - cell "96,000/year" [ref=f5e86]
+            - row [ref=f5e87]:
+              - cell "Year-one total" [ref=f5e88]
+              - cell "281,000" [ref=f5e89]
+        - paragraph [ref=f5e90]: "That is a real number: around PKR 280,000 in year one for one screen — and you still cannot take orders with it. A menu board is a display, not an ordering system."
+        - heading "How to Reduce the Cost" [level=2] [ref=f5e91]
+        - paragraph [ref=f5e92]: "You can cut costs three ways:"
+        - paragraph [ref=f5e93]: • Use an existing TV you already own and pay only for software (PKR 5,000-10,000/month)
+        - paragraph [ref=f5e94]: • Buy a slightly smaller screen
+        - paragraph [ref=f5e95]: • Choose a single-screen plan instead of a multi-screen package
+        - paragraph [ref=f5e96]: Even at minimum cost, you are still paying a recurring software fee for a display-only tool.
+        - 'heading "Digital Menu Board vs QR Code Menu: The Cost Comparison" [level=2] [ref=f5e97]'
+        - paragraph [ref=f5e98]: "Now the comparison that matters for Pakistani restaurant owners:"
+        - table [ref=f5e100]:
+          - rowgroup [ref=f5e101]:
+            - row [ref=f5e102]:
+              - columnheader [ref=f5e103]
+              - columnheader "Digital Menu Board" [ref=f5e104]
+              - columnheader "QR Code Menu (Digital QR Menue)" [ref=f5e105]
+          - rowgroup [ref=f5e106]:
+            - row [ref=f5e107]:
+              - cell "Upfront cost" [ref=f5e108]
+              - cell "PKR 80,000-185,000+" [ref=f5e109]
+              - cell "PKR 0" [ref=f5e110]
+            - row [ref=f5e111]:
+              - cell "Monthly cost" [ref=f5e112]
+              - cell "PKR 5,000-30,000 software" [ref=f5e113]
+              - cell "PKR 1,500-4,500" [ref=f5e114]
+            - row [ref=f5e115]:
+              - cell "Year-one cost" [ref=f5e116]
+              - cell "PKR 180,000-280,000+" [ref=f5e117]
+              - cell "PKR 18,000-54,000" [ref=f5e118]
+            - row [ref=f5e119]:
+              - cell "Takes WhatsApp orders" [ref=f5e120]
+              - cell "No" [ref=f5e121]
+              - cell "Yes" [ref=f5e122]
+            - row [ref=f5e123]:
+              - cell "Updates reach" [ref=f5e124]
+              - cell "Only the screen" [ref=f5e125]
+              - cell "Every customer's phone" [ref=f5e126]
+            - row [ref=f5e127]:
+              - cell "Customer reach outside store" [ref=f5e128]
+              - cell "No" [ref=f5e129]
+              - cell "Yes, via link" [ref=f5e130]
+        - paragraph [ref=f5e131]:
+          - text: A
+          - link "QR code digital menu" [ref=f5e132] [cursor=pointer]:
+            - /url: /digital-menu-for-restaurants
+          - text: costs a fraction, works on every customer's phone, updates instantly everywhere, and takes WhatsApp orders. The only thing the board does better is display your menu to people already standing at your counter — and even then, a QR menu can be printed on a poster for pennies.
+        - heading "When the Board Is Still Worth It" [level=2] [ref=f5e133]
+        - paragraph [ref=f5e134]:
+          - text: "Be fair to the board: it wins in high-volume fast food and drive-throughs where counter display drives impulse purchases and speed matters. If you are that kind of outlet, the investment can pay for itself. Read"
+          - link "the full digital menu boards guide" [ref=f5e135] [cursor=pointer]:
+            - /url: /blog/digital-menu-boards-for-restaurants
+          - text: for when they earn their keep.
+        - heading "The Verdict for Pakistani Restaurants" [level=2] [ref=f5e136]
+        - paragraph [ref=f5e137]:
+          - text: For most restaurants — dine-in, dhabas, biryani houses, casual cafés — a digital menu board is a six-figure display that cannot take orders. The cheaper, smarter move is a
+          - link "digital menu board alternative" [ref=f5e138] [cursor=pointer]:
+            - /url: /blog/digital-menu-boards-for-restaurants
+          - text: ": a QR code menu at PKR 1,500-4,500 per month, zero upfront, with WhatsApp ordering built in. You can always add a screen later if your volume justifies it."
+        - paragraph [ref=f5e139]:
+          - text: Want the numbers for your own restaurant?
+          - link "Start your free trial" [ref=f5e140] [cursor=pointer]:
+            - /url: /signup/restaurant
+          - text: and see how much a QR menu saves you.
+      - generic [ref=f5e141]:
+        - generic [ref=f5e142]:
+          - generic [ref=f5e143]: MM
+          - generic [ref=f5e144]:
+            - paragraph [ref=f5e145]: Maz Makki
+            - paragraph [ref=f5e146]: Digital Marketing Lead, Digital QR Menue
+        - generic [ref=f5e147]:
+          - heading "Ready to create your digital menu?" [level=2] [ref=f5e148]
+          - paragraph [ref=f5e149]: Start your free trial today — no credit card required.
+          - link "Start Free Trial" [ref=f5e150] [cursor=pointer]:
+            - /url: /signup/restaurant
