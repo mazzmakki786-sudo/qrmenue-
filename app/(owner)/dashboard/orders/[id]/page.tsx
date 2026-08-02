@@ -256,7 +256,7 @@ export default function OrderDetailPage() {
         )}
         <div className="flex items-center justify-between text-sm">
           <span className="text-[#555]">Payment</span>
-          <span className="capitalize font-medium">{order.payment_method.replace("_", " ")}</span>
+          <span className="capitalize font-medium">{order.payment_method === "cod" ? "Cash on Delivery (COD)" : order.payment_method.replace("_", " ")}</span>
         </div>
         {(order.delivery_fee ?? 0) > 0 && (
           <div className="flex items-center justify-between text-sm">

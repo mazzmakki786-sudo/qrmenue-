@@ -3,6 +3,7 @@ import { safeRoute } from "@/lib/api-error"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { csrfGuard } from "@/lib/csrf"
 import { isSuperAdmin } from "@/lib/superadmin-security"
+import { invalidateOrderCount } from "@/lib/subscription-usage"
 
 export const POST = safeRoute(async (
   request,
@@ -46,6 +47,8 @@ export const POST = safeRoute(async (
       trial_end: newTrialEnd,
       plan_start_date: now,
       plan_end_date: null,
+      // Reset to trial is a plan change — clear stale caps so fresh trial limits apply.
+      plan_limits_override: null,
     })
     .eq("id", id)
     .select()
@@ -59,6 +62,9 @@ export const POST = safeRoute(async (
     .from("trial_reminder_emails")
     .delete()
     .eq("restaurant_id", id)
+
+  // Trial counter anchors to the new trial_start — drop any stale cached count.
+  invalidateOrderCount(id)
 
   return NextResponse.json({
     success: true,

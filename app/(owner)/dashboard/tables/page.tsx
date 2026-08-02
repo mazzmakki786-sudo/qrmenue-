@@ -2,13 +2,12 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { useI18n } from "@/lib/i18n/useTranslation"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
-import { Dialog } from "@/components/ui/dialog"
-import { Plus, X, Trash2, Table2, Lock, Sparkles, ArrowUp } from "lucide-react"
-import Link from "next/link"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Plus, Trash2, Table2, Lock, ArrowUp } from "lucide-react"
 
 type Table = {
   id: string
@@ -22,7 +21,6 @@ type Table = {
 const TABLES_ENABLED_PLANS = ["growth", "growth-yearly", "premium", "premium-yearly"]
 
 export default function TablesPage() {
-  const { t } = useI18n()
   const [tables, setTables] = useState<Table[]>([])
   const [loading, setLoading] = useState(true)
   const [showAddDialog, setShowAddDialog] = useState(false)
@@ -99,7 +97,37 @@ export default function TablesPage() {
     }
   }
 
+  const handleMarkVacant = async (id: string) => {
+    const table = tables.find((t) => t.id === id)
+    if (!table?.is_occupied) return
+
+    const confirmed = window.confirm(`Mark table ${table.table_number} as vacant? Only do this if the order was already completed or cancelled outside the system.`)
+    if (!confirmed) return
+
+    try {
+      const res = await fetch(`/api/owner/tables/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_occupied: false }),
+      })
+      if (res.ok) {
+        setTables((prev) => prev.map((t) => t.id === id ? { ...t, is_occupied: false } : t))
+      } else {
+        const data = await res.json()
+        alert(data.error || "Failed to mark table as vacant")
+      }
+    } catch {
+      alert("Something went wrong")
+    }
+  }
+
   const handleDelete = async (id: string) => {
+    const table = tables.find((t) => t.id === id)
+    if (table?.is_occupied) {
+      alert(`Table ${table.table_number} is currently occupied. Please wait until the order is completed before deleting.`)
+      return
+    }
+
     const confirmed = window.confirm("Delete this table? This cannot be undone.")
     if (!confirmed) return
 
@@ -107,9 +135,12 @@ export default function TablesPage() {
       const res = await fetch(`/api/owner/tables/${id}`, { method: "DELETE" })
       if (res.ok) {
         setTables((prev) => prev.filter((t) => t.id !== id))
+      } else {
+        const data = await res.json()
+        alert(data.error || "Failed to delete table")
       }
     } catch {
-      // silent
+      alert("Something went wrong while deleting the table")
     }
   }
 
@@ -182,6 +213,7 @@ export default function TablesPage() {
               <button
                 onClick={() => handleDelete(table.id)}
                 className="absolute top-1 right-1 p-1 text-gray-400 hover:text-red-500 hover:bg-white/50 rounded"
+                title="Delete table"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
@@ -194,49 +226,55 @@ export default function TablesPage() {
               }`}>
                 {table.is_occupied ? "Occupied" : "Vacant"}
               </span>
+              {table.is_occupied && (
+                <button
+                  onClick={() => handleMarkVacant(table.id)}
+                  className="block mx-auto mt-2 text-xs text-red-600 hover:text-red-800 underline underline-offset-2"
+                  title="Manual override — mark as vacant when order is completed outside the system"
+                >
+                  Mark Vacant
+                </button>
+              )}
             </div>
           ))}
         </div>
       )}
 
       <Dialog open={showAddDialog} onOpenChange={(open: boolean) => { if (!open) setShowAddDialog(false); }}>
-        <div className="p-6 max-w-sm mx-auto">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Add Table</h2>
-            <button onClick={() => setShowAddDialog(false)} className="p-1 hover:bg-gray-100 rounded">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+        <DialogContent>
+          <div className="max-w-sm mx-auto">
+            <h2 className="text-lg font-semibold mb-4">Add Table</h2>
 
-          {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
-              {error}
-            </div>
-          )}
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+                {error}
+              </div>
+            )}
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Table Number</label>
-              <Input
-                value={tableNumber}
-                onChange={(e) => setTableNumber(e.target.value)}
-                placeholder="e.g. 1, A1, Patio-1"
-              />
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Table Number</label>
+                <Input
+                  value={tableNumber}
+                  onChange={(e) => setTableNumber(e.target.value)}
+                  placeholder="e.g. 1, A1, Patio-1"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Capacity (persons)</label>
+                <Input
+                  type="number"
+                  value={capacity}
+                  onChange={(e) => setCapacity(parseInt(e.target.value) || 1)}
+                  min={1}
+                />
+              </div>
+              <Button onClick={handleAdd} disabled={saving} className="w-full">
+                {saving ? "Adding..." : "Add Table"}
+              </Button>
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Capacity (persons)</label>
-              <Input
-                type="number"
-                value={capacity}
-                onChange={(e) => setCapacity(parseInt(e.target.value) || 1)}
-                min={1}
-              />
-            </div>
-            <Button onClick={handleAdd} disabled={saving} className="w-full">
-              {saving ? "Adding..." : "Add Table"}
-            </Button>
           </div>
-        </div>
+        </DialogContent>
       </Dialog>
     </div>
   )

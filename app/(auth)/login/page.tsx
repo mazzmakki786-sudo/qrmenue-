@@ -1,86 +1,32 @@
 "use client"
 
 import { Suspense, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { PasswordInput } from "@/components/ui/password-input"
 import Link from "next/link"
 
 function LoginForm() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const redirectParam = searchParams.get("redirect")
 
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleGoogleLogin = async () => {
-    const supabase = (await import("@/lib/supabase/client")).createClient()
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || location.origin
-    const cb = redirectParam
-      ? `${baseUrl}/auth/callback?redirect=${redirectParam}`
-      : `${baseUrl}/auth/callback`
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: cb },
-    })
-  }
-
-  const handleEmailLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!email.trim() || !password.trim()) {
-      setError("Please enter both email and password")
-      return
-    }
-
     setLoading(true)
     setError(null)
-
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), password }),
-      })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        setError(data.error || "Incorrect email or password")
-        setLoading(false)
-        return
-      }
-
-      // Wait for Supabase session to be fully established in cookies
-      // before navigating. On iOS Safari, cookies may not be immediately
-      // available, and the middleware will redirect back to /login.
       const supabase = (await import("@/lib/supabase/client")).createClient()
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        // Session not ready yet — retry after a short delay
-        await new Promise((resolve) => setTimeout(resolve, 500))
-        await supabase.auth.getSession()
-      }
-
-      if (redirectParam) {
-        // Use hard navigation to ensure fresh cookies reach middleware
-        window.location.href = redirectParam
-      } else if (data.user) {
-        const { data: restaurant } = await supabase
-          .from("restaurants")
-          .select("id")
-          .eq("owner_id", data.user.id)
-          .maybeSingle()
-        window.location.href = restaurant ? "/dashboard" : "/restaurants"
-      } else {
-        window.location.href = "/restaurants"
-      }
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || location.origin
+      const cb = redirectParam
+        ? `${baseUrl}/auth/callback?redirect=${redirectParam}`
+        : `${baseUrl}/auth/callback`
+      await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: cb },
+      })
     } catch {
-      setError("Incorrect email or password")
+      setError("Something went wrong. Please try again.")
       setLoading(false)
     }
   }
@@ -112,40 +58,14 @@ function LoginForm() {
         Continue with Google
       </Button>
 
-      <div className="relative w-full flex items-center justify-center mb-5">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-[#F0F0F0]" />
+      {error && (
+        <div className="w-full bg-red-50 border border-red-100 rounded-xl px-4 py-3">
+          <p className="text-xs text-[#DC2626]">{error}</p>
         </div>
-        <span className="relative px-4 bg-white text-xs text-[#999] uppercase tracking-wider">or</span>
-      </div>
-
-      <form onSubmit={handleEmailLogin} className="w-full space-y-4">
-        <Input label="Email" id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" required />
-        <PasswordInput label="Password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your password" required />
-
-        {error && (
-          <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3">
-            <p className="text-xs text-[#DC2626]">{error}</p>
-          </div>
-        )}
-
-        <div className="text-right">
-          <button
-            type="button"
-            onClick={() => alert("Please contact support@digitalmenue.com to reset your password")}
-            className="text-sm text-[#25D366] hover:text-[#1da851] transition-colors font-medium min-h-[44px]"
-          >
-            Forgot Password?
-          </button>
-        </div>
-
-        <Button type="submit" variant="primary" fullWidth loading={loading}>
-          {loading ? "Signing in..." : "Sign In"}
-        </Button>
-      </form>
+      )}
 
       <div className="flex flex-col items-center gap-3 mt-6 w-full">
-        <Link href="/signup" className="text-sm text-[#555] hover:text-black transition-colors">
+        <Link href="/signup/restaurant" className="text-sm text-[#555] hover:text-black transition-colors">
           Don&apos;t have an account? <span className="text-[#25D366] font-semibold">Sign up</span>
         </Link>
         <Link href="/" className="text-xs text-[#999] hover:text-black transition-colors">

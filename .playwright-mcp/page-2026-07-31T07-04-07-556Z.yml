@@ -1,0 +1,30 @@
+- generic [active] [ref=f1e1]:
+  - main [ref=f1e2]:
+    - generic [ref=f1e5]:
+      - generic [ref=f1e6]:
+        - heading "Welcome back" [level=1] [ref=f1e16]
+        - paragraph [ref=f1e17]: Sign in to your account
+      - button "Continue with Google" [ref=f1e18] [cursor=pointer]
+      - generic [ref=f1e24]: or
+      - generic [ref=f1e28]:
+        - generic [ref=f1e29]:
+          - generic [ref=f1e30]: Email*
+          - textbox "Email*" [ref=f1e31]:
+            - /placeholder: your@email.com
+            - text: test@nonexistent.com
+        - generic [ref=f1e32]:
+          - generic [ref=f1e33]: Password
+          - generic [ref=f1e34]:
+            - textbox "Password" [ref=f1e35]:
+              - /placeholder: Enter your password
+              - text: WrongPass123!
+            - button [ref=f1e36] [cursor=pointer]
+        - paragraph [ref=f1e48]: Incorrect email or password
+        - button "Forgot Password?" [ref=f1e41] [cursor=pointer]
+        - button "Sign In" [ref=f1e42] [cursor=pointer]
+      - generic [ref=f1e43]:
+        - link "Don't have an account? Sign up" [ref=f1e44] [cursor=pointer]:
+          - /url: /signup
+        - link "Back to home" [ref=f1e45] [cursor=pointer]:
+          - /url: /
+  - alert [ref=f1e46]

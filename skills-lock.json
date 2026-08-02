@@ -6,6 +6,36 @@
       "sourceType": "github",
       "skillPath": ".claude/skills/backend-development/SKILL.md",
       "computedHash": "dedbc6bb7afa2c16ac6b3451a435a198af0e5d3786b30a15d40910ba207fd6e3"
+    },
+    "competitive-analysis": {
+      "source": "mverab/egeoagents",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/competitive-analysis/SKILL.md",
+      "computedHash": "7de79b8d9da4da59d36b37f2a24c234cc4d3bafca04c6f7355b8446f30996658"
+    },
+    "content-scoring": {
+      "source": "mverab/egeoagents",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/content-scoring/SKILL.md",
+      "computedHash": "2bd35f90809e625dd53b76589227bbc8affdbfa8fcde933364eaf7993f39bab8"
+    },
+    "geo-loop": {
+      "source": "mverab/egeoagents",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/geo-loop/SKILL.md",
+      "computedHash": "77b93c9734a00a5443dd4ef3af174b5bef303fa16eb7c947014ff54532c2e8f5"
+    },
+    "schema-generator": {
+      "source": "mverab/egeoagents",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/schema-generator/SKILL.md",
+      "computedHash": "f32f5352aa06ff98b2d096bfc0be7ea2b0b8386ee9fd572099d432500f7374b6"
+    },
+    "validation-doctor": {
+      "source": "mverab/egeoagents",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/validation-doctor/SKILL.md",
+      "computedHash": "b94989df847ef886aa136cf502e92989f0dfb4cc4a3cc74b4d44c54044f57874"
     }
   }
 }

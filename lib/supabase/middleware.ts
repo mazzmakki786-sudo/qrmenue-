@@ -79,14 +79,35 @@ export async function updateSession(request: NextRequest) {
       }
     }
     if (!cachedId) {
-      // User is logged in but doesn't own a restaurant — redirect to customer home
-      return NextResponse.redirect(new URL("/restaurants", request.url))
+      // User is logged in but doesn't own a restaurant — redirect to signup
+      return NextResponse.redirect(new URL("/signup/restaurant", request.url))
     }
   }
 
   if (pathname.startsWith("/account")) {
     if (!user) {
       return NextResponse.redirect(new URL("/login/customer?redirect=/account", request.url))
+    }
+  }
+
+  // A user who already has a customer account cannot become a restaurant owner.
+  // Send them away from the restaurant signup form early (RLS blocks the insert
+  // too — this is a clean UX guard).
+  if (pathname.startsWith("/signup/restaurant")) {
+    if (user) {
+      try {
+        const { data: existingCustomer } = await supabase
+          .from("customers")
+          .select("id")
+          .eq("id", user.id)
+          .maybeSingle()
+        if (existingCustomer) {
+          return NextResponse.redirect(new URL("/account", request.url))
+        }
+      } catch (err) {
+        console.error("[middleware] customer check failed:", err)
+        // Pass through — let the client-side guard handle it
+      }
     }
   }
 

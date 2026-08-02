@@ -33,7 +33,11 @@ function getStepState(
   }
 
   if (stepIndex < orderIndex) return "done"
-  if (stepIndex === orderIndex) return "current"
+  if (stepIndex === orderIndex) {
+    // Completed is a terminal state — no "In Progress" badge for it
+    if (currentStatus === "completed") return "done"
+    return "current"
+  }
   return "pending"
 }
 

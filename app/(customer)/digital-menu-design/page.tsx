@@ -382,6 +382,24 @@ export default function DigitalMenuDesignPage() {
           </div>
         </section>
 
+        {/* Explore More — internal link hub */}
+        <section className="py-16 md:py-20">
+          <div className="max-w-3xl mx-auto px-5 text-center">
+            <h2 className="text-lg font-bold mb-4">Explore More Digital Menu Solutions</h2>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <Link href="/digital-menu-for-restaurants" className="px-4 py-2 rounded-full bg-[#F5F5F5] text-sm font-medium hover:bg-black hover:text-white transition-colors">
+                Digital Menu for Restaurants
+              </Link>
+              <Link href="/digital-menu-pdf" className="px-4 py-2 rounded-full bg-[#F5F5F5] text-sm font-medium hover:bg-black hover:text-white transition-colors">
+                PDF to QR Menu
+              </Link>
+              <Link href="/digital-menu-app" className="px-4 py-2 rounded-full bg-[#F5F5F5] text-sm font-medium hover:bg-black hover:text-white transition-colors">
+                Digital Menu App
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* CTA */}
         <section className="py-16 md:py-24 bg-black text-white">
           <div className="max-w-2xl mx-auto px-5 text-center">

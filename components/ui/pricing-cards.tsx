@@ -55,8 +55,7 @@ const Pricing2 = ({
   return (
     <section className="bg-[#FAFAFA] py-16 md:py-24">
       <div className="max-w-6xl mx-auto px-5">
-        {(heading || description) && (
-          <div className="text-center mb-12">
+        <div className="text-center mb-12">
             {heading && <h2 className="text-2xl md:text-3xl font-bold mb-3">{heading}</h2>}
             {description && <p className="speakable-pricing-desc text-sm text-[#888] max-w-md mx-auto">{description}</p>}
             {plans.length > 1 && (
@@ -71,7 +70,6 @@ const Pricing2 = ({
               </div>
             )}
           </div>
-        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
           {plans.map((plan, i) => {

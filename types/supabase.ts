@@ -229,6 +229,7 @@ export type Database = {
           customer_name: string
           customer_phone: string | null
           delivery_address: string | null
+          delivery_fee: number | null
           email_sent: boolean | null
           id: string
           items: Json
@@ -240,6 +241,7 @@ export type Database = {
           prepared_at: string | null
           ready_at: string | null
           restaurant_id: string
+          table_id: string | null
           table_number: string | null
           total_price: number
           updated_at: string | null
@@ -251,6 +253,7 @@ export type Database = {
           customer_name: string
           customer_phone?: string | null
           delivery_address?: string | null
+          delivery_fee?: number | null
           email_sent?: boolean | null
           id?: string
           items: Json
@@ -262,6 +265,7 @@ export type Database = {
           prepared_at?: string | null
           ready_at?: string | null
           restaurant_id: string
+          table_id?: string | null
           table_number?: string | null
           total_price: number
           updated_at?: string | null
@@ -273,6 +277,7 @@ export type Database = {
           customer_name?: string
           customer_phone?: string | null
           delivery_address?: string | null
+          delivery_fee?: number | null
           email_sent?: boolean | null
           id?: string
           items?: Json
@@ -284,6 +289,7 @@ export type Database = {
           prepared_at?: string | null
           ready_at?: string | null
           restaurant_id?: string
+          table_id?: string | null
           table_number?: string | null
           total_price?: number
           updated_at?: string | null

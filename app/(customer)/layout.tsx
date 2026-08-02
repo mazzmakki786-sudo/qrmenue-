@@ -28,6 +28,11 @@ export default function CustomerLayout({
     "/digital-menu-tablet",
     "/digital-menu-app",
     "/qr-menu-login",
+    "/digital-menu-pakistan",
+    "/qr-menu-pakistan",
+    "/digital-menu-islamabad",
+    "/digital-menu-lahore",
+    "/digital-menu-karachi",
   ]
   const hideNav = seoLandingPaths.includes(pathname)
 

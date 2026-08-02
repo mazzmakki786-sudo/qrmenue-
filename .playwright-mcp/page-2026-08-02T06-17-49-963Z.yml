@@ -1,0 +1,26 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - heading "Welcome back" [level=1] [ref=e16]
+        - paragraph [ref=e17]: Sign in to your customer account
+      - generic [ref=e18]:
+        - generic [ref=e19]:
+          - generic [ref=e20]: Phone Number **
+          - textbox "Phone Number **" [ref=e21]:
+            - /placeholder: 03XX-XXXXXXX
+        - generic [ref=e22]:
+          - generic [ref=e23]: Password *
+          - generic [ref=e24]:
+            - textbox "Password *" [ref=e25]:
+              - /placeholder: Enter your password
+            - button [ref=e26] [cursor=pointer]
+        - generic [ref=e30] [cursor=pointer]:
+          - checkbox "Remember me" [ref=e31]
+          - generic [ref=e32]: Remember me
+        - button "Sign In" [ref=e33] [cursor=pointer]
+      - generic [ref=e34]:
+        - button "Don't have an account? Sign up" [ref=e35] [cursor=pointer]
+        - link "Back to restaurants" [ref=e36] [cursor=pointer]:
+          - /url: /restaurants
+  - alert [ref=e37]

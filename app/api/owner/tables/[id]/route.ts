@@ -9,6 +9,7 @@ const updateTableSchema = z.object({
   table_number: z.string().min(1).max(10).optional(),
   capacity: z.number().int().positive().optional(),
   is_active: z.boolean().optional(),
+  is_occupied: z.boolean().optional(),
 })
 
 export const PATCH = safeRoute(async (request, { params }) => {
@@ -45,7 +46,7 @@ export const PATCH = safeRoute(async (request, { params }) => {
     .update(parsed.data)
     .eq("id", id)
     .eq("restaurant_id", restaurantId)
-    .select("id, table_number, capacity, is_active, created_at")
+    .select("id, table_number, capacity, is_active, is_occupied, created_at")
     .single()
 
   if (error) {
@@ -75,13 +76,17 @@ export const DELETE = safeRoute(async (request, { params }) => {
 
   const { data: existing } = await admin
     .from("restaurant_tables")
-    .select("id")
+    .select("id, is_occupied, table_number")
     .eq("id", id)
     .eq("restaurant_id", restaurantId)
     .single()
 
   if (!existing) {
     return NextResponse.json({ error: "Table not found" }, { status: 404 })
+  }
+
+  if (existing.is_occupied) {
+    return NextResponse.json({ error: `Table ${existing.table_number} is currently occupied. Free the table before deleting.` }, { status: 409 })
   }
 
   const { error } = await admin.from("restaurant_tables").delete().eq("id", id).eq("restaurant_id", restaurantId)

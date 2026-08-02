@@ -15,6 +15,7 @@ import { AnnouncementsPanel } from "@/components/superadmin/AnnouncementsPanel"
 import { ActivityLogView } from "@/components/superadmin/ActivityLogView"
 import { PlanManager } from "@/components/superadmin/PlanManager"
 import { ContactInquiriesPanel } from "@/components/superadmin/ContactInquiriesPanel"
+import { AddUserModal } from "./AddUserModal"
 
 // Dynamic import for heavy analytics view with recharts
 const AnalyticsView = dynamic(
@@ -32,6 +33,8 @@ function LoginForm({ onLogin, locked }: { onLogin: () => void; locked: boolean }
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [clearing, setClearing] = useState(false)
+  const [cleared, setCleared] = useState(false)
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -52,20 +55,49 @@ function LoginForm({ onLogin, locked }: { onLogin: () => void; locked: boolean }
   }
 
   if (locked) {
+    const handleClearLockout = async () => {
+      setClearing(true)
+      try {
+        await fetch("/api/superadmin/clear-lockout", { method: "POST" })
+        setCleared(true)
+      } catch (e) {
+        console.error("Failed to clear lockout:", e)
+      }
+      setClearing(false)
+    }
+
+    if (cleared) {
+      return (
+        <div className="fixed inset-0 z-[60] bg-white flex items-center justify-center px-4">
+          <div className="text-center max-w-sm">
+            <LogoIcon className="w-12 h-12 mx-auto mb-4" />
+            <h1 className="text-xl font-bold mb-2">Lockout Cleared</h1>
+            <p className="text-sm text-[#555] mb-6">
+              Your lockout has been cleared. Try signing in again.
+            </p>
+            <button onClick={onLogin} className="h-11 px-6 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 transition-opacity">Try Again</button>
+          </div>
+        </div>
+      )
+    }
+
     return (
       <div className="fixed inset-0 z-[60] bg-white flex items-center justify-center px-4">
         <div className="text-center max-w-sm">
           <LogoIcon className="w-12 h-12 mb-4 mx-auto" />
           <h1 className="text-xl font-bold mb-2">Access Denied</h1>
           <p className="text-sm text-[#555] mb-6">
-            You do not have permission to access this panel.
+            Account locked due to multiple failed attempts.
           </p>
           <div className="bg-[#F9FAFB] rounded-xl p-4 text-left space-y-2 mb-6">
-            <p className="text-xs font-medium text-[#555]">To request access:</p>
+            <p className="text-xs font-medium text-[#555]">Locked Out</p>
             <p className="text-xs text-[#555]">
-              Contact your system administrator for assistance.
+              Reset your lockout below, or contact your system administrator.
             </p>
           </div>
+          <button onClick={handleClearLockout} disabled={clearing} className="h-11 px-6 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50">
+            {clearing ? "Clearing..." : "Reset Lockout"}
+          </button>
         </div>
       </div>
     )
@@ -105,6 +137,35 @@ function LoginForm({ onLogin, locked }: { onLogin: () => void; locked: boolean }
 }
 
 function AccessDenied({ onLogout }: { onLogout: () => void }) {
+  const [clearing, setClearing] = useState(false)
+  const [cleared, setCleared] = useState(false)
+
+  const handleClearLockout = async () => {
+    setClearing(true)
+    try {
+      await fetch("/api/superadmin/clear-lockout", { method: "POST" })
+      setCleared(true)
+    } catch (e) {
+      console.error("Failed to clear lockout:", e)
+    }
+    setClearing(false)
+  }
+
+  if (cleared) {
+    return (
+      <div className="fixed inset-0 z-[60] bg-white flex items-center justify-center px-4">
+        <div className="text-center max-w-sm">
+          <LogoIcon className="w-12 h-12 mx-auto mb-4" />
+          <h1 className="text-xl font-bold mb-2">Lockout Cleared</h1>
+          <p className="text-sm text-[#555] mb-6">
+            Your lockout has been cleared. Try signing in again.
+          </p>
+          <button onClick={onLogout} className="h-11 px-6 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 transition-opacity">Sign In Again</button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="fixed inset-0 z-[60] bg-white flex items-center justify-center px-4">
       <div className="text-center max-w-sm">
@@ -113,7 +174,12 @@ function AccessDenied({ onLogout }: { onLogout: () => void }) {
         <p className="text-sm text-[#555] mb-6">
           You do not have permission to access this panel.
         </p>
-        <button onClick={onLogout} className="h-11 px-6 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 transition-opacity">Sign Out & Try Again</button>
+        <div className="flex flex-col gap-3">
+          <button onClick={onLogout} className="h-11 px-6 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 transition-opacity">Sign Out & Try Again</button>
+          <button onClick={handleClearLockout} disabled={clearing} className="h-11 px-6 rounded-xl border border-[#F0F0F0] text-sm font-medium hover:bg-[#F9FAFB] transition-opacity disabled:opacity-50">
+            {clearing ? "Clearing..." : "Reset Lockout"}
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -131,7 +197,7 @@ const TABS: { id: Tab; label: string; icon: any }[] = [
 
 export default function SuperAdminClient({ currentUserEmail }: { currentUserEmail: string }) {
   const [user, setUser] = useState<{ email: string } | null>(null)
-  const [checking, setChecking] = useState(false)
+  const [checking, setChecking] = useState(true)
   const [isSuperAdmin, setIsSuperAdmin] = useState(false)
   const [isLocked, setIsLocked] = useState(false)
   const searchParams = useSearchParams()
@@ -142,6 +208,7 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
   const [loading, setLoading] = useState(true)
   const [showActivityLog, setShowActivityLog] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [showAddUser, setShowAddUser] = useState(false)
 
   const supabase = createClient()
   const router = useRouter()
@@ -167,6 +234,12 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
     } catch {
       setIsSuperAdmin(false)
       setLoading(false)
+    } finally {
+      // CRITICAL FIX: checking MUST always resolve to false after the admin
+      // check completes. Previously it was only cleared on the "no session"
+      // branch — so any logged-in superadmin who navigated (tab switch,
+      // detail page, browser back) got stuck on the infinite "Loading..." gate.
+      setChecking(false)
     }
   }, [])
 
@@ -198,7 +271,24 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
     }
   }, [isSuperAdmin, resetInactivityTimer])
 
-  // Auth handled by LoginForm — no auto-detection
+  // Auto-detect existing session on mount
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session?.user?.email) {
+          setUser({ email: session.user.email })
+          await verifyAdmin(session.user.email)
+        } else {
+          setChecking(false)
+        }
+      } catch {
+        setChecking(false)
+      }
+    }
+    checkSession()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const fetchRestaurants = useCallback(async () => {
     try {
@@ -217,7 +307,7 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
       if (res.ok) {
         const json = await res.json()
         const map: Record<string, { email: string; last_sign_in_at: string | null }> = {}
-        ;(json.users || []).forEach((u: any) => { map[u.id] = { email: u.email, last_sign_in_at: u.last_sign_in_at } })
+        ;(json.data || []).forEach((u: any) => { map[u.id] = { email: u.email, last_sign_in_at: u.last_sign_in_at } })
         setUsers(map)
       }
     } catch (e) { console.error("Failed to fetch users", e) }
@@ -308,10 +398,19 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
               )
             })}
           </nav>
-          <button onClick={() => setShowActivityLog(true)} className="shrink-0 text-[10px] md:text-xs text-black hover:opacity-70 transition-opacity flex items-center gap-1.5 pb-2">
-            <Clock className="w-3.5 h-3.5 md:w-4 md:h-4" />
-            <span className="hidden sm:inline">Activity Log</span>
-          </button>
+          <div className="flex items-center gap-2 pb-2">
+            <button
+              onClick={() => setShowAddUser(true)}
+              className="shrink-0 text-[10px] md:text-xs text-black hover:opacity-70 transition-opacity flex items-center gap-1.5 font-semibold border border-black rounded-lg px-3 py-1"
+            >
+              <Users className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              <span className="hidden sm:inline">Add Owner</span>
+            </button>
+            <button onClick={() => setShowActivityLog(true)} className="shrink-0 text-[10px] md:text-xs text-black hover:opacity-70 transition-opacity flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              <span className="hidden sm:inline">Activity Log</span>
+            </button>
+          </div>
         </div>
 
         {loading ? (
@@ -337,6 +436,7 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
         )}
       </div>
       <ActivityLogView open={showActivityLog} onClose={() => setShowActivityLog(false)} />
+      <AddUserModal open={showAddUser} onClose={() => setShowAddUser(false)} onSuccess={() => { setShowAddUser(false); loadData() }} />
     </div>
   )
 }

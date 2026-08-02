@@ -11,6 +11,7 @@ import {
   clearLoginAttempts,
 } from "@/lib/account-lockout"
 import { sendLockoutAlert } from "@/lib/email"
+import { isSuperAdmin } from "@/lib/superadmin-security"
 import type { NextRequest } from "next/server"
 
 const LOGIN_RATE_LIMIT_MAX = 10
@@ -108,6 +109,19 @@ export const POST = safeRoute(async (request) => {
       { error: "Incorrect email or password" },
       { status: 401 }
     )
+  }
+
+  // Owner email/password login was removed — this endpoint now serves only
+  // the superadmin panel. Reject any non-superadmin (e.g. restaurant owners
+  // or plain customers) and revoke their session.
+  if (!(await isSuperAdmin(data.user.email))) {
+    await supabase.auth.signOut()
+    console.warn("[Auth Login] non-superadmin rejected", {
+      email: sanitizedEmail,
+      ip,
+      timestamp: new Date().toISOString(),
+    })
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
   await clearLoginAttempts(sanitizedEmail)

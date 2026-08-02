@@ -7,18 +7,19 @@ import { DEFAULT_TRIAL_LIMITS, GRACE_PERIOD_DAYS, type Plan } from "@/lib/subscr
 import { getEffectiveLimitsFromDB } from "@/lib/subscription-db"
 import { checkAndSendOrderLimitAlert } from "@/lib/email/orderLimitAlert"
 import { sendPushNotification } from "@/lib/push-server"
+import { sendCustomerPushNotification, createCustomerNotification } from "@/lib/customer-notifications"
 import { safeRoute } from "@/lib/api-error"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 import { csrfGuard } from "@/lib/csrf"
+import { normalizePhone } from "@/lib/auth-validation"
 import { buildWhatsAppURL } from "@/lib/whatsapp"
 import { isRestaurantOpen } from "@/lib/restaurant-hours"
 import { logCustomerAction, getIpSimple } from "@/lib/owner-audit"
-import { restaurantCache, dishPriceCache, Cache } from "@/lib/cache"
+import { restaurantCache, dishPriceCache } from "@/lib/cache"
+import { getOrderCountFromDB, invalidateOrderCount } from "@/lib/subscription-usage"
+import { createLogger } from "@/lib/logger"
 
-// ── In-memory order count cache ──
-// Avoids querying the order-count DB table on every POST.
-// Short TTL (10s) ensures freshness while still providing a good hit rate.
-const orderCountCache = new Cache<number>("order-count")
+const log = createLogger("orders")
 
 const orderItemSchema = z.object({
   id: z.string(),
@@ -114,7 +115,7 @@ export const POST = safeRoute(async (request) => {
   if (!restaurant) {
     const { data } = await supabase
       .from("restaurants")
-      .select("id, phone, is_active, is_suspended, is_open, plan, plan_end_date, trial_end, opening_time, closing_time, opening_hours")
+      .select("id, phone, is_active, is_suspended, is_open, plan, plan_end_date, trial_end, trial_start, plan_start_date, opening_time, closing_time, opening_hours, plan_limits_override")
       .eq("id", restaurantId)
       .single()
 
@@ -162,7 +163,7 @@ export const POST = safeRoute(async (request) => {
     }
   }
 
-  // ── Step 2: Dish price verification (cached) ──
+  // ── Step 2: Dish price & availability verification (cached) ──
   const dishIds = parsed.data.items.map(item => item.id)
 
   // Build cache key from sorted dish IDs for cacheability
@@ -170,13 +171,14 @@ export const POST = safeRoute(async (request) => {
   const dishCacheKey = `dishes:${restaurantId}:${sortedDishIds.join(",")}`
 
   let dishPriceMap: Map<string, number> | undefined
+  let dishAvailabilityMap: Map<string, boolean> | undefined
   const cachedPrices = dishPriceCache.get(dishCacheKey) as Record<string, number> | undefined
   if (cachedPrices) {
     dishPriceMap = new Map(Object.entries(cachedPrices))
   } else {
     const { data: dishes, error: dishesError } = await supabase
       .from("dishes")
-      .select("id, price")
+      .select("id, price, is_available")
       .in("id", dishIds)
       .eq("restaurant_id", restaurantId)
 
@@ -185,6 +187,7 @@ export const POST = safeRoute(async (request) => {
     }
 
     dishPriceMap = new Map(dishes.map(d => [d.id, d.price]))
+    dishAvailabilityMap = new Map(dishes.map(d => [d.id, d.is_available ?? true]))
 
     // Cache as plain object for serialization
     const priceObj: Record<string, number> = {}
@@ -192,7 +195,7 @@ export const POST = safeRoute(async (request) => {
     dishPriceCache.set(dishCacheKey, priceObj, 15_000) // 15 second TTL
   }
 
-  // Verify each item's price matches the database and recalculate subtotals
+  // Verify each item's price matches the database, check availability, and recalculate subtotals
   const recalculatedItems: Array<{
     id: string
     name_en: string
@@ -214,6 +217,16 @@ export const POST = safeRoute(async (request) => {
         { status: 400 }
       )
     }
+    // Check dish availability (only if we queried for it, i.e. cache miss)
+    if (dishAvailabilityMap) {
+      const isAvailable = dishAvailabilityMap.get(item.id)
+      if (isAvailable === false) {
+        return NextResponse.json(
+          { error: `"${item.name_en}" is currently unavailable` },
+          { status: 400 }
+        )
+      }
+    }
     recalculatedItems.push({
       ...item,
       price: dbPrice,
@@ -229,23 +242,21 @@ export const POST = safeRoute(async (request) => {
   }
 
   // ── Step 3: Order count check (cached, 10s TTL) ──
-  // Uses in-memory cache to avoid the COUNT query on every order.
-  const countCacheKey = `count:${restaurantId}`
-  let orderCount: number | undefined = orderCountCache.get(countCacheKey)
-
-  if (orderCount === undefined) {
-    const { count: dbCount } = await supabase
-      .from("orders")
-      .select("id", { count: "exact", head: true })
-      .eq("restaurant_id", restaurantId)
-      .neq("order_status", "cancelled")
-    orderCount = dbCount ?? 0
-    orderCountCache.set(countCacheKey, orderCount, 10_000)
-  }
+  // Counts non-cancelled orders since the current plan's start (trial_start for
+  // trial, plan_start_date for paid) so usage resets on plan change.
+  const orderCount = await getOrderCountFromDB(
+    {
+      id: restaurantId,
+      plan: restaurant.plan,
+      trial_start: restaurant.trial_start ?? null,
+      plan_start_date: restaurant.plan_start_date ?? null,
+    },
+    supabase
+  )
 
   const orderLimit = restaurant.plan === "trial"
     ? (await loadTrialLimitsFromDB()).maxOrders ?? DEFAULT_TRIAL_LIMITS.maxOrders
-    : (await getEffectiveLimitsFromDB(restaurant.plan as Plan, null)).maxOrders
+    : (await getEffectiveLimitsFromDB(restaurant.plan as Plan, restaurant.plan_limits_override)).maxOrders
 
   if (orderCount >= orderLimit) {
     return NextResponse.json({
@@ -284,11 +295,27 @@ export const POST = safeRoute(async (request) => {
     if (parsed.data.customer_id) {
       const customerData: Record<string, any> = { id: parsed.data.customer_id }
       if (parsed.data.customer_name) customerData.name = parsed.data.customer_name
-      if (parsed.data.customer_phone) customerData.phone = parsed.data.customer_phone
+      if (parsed.data.customer_phone) customerData.phone = normalizePhone(parsed.data.customer_phone)
       await adminSupabase.from("customers").upsert(
         customerData,
         { onConflict: "id", ignoreDuplicates: false }
       )
+    }
+
+    // ── Validate deal_id exists before INSERT (prevents FK violation) ──
+    if (parsed.data.deal_id) {
+      const { data: deal } = await adminSupabase
+        .from("deals")
+        .select("id")
+        .eq("id", parsed.data.deal_id)
+        .eq("restaurant_id", restaurantId)
+        .maybeSingle()
+
+      if (!deal) {
+        log.warn("Stale deal_id cleared", { deal_id: parsed.data.deal_id, restaurant_id: restaurantId })
+        // Clear the stale deal silently instead of failing the whole order
+        parsed.data.deal_id = null
+      }
     }
 
     // ── Order INSERT ──
@@ -316,11 +343,26 @@ export const POST = safeRoute(async (request) => {
       .single()
 
     if (error) {
-      return NextResponse.json({ error: "Failed to create order" }, { status: 400 })
+      log.error("INSERT failed", { code: error.code, message: error.message, details: error.details, restaurant_id: restaurantId })
+
+      // Return a more descriptive error based on the Postgres error code
+      if (error.code === "23503") {
+        return NextResponse.json({ error: "Invalid reference in order. Please try again." }, { status: 400 })
+      }
+      if (error.code === "23505") {
+        return NextResponse.json({ error: "Order number conflict. Please try again." }, { status: 409 })
+      }
+      if (error.code === "23514" || error.code === "23502") {
+        return NextResponse.json({ error: "Invalid order data. Please check your input." }, { status: 400 })
+      }
+      if (error.code === "42P01" || error.code === "42703") {
+        return NextResponse.json({ error: "System configuration error. Please contact support." }, { status: 500 })
+      }
+      return NextResponse.json({ error: "Failed to create order. Please try again." }, { status: 400 })
     }
 
     // Invalidate order count cache so the next request reflects the new order
-    orderCountCache.invalidate(`count:${restaurantId}`)
+    invalidateOrderCount(restaurantId)
 
     // ── Mark table occupied (dine-in only) ──
     if (parsed.data.order_type === "dine_in" && parsed.data.table_number && data.table_number) {
@@ -330,7 +372,7 @@ export const POST = safeRoute(async (request) => {
         .eq("restaurant_id", restaurantId)
         .eq("table_number", parsed.data.table_number)
         .then(({ error: occupyErr }) => {
-          if (occupyErr) console.error("[orders] Failed to mark table occupied:", occupyErr.message)
+          if (occupyErr) log.error("Failed to mark table occupied", { message: occupyErr.message, restaurant_id: restaurantId, table: parsed.data.table_number })
         })
     }
 
@@ -356,16 +398,39 @@ export const POST = safeRoute(async (request) => {
       order_id: data.id,
       type: "order_email",
       status: "sent",
-    })).catch(console.error)
+    })).catch((err: any) => log.error("Notification log insert failed", { message: err?.message }))
 
     // ── Fire-and-forget: more non-critical side effects ──
-    checkAndSendOrderLimitAlert(restaurantId).catch(console.error)
+    checkAndSendOrderLimitAlert(restaurantId).catch((err: any) => log.warn("Order limit alert failed", { message: err?.message }))
     sendPushNotification(restaurantId, {
       title: `New Order #${orderNumber}`,
       body: `${parsed.data.customer_name} — ${formatPrice(recalculatedTotal)}`,
       url: `/dashboard/orders/${data.id}`,
       tag: `order-${data.id}`,
-    }).catch((err: any) => console.error("[orders] Push send failed:", err))
+    }).catch((err: any) => log.error("Push send failed", { message: err?.message }))
+
+    // ── Customer notification on order creation ──
+    if (parsed.data.customer_id) {
+      sendCustomerPushNotification(parsed.data.customer_id, {
+        title: "Order Confirmed!",
+        body: `Your order #${orderNumber} of ${formatPrice(recalculatedTotal)} has been placed successfully at ${parsed.data.customer_name}`,
+        url: `/order-confirm/${data.id}`,
+        tag: `order-${data.id}`,
+        icon: "/og-image.png",
+      }).catch((err: any) => log.error("Customer push on create failed", { message: err?.message }))
+
+      createCustomerNotification({
+        customer_id: parsed.data.customer_id,
+        order_id: data.id,
+        type: "order_confirmed",
+        title_en: "Order Confirmed!",
+        title_ur: "رڈرآ رایت!",
+        body_en: `Your order #${orderNumber} of ${formatPrice(recalculatedTotal)} has been placed successfully.`,
+        body_ur: `ےہ لےک ےہ رایت رڈرآ #${orderNumber}`,
+        data: { total_price: recalculatedTotal, order_type: parsed.data.order_type },
+      }).catch((err: any) => log.error("Create notification failed", { message: err?.message }))
+    }
+
     logCustomerAction(
       parsed.data.customer_id || null,
       "order_created",
@@ -376,7 +441,7 @@ export const POST = safeRoute(async (request) => {
         order_type: parsed.data.order_type,
       },
       getIpSimple(request)
-    ).catch(console.error)
+    ).catch((err: any) => log.warn("logCustomerAction failed", { message: err?.message }))
 
     return NextResponse.json({
       order: data,

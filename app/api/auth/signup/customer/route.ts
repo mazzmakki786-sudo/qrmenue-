@@ -22,19 +22,25 @@ export const POST = safeRoute(async (request) => {
     )
   }
 
-  const { name, email, password } = parsed.data
+  const { name, phone, password } = parsed.data
+
+  // phoneSchema already normalizes to canonical 11-digit form; generate the
+  // internal email from the SAME normalized value used for storage/lookup so
+  // login always resolves the same account regardless of input format.
+  const internalEmail = `customer_${phone}@customer.digitalmenue.com`
+
   const admin = createAdminClient()
 
   const { data: authData, error: authError } = await admin.auth.admin.createUser({
-    email: sanitize(email),
+    email: internalEmail,
     password,
     email_confirm: true,
-    user_metadata: { full_name: sanitize(name) },
+    user_metadata: { full_name: sanitize(name), phone },
   })
 
   if (authError) {
     console.warn("[Auth Customer Signup] auth failure", {
-      email,
+      phone,
       code: authError.code,
       timestamp: new Date().toISOString(),
     })
@@ -47,12 +53,13 @@ export const POST = safeRoute(async (request) => {
   const { error: insertError } = await admin.from("customers").insert({
     id: authData.user.id,
     name: sanitize(name),
-    email: sanitize(email),
+    phone, // already normalized to canonical form by phoneSchema
+    email: internalEmail,
   })
 
   if (insertError) {
     console.warn("[Auth Customer Signup] db insert failure", {
-      email,
+      phone,
       code: insertError.code,
       timestamp: new Date().toISOString(),
     })

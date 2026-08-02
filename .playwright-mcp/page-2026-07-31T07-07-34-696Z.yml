@@ -1,0 +1,32 @@
+- main [ref=f5e2]:
+  - generic [ref=f5e3]:
+    - complementary [ref=f5e4]:
+      - generic [ref=f5e16]:
+        - generic [ref=f5e17]: Digital QR
+        - generic [ref=f5e18]: Menue
+      - navigation [ref=f5e19]:
+        - link "Dashboard" [ref=f5e20] [cursor=pointer]:
+          - /url: /dashboard
+        - link "Menu" [ref=f5e27] [cursor=pointer]:
+          - /url: /dashboard/menu
+        - link "Deals" [ref=f5e34] [cursor=pointer]:
+          - /url: /dashboard/deals
+        - link "Orders" [ref=f5e40] [cursor=pointer]:
+          - /url: /dashboard/orders
+        - link "Announcements" [ref=f5e45] [cursor=pointer]:
+          - /url: /dashboard/announcements
+        - link "Analytics" [ref=f5e50] [cursor=pointer]:
+          - /url: /dashboard/analytics
+        - link "Profile" [ref=f5e54] [cursor=pointer]:
+          - /url: /dashboard/settings
+        - link "Subscription" [ref=f5e59] [cursor=pointer]:
+          - /url: /dashboard/subscription
+        - link "QR Code" [ref=f5e63] [cursor=pointer]:
+          - /url: /dashboard/qr
+      - button "Sign Out" [ref=f5e73] [cursor=pointer]
+    - generic [ref=f5e78]:
+      - heading "Dashboard" [level=1] [ref=f5e81]
+      - link "Profile" [ref=f5e83] [cursor=pointer]:
+        - /url: /dashboard/settings
+    - main [ref=f5e88]:
+      - generic [ref=f5e89]: Setting up your restaurant...

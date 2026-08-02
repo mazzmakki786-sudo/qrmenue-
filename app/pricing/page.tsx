@@ -81,6 +81,11 @@ export default async function PricingPage() {
       />
       <LandingHeader />
       <div className="flex-1">
+        <section className="bg-[#FAFAFA] pt-16 md:pt-24">
+          <div className="max-w-6xl mx-auto px-5 text-center">
+            <h1 className="text-2xl md:text-3xl font-bold">Pricing — Digital QR Menue Plans</h1>
+          </div>
+        </section>
         <PricingSection
           heading="Plans & Pricing"
           description="No hidden fees. No commission on orders. Cancel anytime."

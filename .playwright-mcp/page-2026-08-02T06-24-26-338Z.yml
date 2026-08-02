@@ -1,0 +1,28 @@
+- generic [active] [ref=f2e1]:
+  - main [ref=f2e2]:
+    - generic [ref=f2e5]:
+      - generic [ref=f2e6]:
+        - heading "Create Account" [level=1] [ref=f2e16]
+        - paragraph [ref=f2e17]: Join as a customer to browse and order
+      - generic [ref=f2e18]:
+        - generic [ref=f2e19]:
+          - generic [ref=f2e20]: Full Name*
+          - textbox "Full Name*" [ref=f2e21]:
+            - /placeholder: Your name
+        - generic [ref=f2e22]:
+          - generic [ref=f2e23]: Phone Number*
+          - textbox "Phone Number*" [ref=f2e24]:
+            - /placeholder: 03XX-XXXXXXX
+        - generic [ref=f2e25]:
+          - generic [ref=f2e26]: Password
+          - generic [ref=f2e27]:
+            - textbox "Password" [ref=f2e28]:
+              - /placeholder: Create a strong password
+            - button [ref=f2e29] [cursor=pointer]
+        - button "Sign Up" [ref=f2e33] [cursor=pointer]
+      - generic [ref=f2e34]:
+        - link "Already have an account? Sign in" [ref=f2e35] [cursor=pointer]:
+          - /url: /login/customer
+        - link "Back to home" [ref=f2e36] [cursor=pointer]:
+          - /url: /
+  - alert [ref=f2e37]

@@ -1,12 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback, startTransition } from "react"
 import { Pricing2 } from "@/components/ui/pricing-cards"
 import { mergeYearlyPlans, type DBPlan } from "@/lib/map-plans"
 import Link from "next/link"
 import Image from "next/image"
 import { Check, X } from "lucide-react"
 import { useCompanySettings } from "@/lib/hooks/useCompanySettings"
+import { createClient } from "@/lib/supabase/client"
+import { uid } from "@/lib/realtime"
 
 const comparisonFeatures = [
   { label: "Menu Items", trial: "20", starter: "30", growth: "50", premium: "100" },
@@ -24,31 +26,41 @@ export function PricingClient() {
   const { settings, loading } = useCompanySettings()
   const [plans, setPlans] = useState<any[]>([])
 
-  useEffect(() => {
-    fetch("/api/plans")
-      .then((res) => res.json())
-      .then((data) => {
+  const fetchPlans = useCallback(async () => {
+    try {
+      const res = await fetch("/api/plans")
+      if (res.ok) {
+        const data = await res.json()
         if (data.plans) {
           setPlans(mergeYearlyPlans(data.plans))
         }
-      })
-      .catch(() => {})
+      }
+    } catch {}
   }, [])
+
+  useEffect(() => {
+    fetchPlans()
+  }, [fetchPlans])
+
+  // Real-time subscription — instantly reflects superadmin changes
+  useEffect(() => {
+    const supabase = createClient()
+    const channel = supabase
+      .channel(uid("pricing-client-plans"))
+      .on("postgres_changes", { event: "*", schema: "public", table: "plans" }, () => {
+        startTransition(() => fetchPlans())
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [fetchPlans])
 
   // Polling fallback — every 30s in case Realtime misses an update
   useEffect(() => {
     const interval = setInterval(() => {
-      fetch("/api/plans")
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.plans) {
-            setPlans(mergeYearlyPlans(data.plans))
-          }
-        })
-        .catch(() => {})
+      fetchPlans()
     }, 30000)
     return () => clearInterval(interval)
-  }, [])
+  }, [fetchPlans])
 
   const whatsapp = settings.whatsapp_support || "03001234567"
   const whatsappDigits = whatsapp.replace(/[^0-9]/g, "")
@@ -171,7 +183,7 @@ export function PricingClient() {
           </p>
           <div className="relative z-10">
             <Link
-              href="/signup"
+              href="/signup/restaurant"
               className="inline-block px-10 py-3.5 rounded-xl bg-white text-black text-sm font-semibold hover:bg-[#25D366] hover:text-black transition-all"
             >
               Start Free Trial — No Credit Card

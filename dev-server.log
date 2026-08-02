@@ -1,11 +1,35 @@
+
+> qrmenu@0.1.0 dev
+> next dev
+
    ▲ Next.js 15.5.18
-   - Local:        http://localhost:3001
-   - Network:      http://192.168.0.112:3001
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.103:3000
    - Environments: .env.local
    - Experiments (use with caution):
+     ⨯ webpackBuildWorker
      · optimizePackageImports
 
  ✓ Starting...
- ✓ Ready in 14.6s
-
-C:\Users\Administrator\Desktop\qr_menue>
+ ✓ Ready in 4.4s
+ ○ Compiling / ...
+ ✓ Compiled / in 14.6s (956 modules)
+ GET / 200 in 17917ms
+ ○ Compiling /api/plans ...
+ ✓ Compiled /api/plans in 1720ms (947 modules)
+ GET /api/plans 200 in 3107ms
+ GET /api/plans 200 in 921ms
+ GET / 200 in 2628ms
+ GET /api/plans 200 in 390ms
+ GET /api/plans 200 in 451ms
+ GET / 200 in 1289ms
+ GET / 200 in 1594ms
+ GET /api/plans 200 in 472ms
+ GET /api/plans 200 in 361ms
+ GET / 200 in 1851ms
+ GET /api/plans 200 in 463ms
+ GET /api/plans 200 in 366ms
+ GET / 200 in 3120ms
+ GET /api/plans 200 in 619ms
+ GET /api/plans 200 in 442ms
+ GET / 200 in 1142ms

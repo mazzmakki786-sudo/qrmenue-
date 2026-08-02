@@ -11,6 +11,7 @@ import {
   type PlanLimits,
   type SubscriptionStatus,
 } from "@/lib/subscription"
+import { getOrderCountQuery } from "@/lib/subscription-usage"
 import type { Restaurant } from "@/types"
 
 export interface UseSubscriptionReturn {
@@ -100,11 +101,9 @@ export function useSubscription(): UseSubscriptionReturn {
           .from("dishes")
           .select("id, image_url", { count: "exact" })
           .eq("restaurant_id", restaurantData.id),
-        supabase
-          .from("orders")
-          .select("id", { count: "exact", head: true })
-          .eq("restaurant_id", restaurantData.id)
-          .neq("order_status", "cancelled"),
+        // Count orders since the current plan's start (trial_start / plan_start_date)
+        // so the usage meter resets on plan change.
+        getOrderCountQuery(restaurantData as any, supabase),
         supabase
           .from("categories")
           .select("id", { count: "exact", head: true })

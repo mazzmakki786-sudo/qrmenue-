@@ -1,0 +1,9 @@
+[    3647ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://zkwwqcopkwbzbsqqxoiq.supabase.co/auth/v1/token?grant_type=refresh_token:0
+[    3652ms] [ERROR] AuthApiError: Invalid Refresh Token: Refresh Token Not Found
+    at c (https://www.digitalmenue.com/_next/static/chunks/3540-fd06a061995a029f.js:14:13220)
+    at async u (https://www.digitalmenue.com/_next/static/chunks/3540-fd06a061995a029f.js:14:14199)
+    at async h (https://www.digitalmenue.com/_next/static/chunks/3540-fd06a061995a029f.js:14:13610)
+    at async https://www.digitalmenue.com/_next/static/chunks/44530001-a9ce8b2fb3979725.js:1:36221
+    at async https://www.digitalmenue.com/_next/static/chunks/3540-fd06a061995a029f.js:14:4440 @ https://www.digitalmenue.com/_next/static/chunks/44530001-a9ce8b2fb3979725.js:0
+[    3776ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.digitalmenue.com/signup/restaurant:0
+[    5635ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.digitalmenue.com/signup/restaurant:0

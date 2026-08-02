@@ -1,0 +1,31 @@
+- generic [active] [ref=f16e1]:
+  - main [ref=f16e2]:
+    - generic [ref=f16e5]:
+      - generic [ref=f16e6]:
+        - heading "Register Your Restaurant" [level=1] [ref=f16e16]
+        - paragraph [ref=f16e17]: Start your 30-day free trial today
+      - generic [ref=f16e18]:
+        - generic [ref=f16e19]:
+          - generic [ref=f16e20]: Restaurant Name **
+          - textbox "Restaurant Name **" [ref=f16e21]:
+            - /placeholder: Al-Habib Grill
+        - generic [ref=f16e22]:
+          - generic [ref=f16e23]: City *
+          - combobox "City *" [ref=f16e24]
+        - generic [ref=f16e25]:
+          - generic [ref=f16e26]: Phone / WhatsApp **
+          - textbox "Phone / WhatsApp **" [ref=f16e27]:
+            - /placeholder: 0300-XXXXXXX
+        - generic [ref=f16e28]:
+          - generic [ref=f16e29]: Your Restaurant URL *
+          - generic [ref=f16e31]:
+            - generic [ref=f16e32]: https://www.digitalmenue.com/
+            - textbox "my-restaurant-name" [ref=f16e33]
+        - button "Create Restaurant & Start Trial" [ref=f16e34] [cursor=pointer]
+      - paragraph [ref=f16e35]: Signed in as customer_03451239876@customer.digitalmenue.com
+      - generic [ref=f16e36]:
+        - link "Already have an account? Sign in" [ref=f16e37] [cursor=pointer]:
+          - /url: /login
+        - link "Back to home" [ref=f16e38] [cursor=pointer]:
+          - /url: /
+  - alert [ref=f16e39]

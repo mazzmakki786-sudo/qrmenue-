@@ -294,6 +294,27 @@ export function RestaurantsClient({ initialRestaurants, initialCities }: Restaur
           </div>
         </section>
 
+        {/* Digital Menu Guides — internal link module */}
+        <section className="mb-6">
+          <h2 className="text-[13px] font-semibold text-black/60 mb-3">Digital Menu Guides</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {[
+              { href: "/digital-menu-for-restaurants", label: "Digital Menue Guide" },
+              { href: "/digital-menu-pdf", label: "PDF to QR Menu" },
+              { href: "/digital-menu-app", label: "Digital Menu App" },
+              { href: "/digital-menu-tablet", label: "Tablet Menu" },
+            ].map((g) => (
+              <Link
+                key={g.href}
+                href={g.href}
+                className="px-3 py-2.5 rounded-xl bg-white border border-border text-[12px] font-medium text-text-secondary hover:border-black/20 hover:text-black hover:shadow-sm transition-all text-center"
+              >
+                {g.label}
+              </Link>
+            ))}
+          </div>
+        </section>
+
         {/* Results header */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-[13px] font-semibold text-black/60">

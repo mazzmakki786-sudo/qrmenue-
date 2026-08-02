@@ -1,0 +1,40 @@
+- generic [ref=f10e1]:
+  - generic [ref=f10e3]:
+    - generic [ref=f10e4]:
+      - generic [ref=f10e6]:
+        - generic [ref=f10e7]: Loading
+        - progressbar [ref=f10e8]
+      - main [ref=f10e15]:
+        - generic [ref=f10e16]:
+          - generic [ref=f10e17]: Sign in with Google
+          - generic [ref=f10e27]:
+            - heading "Sign in" [level=1] [ref=f10e28]
+            - generic [ref=f10e30]:
+              - text: to continue to
+              - button "zkwwqcopkwbzbsqqxoiq.supabase.co" [ref=f10e31] [cursor=pointer]
+        - generic [ref=f10e39]:
+          - generic [ref=f10e44]:
+            - textbox "Email or phone" [active] [ref=f10e45]
+            - generic: Email or phone
+          - button "Forgot email?" [ref=f10e49] [cursor=pointer]
+        - generic [ref=f10e51]:
+          - button "Next" [ref=f10e55]
+          - button "Create account" [ref=f10e63]
+    - contentinfo [ref=f10e70]:
+      - combobox "Change language English (United States)" [ref=f10e74] [cursor=pointer]:
+        - generic: English (United States)
+      - list [ref=f10e76]:
+        - listitem [ref=f10e77]:
+          - link "Open Google Account Help Center (external, opens in a new window)" [ref=f10e78] [cursor=pointer]:
+            - /url: https://support.google.com/accounts?hl=en-US&p=account_iph
+            - text: Help
+        - listitem [ref=f10e79]:
+          - link "Privacy Policy (external, opens in a new window)" [ref=f10e80] [cursor=pointer]:
+            - /url: https://accounts.google.com/TOS?loc=PK&hl=en-US&privacy=true
+            - text: Privacy
+        - listitem [ref=f10e81]:
+          - link "Google Terms of Service (external, opens in a new window)" [ref=f10e82] [cursor=pointer]:
+            - /url: https://accounts.google.com/TOS?loc=PK&hl=en-US
+            - text: Terms
+  - iframe [ref=f10e83]:
+    

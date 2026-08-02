@@ -1,0 +1,3 @@
+[     302ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.digitalmenue.com/login/customer:0
+[   20993ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://www.digitalmenue.com/api/auth/customer-login:0
+[   48112ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.digitalmenue.com/login/customer:0

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { getEffectiveLimitsFromDB } from "@/lib/subscription-db"
+import { getOrderCountFromDB } from "@/lib/subscription-usage"
 import { safeRoute } from "@/lib/api-error"
 import { rateLimit, getClientIp } from "@/lib/rate-limiter"
 
@@ -19,7 +20,7 @@ export const GET = safeRoute(async (
 
   const { data: restaurant, error: rErr } = await supabase
     .from("restaurants")
-    .select("id, plan, trial_end, is_active, plan_limits_override")
+    .select("id, plan, trial_end, trial_start, plan_start_date, is_active, plan_limits_override")
     .eq("slug", slug)
     .single()
 
@@ -48,17 +49,15 @@ export const GET = safeRoute(async (
     })
   }
 
-  const { count, error: cErr } = await supabase
-    .from("orders")
-    .select("id", { count: "exact", head: true })
-    .eq("restaurant_id", restaurant.id)
-    .neq("order_status", "cancelled")
-
-  if (cErr) {
-    return NextResponse.json({ error: cErr.message }, { status: 500 })
-  }
-
-  const orderCount = count ?? 0
+  const orderCount = await getOrderCountFromDB(
+    {
+      id: restaurant.id,
+      plan: restaurant.plan,
+      trial_start: restaurant.trial_start ?? null,
+      plan_start_date: restaurant.plan_start_date ?? null,
+    },
+    supabase
+  )
   const canAccept = orderCount < limits.maxOrders
 
   let message = "Restaurant is not accepting orders right now"

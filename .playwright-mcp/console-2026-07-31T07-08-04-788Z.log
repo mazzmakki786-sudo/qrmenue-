@@ -1,0 +1,2 @@
+[     321ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.digitalmenue.com/signup/customer:0
+[   46954ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.digitalmenue.com/login/customer?message=Account%20created!%20Sign%20in%20with%20your%20phone%20number.:0

@@ -1,14 +1,14 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
-import { MapPin, Phone, ArrowLeft, UtensilsCrossed, Clock, Navigation, Truck, Timer, ShoppingCart, Minus, Plus, Trash2, Percent, ImageOff, Store, ExternalLink } from "lucide-react"
+import { MapPin, Phone, ArrowLeft, UtensilsCrossed, Clock, Navigation, Truck, Timer, ShoppingCart, Minus, Plus, Trash2, Percent, ImageOff, Store, ExternalLink, Globe, Languages } from "lucide-react"
 import { formatTo12Hour, formatPrice } from "@/lib/utils"
 import { isRestaurantOpen } from "@/lib/restaurant-hours"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { useCartStore } from "@/stores/cartStore"
 import { CartBar } from "@/components/customer/CartBar"
 import { DealBanner } from "@/components/customer/DealBanner"
@@ -149,7 +149,7 @@ function DesktopCartPanel({ effectivelyClosed, liveOpenTime, liveCloseTime }: { 
   )
 }
 
-function DesktopDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deals?: (Deal & { dish?: { id: string; name_en: string; name_ur: string | null; image_url: string | null; price: number } | null })[]; unavailable?: boolean; closed?: boolean }) {
+function DesktopDishCard({ dish, deals, getName, getDesc, displayLang, unavailable, closed }: { dish: Dish; deals?: (Deal & { dish?: { id: string; name_en: string; name_ur: string | null; image_url: string | null; price: number } | null })[]; getName: (d: Dish) => string; getDesc: (d: Dish) => string | null; displayLang?: string; unavailable?: boolean; closed?: boolean }) {
   const [imgError, setImgError] = useState(false)
   const addItem = useCartStore((s) => s.addItem)
   const items = useCartStore((s) => s.items)
@@ -200,10 +200,10 @@ function DesktopDishCard({ dish, deals, unavailable, closed }: { dish: Dish; dea
         )}
       </div>
 
-      {/* Info — flex-1 + mt-auto on action to push to bottom */}
+      {/* Info — full descriptions visible */}
       <div className="p-4 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-3 mb-1.5">
-          <h3 className="text-sm font-semibold text-text-primary leading-snug">{dish.name_en}</h3>
+          <h3 className="text-[15px] font-semibold text-text-primary leading-snug">{getName(dish)}</h3>
           <div className="text-right shrink-0">
             {dealPrice !== null ? (
               <>
@@ -216,7 +216,9 @@ function DesktopDishCard({ dish, deals, unavailable, closed }: { dish: Dish; dea
           </div>
         </div>
 
-        {dish.name_ur && <p className="text-[11px] text-text-secondary font-urdu leading-tight mb-1.5">{dish.name_ur}</p>}
+        {/* Show secondary language name below */}
+        {displayLang === "ur" && dish.name_en && <p className="text-[12px] text-text-muted leading-snug mb-1">{dish.name_en}</p>}
+        {displayLang === "en" && dish.name_ur && <p className="text-[13px] text-text-secondary font-urdu leading-snug mb-1.5">{dish.name_ur}</p>}
 
         {badges.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-1.5">
@@ -224,8 +226,8 @@ function DesktopDishCard({ dish, deals, unavailable, closed }: { dish: Dish; dea
           </div>
         )}
 
-        {dish.description_en && (
-          <p className="text-[12px] text-text-secondary leading-relaxed line-clamp-2 mb-3">{dish.description_en}</p>
+        {getDesc(dish) && (
+          <p className="text-[13px] text-text-secondary leading-relaxed mb-3">{getDesc(dish)}</p>
         )}
 
         {!dish.description_en && <div className="mb-3" />}
@@ -249,7 +251,7 @@ function DesktopDishCard({ dish, deals, unavailable, closed }: { dish: Dish; dea
   )
 }
 
-function MobileDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deals?: (Deal & { dish?: { id: string; name_en: string; name_ur: string | null; image_url: string | null; price: number } | null })[]; unavailable?: boolean; closed?: boolean }) {
+function MobileDishCard({ dish, deals, getName, getDesc, displayLang, unavailable, closed }: { dish: Dish; deals?: (Deal & { dish?: { id: string; name_en: string; name_ur: string | null; image_url: string | null; price: number } | null })[]; getName: (d: Dish) => string; getDesc: (d: Dish) => string | null; displayLang?: string; unavailable?: boolean; closed?: boolean }) {
   const [imgError, setImgError] = useState(false)
   const addItem = useCartStore((s) => s.addItem)
   const items = useCartStore((s) => s.items)
@@ -301,10 +303,10 @@ function MobileDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deal
       </div>
 
       {/* Info — flex-1 + mt-auto on action to push to bottom */}
-      <div className="p-2.5 flex flex-col flex-1">
+      <div className="p-3 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-1 mb-1">
-          <h3 className="text-[12px] font-semibold text-text-primary line-clamp-1 leading-tight flex-1">{dish.name_en}</h3>
-          <span className="text-[12px] font-bold text-text-primary shrink-0 ml-1">
+          <h3 className="text-[13px] font-semibold text-text-primary leading-snug flex-1">{getName(dish)}</h3>
+          <span className="text-[13px] font-bold text-text-primary shrink-0 ml-1">
             {dealPrice !== null ? (
               <span className="text-primary">{formatPrice(dealPrice)}</span>
             ) : (
@@ -313,7 +315,9 @@ function MobileDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deal
           </span>
         </div>
 
-        {dish.name_ur && <p className="text-[9px] text-text-secondary font-urdu line-clamp-1 leading-tight mb-1">{dish.name_ur}</p>}
+        {/* Show opposite language name as secondary */}
+        {displayLang === "ur" && dish.name_en && <p className="text-[11px] text-text-muted leading-snug mb-1">{dish.name_en}</p>}
+        {displayLang === "en" && dish.name_ur && <p className="text-[11px] text-text-secondary font-urdu leading-snug mb-1 tracking-tight">{dish.name_ur}</p>}
 
         {badges.length > 0 && (
           <div className="flex flex-wrap gap-0.5 mb-1">
@@ -321,8 +325,8 @@ function MobileDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deal
           </div>
         )}
 
-        {dish.description_en && (
-          <p className="text-[9px] text-text-secondary line-clamp-1 leading-relaxed mb-2">{dish.description_en}</p>
+        {getDesc(dish) && (
+          <p className="text-[11px] text-text-secondary leading-relaxed mb-2">{getDesc(dish)}</p>
         )}
 
         {!dish.description_en && <div className="mb-2" />}
@@ -335,7 +339,7 @@ function MobileDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deal
               <button onClick={() => addItem(dish)} disabled={closed} className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-hover transition-colors disabled:opacity-30 text-[15px] font-bold">+</button>
             </div>
           ) : (
-            <button onClick={() => addItem(dish)} disabled={unavailable || closed} className="inline-flex items-center gap-1 bg-primary text-white rounded-full px-3.5 py-1.5 text-[10px] font-semibold hover:bg-primary-hover active:scale-[0.95] transition-all duration-200 disabled:opacity-50">
+            <button onClick={() => addItem(dish)} disabled={unavailable || closed} className="inline-flex items-center gap-1 bg-primary text-white rounded-full px-3.5 py-1.5 text-[11px] font-semibold hover:bg-primary-hover active:scale-[0.95] transition-all duration-200 disabled:opacity-50">
               {closed ? "Closed" : "+ Add"}
             </button>
           )}
@@ -347,18 +351,26 @@ function MobileDishCard({ dish, deals, unavailable, closed }: { dish: Dish; deal
 
 export function RestaurantDetailClient({ restaurant, categories, branding }: Props) {
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const [logoError, setLogoError] = useState(false)
   const [liveIsOpen, setLiveIsOpen] = useState(restaurant.is_open ?? true)
+  const [_, setLang] = useState(searchParams?.get("lang") === "ur" ? "ur" : "en")
+  const [imgLoaded, setImgLoaded] = useState(false)
   const [liveOpenTime, setLiveOpenTime] = useState(restaurant.opening_time ? restaurant.opening_time.slice(0, 5) : undefined)
   const [liveCloseTime, setLiveCloseTime] = useState(restaurant.closing_time ? restaurant.closing_time.slice(0, 5) : undefined)
+  const [liveOpeningHours, setLiveOpeningHours] = useState<Record<string, { open: string; close: string; closed: boolean }> | null>(restaurant.opening_hours ?? null)
   const [deals, setDeals] = useState<(Deal & { dish?: { id: string; name_en: string; name_ur: string | null; image_url: string | null; price: number } | null })[]>([])
   const setRestaurant = useCartStore((s) => s.setRestaurant)
   const clearCart = useCartStore((s) => s.clearCart)
   const currentRestaurantId = useCartStore((s) => s.restaurantId)
+
+  // ── Realtime-reactive time check ──
+  // Uses live state instead of static SSR props so Realtime updates take effect.
   const isTimeClosed = !isRestaurantOpen(
-    restaurant.opening_time,
-    restaurant.closing_time,
-    restaurant.opening_hours
+    liveOpenTime,
+    liveCloseTime,
+    liveOpeningHours
   )
   const effectivelyClosed = !liveIsOpen || isTimeClosed
 
@@ -366,7 +378,8 @@ export function RestaurantDetailClient({ restaurant, categories, branding }: Pro
     setLiveIsOpen(restaurant.is_open ?? true)
     setLiveOpenTime(restaurant.opening_time ? restaurant.opening_time.slice(0, 5) : undefined)
     setLiveCloseTime(restaurant.closing_time ? restaurant.closing_time.slice(0, 5) : undefined)
-  }, [restaurant.is_open, restaurant.opening_time, restaurant.closing_time])
+    setLiveOpeningHours(restaurant.opening_hours ?? null)
+  }, [restaurant.is_open, restaurant.opening_time, restaurant.closing_time, restaurant.opening_hours])
 
   useEffect(() => {
     const supabase = createClient()
@@ -380,6 +393,7 @@ export function RestaurantDetailClient({ restaurant, categories, branding }: Pro
           if (r.is_open !== undefined) setLiveIsOpen(r.is_open)
           if (r.opening_time) setLiveOpenTime(r.opening_time.slice(0, 5))
           if (r.closing_time) setLiveCloseTime(r.closing_time.slice(0, 5))
+          if (r.opening_hours) setLiveOpeningHours(r.opening_hours)
         }
       )
       .subscribe()
@@ -411,57 +425,91 @@ export function RestaurantDetailClient({ restaurant, categories, branding }: Pro
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" })
   }
 
+  // Language toggle - updates URL param for SSR and component re-render
+  const lang = searchParams?.get("lang") === "ur" ? "ur" : "en"
+  const toggleLang = useCallback(() => {
+    const newLang = lang === "en" ? "ur" : "en"
+    const params = new URLSearchParams(searchParams?.toString() || "")
+    if (newLang === "en") params.delete("lang")
+    else params.set("lang", newLang)
+    router.push(`${pathname}?${params.toString()}`)
+  }, [lang, pathname, router, searchParams])
+
+  // Language-aware display helper
+  const displayLang = lang
+  const getName = useCallback((dish: Dish) => {
+    return displayLang === "ur" && dish.name_ur ? dish.name_ur : dish.name_en
+  }, [displayLang])
+  const getCatName = useCallback((cat: { name_en: string; name_ur?: string | null }) => {
+    return displayLang === "ur" && cat.name_ur ? cat.name_ur : cat.name_en
+  }, [displayLang])
+  const getDesc = useCallback((dish: Dish) => {
+    return displayLang === "ur" && dish.description_ur ? dish.description_ur : dish.description_en
+  }, [displayLang])
+
   const hasAnyDishes = categories.some((cat) => cat.dishes.length > 0)
 
   return (
     <div className="min-h-screen bg-white">
 
       {/* ===== UNIFIED TOP BAR ===== */}
-      <header
-        className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-sm border-b border-border/30 h-12 md:h-9 flex items-center safe-top"
-        style={{ backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}
-      >
+      <header className="sticky top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-border/30 h-14 md:h-14 flex items-center shadow-sm">
         <div className="flex items-center justify-between w-full px-4 max-w-7xl mx-auto">
-          <Link href="/restaurants" className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary hover:text-text-primary transition-colors shrink-0">
-            <LogoIcon className="w-3.5 h-3.5 shrink-0" />
-            <span className="hidden sm:inline text-[11px]">Digital QR Menue</span>
-          </Link>
           <div className="flex items-center gap-2">
-            {/* Mobile: back button + restaurant name */}
-            <div className="flex items-center gap-2 md:hidden">
-              <button
-                onClick={() => router.back()}
-                className="w-7 h-7 rounded-full bg-[#F5F5F5] flex items-center justify-center active:scale-95 transition-transform"
-                aria-label="Go back"
-              >
-                <ArrowLeft className="w-3.5 h-3.5 text-text-primary" />
-              </button>
-              <span className="text-[12px] font-semibold text-text-primary truncate max-w-[160px]">
-                {restaurant.name}
-              </span>
-            </div>
-            {/* Desktop: restaurants link */}
-            <Link href="/restaurants" className="hidden md:block text-[10px] font-medium text-text-muted hover:text-text-secondary transition-colors">
-              Restaurants
+            {/* Back button - use Link instead of router.back() to avoid glitch */}
+            <Link
+              href="/restaurants"
+              className="w-8 h-8 rounded-full bg-surface flex items-center justify-center active:scale-95 transition-transform hover:bg-border shrink-0"
+              aria-label="Go back to restaurants"
+            >
+              <ArrowLeft className="w-4 h-4 text-text-primary" />
+            </Link>
+            {/* Logo + Name */}
+            <Link href="/restaurants" className="flex items-center gap-2 shrink-0">
+              <LogoIcon className="w-5 h-5 shrink-0" />
+              <span className="hidden sm:inline text-xs font-semibold text-text-primary">{restaurant.name}</span>
+              <span className="text-[10px] text-text-muted hidden sm:inline">— Digital QR Menue</span>
+            </Link>
+          </div>
+          <div className="flex items-center gap-2">
+            {/* Language Toggle */}
+            <button
+              onClick={toggleLang}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface hover:bg-border transition-colors text-xs font-semibold text-text-secondary"
+              aria-label="Toggle language"
+            >
+              <Languages className="w-3.5 h-3.5" />
+              <span>{lang === "en" ? "اردو" : "English"}</span>
+            </button>
+            {/* Desktop: all restaurants link */}
+            <Link
+              href="/restaurants"
+              className="hidden md:inline-flex text-xs font-medium text-text-muted hover:text-text-secondary transition-colors px-3 py-1.5"
+            >
+              All Restaurants
             </Link>
           </div>
         </div>
       </header>
 
       {/* ===== MOBILE LAYOUT ===== */}
-      <div className="md:hidden pt-12">
+      <div className="md:hidden">
         <main className="pb-[100px] mx-auto">
           {/* Hero Section — Banner or Logo background */}
-          <div className="relative w-full h-48 bg-surface overflow-hidden">
+          <div className="relative w-full h-52 bg-surface overflow-hidden">
             {(restaurant.banner_enabled && restaurant.banner_image_url) ? (
               <>
+                {!imgLoaded && (
+                  <div className="absolute inset-0 bg-gradient-to-br from-surface to-border/20 animate-pulse" />
+                )}
                 <Image
                   src={restaurant.banner_image_url}
                   alt={restaurant.name}
                   fill
-                  className="object-cover"
+                  className={`object-cover transition-opacity duration-500 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
                   sizes="100vw"
                   priority
+                  onLoad={() => setImgLoaded(true)}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
               </>
@@ -560,7 +608,7 @@ export function RestaurantDetailClient({ restaurant, categories, branding }: Pro
 
           {/* Sticky Category Pills */}
           {categories.length > 0 && (
-            <div className="sticky top-12 z-30 bg-white/95 backdrop-blur-md border-b border-border/40 overflow-x-auto no-scrollbar px-4">
+            <div className="sticky top-14 z-30 bg-white/95 backdrop-blur-md border-b border-border/40 overflow-x-auto no-scrollbar px-4">
               <div className="flex gap-1.5 py-2.5 min-w-max" role="tablist">
                 {categories.map((cat) => {
                   if (cat.dishes.length === 0) return null
@@ -573,7 +621,7 @@ export function RestaurantDetailClient({ restaurant, categories, branding }: Pro
                       }}
                       className="whitespace-nowrap text-[12px] font-semibold px-4 py-2 rounded-full bg-surface text-text-secondary hover:bg-surface-dark hover:text-text-primary transition-all active:scale-95"
                     >
-                      {cat.name_en}
+                      {getCatName(cat)}
                     </button>
                   )
                 })}
@@ -607,12 +655,12 @@ export function RestaurantDetailClient({ restaurant, categories, branding }: Pro
                   return (
                     <section key={category.id} id={`m-cat-${category.id}`} className="scroll-mt-28">
                       <div className="flex items-center gap-2 mb-3">
-                        <h2 className="text-[14px] font-bold text-text-primary">{category.name_en}</h2>
+                        <h2 className="text-[14px] font-bold text-text-primary">{getCatName(category)}</h2>
                         <span className="h-px flex-1 bg-border/50" />
                       </div>
                       <div className="grid grid-cols-2 gap-2.5 auto-rows-fr">
-                        {availableDishes.map((dish) => <MobileDishCard key={dish.id} dish={dish} closed={effectivelyClosed} deals={deals} />)}
-                        {unavailableDishes.map((dish) => <MobileDishCard key={dish.id} dish={dish} unavailable closed={effectivelyClosed} deals={deals} />)}
+                        {availableDishes.map((dish) => <MobileDishCard key={dish.id} dish={dish} closed={effectivelyClosed} deals={deals} getName={getName} getDesc={getDesc} displayLang={lang} />)}
+                        {unavailableDishes.map((dish) => <MobileDishCard key={dish.id} dish={dish} unavailable closed={effectivelyClosed} deals={deals} getName={getName} getDesc={getDesc} displayLang={lang} />)}
                       </div>
                     </section>
                   )
@@ -633,47 +681,56 @@ export function RestaurantDetailClient({ restaurant, categories, branding }: Pro
 
       {/* ===== DESKTOP LAYOUT ===== */}
       <div className="hidden md:block">
-        {/* Desktop Banner Promo */}
-        {restaurant.banner_enabled && restaurant.banner_image_url && (
-          <div className="pt-[36px]">
-            {restaurant.banner_link_url ? (
-              <a
-                href={restaurant.banner_link_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block relative w-full h-48 overflow-hidden group"
-              >
-                <Image
-                  src={restaurant.banner_image_url}
-                  alt="Promotional banner"
-                  fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  sizes="100vw"
-                  priority
-                />
-                <div className="absolute inset-0 bg-black/10 flex items-end justify-end p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+        {/* Desktop Hero — Banner or Logo as background */}
+        <div className="relative w-full h-56 bg-surface overflow-hidden">
+          {(restaurant.banner_enabled && restaurant.banner_image_url) ? (
+            <>
+              {!imgLoaded && (
+                <div className="absolute inset-0 bg-gradient-to-br from-surface to-border/20 animate-pulse" />
+              )}
+              <Image
+                src={restaurant.banner_image_url}
+                alt={`${restaurant.name} banner`}
+                fill
+                className={`object-cover transition-opacity duration-500 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
+                sizes="100vw"
+                priority
+                onLoad={() => setImgLoaded(true)}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+              {restaurant.banner_link_url && (
+                <a
+                  href={restaurant.banner_link_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute inset-0 z-10 flex items-end justify-end p-4 opacity-0 hover:opacity-100 transition-opacity"
+                >
                   <span className="text-white text-xs bg-black/50 px-3 py-1.5 rounded-full flex items-center gap-1">
                     Learn more <ExternalLink className="w-3 h-3" />
                   </span>
-                </div>
-              </a>
-            ) : (
-              <div className="relative w-full h-48 overflow-hidden">
-                <Image
-                  src={restaurant.banner_image_url}
-                  alt="Promotional banner"
-                  fill
-                  className="object-cover"
-                  sizes="100vw"
-                  priority
-                />
-              </div>
-            )}
-          </div>
-        )}
+                </a>
+              )}
+            </>
+          ) : (restaurant.logo_url && !logoError ? (
+            <>
+              <Image
+                src={restaurant.logo_url}
+                alt={`${restaurant.name} logo`}
+                fill
+                className="object-cover opacity-30 scale-150"
+                sizes="100vw"
+                priority
+                onError={() => setLogoError(true)}
+              />
+              <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/60 to-black/80" />
+            </>
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-primary via-primary-hover to-primary/60" />
+          ))}
+        </div>
 
-        {/* HERO SECTION */}
-        <div className={`bg-white pb-10 border-b border-border/60 ${restaurant.banner_enabled && restaurant.banner_image_url ? "pt-6" : "pt-12"}`}>
+        {/* HERO INFO SECTION */}
+        <div className="bg-white pb-10 border-b border-border/60">
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex items-start gap-6">
               {restaurant.logo_url && !logoError ? (
@@ -758,7 +815,7 @@ export function RestaurantDetailClient({ restaurant, categories, branding }: Pro
             {/* LEFT SIDEBAR — Category Nav */}
             {hasAnyDishes && (
               <aside className="w-48 shrink-0">
-                <nav className="sticky top-24 space-y-1">
+                <nav className="sticky top-[72px] space-y-1">
                   {categories.map((cat) => {
                     if (cat.dishes.length === 0) return null
                     const availableCount = cat.dishes.filter((d) => d.is_available).length
@@ -769,7 +826,7 @@ export function RestaurantDetailClient({ restaurant, categories, branding }: Pro
                         className="group block w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-medium text-text-secondary hover:bg-surface hover:text-text-primary transition-all"
                       >
                         <span className="flex items-center justify-between">
-                          <span>{cat.name_en}</span>
+                          <span>{getCatName(cat)}</span>
                           <span className="text-[10px] text-text-muted group-hover:text-text-secondary transition-colors">{availableCount}</span>
                         </span>
                       </button>
@@ -812,12 +869,12 @@ export function RestaurantDetailClient({ restaurant, categories, branding }: Pro
                     return (
                       <section key={category.id} id={`desk-cat-${category.id}`}>
                         <div className="flex items-center gap-3 mb-5">
-                          <h2 className="text-lg font-bold text-text-primary">{category.name_en}</h2>
+                          <h2 className="text-lg font-bold text-text-primary">{getCatName(category)}</h2>
                           <span className="h-px flex-1 bg-border/60" />
                         </div>
                         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 auto-rows-fr">
-                          {availableDishes.map((dish) => <DesktopDishCard key={dish.id} dish={dish} closed={effectivelyClosed} deals={deals} />)}
-                          {unavailableDishes.map((dish) => <DesktopDishCard key={dish.id} dish={dish} unavailable closed={effectivelyClosed} deals={deals} />)}
+                          {availableDishes.map((dish) => <DesktopDishCard key={dish.id} dish={dish} closed={effectivelyClosed} deals={deals} getName={getName} getDesc={getDesc} displayLang={lang} />)}
+                          {unavailableDishes.map((dish) => <DesktopDishCard key={dish.id} dish={dish} unavailable closed={effectivelyClosed} deals={deals} getName={getName} getDesc={getDesc} displayLang={lang} />)}
                         </div>
                       </section>
                     )

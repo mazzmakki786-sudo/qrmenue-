@@ -518,8 +518,9 @@ export default function MenuManagementPage() {
             className="w-full h-10 pl-9 pr-4 rounded-xl bg-white border border-[#F0F0F0] text-sm placeholder:text-[#999] focus:outline-none focus:border-black transition-colors"
           />
         </div>
-        <Button size="sm" variant="ghost" onClick={handleAddCategory} className="shrink-0">
+        <Button size="sm" variant="ghost" onClick={handleAddCategory} className="shrink-0 gap-1.5">
           <Plus className="w-4 h-4" />
+          <span>Add Category</span>
         </Button>
         <Button
           size="sm"
@@ -537,9 +538,10 @@ export default function MenuManagementPage() {
             }
             setShowAddModal(true)
           }}
-          className="shrink-0"
+          className="shrink-0 gap-1.5"
         >
           <Plus className="w-4 h-4" />
+          <span>Add Item</span>
         </Button>
       </div>
 

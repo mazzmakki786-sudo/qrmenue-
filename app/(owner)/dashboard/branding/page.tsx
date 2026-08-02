@@ -6,7 +6,7 @@ import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { useSubscription } from "@/lib/hooks/useSubscription"
-import { Check, Upload, ImageIcon, Info } from "lucide-react"
+import { Check, Upload, ImageIcon, Info, Trash2 } from "lucide-react"
 import NextImage from "next/image"
 import Link from "next/link"
 
@@ -85,41 +85,12 @@ export default function BrandingPage() {
     )
   }
 
-  if (!isPremium) {
-    return (
-      <div className="max-w-2xl mx-auto flex flex-col gap-6">
-        <section>
-          <h1 className="text-3xl font-bold text-black">Branding</h1>
-          <p className="text-sm text-[#555] mt-1">
-            Customize your restaurant&apos;s look and feel
-          </p>
-        </section>
-
-        <div className="bg-white border border-[#F0F0F0] rounded-2xl p-6 flex flex-col items-center justify-center text-center py-16">
-          <div className="w-16 h-16 rounded-2xl bg-[#F0F0F0] flex items-center justify-center mx-auto mb-4">
-            <ImageIcon className="w-8 h-8 text-[#999]" />
-          </div>
-          <h2 className="text-xl font-bold mb-2">Promotional Banner</h2>
-          <p className="text-sm text-[#555] max-w-sm mb-4">
-            Add a promotional banner to your customer menu. This feature is exclusive to the <strong>Premium</strong> plan.
-          </p>
-          <Link
-            href="/dashboard/subscription"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white text-sm font-semibold rounded-full hover:opacity-90 transition-all"
-          >
-            Upgrade to Premium
-          </Link>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="max-w-2xl mx-auto flex flex-col gap-6">
       <section>
         <h1 className="text-3xl font-bold text-black">Branding</h1>
         <p className="text-sm text-[#555] mt-1">
-          Add a promotional banner to your customer menu
+          Customize your restaurant&apos;s banner and appearance
         </p>
       </section>
 
@@ -128,9 +99,11 @@ export default function BrandingPage() {
         <div className="flex items-center gap-2">
           <ImageIcon className="w-4 h-4" />
           <h3 className="text-sm font-semibold text-black">Promotional Banner</h3>
-          <span className="bg-[#25D366] text-white text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
-            Premium
-          </span>
+          {isPremium && (
+            <span className="bg-[#25D366] text-white text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
+              Premium
+            </span>
+          )}
         </div>
         <p className="text-xs text-[#555]">
           Show a promotional banner on your customer menu. Great for offers, events, or social media links.
@@ -176,9 +149,9 @@ export default function BrandingPage() {
                       setBannerPreview(null)
                       setBannerImageUrl(null)
                     }}
-                    className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-lg"
+                    className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-lg hover:bg-black/80 transition-colors"
                   >
-                    Remove
+                    <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
               ) : (

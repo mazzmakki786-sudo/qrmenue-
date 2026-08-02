@@ -4,7 +4,8 @@ import "./globals.css"
 import dynamic from "next/dynamic"
 import { Suspense } from "react"
 import { I18nProvider } from "@/lib/i18n/context"
-import { WebsiteJsonLd, SoftwareApplicationJsonLd, LocalBusinessJsonLd } from "@/components/JsonLd"
+import { WebsiteJsonLd, SoftwareApplicationJsonLd, LocalBusinessJsonLd, OrganizationJsonLd } from "@/components/JsonLd"
+import { WhatsAppFloatButton } from "@/components/shared/WhatsAppFloatButton"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -22,8 +23,11 @@ const notoUrdu = Noto_Nastaliq_Urdu({
   preload: false,
 })
 
-// Dynamically import Google Analytics — the "use client" directive ensures it only runs on client
-const GoogleAnalytics = dynamic(() => import("@/components/shared/GoogleAnalytics").then((m) => m.GoogleAnalytics))
+// Static import — GoogleAnalytics returns null and only runs side effects in
+// useEffect ("use client"), so it does not need lazy loading. (dynamic() here
+// caused a dev-only "Cannot read properties of undefined (reading 'call')"
+// error when resolving the RSC chunk for the lazy component.)
+import { GoogleAnalytics } from "@/components/shared/GoogleAnalytics"
 
 const APP_NAME = "Digital QR Menue"
 const SITE_NAME = "Digitalmenue.com"
@@ -32,8 +36,8 @@ const SITE_URL = "https://www.digitalmenue.com"
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `Digital QR Menu for Restaurants in Pakistan | Free QR Code Menu & WhatsApp Ordering`,
-    template: `%s | Digital QR Menu Pakistan`,
+    default: `Free Digital QR Menue for Restaurants in Pakistan — No Commission`,
+    template: `%s | Digital QR Menue Pakistan`,
   },
   description:
     "Create a free digital QR menu for your restaurant in Pakistan. Eliminate printing costs, get orders directly on WhatsApp, and save 30% on Foodpanda commissions. Start your free QR code menu trial today.",
@@ -89,7 +93,7 @@ export const metadata: Metadata = {
     locale: "en_PK",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: `Pakistan's #1 Digital QR Menu for Restaurants — Free QR Code Menu & WhatsApp Online Ordering System`,
+    title: `Pakistan's #1 Digital QR Menue for Restaurants — Free QR Code Menu & WhatsApp Online Ordering System`,
     description:
       "Create a free digital QR menu for your restaurant. Customers scan, browse your digital food menu, and order directly via WhatsApp. Zero commission. No app download. Start your free QR code menu trial today.",
     images: [
@@ -97,13 +101,13 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: `${SITE_NAME} — Free Digital QR Menu for Restaurants with WhatsApp Ordering in Pakistan`,
+        alt: `${SITE_NAME} — Free Digital QR Menue for Restaurants with WhatsApp Ordering in Pakistan`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `Digital QR Menu for Restaurants in Pakistan — Free QR Code Menu & WhatsApp Ordering`,
+    title: `Digital QR Menue for Restaurants in Pakistan — Free QR Code Menu & WhatsApp Ordering`,
     description:
       "Create a free digital QR menu for your restaurant. Customers scan, browse your digital food menu, and order directly via WhatsApp. Zero commission. No app download.",
     images: ["/og-image.png"],
@@ -123,7 +127,7 @@ export const metadata: Metadata = {
     canonical: SITE_URL,
     languages: {
       en: SITE_URL,
-      ur: `${SITE_URL}/restaurants`,
+      ur: `${SITE_URL}/?lang=ur`,
       "x-default": SITE_URL,
     },
   },
@@ -164,11 +168,15 @@ export default function RootLayout({
         <WebsiteJsonLd />
         <SoftwareApplicationJsonLd />
         <LocalBusinessJsonLd />
+        <OrganizationJsonLd />
         <I18nProvider>
           <Suspense fallback={null}>
             <GoogleAnalytics />
           </Suspense>
           <main id="main-content">{children}</main>
+          <Suspense fallback={null}>
+            <WhatsAppFloatButton />
+          </Suspense>
         </I18nProvider>
       </body>
     </html>

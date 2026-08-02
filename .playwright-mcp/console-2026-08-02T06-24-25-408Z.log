@@ -1,0 +1,2 @@
+[     465ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.digitalmenue.com/signup/customer:0
+[  277652ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.digitalmenue.com/login/customer:0

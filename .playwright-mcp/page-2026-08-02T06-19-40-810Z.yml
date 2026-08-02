@@ -1,0 +1,27 @@
+- generic [ref=f1e1]:
+  - main [ref=f1e2]:
+    - generic [ref=f1e5]:
+      - generic [ref=f1e6]:
+        - heading "Create an Account" [level=1] [ref=f1e38]
+        - paragraph [ref=f1e17]: Sign up to save favorites and track orders
+      - generic [ref=f1e18]:
+        - generic [ref=f1e39]:
+          - generic [ref=f1e40]: Full Name **
+          - textbox "Full Name **" [ref=f1e41]:
+            - /placeholder: Your name
+        - generic [ref=f1e19]:
+          - generic [ref=f1e20]: Phone Number **
+          - textbox "Phone Number **" [ref=f1e21]:
+            - /placeholder: 03XX-XXXXXXX
+        - generic [ref=f1e22]:
+          - generic [ref=f1e23]: Password *
+          - generic [ref=f1e24]:
+            - textbox "Password *" [ref=f1e25]:
+              - /placeholder: Create a password
+            - button [ref=f1e26] [cursor=pointer]
+        - button "Create Account" [ref=f1e42] [cursor=pointer]
+      - generic [ref=f1e34]:
+        - button "Already have an account? Sign in" [active] [ref=f1e43] [cursor=pointer]
+        - link "Back to restaurants" [ref=f1e36] [cursor=pointer]:
+          - /url: /restaurants
+  - alert [ref=f1e37]

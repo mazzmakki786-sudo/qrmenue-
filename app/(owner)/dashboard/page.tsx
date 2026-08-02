@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic"
 import { useEffect, useState, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { formatPrice, timeAgo, formatTo12Hour } from "@/lib/utils"
-import { ChevronRight, ClipboardList, QrCode, UtensilsCrossed, User, Check, TrendingUp, TrendingDown, AlertCircle, RefreshCw, Power, Clock, Sparkles } from "lucide-react"
+import { ChevronRight, ClipboardList, QrCode, UtensilsCrossed, User, Check, TrendingUp, TrendingDown, AlertCircle, RefreshCw, Power, Clock, Sparkles, Store, ImageIcon, MapPin, Phone, Globe, Camera, ChevronLeft, ChevronDown, ChevronUp, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import type { Order } from "@/types"
@@ -14,8 +14,20 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { DashboardFooter } from "@/components/shared/DashboardFooter"
 import { PageLoader } from "@/components/shared/PageLoader"
+import Image from "next/image"
 
 type PageState = "loading" | "ready" | "error" | "offline"
+
+interface SetupStep {
+  id: string
+  title: string
+  description: string
+  icon: typeof Store
+  fields: { label: string; key: string; done: boolean }[]
+  actionLabel: string
+  actionHref: string
+  isOptional?: boolean
+}
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -33,8 +45,9 @@ export default function DashboardPage() {
   const [openingTime, setOpeningTime] = useState("09:00")
   const [closingTime, setClosingTime] = useState("23:00")
   const [toggling, setToggling] = useState(false)
+  const [expandedStep, setExpandedStep] = useState<string | null>(null)
   const supabase = createClient()
-  const fetchedRef = useRef(false) // Prevent double-fetch in strict mode
+  const fetchedRef = useRef(false)
 
   const handleToggleOpen = async () => {
     if (!restaurant?.id || toggling) return
@@ -99,7 +112,6 @@ export default function DashboardPage() {
           .from("dishes")
           .select("*", { count: "exact", head: true })
           .eq("restaurant_id", restaurant.id),
-        // Use daily_order_stats for monthly totals
         supabase
           .from("daily_order_stats")
           .select("total_orders, total_revenue")
@@ -119,12 +131,10 @@ export default function DashboardPage() {
         setYesterdayRevenue(yesterdayRes.data.reduce((sum, o) => sum + o.total_price, 0))
       }
 
-      // Monthly totals from daily_order_stats (persistent)
       if (monthlyStatsRes.data && monthlyStatsRes.data.length > 0) {
         setMonthlyOrders(monthlyStatsRes.data.reduce((s, d) => s + d.total_orders, 0))
         setMonthlyRevenue(monthlyStatsRes.data.reduce((s, d) => s + d.total_revenue, 0))
       } else {
-        // Fallback: query orders directly
         const { data: monthlyFallback } = await supabase
           .from("orders")
           .select("total_price")
@@ -165,7 +175,6 @@ export default function DashboardPage() {
     }
   }, [restaurant?.id])
 
-  // Timeout to prevent infinite loading — show error after 20s
   useEffect(() => {
     if (pageState !== "loading") return
     const timeout = setTimeout(() => {
@@ -175,20 +184,16 @@ export default function DashboardPage() {
     return () => clearTimeout(timeout)
   }, [pageState])
 
-  // Central loading orchestrator — waits for subscription + dashboard data
   useEffect(() => {
     if (fetchedRef.current) return
     if (subLoading) {
       setPageState("loading")
       return
     }
-    // Subscription resolved
     if (!restaurant) {
-      // User has no restaurant — show empty state
       setPageState("ready")
       return
     }
-    // Restaurant exists — fetch dashboard data
     setPageState("loading")
     fetchedRef.current = true
     fetchData()
@@ -212,21 +217,75 @@ export default function DashboardPage() {
     fetch("/api/owner/alerts/check", { method: "POST" }).catch(() => {})
   }, [restaurant?.id, restaurant?.plan])
 
-  const profileFields = [
-    { label: "Phone number", done: !!restaurant?.phone },
-    { label: "Address", done: !!restaurant?.address },
-    { label: "Logo", done: !!restaurant?.logo_url },
-    { label: "Cuisine type", done: !!restaurant?.cuisine_type },
-    { label: "Urdu name", done: !!restaurant?.name_ur },
+  // ── Setup wizard logic ──
+  const setupSteps: SetupStep[] = [
+    {
+      id: "basics",
+      title: "Basic Info",
+      description: "Restaurant name and contact details",
+      icon: Store,
+      fields: [
+        { label: "Restaurant Name", key: "name", done: !!restaurant?.name },
+        { label: "Phone / WhatsApp", key: "phone", done: !!restaurant?.phone },
+        { label: "City", key: "city", done: !!restaurant?.city },
+      ],
+      actionLabel: "Edit Details",
+      actionHref: "/dashboard/settings",
+    },
+    {
+      id: "branding",
+      title: "Logo & Brand",
+      description: "Add your logo and cuisine type",
+      icon: Camera,
+      fields: [
+        { label: "Restaurant Logo", key: "logo", done: !!restaurant?.logo_url },
+        { label: "Cuisine Type", key: "cuisine", done: !!restaurant?.cuisine_type },
+        { label: "Urdu Name", key: "name_ur", done: !!restaurant?.name_ur },
+      ],
+      actionLabel: "Upload Logo",
+      actionHref: "/dashboard/settings",
+    },
+    {
+      id: "hours",
+      title: "Hours & Location",
+      description: "Set opening hours and address",
+      icon: Clock,
+      fields: [
+        { label: "Address", key: "address", done: !!restaurant?.address },
+        { label: "Opening Hours", key: "hours", done: true }, // Hours are set by default
+      ],
+      actionLabel: "Set Hours",
+      actionHref: "/dashboard/settings",
+      isOptional: true,
+    },
+    {
+      id: "menu",
+      title: "Menu Setup",
+      description: "Add categories and dishes",
+      icon: UtensilsCrossed,
+      fields: [
+        { label: "Categories Added", key: "categories", done: categoryCount > 0 },
+        { label: "Dishes Added", key: "dishes", done: dishCount > 0 },
+      ],
+      actionLabel: "Add Menu Items",
+      actionHref: "/dashboard/menu",
+    },
   ]
-  const profileDone = profileFields.filter((f) => f.done).length
-  const profilePercent = Math.round((profileDone / profileFields.length) * 100)
 
-  const menuFields = [
-    { label: "Categories added", done: categoryCount > 0 },
-    { label: "Dishes added", done: dishCount > 0 },
-  ]
-  const menuDone = menuFields.filter((f) => f.done).length
+  // Calculate overall setup progress
+  const overallDone = setupSteps.flatMap(s => s.fields).filter(f => f.done).length
+  const overallTotal = setupSteps.filter(s => !s.isOptional).flatMap(s => s.fields).length
+  const overallPercent = Math.round((overallDone / overallTotal) * 100)
+  const isSetupComplete = setupSteps.slice(0, 3).every(s => s.fields.every(f => f.done)) &&
+    setupSteps[3].fields.some(f => f.done)
+  const activeSteps = setupSteps.filter(s => !s.fields.every(f => f.done))
+
+  const ordersTrend = yesterdayOrders > 0
+    ? Math.round(((todayOrders - yesterdayOrders) / yesterdayOrders) * 100)
+    : todayOrders > 0 ? 100 : 0
+  const revenueTrend = yesterdayRevenue > 0
+    ? Math.round(((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100)
+    : todayRevenue > 0 ? 100 : 0
 
   const isTrial = restaurant?.plan === "trial"
   const trialDaysRemaining = isTrial && restaurant?.trial_end
@@ -236,16 +295,6 @@ export default function DashboardPage() {
     ? Math.max(0, Math.ceil((new Date(restaurant.plan_end_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : null
 
-  const onboardingComplete = profilePercent === 100 && menuDone === 2
-
-  const ordersTrend = yesterdayOrders > 0
-    ? Math.round(((todayOrders - yesterdayOrders) / yesterdayOrders) * 100)
-    : todayOrders > 0 ? 100 : 0
-  const revenueTrend = yesterdayRevenue > 0
-    ? Math.round(((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100)
-    : todayRevenue > 0 ? 100 : 0
-
-  // Show PageLoader while loading (covers: slow internet, offline, error)
   if (pageState !== "ready") {
     return (
       <PageLoader
@@ -276,7 +325,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-4">
 
-      {/* Top Row */}
+      {/* ── Top Row ── */}
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-black">Dashboard</h1>
         <div className="flex items-center gap-2">
@@ -297,7 +346,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Subscription Banner */}
+      {/* ── Subscription Banner ── */}
       {restaurant && (
         <div className="relative overflow-hidden bg-gradient-to-r from-[#0052D4] via-[#4364F7] to-[#6FB1FC] p-5 md:p-6 rounded-2xl text-white shadow-sm">
           <div className="absolute top-0 right-0 w-48 h-48 bg-white/[0.03] rounded-full -translate-y-1/2 translate-x-1/4" />
@@ -339,7 +388,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Closed Banner */}
+      {/* ── Closed Banner ── */}
       {!isOpen && (
         <div className="bg-gradient-to-r from-[#DC2626] to-[#EF4444] rounded-2xl p-5 text-white shadow-sm">
           <div className="flex items-start gap-3">
@@ -362,7 +411,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Open/Close Toggle + Timing */}
+      {/* ── Open/Close Toggle ── */}
       <div className="bg-white border border-[#F0F0F0] rounded-2xl p-4 sm:p-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -413,7 +462,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Quick Action Cards */}
+      {/* ── Quick Action Cards ── */}
       <div className="grid grid-cols-2 gap-3">
         <Link
           href="/dashboard/menu"
@@ -441,56 +490,197 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {/* 2-Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* Left Column - Onboarding (hide when complete) */}
-        {!onboardingComplete && (
-          <div className="lg:col-span-4 space-y-4">
-            {/* Profile Completion */}
-            <div className="bg-white border border-[#F0F0F0] rounded-2xl p-4">
-              <h3 className="text-sm font-semibold text-black mb-3">Profile Completion</h3>
-              <div className="flex items-baseline gap-2 mb-3">
-                <span className="text-3xl font-extrabold text-black">{profilePercent}%</span>
+      {/* ── SETUP WIZARD ── */}
+      {!isSetupComplete && (
+        <div className="bg-white border border-[#F0F0F0] rounded-2xl overflow-hidden">
+          {/* Overall Progress Header */}
+          <div className="p-5 pb-4 border-b border-[#F0F0F0]">
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center shrink-0">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-sm font-bold">Set Up Your Restaurant</h2>
+                  <p className="text-[11px] text-[#555] mt-0.5">
+                    {overallDone} of {overallTotal} tasks complete
+                  </p>
+                </div>
               </div>
-              <div className="h-1.5 w-full bg-[#EDEEEF] rounded-full mb-4">
-                <div className="h-full bg-black rounded-full" style={{ width: `${profilePercent}%` }} />
+              <div className="shrink-0">
+                <div className="relative w-12 h-12">
+                  <svg className="w-12 h-12 -rotate-90" viewBox="0 0 36 36">
+                    <circle cx="18" cy="18" r="15.5" fill="none" stroke="#F0F0F0" strokeWidth="3" />
+                    <circle
+                      cx="18" cy="18" r="15.5"
+                      fill="none" stroke="#000"
+                      strokeWidth="3"
+                      strokeDasharray={`${overallPercent * 0.972} 97.2`}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold">
+                    {overallPercent}%
+                  </span>
+                </div>
               </div>
-              <ul className="space-y-3">
-                {profileFields.map((f) => (
-                  <li key={f.label} className="flex items-center gap-2.5">
-                    {f.done ? (
-                      <Check className="w-4 h-4 text-[#25D366] shrink-0" />
-                    ) : (
-                      <div className="w-4 h-4 rounded-full border-2 border-[#BBCBB9] shrink-0" />
-                    )}
-                    <span className="text-xs text-[#191c1d]">{f.label}</span>
-                  </li>
-                ))}
-              </ul>
             </div>
-
-            {/* Menu Setup */}
-            <div className="bg-white border border-[#F0F0F0] rounded-2xl p-4">
-              <h3 className="text-sm font-semibold text-black mb-3">Menu Setup</h3>
-              <ul className="space-y-3">
-                {menuFields.map((f) => (
-                  <li key={f.label} className="flex items-center gap-2.5">
-                    {f.done ? (
-                      <Check className="w-4 h-4 text-[#25D366] shrink-0" />
-                    ) : (
-                      <div className="w-4 h-4 rounded-full border-2 border-[#BBCBB9] shrink-0" />
+            {/* Progress bar */}
+            <div className="h-1.5 w-full bg-[#F0F0F0] rounded-full">
+              <div
+                className="h-full bg-black rounded-full transition-all duration-500"
+                style={{ width: `${overallPercent}%` }}
+              />
+            </div>
+            {/* Step labels - desktop */}
+            <div className="hidden md:flex items-center justify-between mt-3">
+              {setupSteps.map((step, i) => {
+                const done = step.fields.every(f => f.done)
+                return (
+                  <div key={step.id} className="flex items-center gap-1.5">
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold ${
+                      done ? "bg-[#16A34A]/10 text-[#16A34A]" :
+                      activeSteps[0]?.id === step.id ? "bg-black text-white" :
+                      "bg-[#F0F0F0] text-[#BBB]"
+                    }`}>
+                      {done ? <Check className="w-3 h-3" /> : i + 1}
+                    </div>
+                    <span className={`text-[10px] font-medium ${
+                      done ? "text-[#16A34A]" :
+                      activeSteps[0]?.id === step.id ? "text-black" :
+                      "text-[#BBB]"
+                    }`}>{step.title}</span>
+                    {i < setupSteps.length - 1 && (
+                      <div className={`w-6 h-px ml-1.5 ${done ? "bg-[#16A34A]" : "bg-[#F0F0F0]"}`} />
                     )}
-                    <span className="text-xs text-[#191c1d]">{f.label}</span>
-                  </li>
-                ))}
-              </ul>
+                  </div>
+                )
+              })}
             </div>
           </div>
-        )}
 
-        {/* Right Column */}
-        <div className={`${onboardingComplete ? "lg:col-span-12" : "lg:col-span-8"} space-y-4`}>
-          {/* Stats Row */}
+          {/* Active Steps (mobile: accordion, desktop: inline) */}
+          <div className="divide-y divide-[#F0F0F0]">
+            {setupSteps.map((step, idx) => {
+              const stepDone = step.fields.every(f => f.done)
+              const doneCount = step.fields.filter(f => f.done).length
+              const isActive = activeSteps[0]?.id === step.id
+              const isExpanded = expandedStep === step.id
+
+              // Skip completely done steps
+              if (stepDone && !isExpanded) return null
+
+              return (
+                <div key={step.id}>
+                  {/* Mobile: collapsible header */}
+                  <button
+                    onClick={() => setExpandedStep(isExpanded ? null : step.id)}
+                    className="md:hidden w-full flex items-center gap-3 p-4 hover:bg-[#FAFAFA] transition-colors text-left"
+                  >
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                      stepDone ? "bg-[#16A34A]/10" :
+                      isActive ? "bg-black text-white" :
+                      "bg-[#F5F5F5]"
+                    }`}>
+                      {stepDone ? (
+                        <Check className={`w-4 h-4 ${stepDone ? "text-[#16A34A]" : ""}`} />
+                      ) : (
+                        <step.icon className="w-4 h-4" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold">{step.title}</p>
+                      <p className="text-[11px] text-[#555]">
+                        {doneCount}/{step.fields.length} done
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="text-[11px] font-semibold text-[#888]">
+                        {isActive ? "Next" : ""}
+                      </div>
+                      {isExpanded ? <ChevronUp className="w-4 h-4 text-[#888]" /> : <ChevronDown className="w-4 h-4 text-[#888]" />}
+                    </div>
+                  </button>
+
+                  {/* Content (mobile: show when expanded, desktop: always show active) */}
+                  <div className={`${
+                    isExpanded || isActive ? "block" : "hidden"
+                  } md:block`}>
+                    <div className={`px-4 pb-4 md:px-5 md:pb-5 ${idx > 0 ? "" : ""}`}>
+                      {/* Desktop: title row */}
+                      <div className="hidden md:flex items-center gap-3 mb-3">
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                          stepDone ? "bg-[#16A34A]/10" :
+                          isActive ? "bg-black text-white" :
+                          "bg-[#F5F5F5]"
+                        }`}>
+                          {stepDone ? (
+                            <Check className="w-4 h-4 text-[#16A34A]" />
+                          ) : (
+                            <step.icon className="w-4 h-4" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold">{step.title}</p>
+                          <p className="text-[11px] text-[#555]">{step.description}</p>
+                        </div>
+                        {isActive && (
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#F59E0B] bg-[#FFF8E7] px-2 py-1 rounded-full">
+                            Active
+                          </span>
+                        )}
+                        {stepDone && (
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#16A34A] bg-[#F0FFF4] px-2 py-1 rounded-full">
+                            Complete
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Fields checklist */}
+                      <div className="grid md:grid-cols-2 gap-2 mb-3">
+                        {step.fields.map((field) => (
+                          <div
+                            key={field.key}
+                            className={`flex items-center gap-2.5 p-2.5 rounded-lg ${
+                              field.done ? "bg-[#FAFAFA]" : "bg-[#FFF8E7]/30"
+                            }`}
+                          >
+                            <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
+                              field.done ? "bg-[#16A34A]/10" : "border-2 border-[#D0D0D0]"
+                            }`}>
+                              {field.done && <Check className="w-3 h-3 text-[#16A34A]" />}
+                            </div>
+                            <div className="min-w-0">
+                              <p className={`text-xs font-medium ${field.done ? "text-[#888] line-through" : "text-black"}`}>
+                                {field.label}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Action button (only for active / incomplete steps) */}
+                      {!stepDone && (
+                        <Link
+                          href={step.actionHref}
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-black bg-[#F5F5F5] hover:bg-[#E8E8E8] px-4 py-2 rounded-xl transition-colors"
+                        >
+                          {step.actionLabel}
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── Quick Stats + Analytics ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div className="lg:col-span-12 space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-white border border-[#F0F0F0] p-4 rounded-2xl">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-[#555]">Today Orders</span>
@@ -548,7 +738,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Recent Orders */}
+      {/* ── Recent Orders ── */}
       <div className="bg-white border border-[#F0F0F0] rounded-2xl overflow-hidden">
         <div className="p-4 border-b border-[#F0F0F0] flex items-center justify-between">
           <h3 className="text-sm font-semibold text-black">Recent Orders</h3>

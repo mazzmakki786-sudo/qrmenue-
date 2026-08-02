@@ -92,17 +92,6 @@ export function PricingSection({ heading, description, initialPlans, whatsappNum
     return () => { supabase.removeChannel(channel) }
   }, [fetchPlans])
 
-  const handleSelectPlan = (planId: string, isYearly?: boolean) => {
-    if (planId === "trial") return
-    if (!whatsapp) return
-    const plan = plans.find(p => p.id === planId)
-    if (!plan) return
-    const price = isYearly ? plan.yearlyPrice : plan.monthlyPrice
-    const period = isYearly ? "yearly" : "monthly"
-    const msg = `Hi, I'm interested in the ${plan.name} plan (${period}: ${price}). Please activate my plan.`
-    window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`, "_blank")
-  }
-
   if (!plans.length) {
     return (
       <div className="min-h-[400px] bg-white flex items-center justify-center">
@@ -111,5 +100,5 @@ export function PricingSection({ heading, description, initialPlans, whatsappNum
     )
   }
 
-  return <Pricing2 heading={heading} description={description} plans={plans} onSelectPlan={handleSelectPlan} data-testid="pricing-section" />
+  return <Pricing2 heading={heading} description={description} plans={plans} data-testid="pricing-section" />
 }

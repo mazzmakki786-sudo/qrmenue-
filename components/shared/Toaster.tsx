@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react"
 import { useToastStore, type Toast } from "@/stores/toastStore"
 import { X, CheckCircle, AlertCircle, Info, BellRing } from "lucide-react"
+import { playNotification, playStatusChange, playOrderConfirmed } from "@/lib/sound"
 
 const TYPE_STYLES: Record<string, { bg: string; icon: typeof CheckCircle }> = {
   success: { bg: "bg-black", icon: CheckCircle },
@@ -89,10 +90,27 @@ export function Toaster() {
   const toasts = useToastStore((s) => s.toasts)
   const removeToast = useToastStore((s) => s.removeToast)
   const [mounted, setMounted] = useState(false)
+  const [playedIds, setPlayedIds] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  // Play sound for new toasts with sound: true
+  useEffect(() => {
+    toasts.forEach((toast) => {
+      if (toast.sound && !playedIds.has(toast.id)) {
+        setPlayedIds((prev) => new Set(prev).add(toast.id))
+        if (toast.type === "order") {
+          playOrderConfirmed()
+        } else if (toast.type === "success") {
+          playStatusChange()
+        } else {
+          playNotification()
+        }
+      }
+    })
+  }, [toasts, playedIds])
 
   if (!mounted) return null
 

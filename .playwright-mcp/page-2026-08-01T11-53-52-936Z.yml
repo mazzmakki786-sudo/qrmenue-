@@ -1,0 +1,46 @@
+- generic [active] [ref=f15e1]:
+  - link "Skip to content":
+    - /url: "#geist-skip-nav"
+  - generic [ref=f15e3]:
+    - banner [ref=f15e4]:
+      - link "Vercel logo":
+        - /url: /home
+        - button "Vercel Logo":
+          - img "Vercel Logo"
+      - navigation [ref=f15e5]:
+        - navigation [ref=f15e6]:
+          - link [ref=f15e7] [cursor=pointer]:
+            - /url: /signup?next=%2Fsso-api%3Furl%3Dhttps%253A%252F%252Fqr-menue-aqccwqxug-mazzmakki786-3123s-projects.vercel.app%252Fsignup%252Frestaurant%26nonce%3Dcf4c7219e7dccd40b753c0e668d7de8072322483284db180375977dedec44d56
+            - paragraph [ref=f15e9]: Sign Up
+    - main [ref=f15e10]:
+      - generic [ref=f15e12]:
+        - heading "Log in to Vercel" [level=1] [ref=f15e15]
+        - generic [ref=f15e16]:
+          - generic [ref=f15e17]:
+            - textbox "Email Address" [ref=f15e19]
+            - button "Continue with Email" [ref=f15e20] [cursor=pointer]
+          - generic [ref=f15e23]:
+            - button "Continue with Google" [ref=f15e24] [cursor=pointer]:
+              - generic [ref=f15e28]:
+                - generic [ref=f15e29]: Continue with
+                - text: Google
+            - button "Continue with GitHub" [ref=f15e30] [cursor=pointer]:
+              - generic [ref=f15e34]:
+                - generic [ref=f15e35]: Continue with
+                - text: GitHub
+            - button "Continue with ChatGPT" [ref=f15e36] [cursor=pointer]:
+              - generic [ref=f15e40]:
+                - generic [ref=f15e41]: Continue with
+                - text: ChatGPT
+            - button "Continue with SAML SSO" [ref=f15e43] [cursor=pointer]
+            - button "Continue with Passkey" [ref=f15e48] [cursor=pointer]
+            - button "Show other options" [ref=f15e53] [cursor=pointer]
+        - paragraph [ref=f15e56]:
+          - text: Don't have an account?
+          - link "Sign Up" [ref=f15e57] [cursor=pointer]:
+            - /url: /signup?next=%2Fsso-api%3Furl%3Dhttps%253A%252F%252Fqr-menue-aqccwqxug-mazzmakki786-3123s-projects.vercel.app%252Fsignup%252Frestaurant%26nonce%3Dcf4c7219e7dccd40b753c0e668d7de8072322483284db180375977dedec44d56
+      - generic [ref=f15e60]:
+        - link "Terms" [ref=f15e61] [cursor=pointer]:
+          - /url: /legal/terms
+        - link "Privacy Policy" [ref=f15e62] [cursor=pointer]:
+          - /url: /legal/privacy-policy

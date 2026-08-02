@@ -70,8 +70,21 @@ export const POST = safeRoute(async (
     return NextResponse.json({ error: "Failed to cancel order. It may have been updated already." }, { status: 400 })
   }
 
-  // Notify the owner via push notification (fire-and-forget)
   const restaurantId = order.restaurant_id
+
+  // Free table if dine-in order is cancelled
+  if (order.table_number) {
+    admin
+      .from("restaurant_tables")
+      .update({ is_occupied: false })
+      .eq("restaurant_id", restaurantId)
+      .eq("table_number", order.table_number)
+      .then(({ error: freeErr }) => {
+        if (freeErr) console.error("[cancel] Failed to free table:", freeErr.message)
+      })
+  }
+
+  // Notify the owner via push notification (fire-and-forget)
   const restaurantName = order.restaurants?.name || "Restaurant"
   sendPushNotification(restaurantId, {
     title: `Order #${order.order_number} Cancelled`,

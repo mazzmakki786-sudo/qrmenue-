@@ -76,7 +76,42 @@ export default function SubscriptionPage() {
     if (!plan) return
     const price = isYearly ? plan.yearlyPrice : plan.monthlyPrice
     const period = isYearly ? "yearly" : "monthly"
-    const msg = `Hi, I'm interested in the ${plan.name} plan (${period}: ${price}). Please activate my plan.`
+
+    // Fetch owner email from current session
+    let ownerEmail = "Not available"
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user?.email) ownerEmail = user.email
+    } catch {}
+
+    const restName = restaurant?.name || "Not provided"
+    const restPhone = restaurant?.phone || "Not provided"
+    const priceVal = price === "Free" ? "Free" : price
+
+    const msg = [
+      "🔔 *New Plan Request — Digital QR Menue*",
+      "",
+      `*Restaurant:* ${restName}`,
+      `*Phone:* ${restPhone}`,
+      `*Owner Email:* ${ownerEmail}`,
+      "",
+      `*Requested Plan:* ${plan.name}`,
+      `*Billing:* ${period}`,
+      `*Price:* ${priceVal}`,
+      "",
+      "Activate from superadmin panel.",
+    ].join("\n")
+
+    // Persist the request in the database
+    try {
+      const supabase = createClient()
+      await supabase
+        .from("restaurants")
+        .update({ requested_plan: planId })
+        .eq("id", restaurant?.id)
+    } catch {}
+
     window.open(`https://wa.me/${whatsappDigits}?text=${encodeURIComponent(msg)}`, "_blank")
   }
 
@@ -168,6 +203,22 @@ export default function SubscriptionPage() {
       )}
 
       <SubscriptionBanner restaurant={restaurant} orderCount={orderCount} />
+
+      {/* Requested Plan Banner */}
+      {restaurant?.requested_plan && (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-start gap-3">
+          <Clock className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
+          <div>
+            <h4 className="text-sm font-semibold text-green-900">
+              {restaurant.requested_plan.charAt(0).toUpperCase() + restaurant.requested_plan.slice(1)} Plan Requested
+            </h4>
+            <p className="text-xs text-green-700 mt-1">
+              Your plan upgrade request has been received. The superadmin will activate it shortly, usually within a few hours.
+              You can also contact us on WhatsApp to expedite.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Payment Error */}
       {buyError && (

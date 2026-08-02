@@ -15,7 +15,7 @@ export const blogSlugs = [
   "whatsapp-ordering-restaurant-pakistan-guide",
   "foodpanda-commission-vs-direct-ordering-pakistan",
   "benefits-qr-code-menu-pakistani-restaurants",
-  "restaurant-marketing-lahore-guide",
+  "restaurant-marketing-faisalabad-guide",
   "how-to-make-qr-code-menu-for-restaurant",
   // SEO guides that link to landing pages
   "what-is-digital-menu-for-restaurants",
@@ -25,6 +25,10 @@ export const blogSlugs = [
   "digital-menu-design-tips-restaurants",
   "digital-menu-app-vs-native-app",
   "qr-menu-vs-digital-menu-difference",
+  // Pakistan SEO cluster articles (Aug 2026) — link to new Pakistan/city landing pages
+  "menu-printing-islamabad",
+  "digital-vs-printed-menu-pakistan",
+  "how-to-create-digital-menu-restaurant",
 ] as const
 
 export const blogArticles: BlogArticle[] = [
@@ -185,27 +189,74 @@ export const blogArticles: BlogArticle[] = [
     authorTitle: "Digital Marketing Lead, Digital QR Menue",
     authorLinkedIn: "https://www.linkedin.com/in/muazmaki2",
   },
+  // === PAKISTAN SEO CLUSTER ARTICLES (Aug 2026) — link to Pakistan/city landing pages ===
+  {
+    slug: "menu-printing-islamabad",
+    title: "Menu Printing in Islamabad: Costs & the Digital Menu Alternative",
+    excerpt:
+      "How much does menu printing cost in Islamabad? See real prices, why reprints eat your profit, and how a digital QR menu saves you thousands. Local guide for Islamabad restaurants.",
+    date: "2026-08-01",
+    readTime: "7 min",
+    category: "Menu Printing",
+    author: "Maz Makki",
+    authorTitle: "Digital Marketing Lead, Digital QR Menue",
+    authorLinkedIn: "https://www.linkedin.com/in/muazmaki2",
+  },
+  {
+    slug: "digital-vs-printed-menu-pakistan",
+    title: "Digital Menu vs Printed Menu: Which Is Better for Pakistani Restaurants?",
+    excerpt:
+      "Compare digital menus with printed menus for Pakistani restaurants: costs, price updates, photos, and ordering. See why restaurants in Pakistan are making the switch.",
+    date: "2026-08-01",
+    readTime: "6 min",
+    category: "Menu Printing",
+    author: "Maz Makki",
+    authorTitle: "Digital Marketing Lead, Digital QR Menue",
+    authorLinkedIn: "https://www.linkedin.com/in/muazmaki2",
+  },
+  {
+    slug: "how-to-create-digital-menu-restaurant",
+    title: "How to Create a Digital Menu for Your Restaurant (Step-by-Step)",
+    excerpt:
+      "Step-by-step guide to create a digital menu for your restaurant in Pakistan. Add dishes, generate a QR code, print table cards, and start receiving WhatsApp orders.",
+    date: "2026-08-01",
+    readTime: "8 min",
+    category: "Digital Menu Guides",
+    author: "Maz Makki",
+    authorTitle: "Digital Marketing Lead, Digital QR Menue",
+    authorLinkedIn: "https://www.linkedin.com/in/muazmaki2",
+  },
 ]
 
 /** Shared list of static/public routes (not behind auth, not noindex). */
 export const publicRoutes = [
-  { path: "", lastModified: "2026-07-16" },
-  { path: "pricing", lastModified: "2026-07-16" },
-  { path: "restaurants", lastModified: "2026-07-16" },
-  { path: "faq", lastModified: "2026-07-16" },
-  { path: "about", lastModified: "2026-07-16" },
-  { path: "contact", lastModified: "2026-07-16" },
+  { path: "", lastModified: "2026-07-30" },
+  { path: "pricing", lastModified: "2026-07-30" },
+  { path: "restaurants", lastModified: "2026-07-30" },
+  { path: "faq", lastModified: "2026-07-30" },
+  { path: "about", lastModified: "2026-07-30" },
+  { path: "contact", lastModified: "2026-07-30" },
   { path: "privacy", lastModified: "2026-04-01" },
   { path: "terms", lastModified: "2026-04-01" },
-  { path: "signup/restaurant", lastModified: "2026-07-16" },
-  { path: "blog", lastModified: "2026-07-16" },
+  // Auth pages — now indexable (noindex removed)
+  { path: "signup/restaurant", lastModified: "2026-07-30" },
+  { path: "signup/customer", lastModified: "2026-07-30" },
+  { path: "login", lastModified: "2026-07-30" },
+  { path: "login/customer", lastModified: "2026-07-30" },
+  { path: "blog", lastModified: "2026-07-30" },
   // SEO landing pages — kept, distinct user intents
-  { path: "digital-menu-for-restaurants", lastModified: "2026-07-25" },
-  { path: "digital-menu-pdf", lastModified: "2026-07-21" },
-  { path: "digital-menu-design", lastModified: "2026-07-21" },
-  { path: "digital-menu-app", lastModified: "2026-07-21" },
-  { path: "digital-menu-tablet", lastModified: "2026-07-21" },
-  { path: "qr-menu-login", lastModified: "2026-07-21" },
+  { path: "digital-menu-for-restaurants", lastModified: "2026-07-30" },
+  { path: "digital-menu-pdf", lastModified: "2026-07-30" },
+  { path: "digital-menu-design", lastModified: "2026-07-30" },
+  { path: "digital-menu-app", lastModified: "2026-07-30" },
+  { path: "digital-menu-tablet", lastModified: "2026-07-30" },
+  { path: "qr-menu-login", lastModified: "2026-07-30" },
+  // Pakistan SEO cluster landing pages (Aug 2026)
+  { path: "digital-menu-pakistan", lastModified: "2026-08-01" },
+  { path: "qr-menu-pakistan", lastModified: "2026-08-01" },
+  { path: "digital-menu-islamabad", lastModified: "2026-08-01" },
+  { path: "digital-menu-lahore", lastModified: "2026-08-01" },
+  { path: "digital-menu-karachi", lastModified: "2026-08-01" },
 ] as const
 
 export const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.digitalmenue.com"

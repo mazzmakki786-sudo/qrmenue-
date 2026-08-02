@@ -36,8 +36,8 @@ export function AppFooter() {
   return (
     <footer className="bg-[#0A0A0A] text-[#999]">
       <div className="max-w-6xl mx-auto px-4 py-6 md:py-10">
-        {/* 2 cols on mobile, 4 on desktop */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-8">
+        {/* 2 cols on mobile, 5 on desktop */}
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-5 md:gap-8">
           {/* Column 1: Brand — full width on mobile */}
           <div className="col-span-2 lg:col-span-1">
             <div className="flex items-center gap-2.5 mb-3">
@@ -101,6 +101,8 @@ export function AppFooter() {
                 { href: "/digital-menu-pdf", label: "PDF Menu to QR" },
                 { href: "/digital-menu-app", label: "Digital Menu App" },
                 { href: "/digital-menu-tablet", label: "Tablet Menu" },
+                { href: "/digital-menu-design", label: "Digital Menu Design" },
+                { href: "/qr-menu-login", label: "QR Menu Login" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link
@@ -114,7 +116,30 @@ export function AppFooter() {
             </ul>
           </div>
 
-          {/* Column 4: Contact & Legal */}
+          {/* Column 4: Pakistan */}
+          <div className="col-span-1">
+            <h4 className="text-[10px] font-semibold uppercase tracking-widest text-white/60 mb-3">Pakistan</h4>
+            <ul className="space-y-1.5">
+              {[
+                { href: "/digital-menu-pakistan", label: "Digital Menu Pakistan" },
+                { href: "/qr-menu-pakistan", label: "QR Menu Pakistan" },
+                { href: "/digital-menu-islamabad", label: "Digital Menu Islamabad" },
+                { href: "/digital-menu-lahore", label: "Digital Menu Lahore" },
+                { href: "/digital-menu-karachi", label: "Digital Menu Karachi" },
+              ].map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-xs text-[#777] hover:text-white transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Column 5: Contact & Legal */}
           <div>
             <h4 className="text-[10px] font-semibold uppercase tracking-widest text-white/60 mb-3">Contact</h4>
             <ul className="space-y-1.5 mb-4">

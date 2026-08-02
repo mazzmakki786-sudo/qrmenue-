@@ -295,7 +295,7 @@ export default function DigitalMenuForRestaurantsPage() {
                 <thead>
                   <tr className="border-b border-[#E0E0E0]">
                     <th className="text-left py-3 font-semibold">Feature</th>
-                    <th className="text-left py-3 font-semibold text-green-700">Digital QR Menu</th>
+                    <th className="text-left py-3 font-semibold text-green-700">Digital QR Menue</th>
                     <th className="text-left py-3 font-semibold text-red-600">Foodpanda / Delivery Apps</th>
                   </tr>
                 </thead>
@@ -365,6 +365,36 @@ export default function DigitalMenuForRestaurantsPage() {
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Explore Digital Menu Solutions — internal link hub */}
+        <section className="py-16 md:py-20">
+          <div className="max-w-4xl mx-auto px-5">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center">
+              Explore Digital Menu Solutions
+            </h2>
+            <p className="text-sm text-[#555] text-center mb-10 max-w-lg mx-auto">
+              Everything you need to go fully digital — from PDF conversion to tablet menus and design tips.
+            </p>
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {[
+                { href: "/digital-menu-pdf", title: "Digital Menu PDF", desc: "Convert your existing PDF menu into an interactive QR code menu." },
+                { href: "/digital-menu-app", title: "Digital Menu App", desc: "A web-based digital menu app — no downloads, works in every browser." },
+                { href: "/digital-menu-tablet", title: "Tablet Menu", desc: "Turn any tablet or iPad into a premium digital menu display." },
+                { href: "/digital-menu-design", title: "Menu Design", desc: "Professional design tips, templates, and branding for your digital menu." },
+                { href: "/qr-menu-login", title: "QR Menu Login", desc: "Already a customer? Access your restaurant dashboard here." },
+              ].map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="p-6 bg-[#F9FAFB] border border-[#F0F0F0] rounded-2xl hover:border-[#CCC] hover:shadow-sm transition-all group"
+                >
+                  <h3 className="font-semibold text-sm mb-1.5 group-hover:underline">{item.title}</h3>
+                  <p className="text-xs text-[#555] leading-relaxed">{item.desc}</p>
+                </Link>
+              ))}
             </div>
           </div>
         </section>

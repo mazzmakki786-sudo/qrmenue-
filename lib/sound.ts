@@ -81,3 +81,24 @@ export function playNotification() {
     osc.stop(now + 0.15)
   } catch {}
 }
+
+export function playOrderConfirmed() {
+  if (!soundEnabled) return
+  try {
+    const ctx = getAudioContext()
+    const now = ctx.currentTime
+    // Three ascending chimes — happy, confirming tone
+    const notes = [523, 659, 784] // C5, E5, G5
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.type = "sine"
+      osc.frequency.setValueAtTime(freq, now + i * 0.12)
+      gain.gain.setValueAtTime(0.2, now + i * 0.12)
+      gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.12 + 0.3)
+      osc.connect(gain).connect(ctx.destination)
+      osc.start(now + i * 0.12)
+      osc.stop(now + i * 0.12 + 0.3)
+    })
+  } catch {}
+}

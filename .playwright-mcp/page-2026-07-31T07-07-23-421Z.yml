@@ -1,0 +1,18 @@
+- generic [ref=f4e1]:
+  - main [ref=f4e2]:
+    - generic [ref=f4e5]:
+      - heading "Almost there!" [level=1] [ref=f4e15]
+      - paragraph [ref=f4e16]: Choose your restaurant's permanent URLYour QR code will be generated for this URL
+      - generic [ref=f4e17]:
+        - paragraph [ref=f4e18]: Restaurant
+        - paragraph [ref=f4e19]: Test Restaurant
+        - paragraph [ref=f4e20]: Lahore · 03001234567
+      - generic [ref=f4e21]:
+        - generic [ref=f4e22]: Your Restaurant URL *
+        - generic [ref=f4e24]:
+          - generic [ref=f4e25]: https://www.digitalmenue.com/
+          - textbox "my-restaurant-name" [active] [ref=f4e26]: test-restaurant-xyz
+        - paragraph [ref=f4e38]: https://www.digitalmenue.com/test-restaurant-xyz is available!
+        - paragraph [ref=f4e31]: This URL is permanent and cannot be changed later.
+      - button "Complete Setup & Go to Dashboard" [ref=f4e39] [cursor=pointer]
+  - alert [ref=f4e27]

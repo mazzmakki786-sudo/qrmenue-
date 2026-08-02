@@ -6,7 +6,7 @@ import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Camera, Clock, Power } from "lucide-react"
+import { Camera, Clock, Power, ImageIcon, Upload, X, Trash2, Landmark } from "lucide-react"
 import type { Restaurant } from "@/types"
 import Image from "next/image"
 
@@ -31,6 +31,17 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const bannerFileInputRef = useRef<HTMLInputElement>(null)
+  const [bannerEnabled, setBannerEnabled] = useState(false)
+  const [bannerFile, setBannerFile] = useState<File | null>(null)
+  const [bannerPreview, setBannerPreview] = useState<string | null>(null)
+  const [bannerImageUrl, setBannerImageUrl] = useState<string | null>(null)
+  const [bannerLinkUrl, setBannerLinkUrl] = useState("")
+  const [paymentTillId, setPaymentTillId] = useState("")
+  const [paymentQrUrl, setPaymentQrUrl] = useState<string | null>(null)
+  const [paymentQrFile, setPaymentQrFile] = useState<File | null>(null)
+  const [paymentQrPreview, setPaymentQrPreview] = useState<string | null>(null)
+  const paymentQrInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
 
   const fetchRestaurant = async () => {
@@ -65,6 +76,11 @@ export default function SettingsPage() {
           delivery_time_min: (data as any).delivery_time_min ?? 30,
         })
         setLogoUrl(data.logo_url)
+        setBannerEnabled((data as any).banner_enabled ?? false)
+        setBannerImageUrl((data as any).banner_image_url || null)
+        setBannerLinkUrl((data as any).banner_link_url || "")
+        setPaymentTillId((data as any).payment_till_id || "")
+        setPaymentQrUrl((data as any).payment_qr_url || null)
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load settings.")
@@ -93,6 +109,8 @@ export default function SettingsPage() {
     setSaved(false)
 
     let newLogoUrl = logoUrl
+    let newBannerUrl = bannerImageUrl
+    let newPaymentQrUrl = paymentQrUrl
 
     if (logoFile) {
       const ext = logoFile.name.split(".").pop()
@@ -109,17 +127,58 @@ export default function SettingsPage() {
       }
     }
 
+    if (bannerFile) {
+      const ext = bannerFile.name.split(".").pop()
+      const path = `banners/${restaurant.id}-${Date.now()}.${ext}`
+      const { error: uploadError } = await supabase.storage
+        .from("dish-images")
+        .upload(path, bannerFile)
+
+      if (!uploadError) {
+        const { data: urlData } = supabase.storage
+          .from("dish-images")
+          .getPublicUrl(path)
+        newBannerUrl = urlData.publicUrl
+      }
+    }
+
+    if (paymentQrFile) {
+      const ext = paymentQrFile.name.split(".").pop()
+      const path = `payment-qr/${restaurant.id}-${Date.now()}.${ext}`
+      const { error: uploadError } = await supabase.storage
+        .from("dish-images")
+        .upload(path, paymentQrFile)
+
+      if (!uploadError) {
+        const { data: urlData } = supabase.storage
+          .from("dish-images")
+          .getPublicUrl(path)
+        newPaymentQrUrl = urlData.publicUrl
+      }
+    }
+
     await supabase.from("restaurants").update({
       ...form,
       ...timing,
       logo_url: newLogoUrl,
+      banner_enabled: bannerEnabled,
+      banner_image_url: bannerEnabled ? newBannerUrl : null,
+      banner_link_url: bannerEnabled ? bannerLinkUrl || null : null,
+      payment_till_id: paymentTillId.trim() || null,
+      payment_qr_url: newPaymentQrUrl,
     }).eq("id", restaurant.id)
 
     setSaving(false)
     setSaved(true)
     setLogoUrl(newLogoUrl)
+    setBannerImageUrl(newBannerUrl)
+    setBannerFile(null)
+    setBannerPreview(null)
     setLogoFile(null)
     setLogoPreview(null)
+    setPaymentQrUrl(newPaymentQrUrl)
+    setPaymentQrFile(null)
+    setPaymentQrPreview(null)
     setTimeout(() => setSaved(false), 3000)
   }
 
@@ -238,8 +297,152 @@ export default function SettingsPage() {
         <Input label="Phone / WhatsApp *" id="phone" value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} />
         <Input label="City *" id="city" value={form.city} onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))} />
         <Input label="Address" id="address" value={form.address} onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))} />
+      </div>
+
+      {/* Banner Section */}
+      <div className="bg-white rounded-2xl border border-[#F0F0F0] p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <ImageIcon className="w-4 h-4" />
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-black">Banner Image</h2>
+        </div>
+        <p className="text-xs text-[#555]">
+          Add a banner that appears at the top of your menu page. If no banner is set, your logo will be shown instead.
+        </p>
+
+        <label className="flex items-center gap-3 cursor-pointer">
+          <div className={`w-11 h-6 rounded-full transition-colors ${bannerEnabled ? "bg-black" : "bg-[#CCC]"} relative`}>
+            <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${bannerEnabled ? "translate-x-[22px]" : "translate-x-0.5"}`} />
+          </div>
+          <input type="checkbox" checked={bannerEnabled} onChange={(e) => setBannerEnabled(e.target.checked)} className="sr-only" />
+          <span className="text-sm text-black font-medium">Enable banner</span>
+        </label>
+
+        {bannerEnabled && (
+          <div className="space-y-3">
+            {/* Banner Image Upload */}
+            <div>
+              <label className="block text-sm font-medium text-black mb-2">Banner Image</label>
+              {bannerPreview || bannerImageUrl ? (
+                <div className="relative w-full aspect-[3/1] rounded-xl overflow-hidden mb-2 bg-[#F8F8F8]">
+                  <Image
+                    src={bannerPreview || bannerImageUrl || ""}
+                    alt="Banner"
+                    fill
+                    className="object-cover"
+                    sizes="600px"
+                  />
+                  <button
+                    onClick={() => { setBannerFile(null); setBannerPreview(null); setBannerImageUrl(null) }}
+                    className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-lg hover:bg-black/80 transition-colors"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => bannerFileInputRef.current?.click()}
+                  className="w-full aspect-[3/1] rounded-xl border-2 border-dashed border-[#E8E8E8] flex flex-col items-center justify-center gap-2 text-[#999] hover:border-[#999] hover:text-[#555] transition-colors"
+                >
+                  <Upload className="w-6 h-6" />
+                  <span className="text-sm">Upload banner image</span>
+                  <span className="text-xs">Recommended: 1200x400px</span>
+                </button>
+              )}
+              <input ref={bannerFileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (!file) return
+                setBannerFile(file)
+                setBannerPreview(URL.createObjectURL(file))
+              }} />
+            </div>
+
+            {/* Banner Link */}
+            <div>
+              <label className="block text-sm font-medium text-black mb-2">Banner Link (optional)</label>
+              <input
+                type="url"
+                value={bannerLinkUrl}
+                onChange={(e) => setBannerLinkUrl(e.target.value)}
+                placeholder="https://..."
+                className="flex h-12 w-full rounded-xl bg-[#F8F8F8] border border-[#E8E8E8] px-4 text-sm focus:outline-none focus:border-black transition-colors"
+              />
+              <p className="text-[11px] text-[#999] mt-1">Customers will be taken to this URL when they tap the banner</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Bank Transfer / Wallet Payment */}
+      <div className="bg-white rounded-2xl border border-[#F0F0F0] p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <Landmark className="w-4 h-4" />
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-black">Bank Transfer / Wallet</h2>
+        </div>
+        <p className="text-xs text-[#555]">
+          Add your JazzCash / Easypaisa TILL ID and QR code. Customers see these details on checkout when they select &quot;Bank Transfer&quot;, and on the order confirmation screen.
+        </p>
+
+        <div>
+          <label className="block text-sm font-medium text-black mb-2">TILL / Wallet ID</label>
+          <input
+            type="text"
+            value={paymentTillId}
+            onChange={(e) => setPaymentTillId(e.target.value)}
+            placeholder="e.g. 0312345678"
+            className="flex h-12 w-full rounded-xl bg-[#F8F8F8] border border-[#E8E8E8] px-4 text-base focus:outline-none focus:border-black transition-colors"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-black mb-2">Payment QR Code</label>
+          {paymentQrPreview || paymentQrUrl ? (
+            <div className="relative w-32 h-32 rounded-xl overflow-hidden mb-2 bg-[#F8F8F8] border border-[#E8E8E8]">
+              <Image
+                src={paymentQrPreview || paymentQrUrl || ""}
+                alt="Payment QR"
+                fill
+                className="object-contain p-1"
+                sizes="128px"
+                unoptimized
+              />
+              <button
+                onClick={() => { setPaymentQrFile(null); setPaymentQrPreview(null); setPaymentQrUrl(null) }}
+                className="absolute top-1.5 right-1.5 bg-black/60 text-white text-xs px-2 py-1 rounded-lg hover:bg-black/80 transition-colors"
+                aria-label="Remove payment QR"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => paymentQrInputRef.current?.click()}
+              className="w-32 h-32 rounded-xl border-2 border-dashed border-[#E8E8E8] flex flex-col items-center justify-center gap-2 text-[#999] hover:border-[#999] hover:text-[#555] transition-colors"
+            >
+              <Upload className="w-6 h-6" />
+              <span className="text-xs text-center px-1">Upload QR image</span>
+            </button>
+          )}
+          <input
+            ref={paymentQrInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (!file) return
+              setPaymentQrFile(file)
+              setPaymentQrPreview(URL.createObjectURL(file))
+            }}
+          />
+          <p className="text-[11px] text-[#999] mt-1">Take a screenshot of your payment QR (from JazzCash, Easypaisa, or bank app) and upload it.</p>
+        </div>
+      </div>
+
+      {/* Default Language */}
+      <div className="bg-white rounded-2xl border border-[#F0F0F0] p-5 space-y-4">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-black">Default Language</h2>
         <div className="space-y-1.5">
-          <label htmlFor="language" className="block text-sm font-medium text-black">Default Language</label>
+          <label htmlFor="language" className="block text-sm font-medium text-black">Language</label>
           <select
             id="language"
             value={form.language}

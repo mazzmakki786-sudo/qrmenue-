@@ -50,8 +50,9 @@ export function BellNotification({ restaurantId }: Props) {
   const [exitingAlerts, setExitingAlerts] = useState<Set<string>>(new Set())
   const [unreadAnnouncements, setUnreadAnnouncements] = useState(0)
 
-  // Derive badge count from today's orders + unread announcements
-  const unreadCount = todayOrders.filter((o) => o.order_status !== "cancelled").length + unreadAnnouncements
+  // Derive badge count from active today's orders + unread announcements
+  // Only show orders that need attention: received (new) + preparing (in progress)
+  const unreadCount = todayOrders.filter((o) => o.order_status === "received" || o.order_status === "preparing").length + unreadAnnouncements
   const dropdownRef = useRef<HTMLDivElement>(null)
   const addToast = useToastStore((s) => s.addToast)
 
@@ -70,6 +71,18 @@ export function BellNotification({ restaurantId }: Props) {
     })
   }, [])
 
+  const markAnnouncementAsRead = useCallback(async (id: string) => {
+    try {
+      await fetch("/api/owner/announcements", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ announcement_id: id }),
+      })
+      setUnreadAnnouncements((prev) => Math.max(0, prev - 1))
+    } catch {}
+    dismissAnnouncement()
+  }, [dismissAnnouncement])
+
   function getStartOfTodayPK() {
     const pkOffset = 5 * 60 * 60 * 1000
     const nowPK = new Date(Date.now() + pkOffset)
@@ -77,7 +90,14 @@ export function BellNotification({ restaurantId }: Props) {
     return new Date(startPK.getTime() - pkOffset).toISOString()
   }
 
+  function isCreatedToday(createdAt: string): boolean {
+    const orderDate = new Date(createdAt).toISOString().split("T")[0]
+    const todayDate = new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString().split("T")[0]
+    return orderDate === todayDate
+  }
+
   useEffect(() => {
+    if (!restaurantId) return
     const supabase = createClient()
 
     const fetchInitial = async () => {
@@ -116,7 +136,10 @@ export function BellNotification({ restaurantId }: Props) {
         },
         (payload) => {
           const order = payload.new as any
-          setTodayOrders((prev) => [order as TodayOrder, ...prev].slice(0, 50))
+          // Only add to todayOrders if the order was created today (PK timezone)
+          if (isCreatedToday(order.created_at)) {
+            setTodayOrders((prev) => [order as TodayOrder, ...prev].slice(0, 50))
+          }
           // Show toast + play sound only for "received" (new) orders
           if (order.order_status === "received") {
             playOrderAlert()
@@ -205,9 +228,26 @@ export function BellNotification({ restaurantId }: Props) {
       )
       .subscribe()
 
+    // Periodic badge refresh every 60s to catch any missed updates (e.g. status transitions from other tabs)
+    const badgeRefresh = setInterval(() => {
+      const supabase = createClient()
+      const startOfDay = getStartOfTodayPK()
+      supabase
+        .from("orders")
+        .select("id, order_number, customer_name, total_price, order_type, created_at, items, order_status")
+        .eq("restaurant_id", restaurantId)
+        .gte("created_at", startOfDay)
+        .order("created_at", { ascending: false })
+        .limit(50)
+        .then(({ data }) => {
+          if (data) setTodayOrders(data)
+        })
+    }, 60_000)
+
     return () => {
       supabase.removeChannel(channel)
       supabase.removeChannel(announcementChannel)
+      clearInterval(badgeRefresh)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restaurantId])
@@ -439,15 +479,22 @@ export function BellNotification({ restaurantId }: Props) {
             <p className="text-sm text-[#555] leading-relaxed whitespace-pre-wrap">{announcementModal.body}</p>
             <div className="flex items-center gap-3 mt-5">
               <button
-                onClick={dismissAnnouncement}
+                onClick={() => markAnnouncementAsRead(announcementModal.id)}
                 className="flex-1 h-12 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 transition-opacity min-h-[44px]"
               >
                 {announcementQueue.length > 1
-                  ? `Next (${announcementQueue.length - 1} remaining)`
-                  : "Got it"}
+                  ? `Mark as Read & Next (${announcementQueue.length - 1} remaining)`
+                  : "Mark as Read"}
               </button>
               <button
-                onClick={() => { dismissAnnouncement(); router.push("/dashboard/announcements") }}
+                onClick={dismissAnnouncement}
+                className="shrink-0 h-12 w-12 rounded-xl border border-[#F0F0F0] text-sm font-medium text-[#555] hover:bg-[#F0F0F0] transition-colors flex items-center justify-center min-h-[44px]"
+                title="Dismiss without marking as read"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => { markAnnouncementAsRead(announcementModal.id); router.push("/dashboard/announcements") }}
                 className="shrink-0 h-12 px-4 rounded-xl border border-[#F0F0F0] text-sm font-medium text-[#555] hover:bg-[#F0F0F0] transition-colors flex items-center justify-center gap-1.5 min-h-[44px]"
               >
                 <BellRing className="w-4 h-4" />

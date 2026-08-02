@@ -6,7 +6,7 @@ import { uid } from "@/lib/realtime"
 import { useRouter } from "next/navigation"
 import { useCartStore } from "@/stores/cartStore"
 import { useToastStore } from "@/stores/toastStore"
-import { playStatusChange, playNotification } from "@/lib/sound"
+import { playStatusChange, playNotification, playOrderConfirmed } from "@/lib/sound"
 import { useCustomerPushNotifications } from "@/lib/hooks/useCustomerPushNotifications"
 import { buildWhatsAppURL } from "@/lib/whatsapp"
 
@@ -74,6 +74,10 @@ export function useOrderTracking(id: string) {
   useEffect(() => {
     if (order?.order_status) {
       prevStatusRef.current = order.order_status
+      // Play success sound when order page first loads with "received" status (freshly confirmed)
+      if (order.order_status === "received") {
+        playOrderConfirmed()
+      }
     }
   }, [order?.order_status])
 

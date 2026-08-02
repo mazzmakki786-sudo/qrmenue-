@@ -27,6 +27,8 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: "ClaudeBot", allow: "/" },
       { userAgent: "ChatGPT-User", allow: "/" },
       { userAgent: "Applebot-Extended", allow: "/" },
+      // llms.txt — expose a machine-readable company overview for AI assistants
+      { userAgent: "*", allow: "/llms.txt" },
       // Training crawlers — explicitly blocked
       // Dynamic search parameter URLs — prevent infinite crawl traps
       { userAgent: "*", disallow: "/restaurants?q=" },

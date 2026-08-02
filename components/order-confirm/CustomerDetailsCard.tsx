@@ -47,7 +47,7 @@ export default function CustomerDetailsCard({
     {
       label: "Payment",
       value:
-        paymentMethod === "cod" ? "Cash on Delivery" : paymentMethod === "bank_transfer" ? "Bank Transfer" : paymentMethod,
+        paymentMethod === "cod" ? "Cash on Delivery (COD)" : paymentMethod === "bank_transfer" ? "Bank Transfer" : paymentMethod,
     },
     ...(deliveryAddress ? [{ label: "Address", value: deliveryAddress }] : []),
   ].filter(Boolean) as { label: string; value: string; action?: React.ReactNode }[]

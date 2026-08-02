@@ -1,8 +1,6 @@
 "use client"
 
 import { use } from "react"
-import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
 import { useOrderTracking } from "@/components/order-confirm/useOrderTracking"
 import { buildWhatsAppURL } from "@/lib/whatsapp"
 import StatusHeroSection from "@/components/order-confirm/StatusHeroSection"
@@ -15,6 +13,8 @@ import OrderActionsBar from "@/components/order-confirm/OrderActionsBar"
 import CancelOrderDialog from "@/components/order-confirm/CancelOrderDialog"
 import SignUpToCancelDialog from "@/components/order-confirm/SignUpToCancelDialog"
 import OrderConfirmSkeleton from "@/components/order-confirm/OrderConfirmSkeleton"
+import { OrderReceipt } from "@/components/shared/OrderReceipt"
+import { PaymentTransferDetails } from "@/components/shared/PaymentTransferDetails"
 import { X } from "lucide-react"
 
 export default function OrderConfirmPage({ params }: { params: Promise<{ id: string }> }) {
@@ -85,18 +85,12 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
   return (
     <>
       <div className="min-h-screen bg-[#F9FAFB] animate-fade-in">
-        {/* Top AppBar — sticky top-0 on mobile, top-14 below layout nav on desktop */}
-        <header className="bg-white/80 backdrop-blur-md sticky top-0 md:top-14 z-50 border-b border-border">
-          <div className="flex items-center justify-between px-4 h-14 md:h-16 max-w-5xl mx-auto">
+        {/* Top AppBar — sticky top-0, NO back arrow */}
+        <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-border">
+          <div className="flex items-center justify-between px-4 h-14 max-w-5xl mx-auto">
             <div className="flex items-center gap-4">
-              <Link
-                href={user ? "/account" : "/restaurants"}
-                className="w-8 h-8 md:w-9 md:h-9 rounded-full md:rounded-xl bg-[#F5F5F5] flex items-center justify-center active:scale-95 transition-transform shrink-0 hover:bg-[#EFEFEF]"
-              >
-                <ArrowLeft className="w-4 h-4" />
-              </Link>
               <h1 className="text-lg font-bold text-text-primary">{headerTitle}</h1>
-              <span className="text-xs md:text-sm text-text-muted">
+              <span className="text-xs text-text-muted">
                 #{order.order_number}
               </span>
             </div>
@@ -120,6 +114,15 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
                 window.open(whatsappUrl, "_blank")
                 setWhatsappSuccess(true)
               }}
+            />
+          )}
+
+          {/* Bank Transfer details — only shown when order placed with bank_transfer */}
+          {order.payment_method === "bank_transfer" && (
+            <PaymentTransferDetails
+              tillId={restaurant?.payment_till_id}
+              qrUrl={restaurant?.payment_qr_url}
+              compact
             />
           )}
 
@@ -158,6 +161,13 @@ export default function OrderConfirmPage({ params }: { params: Promise<{ id: str
             orderId={order.id}
             user={user}
           />
+
+          {/* Receipt — download & print */}
+          {restaurant && (
+            <div className="pt-2">
+              <OrderReceipt order={order} restaurant={restaurant} />
+            </div>
+          )}
         </main>
       </div>
 

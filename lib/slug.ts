@@ -9,12 +9,14 @@ export const RESERVED_SLUGS = new Set([
   // System & auth pages
   "login", "signup", "auth", "api",
   // Customer routes
-  "cart", "checkout", "favorites", "account", "restaurants", "menu", "faq",
+  "cart", "checkout", "favorites", "account", "restaurants", "restaurant", "menu", "faq",
   "order-confirm", "orders",
   // Owner routes
   "dashboard",
   // Superadmin
   "superadmin",
+  // Setup post-confirmation
+  "setup-restaurant",
   // Blog & content
   "blog", "pricing", "about", "contact", "privacy", "terms",
   // SEO landing pages
@@ -31,7 +33,54 @@ export const RESERVED_SLUGS = new Set([
   "qr-menu-app",
   "qr-menu-login",
   "scan-menu-code-online-free",
+  // Pakistan SEO cluster landing pages
+  "digital-menu-pakistan",
+  "qr-menu-pakistan",
+  "digital-menu-islamabad",
+  "digital-menu-lahore",
+  "digital-menu-karachi",
 ])
+
+/**
+ * Validate a custom slug chosen by the restaurant owner (one-time, permanent).
+ * Allows only lowercase letters, numbers, and hyphens.
+ * Checks against reserved list and DB.
+ */
+export async function validateCustomSlug(slug: string): Promise<{
+  valid: boolean
+  error?: string
+}> {
+  const cleaned = slugify(slug.toLowerCase())
+
+  if (!cleaned || cleaned !== slug) {
+    return { valid: false, error: "Only lowercase letters, numbers, and hyphens are allowed" }
+  }
+
+  if (cleaned.length < 2) {
+    return { valid: false, error: "Slug must be at least 2 characters" }
+  }
+
+  if (cleaned.length > 100) {
+    return { valid: false, error: "Slug must be under 100 characters" }
+  }
+
+  if (RESERVED_SLUGS.has(cleaned)) {
+    return { valid: false, error: "This URL is reserved and cannot be used" }
+  }
+
+  const admin = createAdminClient()
+  const { data } = await admin
+    .from("restaurants")
+    .select("slug")
+    .eq("slug", cleaned)
+    .maybeSingle()
+
+  if (data) {
+    return { valid: false, error: "This URL is already taken by another restaurant" }
+  }
+
+  return { valid: true }
+}
 
 /**
  * Generate a unique, clean slug for a restaurant based on its name.

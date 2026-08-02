@@ -1,0 +1,26 @@
+- generic [active] [ref=f7e1]:
+  - main [ref=f7e2]:
+    - generic [ref=f7e55]:
+      - generic [ref=f7e56]:
+        - heading "Welcome back" [level=1] [ref=f7e66]
+        - paragraph [ref=f7e67]: Sign in to your customer account
+      - generic [ref=f7e68]:
+        - generic [ref=f7e69]:
+          - generic [ref=f7e70]: Phone Number **
+          - textbox "Phone Number **" [ref=f7e71]:
+            - /placeholder: 03XX-XXXXXXX
+        - generic [ref=f7e72]:
+          - generic [ref=f7e73]: Password *
+          - generic [ref=f7e74]:
+            - textbox "Password *" [ref=f7e75]:
+              - /placeholder: Enter your password
+            - button [ref=f7e76] [cursor=pointer]
+        - generic [ref=f7e80] [cursor=pointer]:
+          - checkbox "Remember me" [ref=f7e81]
+          - generic [ref=f7e82]: Remember me
+        - button "Sign In" [ref=f7e83] [cursor=pointer]
+      - generic [ref=f7e84]:
+        - button "Don't have an account? Sign up" [ref=f7e85] [cursor=pointer]
+        - link "Back to restaurants" [ref=f7e86] [cursor=pointer]:
+          - /url: /restaurants
+  - alert [ref=f7e37]: Sign In | Digital QR Menue Pakistan

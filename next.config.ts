@@ -59,7 +59,10 @@ const nextConfig: NextConfig = {
       "@radix-ui/react-separator",
       "@radix-ui/react-switch",
     ],
-    webpackBuildWorker: true,
+    // webpackBuildWorker disabled — it causes flaky "Cannot read properties of
+    // undefined (reading 'call')" RSC chunk errors in dev (Next 15.5.18).
+    // Build worker is off → modules compiled in-process for reliable HMR.
+    webpackBuildWorker: false,
   },
   images: {
     remotePatterns: [
@@ -105,6 +108,12 @@ const nextConfig: NextConfig = {
     {
       source: "/qr-menu-app",
       destination: "/digital-menu-app",
+      permanent: true,
+    },
+    // Fix old 404 blog URL — slug was renamed
+    {
+      source: "/blog/restaurant-marketing-lahore-guide",
+      destination: "/blog/restaurant-marketing-faisalabad-guide",
       permanent: true,
     },
   ],

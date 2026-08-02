@@ -20,7 +20,9 @@ function buildAllowedOrigins(): string[] {
   if (process.env.NEXT_PUBLIC_SITE_URL) addWithWww(process.env.NEXT_PUBLIC_SITE_URL)
 
   if (process.env.NODE_ENV !== "production") {
-    origins.push("http://localhost:3000")
+    // Any localhost port — dev servers commonly run on 3000/3001/3002
+    // when Next.js auto-increments the port.
+    origins.push("http://localhost")
   }
 
   if (process.env.CORS_ORIGINS) {

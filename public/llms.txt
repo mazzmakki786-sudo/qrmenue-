@@ -9,18 +9,13 @@ Digital QR Menue (Digitalmenue.com) helps Pakistani restaurants create digital Q
 ## Key Pages
 
 - [Home](https://www.digitalmenue.com): Pakistan's #1 QR Code Menu Platform for Restaurants
-- [Digital Menu for Restaurants](https://www.digitalmenue.com/digital-menu-for-restaurants): Complete guide to digital menus in Pakistan
-- [Free Digital Menu](https://www.digitalmenue.com/free-digital-menu): Free QR code menu for Pakistani restaurants
-- [Best Digital Menu](https://www.digitalmenue.com/best-digital-menu-for-restaurants): Compare top digital menu platforms in Pakistan
-- [Free QR Code Menu](https://www.digitalmenue.com/qr-code-menu-free): Generate a free QR code menu
-- [Digital Menu QR Code](https://www.digitalmenue.com/digital-menu-qr-code): Create QR code menus for restaurants
-- [QR Code Restaurant Menu](https://www.digitalmenue.com/qr-code-restaurant-menu): Interactive QR code menus
-- [Digital Menu Design](https://www.digitalmenue.com/digital-menu-design): Tips and templates for menu design
+- [Digital Menu for Restaurants](https://www.digitalmenue.com/digital-menu-for-restaurants): Complete guide to digital menus in Pakistan — free QR code menus, WhatsApp ordering, and platform comparison
+- [Digital Menu Pakistan](https://www.digitalmenue.com/digital-menu-pakistan): Digital menus for restaurants across Pakistan — QR code menus, WhatsApp ordering, zero commission
+- [QR Menu Pakistan](https://www.digitalmenue.com/qr-menu-pakistan): Free QR code menus for Pakistani restaurants — scan, browse, order via WhatsApp
 - [Digital Menu App](https://www.digitalmenue.com/digital-menu-app): Web-based menu app — no download needed
-- [QR Menu App](https://www.digitalmenue.com/qr-menu-app): QR menu app for restaurants
 - [Digital Menu Tablet](https://www.digitalmenue.com/digital-menu-tablet): Tablet/iPad menu system
 - [Digital Menu PDF](https://www.digitalmenue.com/digital-menu-pdf): Convert PDF menu to QR code
-- [Scan Menu Code Online Free](https://www.digitalmenue.com/scan-menu-code-online-free): How to scan QR code menus
+- [Digital Menu Design](https://www.digitalmenue.com/digital-menu-design): Tips and templates for menu design
 - [QR Menu Login](https://www.digitalmenue.com/qr-menu-login): Restaurant dashboard login
 - [Browse Restaurants](https://www.digitalmenue.com/restaurants): Find restaurants with digital menus across Pakistan
 - [Pricing](https://www.digitalmenue.com/pricing): Free Trial, Starter (PKR 1,200/mo), Growth (PKR 2,500/mo), Premium (PKR 4,500/mo)
@@ -31,6 +26,10 @@ Digital QR Menue (Digitalmenue.com) helps Pakistani restaurants create digital Q
 - [Terms of Service](https://www.digitalmenue.com/terms)
 
 ## City Pages
+
+- [Digital Menu Islamabad](https://www.digitalmenue.com/digital-menu-islamabad): QR menus and digital menus for restaurants in Islamabad
+- [Digital Menu Lahore](https://www.digitalmenue.com/digital-menu-lahore): Digital menus and WhatsApp ordering for restaurants in Lahore
+- [Digital Menu Karachi](https://www.digitalmenue.com/digital-menu-karachi): QR menus and digital menus for restaurants in Karachi
 
 
 ## Features

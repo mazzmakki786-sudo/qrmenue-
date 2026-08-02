@@ -1,0 +1,25 @@
+- main [ref=e2]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - heading "Welcome back" [level=1] [ref=e16]
+      - paragraph [ref=e17]: Sign in to your account
+    - button "Continue with Google" [ref=e18] [cursor=pointer]
+    - generic [ref=e24]: or
+    - generic [ref=e28]:
+      - generic [ref=e29]:
+        - generic [ref=e30]: Email*
+        - textbox "Email*" [ref=e31]:
+          - /placeholder: your@email.com
+      - generic [ref=e32]:
+        - generic [ref=e33]: Password
+        - generic [ref=e34]:
+          - textbox "Password" [ref=e35]:
+            - /placeholder: Enter your password
+          - button [ref=e36] [cursor=pointer]
+      - button "Forgot Password?" [ref=e41] [cursor=pointer]
+      - button "Sign In" [ref=e42] [cursor=pointer]
+    - generic [ref=e43]:
+      - link "Don't have an account? Sign up" [ref=e44] [cursor=pointer]:
+        - /url: /signup/restaurant
+      - link "Back to home" [ref=e45] [cursor=pointer]:
+        - /url: /

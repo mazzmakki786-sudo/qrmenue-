@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { PlanEditor } from "@/components/superadmin/PlanEditor"
 import { Button } from "@/components/ui/button"
 import { formatPrice, timeAgo } from "@/lib/utils"
@@ -39,8 +39,12 @@ export default function RestaurantDetailPage() {
   const [resetMsg, setResetMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null)
 
   const supabase = createClient()
+  const router = useRouter()
   const debounceRef = useRef<NodeJS.Timeout | null>(null)
   const isFetchingRef = useRef(false)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteConfirm, setDeleteConfirm] = useState(false)
+  const [deleteText, setDeleteText] = useState("")
 
   const fetchData = async () => {
     if (isFetchingRef.current) return
@@ -56,7 +60,7 @@ export default function RestaurantDetailPage() {
       if (rRes?.restaurant) {
         setRestaurant(rRes.restaurant)
         setDishes(rRes.restaurant.dishes || [])
-        const users = ownerRes?.users || []
+        const users = ownerRes?.data || []
         const owner = users.find((u: any) => u.id === rRes.restaurant.owner_id)
         setOwnerEmail(owner?.email || null)
       }
@@ -181,9 +185,15 @@ export default function RestaurantDetailPage() {
         computedEnd = new Date(baseDate.getTime() + extraMs).toISOString()
       }
 
+      // When activating a NON-trial plan, also clear requested_plan
+      const updatePayload: Record<string, unknown> = { plan, plan_end_date: computedEnd }
+      if (plan !== "trial") {
+        updatePayload.requested_plan = null
+      }
+
       await fetch(`/api/superadmin/restaurants/${id}/toggle`, {
         method: "PATCH", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan, plan_end_date: computedEnd }),
+        body: JSON.stringify(updatePayload),
       })
       const amount = PLAN_PRICES[plan as keyof typeof PLAN_PRICES] ?? 0
       if (plan !== "trial" && amount > 0) {
@@ -217,6 +227,26 @@ export default function RestaurantDetailPage() {
     finally { setResetting(false) }
   }
 
+  const handleDelete = async () => {
+    if (!restaurant || deleteText !== "DELETE") return
+    setDeleting(true)
+    try {
+      const res = await fetch(`/api/superadmin/restaurants/${id}`, { method: "DELETE" })
+      if (res.ok) {
+        router.push("/superadmin")
+      } else {
+        const json = await res.json()
+        alert("Failed to delete: " + (json.error || "Unknown error"))
+      }
+    } catch (e: any) {
+      alert("Failed to delete: " + e.message)
+    } finally {
+      setDeleting(false)
+      setDeleteConfirm(false)
+      setDeleteText("")
+    }
+  }
+
   if (loading) return <div className="text-center text-[#999] py-12">Loading...</div>
   if (!restaurant) return <div className="text-center text-[#DC2626] py-12">Restaurant not found</div>
 
@@ -232,6 +262,7 @@ export default function RestaurantDetailPage() {
   const totalFunnel = orderFunnel.reduce((s, x) => s + x.value, 0)
 
   return (
+    <>
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
@@ -244,10 +275,18 @@ export default function RestaurantDetailPage() {
             <code className="text-sm text-[#555]">/{restaurant.slug}</code>
           </div>
         </div>
-        <a href={`/${restaurant.slug}`} target="_blank" rel="noopener"
-          className="px-6 py-2 border border-black text-black text-sm font-semibold rounded-lg hover:bg-[#F3F4F5] transition-colors flex items-center gap-2">
-          <ExternalLink className="w-4 h-4" /> View Menu
-        </a>
+        <div className="flex items-center gap-2">
+          <a href={`/${restaurant.slug}`} target="_blank" rel="noopener"
+            className="px-6 py-2 border border-black text-black text-sm font-semibold rounded-lg hover:bg-[#F3F4F5] transition-colors flex items-center gap-2">
+            <ExternalLink className="w-4 h-4" /> View Menu
+          </a>
+          <button
+            onClick={() => setDeleteConfirm(true)}
+            className="px-4 py-2 border border-[#DC2626] text-[#DC2626] text-sm font-semibold rounded-lg hover:bg-red-50 transition-colors flex items-center gap-1.5"
+          >
+            <XCircle className="w-4 h-4" /> Delete
+          </button>
+        </div>
       </header>
 
       {/* Quick-Toggle Grid */}
@@ -282,6 +321,9 @@ export default function RestaurantDetailPage() {
               <DetailRow icon={<Utensils className="w-4 h-4" />} text={restaurant.cuisine_type || "—"} />
               <div className="pt-3 border-t border-[#F0F0F0] space-y-2">
                 <DetailRow label="Current Plan" value={restaurant.plan} badge />
+                {restaurant.requested_plan && (
+                  <DetailRow label="Requested Plan" value={restaurant.requested_plan} badge color="text-[#16A34A]" />
+                )}
                 {restaurant.plan === "trial" && (
                   <DetailRow label="Trial Ends" value={trialDaysLeft === 0 ? "Today" : `${trialDaysLeft} Days Remaining`} color={trialDaysLeft <= 3 ? "text-[#ba1a1a]" : "text-black"} />
                 )}
@@ -528,6 +570,48 @@ export default function RestaurantDetailPage() {
         </section>
       </div>
     </div>
+
+    {/* Delete Confirmation Dialog */}
+    {deleteConfirm && (
+      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center px-4">
+        <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
+          <h3 className="text-lg font-bold text-black mb-2">Delete Restaurant</h3>
+          <p className="text-sm text-[#555] mb-2">
+            Are you sure you want to delete <strong>{restaurant.name}</strong>?
+          </p>
+          <p className="text-sm text-[#DC2626] mb-4 font-medium">
+            This will permanently delete all dishes, categories, orders, and associated data. This action cannot be undone.
+          </p>
+          <div className="mb-4">
+            <label className="block text-xs text-[#555] mb-1.5">Type <strong>DELETE</strong> to confirm:</label>
+            <input
+              type="text"
+              value={deleteText}
+              onChange={(e) => setDeleteText(e.target.value)}
+              className="w-full h-11 px-3.5 rounded-xl border border-[#F0F0F0] text-sm outline-none focus:border-[#DC2626] transition-colors"
+              placeholder="Type DELETE"
+            />
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={() => { setDeleteConfirm(false); setDeleteText("") }}
+              disabled={deleting}
+              className="flex-1 px-4 py-3 rounded-xl border border-[#F0F0F0] text-sm font-semibold hover:bg-[#F9FAFB] transition-colors disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDelete}
+              disabled={deleting || deleteText !== "DELETE"}
+              className="flex-1 px-4 py-3 rounded-xl bg-[#DC2626] text-white text-sm font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {deleting ? <><Loader2 className="w-4 h-4 animate-spin" /> Deleting...</> : "Delete Permanently"}
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   )
 }
 

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { safeRoute } from "@/lib/api-error"
 import { createAdminClient } from "@/lib/supabase/server"
 import { checkRateLimit } from "@/lib/rate-limiter"
+import { invalidateOrderCount } from "@/lib/subscription-usage"
 
 export const GET = safeRoute(async (request) => {
   await checkRateLimit(request, "superadmin:read")
@@ -100,6 +101,7 @@ export const POST = safeRoute(async (request) => {
   }
 
   // Also update the restaurant's plan fields
+  // Clear any stale plan_limits_override so the new plan's real limits apply.
   const { error: updateError } = await admin
     .from("restaurants")
     .update({
@@ -108,8 +110,13 @@ export const POST = safeRoute(async (request) => {
       plan_end_date: end_date || null,
       is_suspended: false,
       is_active: true,
+      plan_limits_override: null,
     })
     .eq("id", restaurant_id)
+
+  // Plan change → order usage counter anchors to the new plan_start_date,
+  // drop any stale cached count from the previous plan period.
+  invalidateOrderCount(restaurant_id)
 
   if (updateError) {
     console.error("[Superadmin Subscriptions] Failed to update restaurant plan:", updateError)

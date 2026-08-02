@@ -101,6 +101,7 @@ export default function CityAutocomplete({
         required={required}
         autoComplete="off"
         aria-describedby={error ? `${id}-error` : undefined}
+        aria-controls={showDropdown && suggestions.length > 0 ? `${id}-listbox` : undefined}
         aria-expanded={showDropdown}
         aria-autocomplete="list"
         role="combobox"
@@ -108,6 +109,7 @@ export default function CityAutocomplete({
       />
       {suggestions.length > 0 && showDropdown && (
         <ul
+          id={`${id}-listbox`}
           role="listbox"
           className="absolute z-50 left-0 right-0 mt-1 bg-white border border-border rounded-xl shadow-lg max-h-48 overflow-y-auto"
         >

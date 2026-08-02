@@ -579,13 +579,13 @@ const articles: Record<string, { title: string; content: string[]; date: string;
 
       "A digital menu for restaurants is an interactive, web-based menu that customers access on their smartphones or tablets instead of a traditional printed menu. Unlike a PDF or image of a menu, a true digital menu is live, updatable in real-time, and often connected directly to an ordering system.",
 
-      "When a customer visits your restaurant, they scan a <a href='/qr-code-restaurant-menu'>QR code restaurant menu</a> using their phone camera. Your full menu instantly appears on their screen with dish names, descriptions, prices, and mouth-watering photos. They can browse categories and place orders directly through WhatsApp without waiting for a waiter.",
+      "When a customer visits your restaurant, they scan a <a href='/digital-menu-for-restaurants'>QR code restaurant menu</a> using their phone camera. Your full menu instantly appears on their screen with dish names, descriptions, prices, and mouth-watering photos. They can browse categories and place orders directly through WhatsApp without waiting for a waiter.",
 
       "## Types of Digital Menus",
 
       "Not all digital menus are the same. Here are the most common types:",
 
-      "QR Code Menu: Customers scan a QR code to view the menu on their phone. This is the most popular type for Pakistani restaurants because it requires zero hardware. See our <a href='/qr-code-menu-free'>free QR code menu</a> page.",
+      "QR Code Menu: Customers scan a QR code to view the menu on their phone. This is the most popular type for Pakistani restaurants because it requires zero hardware. See our <a href='/digital-menu-for-restaurants'>free QR code menu</a> page.",
 
       "Tablet Menu: A tablet or iPad is placed on each table with the menu displayed. See our <a href='/digital-menu-tablet'>digital menu tablet</a> guide.",
 
@@ -596,6 +596,24 @@ const articles: Record<string, { title: string; content: string[]; date: string;
       "## Benefits of a Digital Menu",
 
       "Digital menus save thousands on printing costs, charge zero commission on orders (unlike food delivery apps at 25-35%), let you update prices in 30 seconds, require no app download, and show beautiful food photos that increase order values by 20-30%.",
+
+      "## How a Digital Menu Actually Works",
+
+      "The technical side is simpler than most owners expect. A digital menu is a web page hosted on a platform like <a href='/digital-menu-for-restaurants'>Digital QR Menue</a>. Each restaurant gets its own unique link, and a QR code points to that link. When a customer scans the code with the camera on any Android or iPhone, the menu opens instantly in their browser — no app store, no signup, no OTP. Behind the scenes, the menu is backed by a database of your dishes, so when you edit a price in your dashboard, every table in your restaurant sees the updated menu immediately. Orders are formatted and delivered straight to your WhatsApp Business number, which is why the whole system works without installing a single application.",
+
+      "This architecture also means a digital menu scales with your business. Add a new branch? The same platform can host multiple locations. Launch delivery? Your takeaway and dine-in sections live on the same menu. According to the <a href='https://www.statista.com/topics/4418/restaurant-industry-worldwide/' rel='noopener nofollow' target='_blank'>restaurant industry data compiled by Statista</a>, restaurants that adopt digital ordering channels consistently report lower operating costs and higher average check sizes — trends that are only accelerating as customers expect convenience everywhere.",
+
+      "## Digital Menu vs PDF Menu: What's the Difference?",
+
+      "Many restaurant owners ask whether a simple PDF they send on WhatsApp counts as a digital menu. It does not. A PDF is a static file: every time you change a price, you must create a new file, resend it to every customer, and risk someone reading an outdated version. A true <a href='/digital-menu-for-restaurants'>QR code restaurant menu</a> is live and interactive — it updates in real-time, shows stock availability, highlights daily specials, and connects directly to your ordering system. Think of a PDF as a photograph of your menu and a digital menu as your menu itself, always current and always working for you. If you already have a PDF, you can still <a href='/digital-menu-pdf'>convert your PDF menu to a QR code</a> and get the best of both worlds.",
+
+      "## How Digital Menus Increase Orders",
+
+      "A digital menu does not just replace paper — it actively sells. When customers scan a <a href='/digital-menu-app'>QR menu</a>, they see high-quality photos of your signature dishes, prices they can trust, and a one-tap \"Order via WhatsApp\" button. Restaurants using photo-rich digital menus report 20-30% higher average order values because visual menus are more tempting and easier to browse. Digital menus also remove friction: customers no longer wave for a waiter to ask for the menu, wait for a printed card, or struggle to read a laminated sheet in dim lighting. Faster ordering means faster table turns during lunch rush — and every additional turn is pure revenue.",
+
+      "## Is a Digital Menu Right for Your Restaurant?",
+
+      "If you serve food to customers — whether a fine-dining restaurant, a fast-food outlet, a café, a dhaba, or a cloud kitchen — the answer is almost certainly yes. Digital menus work for every cuisine and every budget, from a single-table setup to a multi-branch chain. They are especially valuable in Pakistan, where WhatsApp penetration is near-universal and data costs are low, so customers face zero barrier to scanning and ordering. And because Digital QR Menue offers a 30-day free trial, you can test the system with your own menu before spending a single rupee. There is very little downside to trying it — and a very large upside in printing savings, commission savings, and order growth.",
 
       "Ready to create your digital menu? <a href='/digital-menu-for-restaurants'>Visit our digital menu for restaurants page</a> to get started.",
     ],
@@ -611,7 +629,7 @@ const articles: Record<string, { title: string; content: string[]; date: string;
 
       "## What Does a Free Digital Menu Include?",
 
-      "A <a href='/free-digital-menu'>free digital menu</a> gives you core features: QR code generation, digital menu with categories, menu items and prices, WhatsApp ordering, and order notifications.",
+      "A <a href='/digital-menu-for-restaurants'>free digital menu</a> gives you core features: QR code generation, digital menu with categories, menu items and prices, WhatsApp ordering, and order notifications.",
 
       "With Digital QR Menue free trial, you get full access to all features for 30 days. No credit card required.",
 
@@ -627,7 +645,7 @@ const articles: Record<string, { title: string; content: string[]; date: string;
 
       "Foodpanda at 25% commission on PKR 150,000 in monthly orders costs PKR 37,500/month. Digital QR Menue paid plans start at PKR 1,500/month. The choice is clear.",
 
-      "Ready to start? <a href='/free-digital-menu'>Start your free digital menu trial today</a>.",
+      "Ready to start? <a href='/digital-menu-for-restaurants'>Start your free digital menu trial today</a>.",
     ],
   },
   "best-digital-menu-platform-pakistan": {
@@ -635,7 +653,7 @@ const articles: Record<string, { title: string; content: string[]; date: string;
     date: "2026-07-21",
     author: "Maz Makki",
     content: [
-      "With dozens of digital menu platforms available, choosing the right one for your restaurant in Pakistan can be overwhelming. Here is our comparison to help you find the <a href='/best-digital-menu-for-restaurants'>best digital menu for restaurants</a>.",
+      "With dozens of digital menu platforms available, choosing the right one for your restaurant in Pakistan can be overwhelming. Here is our comparison to help you find the <a href='/digital-menu-for-restaurants'>best digital menu for restaurants</a>.",
 
       "## What Makes a Great Platform?",
 
@@ -651,7 +669,7 @@ const articles: Record<string, { title: string; content: string[]; date: string;
 
       "MenuPe (India): Payment in INR, no JazzCash/Easypaisa, limited Urdu support.",
 
-      "For Pakistani restaurants, <a href='/best-digital-menu-for-restaurants'>Digital QR Menue</a> is the clear choice.",
+      "For Pakistani restaurants, <a href='/digital-menu-for-restaurants'>Digital QR Menue</a> is the clear choice.",
     ],
   },
   "digital-menu-qr-code-setup-guide": {
@@ -663,7 +681,7 @@ const articles: Record<string, { title: string; content: string[]; date: string;
 
       "## Step 1: Choose Your Platform",
 
-      "Select a platform to create your <a href='/digital-menu-qr-code'>digital menu QR code</a>. For Pakistani restaurants, Digital QR Menue is built for the local market.",
+      "Select a platform to create your <a href='/digital-menu-for-restaurants'>digital menu QR code</a>. For Pakistani restaurants, Digital QR Menue is built for the local market.",
 
       "## Step 2: Add Your Restaurant Info",
 
@@ -683,9 +701,9 @@ const articles: Record<string, { title: string; content: string[]; date: string;
 
       "## Step 6: Connect WhatsApp",
 
-      "Enter your WhatsApp number in the dashboard. Customers scan your <a href='/qr-code-restaurant-menu'>QR code restaurant menu</a> and order with one tap.",
+      "Enter your WhatsApp number in the dashboard. Customers scan your <a href='/digital-menu-for-restaurants'>QR code restaurant menu</a> and order with one tap.",
 
-      "Ready to set up your <a href='/digital-menu-qr-code'>digital menu QR code</a>? Start your free trial today.",
+      "Ready to set up your <a href='/digital-menu-for-restaurants'>digital menu QR code</a>? Start your free trial today.",
     ],
   },
   "digital-menu-design-tips-restaurants": {
@@ -739,13 +757,13 @@ const articles: Record<string, { title: string; content: string[]; date: string;
 
       "## WhatsApp vs Push Notifications",
 
-      "In Pakistan, WhatsApp has near-universal penetration. A <a href='/qr-menu-app'>QR menu app</a> that sends orders via WhatsApp fits naturally into customer behavior.",
+      "In Pakistan, WhatsApp has near-universal penetration. A <a href='/digital-menu-app'>QR menu app</a> that sends orders via WhatsApp fits naturally into customer behavior.",
 
       "## The Verdict",
 
       "For 95% of Pakistani restaurants, a digital menu app is better: costs 95% less, reaches all customers, updates instantly, works with WhatsApp, and needs no maintenance.",
 
-      "Ready to start? <a href='/free-digital-menu'>Start your free digital menu trial</a> today.",
+      "Ready to start? <a href='/digital-menu-for-restaurants'>Start your free digital menu trial</a> today.",
     ],
   },
   "qr-menu-vs-digital-menu-difference": {
@@ -761,9 +779,114 @@ const articles: Record<string, { title: string; content: string[]; date: string;
 
       "Think of it this way: QR code = the door. Digital menu = the room. WhatsApp ordering = the service. You need all three.",
 
-      "| Type | Best For |\n|------|----------|\n| <a href='/qr-code-restaurant-menu'>QR Code Menu</a> | Most restaurants |\n| <a href='/digital-menu-tablet'>Tablet Menu</a> | Fine dining |\n| <a href='/digital-menu-pdf'>PDF Menu</a> | Simple display |\n| <a href='/digital-menu-app'>Web Menu</a> | Social media/delivery |",
+      "| Type | Best For |\n|------|----------|\n| <a href='/digital-menu-for-restaurants'>QR Code Menu</a> | Most restaurants |\n| <a href='/digital-menu-tablet'>Tablet Menu</a> | Fine dining |\n| <a href='/digital-menu-pdf'>PDF Menu</a> | Simple display |\n| <a href='/digital-menu-app'>Web Menu</a> | Social media/delivery |",
 
-      "For most Pakistani restaurants, combine a QR code with a digital menu and WhatsApp ordering. <a href='/free-digital-menu'>Start your free trial</a> today.",
+      "For most Pakistani restaurants, combine a QR code with a digital menu and WhatsApp ordering. <a href='/digital-menu-for-restaurants'>Start your free trial</a> today.",
+    ],
+  },
+  // ═══════════════════════════════════════════════
+  //  PAKISTAN SEO CLUSTER ARTICLES (Aug 2026) -- link to Pakistan/city landing pages
+  // ═══════════════════════════════════════════════
+  "menu-printing-islamabad": {
+    title: "Menu Printing in Islamabad: Costs & the Digital Menu Alternative",
+    date: "2026-08-01",
+    author: "Maz Makki",
+    content: [
+      "If you run a restaurant in Islamabad, you have probably been asked the same question your print shop asks: how many menu cards do you want this time? And you have probably winced at the answer, because menu printing in Islamabad is not cheap — and it never ends. Every price change means another print run.",
+      "In this guide, we break down what menu printing actually costs in Islamabad, why reprints quietly eat your profit, and how a digital menu for restaurants in Islamabad eliminates printing costs for good.",
+      "## How Much Does Menu Printing Cost in Islamabad?",
+      "Menu printing prices in Islamabad vary with quality, size, and quantity. Here is what restaurants typically pay:",
+      "| Menu Type | Typical Cost in Islamabad | Quantity |\n|-----------|--------------------------|----------|\n| A4 laminated menu (black & white) | PKR 150 - 400 per card | 50 - 100 cards |\n| A4 laminated menu (colour) | PKR 300 - 600 per card | 50 - 100 cards |\n| A3 fold-over menu (colour, gloss) | PKR 500 - 900 per card | 50 - 100 cards |\n| Leather-bound menu (premium) | PKR 800 - 2,000 per card | 20 - 50 cards |\n| Table tent / standee inserts | PKR 100 - 300 per insert | 50 - 100 inserts |",
+      "For a mid-size restaurant in Blue Area, F-7, or the food streets, a proper colour print run of 100 laminated A4 cards costs between PKR 30,000 and PKR 60,000. Premium leather menus push that higher still.",
+      "## The Hidden Cost: Reprints",
+      "The sticker price is only half the problem. Most restaurants reprint their menus every 2 to 3 months, because prices change. Chicken, beef, oil, and vegetable prices in Pakistan move often, and a menu with crossed-out or outdated prices looks bad and confuses customers.",
+      "Do the math for a restaurant in Islamabad:",
+      "• 100 laminated colour menu cards: PKR 40,000 per print run\n• 5 print runs a year (price changes + new dishes): PKR 200,000 per year\n• 2 years: PKR 400,000 on printed menus alone",
+      "That is not a one-time cost. That is a recurring expense that grows every time the market shifts. And every reprint means your old cards are waste — paper, lamination, and ink that ends up in the bin.",
+      "## Why Islamabad Restaurants Are Moving Away from Printed Menus",
+      "Islamabad is one of Pakistan's most tech-savvy cities. Customers in F-7, G-9, and the Blue Area scan QR codes without thinking about it. That makes the capital a natural market for the switch from printed to digital menus.",
+      "A <a href='/digital-menu-islamabad'>digital menu for restaurants in Islamabad</a> solves the reprint problem completely:",
+      "• Price changes go live in seconds from your phone — no reprint\n• New dishes appear instantly — no waiting for the print shop\n• Beautiful food photos on every item — impossible to afford on paper\n• Urdu + English on the same card — no extra print cost\n• Orders go straight to your WhatsApp — printed menus can't take orders",
+      "## How Much Does a Digital Menu Cost vs Printing?",
+      "Digital QR Menue's paid plans start at PKR 1,500 per month for the Starter plan, with a 30-day free trial to test everything first. Compare that to the PKR 200,000 a year many Islamabad restaurants spend on reprints:",
+      "| | Printed Menus | Digital QR Menu |\n|---|--------------|-----------------|\n| Yearly cost | PKR 200,000 (reprints) | PKR 18,000 (Starter) |\n| Price updates | Every 2-3 months, expensive | Instant, free |\n| Photos | Expensive to print | Included on every dish |\n| Urdu + English | Costs more to print | Both included |\n| Takes orders | No | Yes, via WhatsApp |",
+      "Over a year, a digital menu can save an Islamabad restaurant over PKR 180,000 — while also taking orders that printed menus never could.",
+      "## Step-by-Step: Going Digital in Islamabad",
+      "1. Create your account at Digital QR Menue (30-day free trial, no credit card)\n2. Add your restaurant name, logo, and menu items with photos and PKR prices\n3. Generate your unique QR code and download it in high resolution\n4. Print the QR code once — on table tents, counter signs, or stickers (a single small print run costs a few hundred rupees)\n5. Place the code on tables and at the counter; share the menu link on WhatsApp for delivery\n6. Start receiving orders directly on your WhatsApp",
+      "That one small QR code print run is the last printing bill you will pay. From then on, every change is free and instant.",
+      "## Where to Print Your QR Code in Islamabad",
+      "You only need to print the QR code once, so any shop works — print it at a local printer in your market, or simply on A4 paper in your own office and slip it into table stands. Because the code never changes, there is no repeat cost.",
+      "## The Bottom Line",
+      "Menu printing in Islamabad is a recurring cost that never stops — unless you switch. A <a href='/digital-menu-pakistan'>digital menu for restaurants in Pakistan</a> costs a fraction of what reprints cost, updates instantly, shows your food beautifully, and takes WhatsApp orders. For Islamabad restaurants, the math is clear.",
+      "Ready to stop paying for reprints? <a href='/digital-menu-islamabad'>Create your digital menu in Islamabad</a> today — start free.",
+    ],
+  },
+  "digital-vs-printed-menu-pakistan": {
+    title: "Digital Menu vs Printed Menu: Which Is Better for Pakistani Restaurants?",
+    date: "2026-08-01",
+    author: "Maz Makki",
+    content: [
+      "Every Pakistani restaurant owner has faced the same decision: keep printing menu cards, or go digital with a QR menu. Both options are used across Lahore, Karachi, and Islamabad today — but they are not equal. This guide compares digital menus vs printed menus on the factors that actually matter for restaurants in Pakistan: cost, speed of updates, photos, language, and ordering.",
+      "## Cost: Printed Menus Are a Recurring Expense",
+      "A printed menu is not a one-time purchase. Laminated colour menu cards in Pakistan typically cost PKR 500-2,000 per card for premium options, and most restaurants reprint every 2-3 months because prices change. A restaurant doing 100 laminated cards at PKR 400 each pays PKR 40,000 per run — and reprints 4-5 times a year.",
+      "A digital menu from Digital QR Menue starts at PKR 1,500 per month. That is PKR 18,000 a year — a fraction of what most restaurants spend on reprints. And there are no per-order fees: you keep 100% of every order that comes through WhatsApp.",
+      "| | Printed Menu | Digital Menu |\n|---|-------------|--------------|\n| Yearly cost | PKR 100,000 - 200,000 (reprints) | PKR 18,000 - 54,000 |\n| Per-order fees | None, but no orders either | Zero commission |\n| Price updates | PKR 500-2,000 per reprint | Instant, free |",
+      "## Price Updates: The Killer Difference",
+      "In Pakistan's economy, food prices move constantly. When chicken, oil, or vegetables go up, your menu prices are immediately out of date. With a printed menu, you face an impossible choice: serve at a loss until you reprint, or leave outdated prices on the card and frustrate customers.",
+      "A <a href='/digital-menu-pakistan'>digital menu for restaurants in Pakistan</a> updates in seconds from your phone. Change the price, add a dish, or remove a sold-out item — and every table sees the new version immediately. No crossed-out prices, no waiting for the print shop, no wasted cards.",
+      "## Photos: What a Menu Can Show",
+      "Colour printing in Pakistan is expensive, which is why most printed menus are text-heavy with only a few photos on the cover. But photos sell food. Restaurants using photo-rich digital menus report 20-30% higher average order values.",
+      "A digital menu lets you show a high-quality photo of every single dish — free, in colour, instantly. Your karahi, your BBQ platter, your biryani — each one gets a mouth-watering image that a printed card simply cannot afford.",
+      "## Urdu + English: Both Languages on One Card",
+      "Pakistan has over 230 million Urdu speakers, and many customers prefer reading menus in Urdu. On a printed menu, printing every item in both Urdu and English costs more and crowds the card. A digital menu includes Urdu and English side by side for every dish at no extra cost, with a language toggle customers can use instantly.",
+      "## Ordering: The Biggest Advantage of Digital",
+      "This is where the comparison stops being close. A printed menu can only inform — it cannot take an order. A <a href='/qr-menu-pakistan'>QR menu</a> is connected to WhatsApp ordering: customers scan, add items to their cart, and send the order directly to your restaurant. The waiter doesn't take it down, the phone doesn't get it wrong, and the order arrives formatted with the customer's name, items, and total.",
+      "For dine-in, takeaway, and delivery, that ordering channel is worth more than the entire printing budget you save.",
+      "## When a Printed Menu Still Makes Sense",
+      "To be fair, printed menus are not useless. Many fine-dining restaurants in Pakistan keep a printed or leather-bound menu alongside a QR menu for the experience, and some older customers prefer a physical card. The best approach is hybrid: keep one elegant printed menu as a keepsake or for ambience, and use your QR menu for the actual ordering.",
+      "The mistake is using printed cards as your only menu — paying reprint costs every few months while giving customers no way to order directly.",
+      "## The Verdict for Pakistani Restaurants",
+      "For almost every restaurant in Pakistan — from dhabas and cafés to fast food and fine dining — a digital menu wins on cost, speed, photos, language, and ordering. The switch is simple: create your menu, print your QR code once, and start receiving WhatsApp orders. To see how in your own city, explore <a href='/digital-menu-lahore'>digital menus in Lahore</a>, <a href='/digital-menu-karachi'>Karachi</a>, or <a href='/digital-menu-islamabad'>Islamabad</a>.",
+      "Ready to compare for yourself? <a href='/signup/restaurant'>Start your free trial</a> and see how much your restaurant saves.",
+    ],
+  },
+  "how-to-create-digital-menu-restaurant": {
+    title: "How to Create a Digital Menu for Your Restaurant (Step-by-Step)",
+    date: "2026-08-01",
+    author: "Maz Makki",
+    content: [
+      "Creating a digital menu for your restaurant is simpler and faster than most owners expect. In under 30 minutes you can have a live, QR-powered menu that takes WhatsApp orders — no technical skills required. Here is the complete step-by-step process, from signup to your first order.",
+      "## What You Need Before You Start",
+      "Before you create your digital menu, gather the basics:",
+      "• Your restaurant name, address, and opening hours\n• Your WhatsApp number (the number where orders will arrive)\n• Your logo (optional, but recommended)\n• Dish names, prices, and descriptions — English, Urdu, or both\n• Photos of your dishes (optional but powerful: photo menus lift order values 20-30%)",
+      "You do not need a website, a designer, or any coding skills. Everything is done in a dashboard.",
+      "## Step 1: Create Your Account",
+      "Visit <a href='/signup/restaurant'>digitalmenue.com and sign up</a>. You get a 30-day free trial with full access to all features — no credit card required. During the trial you can add dishes, test WhatsApp ordering, and see exactly how it works before deciding.",
+      "## Step 2: Add Your Restaurant Information",
+      "Enter your restaurant name, city, cuisine type, opening hours, and delivery details. Upload your logo so your menu reflects your brand. Most importantly, connect your WhatsApp number — this is where every order will arrive.",
+      "## Step 3: Build Your Digital Menu",
+      "Add each dish with its name, price, description, and a mouth-watering photo. Organize items into categories like Appetizers, Main Course, BBQ, Karahi, Biryani, Desserts, and Beverages.",
+      "Pro tips for a menu that sells:",
+      "• Start with your highest-margin items at the top of each category\n• Write descriptive names — \"Authentic Chicken Karahi — slow-cooked with fresh tomatoes\" beats \"Chicken Karahi\"\n• Tag bestsellers as \"Most Popular\" or \"Chef's Special\"\n• Add Urdu names and descriptions so every customer can read the menu\n• Use clear, well-lit photos — a picture of your sizzling chicken tikka will sell itself",
+      "## Step 4: Generate and Print Your QR Code",
+      "Your digital menu platform automatically creates a unique QR code for your restaurant. Download it in high resolution and place it where customers can easily scan:",
+      "• Table tents or acrylic stands on every dining table\n• The front counter near the cash register\n• Takeaway bags and delivery packaging — so customers can reorder\n• Your restaurant entrance or window\n• Your Instagram bio, Facebook page, and Google Business Profile",
+      "The QR code is permanent — it always points to your live menu. Print it once, and it works forever.",
+      "## Step 5: Connect WhatsApp Ordering",
+      "Your WhatsApp number is already connected from Step 2. When a customer places an order, it arrives on your WhatsApp as a cleanly formatted message:",
+      "• Customer name and phone number\n• Items ordered with quantities\n• Total bill amount\n• Order type: dine-in, delivery, or takeaway\n• Delivery address (if applicable)\n• Any special instructions",
+      "You confirm, prepare, and serve. No middleman, no commission, no app for the customer to install.",
+      "## Step 6: Go Live and Promote",
+      "Share your menu link on WhatsApp status, social media, and your Google Business Profile. Tell your regular customers they can now order directly. Within the first week you will see how much printing and commission money you are saving.",
+      "## How Much Does a Digital Menu Cost in Pakistan?",
+      "Digital QR Menue plans start at PKR 1,500 per month for the Starter plan, with a free 30-day trial. Every plan includes unlimited orders, QR code generation, WhatsApp ordering, and zero commission. Compare that to the 25-35% commission delivery apps charge per order — if your restaurant does PKR 200,000 in monthly orders, delivery platforms take PKR 50,000-70,000. Your entire digital menu costs less than 5% of that.",
+      "| Plan | Monthly Price | Dishes | Best For |\n|------|--------------|--------|----------|\n| Starter | PKR 1,500 | 30 dishes | Small restaurants & cafés |\n| Growth | PKR 2,500 | 50 dishes | Growing restaurants |\n| Premium | PKR 4,500 | 100 dishes | High-volume restaurants |",
+      "## What to Do After Your Menu Is Live",
+      "A digital menu is not a set-and-forget project — it is a tool that keeps working:",
+      "• Update prices the moment they change — your menu is always accurate\n• Add seasonal or daily specials in seconds\n• Use your analytics to see which dishes sell best and when orders peak\n• Print your QR code on delivery bags so every package brings a reorder\n• Offer a small discount for direct orders to grow your WhatsApp customer list",
+      "## Ready to Create Your Digital Menu?",
+      "Now you know exactly how to create a digital menu for your restaurant. It takes less than 30 minutes, costs a fraction of what you pay in reprints and commissions, and your customers will love the convenience. Restaurants across Pakistan — from Lahore to Karachi to Islamabad — are already using <a href='/digital-menu-pakistan'>digital menus</a> to take direct WhatsApp orders.",
+      "Start your 30-day free trial today at <a href='/signup/restaurant'>digitalmenue.com</a>. No credit card required. Just a smarter way to run your restaurant.",
     ],
   },
 }
@@ -796,6 +919,64 @@ export default async function BlogArticlePage({ params }: Props) {
   // Count paragraphs starting with ## as headings for sections
   const sections = article.content.filter((p) => p.startsWith("## "))
 
+  // Related guides: group the "Digital Menu Guides" SEO articles so they cross-link to each other
+  const relatedSlugs: Record<string, string[]> = {
+    "what-is-digital-menu-for-restaurants": [
+      "free-digital-menu-vs-paid-comparison",
+      "digital-menu-app-vs-native-app",
+      "qr-menu-vs-digital-menu-difference",
+    ],
+    "free-digital-menu-vs-paid-comparison": [
+      "what-is-digital-menu-for-restaurants",
+      "best-digital-menu-platform-pakistan",
+      "digital-menu-qr-code-setup-guide",
+    ],
+    "best-digital-menu-platform-pakistan": [
+      "free-digital-menu-vs-paid-comparison",
+      "what-is-digital-menu-for-restaurants",
+      "digital-menu-app-vs-native-app",
+    ],
+    "digital-menu-qr-code-setup-guide": [
+      "create-qr-code-menu-restaurant-pakistan",
+      "how-to-make-qr-code-menu-for-restaurant",
+      "digital-menu-design-tips-restaurants",
+    ],
+    "digital-menu-design-tips-restaurants": [
+      "what-is-digital-menu-for-restaurants",
+      "qr-menu-vs-digital-menu-difference",
+      "digital-menu-qr-code-setup-guide",
+    ],
+    "digital-menu-app-vs-native-app": [
+      "qr-menu-vs-digital-menu-difference",
+      "what-is-digital-menu-for-restaurants",
+      "best-digital-menu-platform-pakistan",
+    ],
+    "qr-menu-vs-digital-menu-difference": [
+      "what-is-digital-menu-for-restaurants",
+      "digital-menu-app-vs-native-app",
+      "free-digital-menu-vs-paid-comparison",
+    ],
+    // Pakistan SEO cluster articles — cross-link to each other + existing guides
+    "menu-printing-islamabad": [
+      "digital-vs-printed-menu-pakistan",
+      "how-to-create-digital-menu-restaurant",
+      "what-is-digital-menu-for-restaurants",
+    ],
+    "digital-vs-printed-menu-pakistan": [
+      "menu-printing-islamabad",
+      "how-to-create-digital-menu-restaurant",
+      "create-qr-code-menu-restaurant-pakistan",
+    ],
+    "how-to-create-digital-menu-restaurant": [
+      "digital-vs-printed-menu-pakistan",
+      "menu-printing-islamabad",
+      "what-is-digital-menu-for-restaurants",
+    ],
+  }
+  const related = (relatedSlugs[slug] || [])
+    .map((s) => ({ slug: s, title: articles[s]?.title }))
+    .filter((r): r is { slug: string; title: string } => Boolean(r.title))
+
   return (
     <>
       {/* BlogPosting + Author Person Schema */}
@@ -820,7 +1001,7 @@ export default async function BlogArticlePage({ params }: Props) {
             name: "Digital QR Menue",
             logo: {
               "@type": "ImageObject",
-              url: "https://www.digitalmenue.com/favicon.ico",
+              url: "https://www.digitalmenue.com/logo.png",
             },
           },
           mainEntityOfPage: {
@@ -856,6 +1037,25 @@ export default async function BlogArticlePage({ params }: Props) {
               <p key={i} className={paragraph.startsWith("|") || paragraph.startsWith("•") || paragraph.startsWith("Q:") || paragraph.startsWith("Step") || (paragraph.startsWith("##") && !paragraph.startsWith("###")) ? "whitespace-pre-line" : ""}>{paragraph}</p>
             ))}
           </div>
+          {related.length > 0 && (
+            <div className="mt-12">
+              <h2 className="text-lg font-bold mb-4">Related Guides</h2>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {related.map((r) => (
+                  <Link
+                    key={r.slug}
+                    href={`/blog/${r.slug}`}
+                    className="group p-4 rounded-xl border border-[#F0F0F0] hover:border-[#CCC] hover:shadow-sm transition-all"
+                  >
+                    <span className="text-sm font-semibold text-black group-hover:underline">
+                      {r.title}
+                    </span>
+                    <span className="block text-xs text-[#888] mt-1.5">Read guide &rarr;</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="mt-12 pt-8 border-t border-[#F0F0F0]">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center text-sm font-bold uppercase">

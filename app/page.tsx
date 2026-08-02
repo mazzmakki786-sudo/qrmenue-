@@ -5,7 +5,7 @@ import dynamic from "next/dynamic"
 import { LandingHeader } from "@/components/shared/LandingHeader"
 import { AppFooter } from "@/components/shared/AppFooter"
 import { mergeYearlyPlans, type DBPlan } from "@/lib/map-plans"
-import { FaqJsonLd } from "@/components/JsonLd"
+import { FaqJsonLd, HowToJsonLd } from "@/components/JsonLd"
 
 export const revalidate = 300
 
@@ -29,7 +29,7 @@ export default async function LandingPage() {
       .eq("owner_id", user.id)
       .maybeSingle()
     if (restaurant) redirect("/dashboard")
-    redirect("/restaurants")
+    redirect("/signup/restaurant")
   }
 
   const { data: settingsData } = await supabase
@@ -90,13 +90,14 @@ export default async function LandingPage() {
       </section>
 
       {/* ─── Steps / How It Works ─── */}
+      <HowToJsonLd />
       <section className="py-20 md:py-28">
         <div className="max-w-6xl mx-auto px-5">
           <div className="text-center mb-12 md:mb-20">
             <p className="text-xs font-semibold tracking-widest uppercase text-[#666] mb-4">How It Works</p>
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight">Get started in 3 simple steps</h2>
           </div>
-          {/* Mobile: stacked with timeline */}
+          {/* Mobile: stacked with timeline — no heading tags to avoid duplicate outlines */}
           <div className="md:hidden max-w-sm mx-auto">
             {[
               { num: "01", title: "Create Your Menu", desc: "Add your dishes, prices, and photos through our simple dashboard. Takes under 5 minutes — no technical skills needed." },
@@ -109,7 +110,7 @@ export default async function LandingPage() {
                   <span className="text-sm font-bold">{step.num}</span>
                 </div>
                 <div className="pb-10 flex-1">
-                  <h3 className="font-bold text-base mb-1.5">{step.title}</h3>
+                  <p className="font-bold text-base mb-1.5">{step.title}</p>
                   <p className="text-sm text-[#555] leading-relaxed">{step.desc}</p>
                 </div>
               </div>
@@ -139,7 +140,7 @@ export default async function LandingPage() {
       <section className="max-w-6xl mx-auto px-5 py-16 md:py-24">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">
-            Digital QR Menu for Restaurants &mdash; The Complete Guide
+            Digital QR Menue for Restaurants &mdash; The Complete Guide
           </h2>
           <div className="text-sm md:text-base text-[#555] leading-relaxed space-y-5">
             <h3 className="text-lg md:text-xl font-semibold text-black mt-8 mb-3">
@@ -223,6 +224,12 @@ export default async function LandingPage() {
               &mdash; a <strong>digital QR menu</strong> works for every type of food business. Get started with a
               <Link href="/signup/restaurant" className="text-black underline underline-offset-2 hover:no-underline font-medium">free trial today</Link>
               and see why hundreds of Pakistani restaurants have already gone digital.
+              Want to understand the full picture before you start? Read our
+              <Link href="/digital-menu-for-restaurants" className="text-black underline underline-offset-2 hover:no-underline font-medium">complete Digital Menue guide</Link>,
+              explore a <Link href="/digital-menu-pakistan" className="text-black underline underline-offset-2 hover:no-underline font-medium">digital menu for restaurants in Pakistan</Link>
+              or a <Link href="/qr-menu-pakistan" className="text-black underline underline-offset-2 hover:no-underline font-medium">QR menu for your city</Link>,
+              see how to <Link href="/digital-menu-pdf" className="text-black underline underline-offset-2 hover:no-underline font-medium">convert a PDF menu to a QR code</Link>,
+              or compare a <Link href="/digital-menu-app" className="text-black underline underline-offset-2 hover:no-underline font-medium">web-based Digital Menu App vs a native app</Link>.
               Visit our <Link href="/faq" className="text-black underline underline-offset-2 hover:no-underline font-medium">FAQ</Link> or
               <Link href="/blog" className="text-black underline underline-offset-2 hover:no-underline font-medium">blog</Link>
               for more restaurant tips and guides.
@@ -393,8 +400,12 @@ export default async function LandingPage() {
               { q: "Which delivery app is best for food?", a: "Foodpanda charges restaurants 25-35% commission per order. The best alternative is a direct QR code ordering system like Digital QR Menue. Customers scan a QR code and order via WhatsApp — restaurants keep 100% of revenue, and customers get lower prices." },
               { q: "How to create a digital menu for your restaurant?", a: "Sign up for a free trial, add your dishes with prices and photos, and the platform generates a unique QR code instantly. Print and place on tables — customers scan and order via WhatsApp in seconds." },
               { q: "What is a QR code menu and how does it work?", a: "A QR code menu is a digital menu that customers access by scanning a QR code with their phone camera. Once scanned, your full menu with photos, prices, and categories opens in their browser. They can browse dishes and place orders directly through WhatsApp — no app download needed." },
+              { q: "Do customers need to download an app to use a QR code menu?", a: "No. One of the biggest advantages of a digital QR menu ordering system is that it requires zero app downloads. Customers scan the QR code with their phone's built-in camera — no app store visit, no OTP verification, no account creation. The menu opens in their phone's browser instantly and works on every device." },
               { q: "How much does Digital QR Menue cost?", a: "We offer a 30-day free trial with no credit card required. Paid plans start at PKR 1,500/month. Unlike Foodpanda which charges 25-35% commission per order, we charge a flat monthly fee with zero commission on orders." },
               { q: "How do restaurants get orders on WhatsApp?", a: "When a customer scans your QR code and selects items, a pre-formatted WhatsApp message with their complete order is sent directly to your restaurant WhatsApp. You confirm with one reply." },
+              { q: "What is the difference between ordering on Foodpanda vs ordering via QR code?", a: "When you order on Foodpanda, the app charges the restaurant a 25-35% commission. This means the restaurant either increases prices or loses money on every order. With a Digital QR Menue QR code, you order directly through WhatsApp — the restaurant pays no commission, so prices stay fair. Additionally, Foodpanda requires an app download and account creation; a QR code menu opens instantly in your phone browser with zero friction." },
+              { q: "Can I use QR code ordering for pizza and other specific cuisines?", a: "Absolutely. Digital QR Menue works perfectly for all cuisine types. You can create a dedicated pizza online menu, a barbecue menu, a Chinese food menu, or any other cuisine. Organize dishes by categories (starters, main course, desserts, beverages), add high-quality photos, set prices, and mark items as available or sold out." },
+              { q: "Is there a free QR code menu for restaurants in Pakistan?", a: "Yes, Digital QR Menue offers a completely free 30-day trial with no credit card required. During the trial, you get full access to create your digital QR menu, upload up to 20 dishes, and start receiving WhatsApp orders. After the trial, paid plans start from PKR 1,200/month with unlimited dishes, orders, and zero commission on every sale." },
             ].map((faq, i) => (
               <details key={i} className="group bg-white border border-[#E8E8E8] rounded-xl p-4 md:p-5 open:bg-[#FAFAFA] transition-colors">
                 <summary className="flex items-center justify-between cursor-pointer font-semibold text-sm md:text-base list-none">
