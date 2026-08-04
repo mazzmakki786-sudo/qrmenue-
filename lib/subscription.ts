@@ -18,6 +18,8 @@ export interface PlanLimits {
   canHaveQR: boolean
   canHaveWhatsapp: boolean
   canHaveTables: boolean
+  /** AI poster generations per month */
+  aiGenerationsPerMonth: number
 }
 
 export interface TrialLimitConfig {
@@ -85,6 +87,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     canHaveQR: true,
     canHaveWhatsapp: true,
     canHaveTables: false,
+    aiGenerationsPerMonth: 1,
   },
   starter: {
     maxDishes: 30,
@@ -96,6 +99,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     canHaveQR: true,
     canHaveWhatsapp: true,
     canHaveTables: false,
+    aiGenerationsPerMonth: 4,
   },
   "starter-yearly": {
     maxDishes: 30,
@@ -107,6 +111,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     canHaveQR: true,
     canHaveWhatsapp: true,
     canHaveTables: false,
+    aiGenerationsPerMonth: 4,
   },
   growth: {
     maxDishes: 50,
@@ -118,6 +123,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     canHaveQR: true,
     canHaveWhatsapp: true,
     canHaveTables: true,
+    aiGenerationsPerMonth: 10,
   },
   "growth-yearly": {
     maxDishes: 50,
@@ -129,6 +135,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     canHaveQR: true,
     canHaveWhatsapp: true,
     canHaveTables: true,
+    aiGenerationsPerMonth: 10,
   },
   premium: {
     maxDishes: 100,
@@ -140,6 +147,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     canHaveQR: true,
     canHaveWhatsapp: true,
     canHaveTables: true,
+    aiGenerationsPerMonth: 15,
   },
   "premium-yearly": {
     maxDishes: 100,
@@ -151,6 +159,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     canHaveQR: true,
     canHaveWhatsapp: true,
     canHaveTables: true,
+    aiGenerationsPerMonth: 15,
   },
 }
 
@@ -194,6 +203,7 @@ export interface PlanLimitsPartial {
   maxImages?: number
   maxOrders?: number
   maxCategories?: number
+  aiGenerationsPerMonth?: number
 }
 
 export interface StatusCounts {
@@ -213,6 +223,8 @@ export function getEffectiveLimits(
     if (override.maxImages !== undefined) base.maxImages = override.maxImages
     if (override.maxOrders !== undefined) base.maxOrders = override.maxOrders
     if (override.maxCategories !== undefined) base.maxCategories = override.maxCategories
+    if (override.aiGenerationsPerMonth !== undefined)
+      base.aiGenerationsPerMonth = override.aiGenerationsPerMonth
   }
   return base
 }
@@ -368,6 +380,11 @@ export function getPlanFeatures(plan: Plan): string[] {
   if (limits.analytics) features.push("Analytics dashboard")
   if (limits.canHaveQR) features.push("QR code generation")
   if (limits.canHaveWhatsapp) features.push("WhatsApp orders")
+  if (limits.aiGenerationsPerMonth > 0) {
+    features.push(
+      `${limits.aiGenerationsPerMonth} AI poster${limits.aiGenerationsPerMonth === 1 ? "" : "s"}/mo`
+    )
+  }
 
   return features
 }

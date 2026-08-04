@@ -47,6 +47,7 @@ const EMPTY_LIMITS: PlanLimits = {
   canHaveQR: true,
   canHaveWhatsapp: true,
   canHaveTables: false,
+  aiGenerationsPerMonth: 0,
 }
 
 export function useSubscription(): UseSubscriptionReturn {

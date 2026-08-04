@@ -1,0 +1,11 @@
+- main [ref=e2]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - heading "Welcome back" [level=1] [ref=e16]
+      - paragraph [ref=e17]: Sign in to your account
+    - button "Continue with Google" [ref=e18] [cursor=pointer]
+    - generic [ref=e24]:
+      - link "Don't have an account? Sign up" [ref=e25] [cursor=pointer]:
+        - /url: /signup/restaurant
+      - link "Back to home" [ref=e26] [cursor=pointer]:
+        - /url: /

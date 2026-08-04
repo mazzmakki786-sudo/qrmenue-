@@ -21,7 +21,7 @@ export function LandingHeader() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-[#E8E8E8]">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E8E8E8] shadow-sm">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-5 h-14">
           <Link href="/" className="flex items-center gap-2 font-bold text-sm md:text-base shrink-0 min-w-0">
             <LogoIcon className="w-6 h-6 shrink-0" />

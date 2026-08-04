@@ -78,6 +78,9 @@ export function dbPlanToLimits(plan: DBPlan): PlanLimits {
     canHaveQR: plan.can_have_qr,
     canHaveWhatsapp: plan.can_have_whatsapp,
     canHaveTables: plan.can_have_tables,
+    // The plans table has no AI column — read from PLAN_LIMITS fallback
+    aiGenerationsPerMonth:
+      PLAN_LIMITS[plan.slug as keyof typeof PLAN_LIMITS]?.aiGenerationsPerMonth ?? 0,
   }
 }
 

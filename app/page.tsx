@@ -2,6 +2,7 @@ import { createPublicClient, createAdminClient } from "@/lib/supabase/server"
 import Link from "next/link"
 import dynamic from "next/dynamic"
 import { LandingHeader } from "@/components/shared/LandingHeader"
+import { HeroTypewriter } from "@/components/shared/HeroTypewriter"
 import { RedirectIfAuthed } from "@/components/shared/RedirectIfAuthed"
 import { AppFooter } from "@/components/shared/AppFooter"
 import { mergeYearlyPlans, type DBPlan } from "@/lib/map-plans"
@@ -56,8 +57,8 @@ export default async function LandingPage() {
               <span className="text-xs font-medium text-white/70 tracking-wide">Trusted by 1,000+ Restaurants in Pakistan</span>
             </div>
             <h1 className="text-[clamp(1.75rem,6vw,5rem)] sm:text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.05] mb-6 max-w-5xl mx-auto text-white">
-              Free Digital Menu for Restaurants &mdash;{" "}
-              <span className="text-[#25D366]">Zero Commission</span>
+              Free Digital Menu for Restaurants,{" "}
+              <HeroTypewriter />
             </h1>
             <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto leading-relaxed mb-10">
               Ab menu print karne ka kharcha khatam! Apne customers ko dein behtareen digital menu card aur orders receive karein seedha apne WhatsApp par. Aaj hi free trial shuru karein.

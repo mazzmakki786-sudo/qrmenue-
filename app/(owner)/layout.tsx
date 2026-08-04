@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { Suspense } from "react"
-import { LayoutDashboard, UtensilsCrossed, ClipboardList, BarChart3, User, CreditCard, QrCode, Menu, X, LogOut, Megaphone, Percent, Table2, BellRing, ChevronLeft } from "lucide-react"
+import { LayoutDashboard, UtensilsCrossed, ClipboardList, BarChart3, User, CreditCard, QrCode, Menu, X, LogOut, Megaphone, Percent, Table2, BellRing, ChevronLeft, Sparkles } from "lucide-react"
 import { BellNotification } from "@/components/owner/BellNotification"
 import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
@@ -20,6 +20,7 @@ const ALL_NAV_ITEMS = [
   { href: "/dashboard/announcements", label: "Announcements", icon: Megaphone },
   { href: "/dashboard/tables", label: "Tables", icon: Table2 },
   { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/dashboard/ai-posters", label: "AI Posters", icon: Sparkles },
   { href: "/dashboard/settings", label: "Profile", icon: User },
   { href: "/dashboard/subscription", label: "Subscription", icon: CreditCard },
   { href: "/dashboard/qr", label: "QR Code", icon: QrCode },
