@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { LandingHeader } from "@/components/shared/LandingHeader"
-import { JsonLd, BreadcrumbListJsonLd, FaqJsonLd } from "@/components/JsonLd"
+import { JsonLd, BreadcrumbListJsonLd, FaqJsonLd, SpeakableJsonLd } from "@/components/JsonLd"
 
 export const metadata: Metadata = {
   title: "Digital Menu Tablet for Restaurants — iPad & Tablet Menu System | Digital QR Menue",
@@ -40,6 +40,14 @@ const faqs = [
     question: "How much does a tablet menu system cost?",
     answer: "The Digital QR Menue software starts at PKR 0 (free trial) and PKR 1,500/month for the Starter plan. You'll need to provide your own tablets. This is significantly cheaper than dedicated tablet menu systems that require expensive proprietary hardware.",
   },
+  {
+    question: "What tablets are best for restaurant menus?",
+    answer: "Any iPad (iPad mini, iPad, iPad Air) or Android tablet (Samsung Galaxy Tab, Lenovo Tab) with a modern web browser works well. For best results, use tablets with screens 8 inches or larger. Budget tablets from PKR 15,000–25,000 work perfectly for menu display.",
+  },
+  {
+    question: "How do I set up kiosk mode on a tablet for menu display?",
+    answer: "On iPad: Use Guided Access (Settings > Accessibility > Guided Access) to lock the tablet to the menu browser tab. On Android: Use Screen Pinning (Settings > Security > Screen Pinning) or install a free kiosk mode app. This prevents customers from exiting the menu.",
+  },
 ]
 
 export default function DigitalMenuTabletPage() {
@@ -61,12 +69,16 @@ export default function DigitalMenuTabletPage() {
         { name: "Digital Menu Tablet", url: "https://www.digitalmenue.com/digital-menu-tablet" },
       ]} />
       <FaqJsonLd faqs={faqs} />
+      <SpeakableJsonLd
+        cssSelector={[".speakable-hero", ".speakable-summary"]}
+        url="https://www.digitalmenue.com/digital-menu-tablet"
+      />
       <div className="min-h-screen bg-white">
         <LandingHeader />
         <section className="bg-black text-white py-20 md:py-28">
           <div className="max-w-4xl mx-auto px-5 text-center">
             <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight">Digital Menu Tablet for Restaurants</h1>
-            <p className="text-base md:text-lg text-[#AAA] max-w-2xl mx-auto leading-relaxed">
+            <p className="speakable-hero text-base md:text-lg text-[#AAA] max-w-2xl mx-auto leading-relaxed">
               Turn any tablet or iPad into an interactive digital menu. Customers browse, view photos, and
               order directly. Perfect for fine dining, cafes, and fast-casual restaurants in Pakistan.
             </p>
@@ -121,6 +133,109 @@ export default function DigitalMenuTabletPage() {
             </div>
           </div>
         </section>
+        {/* Tablet vs QR Code Comparison */}
+        <section className="py-16 md:py-24">
+          <div className="max-w-4xl mx-auto px-5">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6">
+              Tablet Menu vs QR Code Menu
+            </h2>
+            <p className="text-sm text-[#555] mb-8 max-w-xl">
+              Both are digital menu solutions. Here&apos;s how they compare for different restaurant types.
+            </p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-[#E0E0E0]">
+                    <th className="text-left py-3 font-semibold">Feature</th>
+                    <th className="text-left py-3 font-semibold">Tablet Menu</th>
+                    <th className="text-left py-3 font-semibold">QR Code Menu</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#F0F0F0]">
+                  {[
+                    { feature: "Hardware cost", tablet: "PKR 15,000–40,000 per tablet", qr: "Free — customers use their own phone" },
+                    { feature: "Setup time", tablet: "15–30 minutes per tablet", qr: "5 minutes total" },
+                    { feature: "Best for", tablet: "Fine dining, upscale cafes", qr: "All restaurant types" },
+                    { feature: "Visibility", tablet: "Always on the table — impossible to miss", qr: "Customer must notice and scan the code" },
+                    { feature: "Photo quality", tablet: "Larger screen = bigger, more appetizing photos", qr: "Full-screen photos on customer's phone" },
+                    { feature: "Maintenance", tablet: "Need to charge, clean, and replace if damaged", qr: "Zero maintenance — code never changes" },
+                    { feature: "Customer experience", tablet: "Premium, high-tech impression", qr: "Familiar, works on every phone" },
+                    { feature: "Multi-table scaling", tablet: "Buy one tablet per table", qr: "Print one QR code per table — zero marginal cost" },
+                  ].map((row, i) => (
+                    <tr key={i}>
+                      <td className="py-3 font-medium text-black pr-4">{row.feature}</td>
+                      <td className="py-3 text-[#555] pr-4">{row.tablet}</td>
+                      <td className="py-3 text-green-600 font-medium">{row.qr}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        {/* Customer Experience */}
+        <section className="py-16 md:py-20 bg-[#F9FAFB]">
+          <div className="max-w-4xl mx-auto px-5">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center">
+              Customer Experience on a Tablet Menu
+            </h2>
+            <p className="text-sm text-[#555] text-center mb-12 max-w-lg mx-auto">
+              From sitting down to placing an order — the tablet menu flow.
+            </p>
+            <div className="grid md:grid-cols-4 gap-4">
+              {[
+                { step: "1", title: "See the Tablet", desc: "Customer sits down and sees the tablet already on the table, displaying the restaurant's menu." },
+                { step: "2", title: "Browse & Scroll", desc: "Swipe through categories, tap items to see photos and descriptions. Larger screen makes browsing effortless." },
+                { step: "3", title: "Select Dishes", desc: "Tap to add items to the order. Choose quantities and any customizations." },
+                { step: "4", title: "Place Order", desc: "Tap the order button. The order is sent to the restaurant via WhatsApp or the restaurant dashboard." },
+              ].map((step, i) => (
+                <div key={i} className="text-center p-4">
+                  <div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center text-lg font-bold mx-auto mb-4">
+                    {step.step}
+                  </div>
+                  <h3 className="font-semibold text-sm mb-2">{step.title}</h3>
+                  <p className="text-xs text-[#555] leading-relaxed">{step.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Use Cases */}
+        <section className="py-16 md:py-24">
+          <div className="max-w-4xl mx-auto px-5">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center">
+              Best Restaurants for Tablet Menus
+            </h2>
+            <p className="text-sm text-[#555] text-center mb-10 max-w-lg mx-auto">
+              Tablet menus shine in specific restaurant environments.
+            </p>
+            <div className="grid md:grid-cols-3 gap-5">
+              {[
+                {
+                  title: "Fine Dining",
+                  desc: "Upscale restaurants where presentation matters. Tablets on every table create a premium, modern impression that matches the dining experience.",
+                },
+                {
+                  title: "Hotels & Resorts",
+                  desc: "Room service and in-room dining via tablets. Guests browse the menu from their room and order without calling. High-end experience for hospitality.",
+                },
+                {
+                  title: "Cafes & Bakeries",
+                  desc: "Tablets on counter displays let customers browse the full menu while waiting. Great for bakeries with many items that need photos to sell.",
+                },
+              ].map((item, i) => (
+                <div key={i} className="p-6 bg-[#F9FAFB] rounded-2xl border border-[#F0F0F0]">
+                  <h3 className="font-semibold text-base mb-2">{item.title}</h3>
+                  <p className="text-sm text-[#555] leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
         <section className="py-16 md:py-24">
           <div className="max-w-3xl mx-auto px-5">
             <h2 className="text-2xl md:text-3xl font-bold mb-2 text-center">Frequently Asked Questions</h2>

@@ -370,25 +370,33 @@ export const publicRoutes = [
   { path: "contact", lastModified: "2026-07-30" },
   { path: "privacy", lastModified: "2026-04-01" },
   { path: "terms", lastModified: "2026-04-01" },
-  // Auth pages — now indexable (noindex removed)
-  { path: "signup/restaurant", lastModified: "2026-07-30" },
-  { path: "signup/customer", lastModified: "2026-07-30" },
-  { path: "login", lastModified: "2026-07-30" },
-  { path: "login/customer", lastModified: "2026-07-30" },
-  { path: "blog", lastModified: "2026-07-30" },
-  // SEO landing pages — kept, distinct user intents
-  { path: "digital-menu-for-restaurants", lastModified: "2026-07-30" },
-  { path: "digital-menu-pdf", lastModified: "2026-07-30" },
-  { path: "digital-menu-design", lastModified: "2026-07-30" },
-  { path: "digital-menu-app", lastModified: "2026-07-30" },
-  { path: "digital-menu-tablet", lastModified: "2026-07-30" },
-  { path: "qr-menu-login", lastModified: "2026-07-30" },
+  { path: "blog", lastModified: "2026-08-04" },
+  // SEO landing pages
+  { path: "digital-menu-for-restaurants", lastModified: "2026-08-04" },
+  { path: "digital-menu-pdf", lastModified: "2026-08-04" },
+  { path: "digital-menu-design", lastModified: "2026-08-04" },
+  { path: "digital-menu-app", lastModified: "2026-08-04" },
+  { path: "digital-menu-tablet", lastModified: "2026-08-04" },
+  { path: "qr-menu-login", lastModified: "2026-08-04" },
+  // High-value pages (were discovered but not indexed — now prioritized)
+  { path: "best-digital-menu-for-restaurants", lastModified: "2026-08-04" },
+  { path: "free-digital-menu", lastModified: "2026-08-04" },
+  { path: "scan-menu-code-online-free", lastModified: "2026-08-04" },
+  { path: "qr-menu-app", lastModified: "2026-08-04" },
   // Pakistan SEO cluster landing pages (Aug 2026)
-  { path: "digital-menu-pakistan", lastModified: "2026-08-01" },
-  { path: "qr-menu-pakistan", lastModified: "2026-08-01" },
-  { path: "digital-menu-islamabad", lastModified: "2026-08-01" },
-  { path: "digital-menu-lahore", lastModified: "2026-08-01" },
-  { path: "digital-menu-karachi", lastModified: "2026-08-01" },
+  { path: "digital-menu-pakistan", lastModified: "2026-08-04" },
+  { path: "qr-menu-pakistan", lastModified: "2026-08-04" },
+  { path: "digital-menu-islamabad", lastModified: "2026-08-04" },
+  { path: "digital-menu-lahore", lastModified: "2026-08-04" },
+  { path: "digital-menu-karachi", lastModified: "2026-08-04" },
+  { path: "digital-menu-faisalabad", lastModified: "2026-08-04" },
+  { path: "digital-menu-rawalpindi", lastModified: "2026-08-04" },
+  { path: "digital-menu-peshawar", lastModified: "2026-08-04" },
+  { path: "digital-menu-multan", lastModified: "2026-08-04" },
+  // Pillar pages (Aug 2026)
+  { path: "qr-code-menu-restaurant", lastModified: "2026-08-04" },
+  { path: "restaurant-ordering-system-pakistan", lastModified: "2026-08-04" },
+  { path: "foodpanda-vs-digital-menu", lastModified: "2026-08-04" },
 ] as const
 
 export const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.digitalmenue.com"

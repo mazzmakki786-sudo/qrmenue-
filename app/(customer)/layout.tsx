@@ -33,6 +33,10 @@ export default function CustomerLayout({
     "/digital-menu-islamabad",
     "/digital-menu-lahore",
     "/digital-menu-karachi",
+    "/qr-code-menu-restaurant",
+    "/restaurant-ordering-system-pakistan",
+    "/foodpanda-vs-digital-menu",
+    "/scan-menu-code-online-free",
   ]
   const hideNav = seoLandingPaths.includes(pathname)
 
@@ -52,6 +56,9 @@ export default function CustomerLayout({
     <ErrorBoundary>
       <Toaster />
       <div className="min-h-screen bg-white flex flex-col">
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-black focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:text-sm">
+          Skip to main content
+        </a>
         {!hideNav && (
           <>
           {/* Desktop Top Navbar */}
@@ -92,7 +99,7 @@ export default function CustomerLayout({
           </header>
 
           {/* Main content expands to push footer to bottom — pt-14 offsets the fixed header on desktop */}
-          <main className="flex-1 pt-0 md:pt-14 pb-14 md:pb-0">
+          <main className="flex-1 pt-0 md:pt-14 pb-14 md:pb-0" id="main-content">
             <Suspense fallback={<div className="flex items-center justify-center min-h-[60vh]"><div className="animate-spin w-8 h-8 border-2 border-black border-t-transparent rounded-full" /></div>}>
               {children}
             </Suspense>
@@ -140,7 +147,7 @@ export default function CustomerLayout({
         )}
         {hideNav && (
           <>
-            <main className="flex-1">
+            <main className="flex-1" id="main-content">
               {children}
             </main>
             <AppFooter />

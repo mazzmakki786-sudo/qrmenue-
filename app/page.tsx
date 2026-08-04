@@ -47,7 +47,7 @@ export default async function LandingPage() {
       <LandingHeader />
       {/* ─── Hero ─── */
       /* Main content flex-1 pushes footer to bottom */}
-      <div className="flex-1">
+      <div className="flex-1" id="main-content">
       <section className="relative bg-black">
         <div className="max-w-6xl mx-auto px-5 pt-28 pb-24 md:pt-40 md:pb-32">
           <div className="max-w-4xl mx-auto text-center">
@@ -416,6 +416,59 @@ export default async function LandingPage() {
             >
               View All FAQs
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Explore More Resources ─── */}
+      <section className="py-16 md:py-20 bg-[#FAFAFA]">
+        <div className="max-w-6xl mx-auto px-5">
+          <div className="text-center mb-10">
+            <p className="text-xs font-semibold tracking-widest uppercase text-[#555] mb-4">Explore</p>
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Digital Menu Resources</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+            {[
+              { href: "/best-digital-menu-for-restaurants", label: "Best Digital Menu" },
+              { href: "/free-digital-menu", label: "Free Digital Menu" },
+              { href: "/digital-menu-app", label: "Digital Menu App" },
+              { href: "/digital-menu-design", label: "Menu Design Tips" },
+              { href: "/digital-menu-tablet", label: "Tablet Menu" },
+              { href: "/digital-menu-pdf", label: "PDF to QR Menu" },
+              { href: "/qr-menu-app", label: "QR Menu App" },
+              { href: "/scan-menu-code-online-free", label: "How to Scan QR" },
+            ].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="block bg-white rounded-xl border border-[#E8E8E8] p-4 text-center text-sm font-medium text-black hover:border-[#25D366] hover:shadow-sm transition-all"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+          <div className="mt-8">
+            <p className="text-xs font-semibold tracking-widest uppercase text-[#555] mb-4 text-center">Cities</p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {[
+                { href: "/digital-menu-pakistan", label: "All Pakistan" },
+                { href: "/digital-menu-islamabad", label: "Islamabad" },
+                { href: "/digital-menu-lahore", label: "Lahore" },
+                { href: "/digital-menu-karachi", label: "Karachi" },
+                { href: "/digital-menu-faisalabad", label: "Faisalabad" },
+                { href: "/digital-menu-rawalpindi", label: "Rawalpindi" },
+                { href: "/digital-menu-peshawar", label: "Peshawar" },
+                { href: "/digital-menu-multan", label: "Multan" },
+              ].map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="px-4 py-2 rounded-full bg-white border border-[#E8E8E8] text-xs font-medium text-[#555] hover:border-[#25D366] hover:text-black transition-all"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>

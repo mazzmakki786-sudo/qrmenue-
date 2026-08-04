@@ -36,6 +36,14 @@ const faqs = [
     question: "Can multiple staff members log in to manage the menu?",
     answer: "Yes. You can share login credentials with your team, or contact us about multi-user access options. Each person can manage orders and update the menu.",
   },
+  {
+    question: "What is the restaurant dashboard?",
+    answer: "The restaurant dashboard is your control center for managing your digital menu. From the dashboard, you can add or edit menu items, upload food photos, download your QR code, view incoming orders, track analytics, create deals, and update your restaurant profile — all from your phone or computer.",
+  },
+  {
+    question: "How do I download my QR code after logging in?",
+    answer: "After logging in, go to the QR Code section in your dashboard. You can download your unique QR code in high resolution (PNG or SVG format). Print it on table tents, posters, or stickers. The QR code never changes, so you only need to print it once.",
+  },
 ]
 
 export default function QrMenuLoginPage() {
@@ -93,6 +101,109 @@ export default function QrMenuLoginPage() {
             </div>
           </div>
         </section>
+        {/* Dashboard Walkthrough */}
+        <section className="py-16 md:py-24">
+          <div className="max-w-4xl mx-auto px-5">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center">
+              Inside Your Restaurant Dashboard
+            </h2>
+            <p className="text-sm text-[#555] text-center mb-12 max-w-lg mx-auto">
+              Everything you need to manage your digital menu — one login, total control.
+            </p>
+            <div className="grid md:grid-cols-2 gap-5">
+              {[
+                {
+                  title: "Menu Management",
+                  desc: "Add unlimited dishes, organize by categories (starters, mains, desserts, drinks), set prices in PKR, upload HD food photos, and write compelling descriptions. Changes go live instantly.",
+                },
+                {
+                  title: "QR Code Generator",
+                  desc: "Your unique QR code is generated automatically. Download it in high resolution for printing. Place it on tables, counters, takeaway bags, or share the menu link digitally.",
+                },
+                {
+                  title: "Order Management",
+                  desc: "See all incoming orders in real-time on your dashboard. Orders also arrive on your WhatsApp as formatted messages with customer name, items, total, and order type.",
+                },
+                {
+                  title: "Analytics & Insights",
+                  desc: "Track which dishes are most popular, see peak ordering hours, monitor total orders, and understand customer preferences. Use data to optimize your menu and increase revenue.",
+                },
+                {
+                  title: "Deals & Promotions",
+                  desc: "Create special offers, discounts, and limited-time deals directly from your dashboard. Highlight featured items and drive more orders during slow periods.",
+                },
+                {
+                  title: "Restaurant Profile",
+                  desc: "Update your restaurant name, logo, phone number, address, operating hours, and social media links. All changes reflect instantly on your customer-facing menu.",
+                },
+              ].map((item, i) => (
+                <div key={i} className="p-6 bg-white rounded-2xl border border-[#F0F0F0]">
+                  <h3 className="font-semibold text-base mb-2">{item.title}</h3>
+                  <p className="text-sm text-[#555] leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Getting Started Flow */}
+        <section className="py-16 md:py-20 bg-[#F9FAFB]">
+          <div className="max-w-4xl mx-auto px-5">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center">
+              From Sign Up to Live Menu in 5 Minutes
+            </h2>
+            <p className="text-sm text-[#555] text-center mb-12 max-w-lg mx-auto">
+              New to Digital QR Menue? Here&apos;s how to get your restaurant online fast.
+            </p>
+            <div className="space-y-4">
+              {[
+                { num: "1", title: "Create Your Free Account", desc: "Go to digitalmenue.com/signup/restaurant. Enter your email, restaurant name, and phone number. No credit card needed for the 30-day free trial." },
+                { num: "2", title: "Add Your First Menu Items", desc: "In the dashboard, click 'Add Menu Item'. Enter the dish name, price in PKR, a description, and optionally upload a photo. Repeat for each dish." },
+                { num: "3", title: "Organize Categories", desc: "Create categories like Starters, Main Course, BBQ, Drinks, and Desserts. Drag and drop dishes into categories for a clean, organized menu." },
+                { num: "4", title: "Download Your QR Code", desc: "Go to the QR Code section. Download your unique QR code in high resolution. Print it on table tents, posters, or counter signs." },
+                { num: "5", title: "Go Live", desc: "Place your QR codes on tables. Customers scan, browse, and order via WhatsApp. You receive orders instantly on your phone." },
+              ].map((item, i) => (
+                <div key={i} className="flex gap-4 items-start p-5 bg-white rounded-xl border border-[#F0F0F0]">
+                  <div className="w-9 h-9 rounded-full bg-black text-white flex items-center justify-center text-sm font-bold shrink-0">
+                    {item.num}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-sm mb-1">{item.title}</h3>
+                    <p className="text-xs text-[#555] leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Security & Access */}
+        <section className="py-16 md:py-24">
+          <div className="max-w-3xl mx-auto px-5">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6">
+              Dashboard Security & Access
+            </h2>
+            <div className="space-y-5 text-sm md:text-base text-[#555] leading-relaxed">
+              <p>
+                Your restaurant dashboard is protected with industry-standard security. All data is encrypted
+                in transit (HTTPS) and at rest. Your login credentials are securely stored — we never see
+                or share your password.
+              </p>
+              <p>
+                The dashboard works on any device with a web browser. Log in from your phone to check orders
+                on the go, from a tablet at the restaurant for a larger view, or from your computer for
+                bulk menu editing. Your session stays active until you log out.
+              </p>
+              <p>
+                If you need to give your manager or staff access to the dashboard, you can share your login
+                credentials or contact our support team for multi-user access options. Each person can manage
+                orders, update menu items, and view analytics independently.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
         <section className="py-16 md:py-20 bg-[#F9FAFB]">
           <div className="max-w-3xl mx-auto px-5">
             <h2 className="text-2xl md:text-3xl font-bold mb-2 text-center">Frequently Asked Questions</h2>

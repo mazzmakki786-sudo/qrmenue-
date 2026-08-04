@@ -98,10 +98,14 @@ export function AppFooter() {
             <ul className="space-y-1.5">
               {[
                 { href: "/digital-menu-for-restaurants", label: "Digital Menu for Restaurants" },
+                { href: "/best-digital-menu-for-restaurants", label: "Best Digital Menu" },
+                { href: "/free-digital-menu", label: "Free Digital Menu" },
                 { href: "/digital-menu-pdf", label: "PDF Menu to QR" },
                 { href: "/digital-menu-app", label: "Digital Menu App" },
                 { href: "/digital-menu-tablet", label: "Tablet Menu" },
                 { href: "/digital-menu-design", label: "Digital Menu Design" },
+                { href: "/scan-menu-code-online-free", label: "Scan Menu Code Free" },
+                { href: "/qr-menu-app", label: "QR Menu App" },
                 { href: "/qr-menu-login", label: "QR Menu Login" },
               ].map((link) => (
                 <li key={link.href}>
@@ -126,6 +130,10 @@ export function AppFooter() {
                 { href: "/digital-menu-islamabad", label: "Digital Menu Islamabad" },
                 { href: "/digital-menu-lahore", label: "Digital Menu Lahore" },
                 { href: "/digital-menu-karachi", label: "Digital Menu Karachi" },
+                { href: "/digital-menu-faisalabad", label: "Digital Menu Faisalabad" },
+                { href: "/digital-menu-rawalpindi", label: "Digital Menu Rawalpindi" },
+                { href: "/digital-menu-peshawar", label: "Digital Menu Peshawar" },
+                { href: "/digital-menu-multan", label: "Digital Menu Multan" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link
