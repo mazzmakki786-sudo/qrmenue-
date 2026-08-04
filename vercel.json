@@ -36,5 +36,19 @@
     "app/api/menu/[slug]/route.ts": {
       "maxDuration": 30
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/refresh-stats",
+      "schedule": "0 */4 * * *"
+    },
+    {
+      "path": "/api/cron/cleanup-rate-limits",
+      "schedule": "15 3 * * *"
+    },
+    {
+      "path": "/api/cron/check-subscriptions",
+      "schedule": "30 8 * * *"
+    }
+  ]
 }

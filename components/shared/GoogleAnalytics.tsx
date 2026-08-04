@@ -38,6 +38,10 @@ export function GoogleAnalytics() {
     if ("serviceWorker" in navigator) {
       const registerSW = async () => {
         try {
+          // Capture BEFORE any update fires: on first-ever install there is
+          // no controller yet — reloading here kicks first-time visitors out
+          // mid-session. Only reload when this is an UPDATE of an existing SW.
+          const hadController = navigator.serviceWorker.controller != null
           const reg = await navigator.serviceWorker.register("/sw.js")
           if (reg.waiting) {
             reg.waiting.postMessage({ type: "SKIP_WAITING" })
@@ -46,7 +50,7 @@ export function GoogleAnalytics() {
             const sw = reg.installing
             if (sw) {
               sw.addEventListener("statechange", () => {
-                if (sw.state === "activated") {
+                if (sw.state === "activated" && hadController) {
                   window.location.reload()
                 }
               })

@@ -147,27 +147,8 @@ export function OrderReceipt({ order, restaurant }: Props) {
       a.click()
     } catch (err) {
       console.error("[Receipt] html-to-image failed:", err)
-      // Fallback to html2canvas with explicit dimensions
-      try {
-        const html2canvas = (await import("html2canvas")).default
-        const canvas = await html2canvas(el, {
-          scale: 2,
-          useCORS: true,
-          logging: false,
-          backgroundColor: "#ffffff",
-          width: el.scrollWidth,
-          height: el.scrollHeight,
-        })
-        const dataUrl = canvas.toDataURL("image/png")
-        const a = document.createElement("a")
-        a.download = `receipt-${snapshot.orderNumber}.png`
-        a.href = dataUrl
-        a.click()
-      } catch (err2) {
-        console.error("[Receipt] html2canvas also failed:", err2)
-        // Last resort: print fallback
-        handlePrint()
-      }
+      // Fallback: open the print dialog (self-contained receipt window)
+      handlePrint()
     } finally {
       setDownloading(false)
     }

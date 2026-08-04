@@ -1,19 +1,29 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { PasswordInput, validatePassword } from "@/components/ui/password-input"
 import Link from "next/link"
 
+const LOGIN_MESSAGE = "Account created! Please sign in with your phone number."
+
 export default function CustomerSignupPage() {
-  const router = useRouter()
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const redirectTimerRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (redirectTimerRef.current !== null) {
+        window.clearTimeout(redirectTimerRef.current)
+      }
+    }
+  }, [])
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,6 +35,7 @@ export default function CustomerSignupPage() {
 
     setLoading(true)
     setError(null)
+    setSuccessMessage(null)
 
     const pwError = validatePassword(password)
     if (pwError) {
@@ -48,8 +59,12 @@ export default function CustomerSignupPage() {
         return
       }
 
+      setSuccessMessage("Account created successfully. Taking you to sign in...")
       setLoading(false)
-      router.push("/login/customer?message=Account created! Sign in with your phone number.")
+
+      redirectTimerRef.current = window.setTimeout(() => {
+        window.location.replace(`/login/customer?message=${encodeURIComponent(LOGIN_MESSAGE)}`)
+      }, 700)
     } catch {
       setError("Something went wrong. Please try again.")
       setLoading(false)
@@ -93,6 +108,12 @@ export default function CustomerSignupPage() {
           required
           showRequirements
         />
+
+        {successMessage && (
+          <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+            <p className="text-xs text-green-700">{successMessage}</p>
+          </div>
+        )}
 
         {error && (
           <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3">

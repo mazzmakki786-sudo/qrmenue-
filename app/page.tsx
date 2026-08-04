@@ -1,8 +1,8 @@
-import { createClient, createAdminClient } from "@/lib/supabase/server"
-import { redirect } from "next/navigation"
+import { createPublicClient, createAdminClient } from "@/lib/supabase/server"
 import Link from "next/link"
 import dynamic from "next/dynamic"
 import { LandingHeader } from "@/components/shared/LandingHeader"
+import { RedirectIfAuthed } from "@/components/shared/RedirectIfAuthed"
 import { AppFooter } from "@/components/shared/AppFooter"
 import { mergeYearlyPlans, type DBPlan } from "@/lib/map-plans"
 import { FaqJsonLd, HowToJsonLd } from "@/components/JsonLd"
@@ -19,18 +19,9 @@ const PricingSection = dynamic(() =>
 )
 
 export default async function LandingPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (user) {
-    const { data: restaurant } = await supabase
-      .from("restaurants")
-      .select("id")
-      .eq("owner_id", user.id)
-      .maybeSingle()
-    if (restaurant) redirect("/dashboard")
-    redirect("/signup/restaurant")
-  }
+  // No cookies()/auth reads here — that keeps the homepage fully static (ISR).
+  // The logged-in redirect runs client-side via <RedirectIfAuthed />.
+  const supabase = createPublicClient()
 
   const { data: settingsData } = await supabase
     .from("company_settings")
@@ -51,6 +42,7 @@ export default async function LandingPage() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
+      <RedirectIfAuthed />
       <LandingHeader />
       {/* ─── Hero ─── */
       /* Main content flex-1 pushes footer to bottom */}

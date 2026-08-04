@@ -17,6 +17,40 @@ function setCachedRestaurant(ownerId: string, restaurantId: string): void {
   restaurantCache.set(ownerId, { id: restaurantId, expiresAt: Date.now() + 5_000 })
 }
 
+// ── Short-TTL cache for auth.getUser() ──────────────────────────────────
+// getUser() is a real network roundtrip to the Supabase Auth server
+// (~150-400ms). Caching per session-cookie removes that from every protected
+// request on a warm middleware instance. The key is derived from the Supabase
+// auth cookie value, so login/logout (new/absent cookie) busts the cache
+// automatically. JWTs themselves are valid for ~1h, so a 10s TTL is safe.
+const USER_CACHE_TTL_MS = 10_000
+const userCache = new Map<string, { user: any; expiresAt: number }>()
+
+function getAuthCacheKey(request: NextRequest): string | null {
+  const cookie = request.cookies
+    .getAll()
+    .find((c) => c.name.startsWith("sb-") && c.name.endsWith("-auth-token"))
+  if (!cookie || !cookie.value) return null
+  return `${cookie.name}:${cookie.value.slice(0, 48)}`
+}
+
+function getCachedUser(request: NextRequest): any | undefined {
+  const key = getAuthCacheKey(request)
+  if (!key) return undefined
+  const entry = userCache.get(key)
+  if (!entry || Date.now() > entry.expiresAt) {
+    userCache.delete(key ?? "")
+    return undefined
+  }
+  return entry.user
+}
+
+function setCachedUser(request: NextRequest, user: any): void {
+  const key = getAuthCacheKey(request)
+  if (!key) return
+  userCache.set(key, { user, expiresAt: Date.now() + USER_CACHE_TTL_MS })
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
@@ -46,12 +80,26 @@ export async function updateSession(request: NextRequest) {
   )
 
   let user: any = null
-  try {
-    const { data } = await supabase.auth.getUser()
-    user = data.user
-  } catch (err) {
-    console.error("[middleware] getUser failed:", err)
-    // Fall through — allow the request to proceed, client-side will handle auth
+  const authCookieKey = getAuthCacheKey(request)
+  if (!authCookieKey) {
+    // No Supabase session cookie present → skip the Auth-server roundtrip
+    // entirely. Without a session, getUser() can never return a user anyway.
+    user = null
+  } else {
+    const cachedUser = userCache.get(authCookieKey)
+    if (cachedUser && Date.now() <= cachedUser.expiresAt) {
+      user = cachedUser.user
+    } else {
+      if (cachedUser) userCache.delete(authCookieKey)
+      try {
+        const { data } = await supabase.auth.getUser()
+        user = data.user
+        setCachedUser(request, user)
+      } catch (err) {
+        console.error("[middleware] getUser failed:", err)
+        // Fall through — allow the request to proceed, client-side will handle auth
+      }
+    }
   }
 
   const pathname = request.nextUrl.pathname

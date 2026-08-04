@@ -29,6 +29,26 @@ export async function createClient() {
 }
 
 /**
+ * Cookie-less public client for PUBLIC, cacheable server components/pages.
+ *
+ * Uses only the anon key (public RLS applies) and never calls cookies(),
+ * which is what allows Next.js to statically cache pages via ISR.
+ * Use this on marketing/menu/blog pages — NOT on authenticated pages.
+ */
+export function createPublicClient() {
+  return createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    }
+  )
+}
+
+/**
  * Creates a Supabase client using the pgBouncer connection pooler.
  * Use this for serverless/edge contexts where direct connections are limited.
  *

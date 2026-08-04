@@ -1,7 +1,9 @@
 import type { Metadata } from "next"
 import { RestaurantsClient } from "./RestaurantsClient"
 import { ItemListJsonLd } from "@/components/JsonLd"
-import { createClient } from "@/lib/supabase/server"
+import { createPublicClient } from "@/lib/supabase/server"
+
+export const revalidate = 300  // ISR: restaurant listing refreshed every 5 min
 
 export const metadata: Metadata = {
   title: "Restaurants in Pakistan — Browse Menus | Digital QR Menue",
@@ -20,7 +22,7 @@ export const metadata: Metadata = {
 }
 
 export default async function RestaurantsPage() {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
   const { data: restaurants } = await supabase
     .from("restaurants")
     .select("id, name, slug, city, cuisine_type, logo_url, description, delivery_time_min, delivery_fee, is_open, opening_time, closing_time, opening_hours, plan, plan_end_date, trial_end, phone")

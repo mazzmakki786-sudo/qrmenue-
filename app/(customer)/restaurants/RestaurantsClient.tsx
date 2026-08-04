@@ -140,35 +140,11 @@ export function RestaurantsClient({ initialRestaurants, initialCities }: Restaur
   const allCities = useMemo(() => [...new Set(initialCities.map((c) => c.trim()))].sort(), [initialCities])
   const [selectedCity, setSelectedCity] = useState<string>("")
   const [searchQuery, setSearchQuery] = useState("")
-  const [loading, setLoading] = useState(false)
   const [searchFocused, setSearchFocused] = useState(false)
   const { isFavorited, toggleFavorite, loading: favLoading } = useFavorites()
 
-  useEffect(() => {
-    if (!selectedCity) {
-      setRestaurants(initialRestaurants)
-      return
-    }
-
-    const fetchRestaurants = async () => {
-      setLoading(true)
-      const supabase = createClient()
-      let query = supabase
-        .from("restaurants")
-        .select("id, name, slug, city, cuisine_type, logo_url, description, delivery_time_min, delivery_fee, is_open, opening_time, closing_time, opening_hours, plan, plan_end_date, trial_end, phone")
-        .eq("is_active", true)
-        .eq("is_suspended", false)
-
-      if (selectedCity) {
-        query = query.eq("city", selectedCity.trim())
-      }
-
-      const { data } = await query.order("name")
-      setRestaurants(data || [])
-      setLoading(false)
-    }
-    fetchRestaurants()
-  }, [selectedCity]) // eslint-disable-line react-hooks/exhaustive-deps
+  // All restaurant data is already server-rendered — city filtering happens
+  // client-side in the memo below, so no Supabase refetch is needed per city change.
 
   useEffect(() => {
     const supabase = createClient()
@@ -193,15 +169,21 @@ export function RestaurantsClient({ initialRestaurants, initialCities }: Restaur
   }, [])
 
   const filteredRestaurants = useMemo(() => {
-    if (!searchQuery.trim()) return restaurants
-    const q = searchQuery.toLowerCase()
-    return restaurants.filter(
-      (r) =>
-        r.name.toLowerCase().includes(q) ||
-        (r.cuisine_type || "").toLowerCase().includes(q) ||
-        r.city.trim().toLowerCase().includes(q)
-    )
-  }, [searchQuery, restaurants])
+    let list = restaurants
+    if (selectedCity) {
+      list = list.filter((r) => r.city.trim() === selectedCity)
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase()
+      list = list.filter(
+        (r) =>
+          r.name.toLowerCase().includes(q) ||
+          (r.cuisine_type || "").toLowerCase().includes(q) ||
+          r.city.trim().toLowerCase().includes(q)
+      )
+    }
+    return list
+  }, [restaurants, selectedCity, searchQuery])
 
   const handleSearchClear = useCallback(() => setSearchQuery(""), [])
 
@@ -318,10 +300,7 @@ export function RestaurantsClient({ initialRestaurants, initialCities }: Restaur
         {/* Results header */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-[13px] font-semibold text-black/60">
-            {loading
-              ? "Loading..."
-              : `${filteredRestaurants.length} ${filteredRestaurants.length === 1 ? "restaurant" : "restaurants"}`
-            }
+            {`${filteredRestaurants.length} ${filteredRestaurants.length === 1 ? "restaurant" : "restaurants"}`}
           </h2>
           {selectedCity && (
             <button
@@ -334,24 +313,7 @@ export function RestaurantsClient({ initialRestaurants, initialCities }: Restaur
         </div>
 
         {/* Restaurant List — horizontal cards */}
-        {loading ? (
-          <div className="space-y-3">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="flex items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white border border-border rounded-xl animate-pulse">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#F5F5F5] shrink-0" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-[#F5F5F5] rounded w-1/3" />
-                  <div className="h-3 bg-[#F5F5F5] rounded w-1/2" />
-                  <div className="h-3 bg-[#F5F5F5] rounded w-1/4" />
-                </div>
-                <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-1.5 shrink-0 self-center">
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-[#F5F5F5]" />
-                  <div className="w-12 sm:w-20 h-7 sm:h-9 rounded-lg sm:rounded-xl bg-[#F5F5F5]" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : filteredRestaurants.length === 0 ? (
+        {filteredRestaurants.length === 0 ? (
           <div data-testid="restaurants-empty-state" className="py-12 sm:py-24 text-center px-2">
             <div className="w-16 h-16 rounded-2xl bg-white border border-[#F0F0F0] mx-auto mb-5 flex items-center justify-center shadow-sm">
               <Search className="w-7 h-7 text-[#CCC]" />

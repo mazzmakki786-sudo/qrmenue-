@@ -5,65 +5,9 @@
    ▲ Next.js 15.5.18
    - Environments: .env.local, .env.production
    - Experiments (use with caution):
-     ✓ webpackBuildWorker
+     ⨯ webpackBuildWorker
      · optimizePackageImports
 
    Creating an optimized production build ...
-Failed to compile.
-
-./app/(owner)/dashboard/qr/page.tsx
-Error:   [31mx[0m You're importing a component that needs `useEffect`. This React Hook only works in a Client Component. To fix, mark the file (or its parent) with the `"use client"` directive.
-  [31m|[0m
-  [31m|[0m  Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
-  [31m|[0m
-
-   ,-[[36;1;4mC:\Users\Administrator\Desktop\qr_menue\app\(owner)\dashboard\qr\page.tsx[0m:1:1]
- [2m1[0m | import { useEffect, useState, useRef } from "react"
-   : [35;1m         ^^^^^^^^^[0m
- [2m2[0m | import { createClient } from "@/lib/supabase/client"
- [2m3[0m | import dynamic from "next/dynamic"
- [2m3[0m | import { useSubscription } from "@/lib/hooks/useSubscription"
-   `----
-  [31mx[0m You're importing a component that needs `useState`. This React Hook only works in a Client Component. To fix, mark the file (or its parent) with the `"use client"` directive.
-  [31m|[0m
-  [31m|[0m  Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
-  [31m|[0m
-
-   ,-[[36;1;4mC:\Users\Administrator\Desktop\qr_menue\app\(owner)\dashboard\qr\page.tsx[0m:1:1]
- [2m1[0m | import { useEffect, useState, useRef } from "react"
-   : [35;1m                    ^^^^^^^^[0m
- [2m2[0m | import { createClient } from "@/lib/supabase/client"
- [2m3[0m | import dynamic from "next/dynamic"
- [2m3[0m | import { useSubscription } from "@/lib/hooks/useSubscription"
-   `----
-  [31mx[0m You're importing a component that needs `useRef`. This React Hook only works in a Client Component. To fix, mark the file (or its parent) with the `"use client"` directive.
-  [31m|[0m
-  [31m|[0m  Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
-  [31m|[0m
-
-   ,-[[36;1;4mC:\Users\Administrator\Desktop\qr_menue\app\(owner)\dashboard\qr\page.tsx[0m:1:1]
- [2m1[0m | import { useEffect, useState, useRef } from "react"
-   : [35;1m                              ^^^^^^[0m
- [2m2[0m | import { createClient } from "@/lib/supabase/client"
- [2m3[0m | import dynamic from "next/dynamic"
- [2m3[0m | import { useSubscription } from "@/lib/hooks/useSubscription"
-   `----
-  [31mx[0m `ssr: false` is not allowed with `next/dynamic` in Server Components. Please move it into a Client Component.
-    ,-[[36;1;4mC:\Users\Administrator\Desktop\qr_menue\app\(owner)\dashboard\qr\page.tsx[0m:9:1]
- [2m 6[0m |     import type { Restaurant } from "@/types"
- [2m 7[0m |     import { escapeHtml } from "@/lib/utils"
- [2m 8[0m |     
- [2m 9[0m | [35;1m,[0m[35;1m-[0m[35;1m>[0m const QRCodeSVG = dynamic(
- [2m10[0m | [35;1m|[0m     () => import("qrcode.react").then((m) => m.QRCodeSVG),
- [2m11[0m | [35;1m|[0m     { ssr: false }
- [2m12[0m | [35;1m`[0m[35;1m-[0m[35;1m>[0m )
- [2m13[0m |     
- [2m14[0m |     const APP_URL = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "")
- [2m14[0m |     
-    `----
-
-Import trace for requested module:
-./app/(owner)/dashboard/qr/page.tsx
-
-
-> Build failed because of webpack errors
+ ✓ Compiled successfully in 38.1s
+   Linting and checking validity of types ...

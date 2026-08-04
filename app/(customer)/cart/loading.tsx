@@ -1,9 +1,7 @@
 export default function CartLoading() {
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
-      {/* Mobile skeleton */}
       <div className="md:hidden">
-        {/* Header */}
         <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-border">
           <div className="flex items-center justify-between px-4 h-14 max-w-[600px] mx-auto">
             <div className="flex items-center gap-3">
@@ -17,7 +15,6 @@ export default function CartLoading() {
           </div>
         </div>
 
-        {/* Restaurant banner */}
         <div className="px-4 pt-3 pb-2 max-w-[600px] mx-auto">
           <div className="flex items-center gap-2.5 bg-white rounded-xl border border-border p-3">
             <div className="w-8 h-8 rounded-lg bg-[#F0F0F0] animate-pulse" />
@@ -26,7 +23,6 @@ export default function CartLoading() {
           </div>
         </div>
 
-        {/* Cart items */}
         <div className="px-4 py-3 space-y-2 max-w-[600px] mx-auto">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="bg-white rounded-2xl border border-border p-3 flex items-center gap-3">
@@ -46,7 +42,6 @@ export default function CartLoading() {
           ))}
         </div>
 
-        {/* Summary */}
         <div className="px-4 py-3 max-w-[600px] mx-auto">
           <div className="bg-white rounded-2xl border border-border p-4 space-y-3">
             <div className="h-4 w-28 bg-[#F0F0F0] rounded animate-pulse" />
@@ -67,7 +62,6 @@ export default function CartLoading() {
           </div>
         </div>
 
-        {/* Fixed checkout bar */}
         <div className="fixed bottom-[60px] left-0 right-0 bg-white border-t border-border p-4 z-40">
           <div className="max-w-[600px] mx-auto">
             <div className="h-12 bg-[#F0F0F0] rounded-xl animate-pulse" />
@@ -75,7 +69,6 @@ export default function CartLoading() {
         </div>
       </div>
 
-      {/* Desktop skeleton */}
       <div className="hidden md:block min-h-screen bg-[#F9FAFB]">
         <header className="bg-white border-b border-border">
           <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">

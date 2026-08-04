@@ -1,7 +1,7 @@
 "use client"
 
-import { Suspense, useState, useEffect } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { Suspense, useEffect, useState } from "react"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { PasswordInput, validatePassword } from "@/components/ui/password-input"
@@ -10,13 +10,12 @@ import Link from "next/link"
 const REMEMBER_KEY = "qrmenu-remembered-phone"
 
 function CustomerLoginForm() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const redirectParam = searchParams.get("redirect")
-  // Success feedback passed from /signup/customer after account creation
   const successMessage = searchParams.get("message")
+  const modeParam = searchParams.get("mode")
 
-  const [mode, setMode] = useState<"signin" | "signup">("signin")
+  const [mode, setMode] = useState<"signin" | "signup">(modeParam === "signup" ? "signup" : "signin")
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
   const [password, setPassword] = useState("")
@@ -26,7 +25,6 @@ function CustomerLoginForm() {
 
   const redirectTo = redirectParam || "/restaurants"
 
-  // Load remembered phone on mount
   useEffect(() => {
     const saved = localStorage.getItem(REMEMBER_KEY)
     if (saved) {
@@ -50,7 +48,6 @@ function CustomerLoginForm() {
     setLoading(true)
     setError(null)
 
-    // Handle Remember Me
     if (mode === "signin" && rememberMe) {
       localStorage.setItem(REMEMBER_KEY, phone.trim())
     } else if (mode === "signin" && !rememberMe) {
@@ -80,7 +77,6 @@ function CustomerLoginForm() {
           return
         }
 
-        // Sign in after signup
         const loginRes = await fetch("/api/auth/customer-login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -91,12 +87,12 @@ function CustomerLoginForm() {
         if (!loginRes.ok) {
           setError(loginData.error || "Account created but sign in failed. Please log in.")
           setLoading(false)
-          router.push("/login/customer")
+          setMode("signin")
           return
         }
 
         setLoading(false)
-        router.push(redirectTo)
+        window.location.replace(redirectTo)
       } catch {
         setError("Something went wrong. Please try again.")
         setLoading(false)
@@ -119,7 +115,6 @@ function CustomerLoginForm() {
 
         setLoading(false)
 
-        // Check if this user owns a restaurant — if so, send to dashboard
         const supabase = (await import("@/lib/supabase/client")).createClient()
         const { data: restaurant } = await supabase
           .from("restaurants")
@@ -129,9 +124,9 @@ function CustomerLoginForm() {
         const isOwner = !!restaurant
 
         if (isOwner && redirectTo === "/restaurants") {
-          window.location.href = "/dashboard"
+          window.location.replace("/dashboard")
         } else {
-          router.push(redirectTo)
+          window.location.replace(redirectTo)
         }
       } catch {
         setError("Incorrect phone or password")

@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createPublicClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import { GRACE_PERIOD_DAYS } from "@/lib/subscription"
 import { buildBrandingConfig } from "@/lib/branding"
@@ -18,7 +18,7 @@ export const revalidate = 60  // ISR: revalidate every 60s (fresh menu content)
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const supabase = await createClient()
+  const supabase = createPublicClient()
 
   const { data: restaurant } = await supabase
     .from("restaurants")
@@ -65,7 +65,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function MenuPage({ params }: Props) {
   const { slug } = await params
-  const supabase = await createClient()
+  const supabase = createPublicClient()
 
   const { data: restaurant } = await supabase
     .from("restaurants")

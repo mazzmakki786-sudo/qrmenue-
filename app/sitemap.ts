@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next"
-import { createClient } from "@/lib/supabase/server"
+import { createPublicClient } from "@/lib/supabase/server"
 import { blogArticles, publicRoutes, baseUrl } from "@/lib/blog-articles"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
 
   // Static public pages (not behind auth)
   const staticPages: MetadataRoute.Sitemap = publicRoutes.map(({ path, lastModified }) => ({

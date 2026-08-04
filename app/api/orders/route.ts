@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server"
+import { NextResponse, after } from "next/server"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { generateOrderNumber, formatPrice } from "@/lib/utils"
 import { z } from "zod"
@@ -69,24 +69,12 @@ const createOrderSchema = z.object({
   { message: "Delivery address is required", path: ["delivery_address"] }
 )
 
-// ── Per-restaurant request queue ──
-// Serializes order writes per restaurant_id to reduce DB contention.
-// Each restaurant gets its own Promise chain: orders are processed one at a time
-// in FIFO order. This prevents thundering-herd writes on the same restaurant's data.
-const orderQueues = new Map<string, Promise<any>>()
-
-function enqueueOrder<T>(restaurantId: string, fn: () => Promise<T>): Promise<T> {
-  const prev = orderQueues.get(restaurantId) || Promise.resolve()
-  const next = prev.then(fn, fn) // Run even if previous failed (don't block the queue)
-  orderQueues.set(restaurantId, next)
-  // Cleanup: remove resolved promise from map to prevent memory leak
-  next.finally(() => {
-    if (orderQueues.get(restaurantId) === next) {
-      orderQueues.delete(restaurantId)
-    }
-  })
-  return next
-}
+// NOTE: The previous in-memory per-restaurant Promise queue was removed.
+// It only serialized requests WITHIN one warm serverless instance — on Vercel
+// (many concurrent instances) it gave no cross-instance safety while adding
+// latency to every order. Correctness now comes from the DB itself:
+//   1. Table occupancy uses one atomic conditional UPDATE (row lock).
+//   2. Order-number collisions rely on the UNIQUE constraint + retry below.
 
 export const POST = safeRoute(async (request) => {
   const csrfResponse = csrfGuard(request)
@@ -265,30 +253,49 @@ export const POST = safeRoute(async (request) => {
     }, { status: 403 })
   }
 
-  // ── Heavy work: enqueue per-restaurant to serialize DB writes ──
-  return enqueueOrder(restaurantId, async () => {
-    const orderNumber = generateOrderNumber()
+  // ── Heavy work: order creation ──
+  {
     const adminSupabase = createAdminClient()
 
-    // ── Table occupancy validation for dine-in ──
+    // ── Table occupancy for dine-in: atomically CLAIM the table ──
+    // One conditional UPDATE doubles as the "is it free?" check — the row
+    // lock makes this race-safe across ALL serverless instances. The old
+    // SELECT-then-UPDATE pair had a window where two concurrent instances
+    // could both see is_occupied=false and double-book the table.
+    let claimedTable: string | null = null
     if (parsed.data.order_type === "dine_in" && parsed.data.table_number) {
-      const { data: table } = await adminSupabase
+      const { data: claimed, error: claimErr } = await adminSupabase
         .from("restaurant_tables")
-        .select("id, is_active, is_occupied")
+        .update({ is_occupied: true })
         .eq("restaurant_id", restaurantId)
         .eq("table_number", parsed.data.table_number)
-        .single()
+        .eq("is_active", true)
+        .eq("is_occupied", false)
+        .select("id")
 
-      if (!table || !table.is_active) {
-        return NextResponse.json({ error: "Table not found" }, { status: 404 })
+      if (claimErr) {
+        log.error("Table claim failed", { message: claimErr.message, restaurant_id: restaurantId })
+        return NextResponse.json({ error: "Failed to create order. Please try again." }, { status: 500 })
       }
 
-      if (table.is_occupied) {
+      if (!claimed || claimed.length === 0) {
+        // Claim failed — find out whether the table is missing/inactive or occupied
+        const { data: table } = await adminSupabase
+          .from("restaurant_tables")
+          .select("id, is_active, is_occupied")
+          .eq("restaurant_id", restaurantId)
+          .eq("table_number", parsed.data.table_number)
+          .maybeSingle()
+
+        if (!table || !table.is_active) {
+          return NextResponse.json({ error: "Table not found" }, { status: 404 })
+        }
         return NextResponse.json({
           error: "TABLE_OCCUPIED",
           message: "This table is already occupied. Please choose a different table.",
         }, { status: 409 })
       }
+      claimedTable = parsed.data.table_number
     }
 
     // ── Customer upsert — only when customer_id is provided (optimization) ──
@@ -318,31 +325,61 @@ export const POST = safeRoute(async (request) => {
       }
     }
 
-    // ── Order INSERT ──
-    const { data, error } = await adminSupabase
-      .from("orders")
-      .insert({
-        restaurant_id: restaurantId,
-        customer_id: parsed.data.customer_id || null,
-        order_number: orderNumber,
-        items: recalculatedItems,
-        total_price: recalculatedTotal,
-        order_type: parsed.data.order_type,
-        customer_name: parsed.data.customer_name,
-        customer_phone: parsed.data.customer_phone || null,
-        table_number: parsed.data.table_number || null,
-        delivery_address: parsed.data.delivery_address || null,
-        payment_method: parsed.data.payment_method || "cod",
-        order_status: "received",
-        deal_id: parsed.data.deal_id || null,
-        discount_amount: parsed.data.discount_amount || 0,
-        delivery_fee: deliveryFee,
-        whatsapp_sent: true,
-      })
-      .select()
-      .single()
+    // ── Order INSERT with collision retry ──
+    // order_number is random (ORD-YYYY-NNNN) under a UNIQUE constraint. Two
+    // concurrent serverless instances can draw the same number — regenerate
+    // and retry instead of failing the customer's checkout (23505).
+    let data: any = null
+    let insertError: any = null
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      const result = await adminSupabase
+        .from("orders")
+        .insert({
+          restaurant_id: restaurantId,
+          customer_id: parsed.data.customer_id || null,
+          order_number: generateOrderNumber(),
+          items: recalculatedItems,
+          total_price: recalculatedTotal,
+          order_type: parsed.data.order_type,
+          customer_name: parsed.data.customer_name,
+          customer_phone: parsed.data.customer_phone || null,
+          table_number: parsed.data.table_number || null,
+          delivery_address: parsed.data.delivery_address || null,
+          payment_method: parsed.data.payment_method || "cod",
+          order_status: "received",
+          deal_id: parsed.data.deal_id || null,
+          discount_amount: parsed.data.discount_amount || 0,
+          delivery_fee: deliveryFee,
+          whatsapp_sent: true,
+        })
+        .select()
+        .single()
 
-    if (error) {
+      if (!result.error) {
+        data = result.data
+        insertError = null
+        break
+      }
+      insertError = result.error
+      // Only retry on unique-violation; any other error is terminal
+      if (result.error.code !== "23505") break
+      log.warn("Order number collision, retrying", { attempt, restaurant_id: restaurantId })
+    }
+
+    if (insertError) {
+      // Release the table claim if the order could not be created
+      if (claimedTable) {
+        await adminSupabase
+          .from("restaurant_tables")
+          .update({ is_occupied: false })
+          .eq("restaurant_id", restaurantId)
+          .eq("table_number", claimedTable)
+          .then(({ error: releaseErr }) => {
+            if (releaseErr) log.error("Failed to release table claim", { message: releaseErr.message, restaurant_id: restaurantId, table: claimedTable })
+          })
+      }
+
+      const error = insertError
       log.error("INSERT failed", { code: error.code, message: error.message, details: error.details, restaurant_id: restaurantId })
 
       // Return a more descriptive error based on the Postgres error code
@@ -364,17 +401,7 @@ export const POST = safeRoute(async (request) => {
     // Invalidate order count cache so the next request reflects the new order
     invalidateOrderCount(restaurantId)
 
-    // ── Mark table occupied (dine-in only) ──
-    if (parsed.data.order_type === "dine_in" && parsed.data.table_number && data.table_number) {
-      await adminSupabase
-        .from("restaurant_tables")
-        .update({ is_occupied: true })
-        .eq("restaurant_id", restaurantId)
-        .eq("table_number", parsed.data.table_number)
-        .then(({ error: occupyErr }) => {
-          if (occupyErr) log.error("Failed to mark table occupied", { message: occupyErr.message, restaurant_id: restaurantId, table: parsed.data.table_number })
-        })
-    }
+    const orderNumber = data.order_number
 
     // ── Build WhatsApp URL ──
     const whatsappUrl = buildWhatsAppURL({
@@ -391,61 +418,71 @@ export const POST = safeRoute(async (request) => {
       deliveryFee,
     })
 
-    // ── Notification log (fire-and-forget, non-critical) ──
-    // Use Promise.resolve to handle supabase's PromiseLike return type
-    Promise.resolve(adminSupabase.from("notification_logs").insert({
-      restaurant_id: restaurantId,
-      order_id: data.id,
-      type: "order_email",
-      status: "sent",
-    })).catch((err: any) => log.error("Notification log insert failed", { message: err?.message }))
+    // ── Post-response side effects via after() ──
+    // after() guarantees these finish before the serverless function is frozen.
+    // Plain fire-and-forget promises can be killed on Vercel as soon as the
+    // response is sent, which made owner "New Order" pushes unreliable.
+    after(async () => {
+      const jobs: Promise<unknown>[] = [
+        Promise.resolve(adminSupabase.from("notification_logs").insert({
+          restaurant_id: restaurantId,
+          order_id: data.id,
+          type: "order_email",
+          status: "sent",
+        })).catch((err: any) => log.error("Notification log insert failed", { message: err?.message })),
 
-    // ── Fire-and-forget: more non-critical side effects ──
-    checkAndSendOrderLimitAlert(restaurantId).catch((err: any) => log.warn("Order limit alert failed", { message: err?.message }))
-    sendPushNotification(restaurantId, {
-      title: `New Order #${orderNumber}`,
-      body: `${parsed.data.customer_name} — ${formatPrice(recalculatedTotal)}`,
-      url: `/dashboard/orders/${data.id}`,
-      tag: `order-${data.id}`,
-    }).catch((err: any) => log.error("Push send failed", { message: err?.message }))
+        checkAndSendOrderLimitAlert(restaurantId).catch((err: any) => log.warn("Order limit alert failed", { message: err?.message })),
 
-    // ── Customer notification on order creation ──
-    if (parsed.data.customer_id) {
-      sendCustomerPushNotification(parsed.data.customer_id, {
-        title: "Order Confirmed!",
-        body: `Your order #${orderNumber} of ${formatPrice(recalculatedTotal)} has been placed successfully at ${parsed.data.customer_name}`,
-        url: `/order-confirm/${data.id}`,
-        tag: `order-${data.id}`,
-        icon: "/og-image.png",
-      }).catch((err: any) => log.error("Customer push on create failed", { message: err?.message }))
+        sendPushNotification(restaurantId, {
+          title: `New Order #${orderNumber}`,
+          body: `${parsed.data.customer_name} — ${formatPrice(recalculatedTotal)}`,
+          url: `/dashboard/orders/${data.id}`,
+          tag: `order-${data.id}`,
+        }).catch((err: any) => log.error("Push send failed", { message: err?.message })),
 
-      createCustomerNotification({
-        customer_id: parsed.data.customer_id,
-        order_id: data.id,
-        type: "order_confirmed",
-        title_en: "Order Confirmed!",
-        title_ur: "رڈرآ رایت!",
-        body_en: `Your order #${orderNumber} of ${formatPrice(recalculatedTotal)} has been placed successfully.`,
-        body_ur: `ےہ لےک ےہ رایت رڈرآ #${orderNumber}`,
-        data: { total_price: recalculatedTotal, order_type: parsed.data.order_type },
-      }).catch((err: any) => log.error("Create notification failed", { message: err?.message }))
-    }
+        logCustomerAction(
+          parsed.data.customer_id || null,
+          "order_created",
+          {
+            order_id: data.id,
+            restaurant_id: restaurantId,
+            total_price: recalculatedTotal,
+            order_type: parsed.data.order_type,
+          },
+          getIpSimple(request)
+        ).catch((err: any) => log.warn("logCustomerAction failed", { message: err?.message })),
+      ]
 
-    logCustomerAction(
-      parsed.data.customer_id || null,
-      "order_created",
-      {
-        order_id: data.id,
-        restaurant_id: restaurantId,
-        total_price: recalculatedTotal,
-        order_type: parsed.data.order_type,
-      },
-      getIpSimple(request)
-    ).catch((err: any) => log.warn("logCustomerAction failed", { message: err?.message }))
+      // ── Customer notification on order creation ──
+      if (parsed.data.customer_id) {
+        jobs.push(
+          sendCustomerPushNotification(parsed.data.customer_id, {
+            title: "Order Confirmed!",
+            body: `Your order #${orderNumber} of ${formatPrice(recalculatedTotal)} has been placed successfully at ${parsed.data.customer_name}`,
+            url: `/order-confirm/${data.id}`,
+            tag: `order-${data.id}`,
+            icon: "/og-image.png",
+          }).catch((err: any) => log.error("Customer push on create failed", { message: err?.message })),
+
+          createCustomerNotification({
+            customer_id: parsed.data.customer_id,
+            order_id: data.id,
+            type: "order_confirmed",
+            title_en: "Order Confirmed!",
+            title_ur: "رڈرآ رایت!",
+            body_en: `Your order #${orderNumber} of ${formatPrice(recalculatedTotal)} has been placed successfully.`,
+            body_ur: `ےہ لےک ےہ رایت رڈرآ #${orderNumber}`,
+            data: { total_price: recalculatedTotal, order_type: parsed.data.order_type },
+          }).catch((err: any) => log.error("Create notification failed", { message: err?.message }))
+        )
+      }
+
+      await Promise.allSettled(jobs)
+    })
 
     return NextResponse.json({
       order: data,
       whatsapp_url: whatsappUrl,
     })
-  })
+  }
 })
