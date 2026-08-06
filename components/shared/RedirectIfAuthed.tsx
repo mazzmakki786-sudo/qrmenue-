@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
+import { fetchOwnerRestaurant } from "@/lib/owner-restaurant"
 
 /**
  * Client-side equivalent of the old server-side homepage auth redirect.
@@ -21,13 +22,13 @@ export function RedirectIfAuthed() {
         const { data: { session } } = await supabase.auth.getSession()
         if (cancelled || !session) return
 
-        const { data: restaurant } = await supabase
-          .from("restaurants")
-          .select("id")
-          .eq("owner_id", session.user.id)
-          .maybeSingle()
+        const { restaurant, error: restaurantQueryError } =
+          await fetchOwnerRestaurant(supabase, session.user.id)
 
         if (cancelled) return
+        // On a failed query, don't redirect at all — never route an existing
+        // owner to restaurant creation because a lookup errored.
+        if (restaurantQueryError) return
         router.replace(restaurant ? "/dashboard" : "/signup/restaurant")
       } catch {
         // Never block the landing page on auth/network errors

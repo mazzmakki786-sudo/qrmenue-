@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import CityAutocomplete from "@/components/shared/CityAutocomplete"
+import { fetchOwnerRestaurant } from "@/lib/owner-restaurant"
 import { Sparkles, Check, X, Loader2, AlertTriangle, ShieldCheck, Timer, Wallet, LogOut } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 
@@ -124,6 +125,20 @@ export default function RestaurantSignupPage() {
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (user) {
+        // A user who already owns a restaurant cannot/should not sign up again.
+        // IMPORTANT: distinguish "no restaurant" (clean null → show form) from
+        // a failed query (error → never show the form; surface a retry instead).
+        const { restaurant: existingRestaurant, error: restaurantQueryError } =
+          await fetchOwnerRestaurant(supabase, user.id)
+        if (existingRestaurant) {
+          window.location.replace("/dashboard")
+          return
+        }
+        if (restaurantQueryError) {
+          setError("We couldn't verify your account status. Please try again.")
+          setCheckingAuth(false)
+          return
+        }
         // A user who already has a customer account cannot become a restaurant
         // owner with the same account (blocked at RLS too — show them a clear
         // message instead of the restaurant form).
@@ -230,6 +245,9 @@ export default function RestaurantSignupPage() {
     }
 
     setLoading(false)
+
+    // Fire-and-forget welcome email (owned by this new restaurant)
+    fetch("/api/auth/welcome", { method: "POST" }).catch(() => {})
 
     // Notify superadmin if a paid plan was requested
     if (hasPaidPlan) {

@@ -7,6 +7,7 @@ import { LayoutDashboard, UtensilsCrossed, ClipboardList, BarChart3, User, Credi
 import { BellNotification } from "@/components/owner/BellNotification"
 import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { fetchOwnerRestaurant } from "@/lib/owner-restaurant"
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary"
 import { Toaster } from "@/components/shared/Toaster"
 import { usePushNotifications } from "@/lib/hooks/usePushNotifications"
@@ -51,18 +52,14 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user?.id) return
-      supabase
-        .from("restaurants")
-        .select("id, plan")
-        .eq("owner_id", user.id)
-        .maybeSingle()
-        .then(({ data }) => {
-          if (data) {
+      fetchOwnerRestaurant(supabase, user.id)
+        .then(({ restaurant }) => {
+          if (restaurant) {
             try {
-              (window as any).__ownerRestaurantCache = { id: data.id, plan: data.plan }
+              (window as any).__ownerRestaurantCache = { id: restaurant.id, plan: restaurant.plan }
             } catch {}
-            setRestaurantId(data.id)
-            setPlan(data.plan)
+            setRestaurantId(restaurant.id)
+            setPlan(restaurant.plan)
           }
         })
     }).catch(() => {})

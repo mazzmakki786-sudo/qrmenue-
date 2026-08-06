@@ -462,6 +462,11 @@ Custom CSS variables drive all colors: `--color-primary` (black), `--color-accen
 - Subscription types: manual billing only. Plans stored in `plans` table, subscriptions in `subscriptions` table. No Stripe/Paddle integration.
 - Trial limits load from DB `company_settings` table key `trial_limits` via `lib/subscription-server.ts` → `loadTrialLimitsFromDB()`, fallback to `DEFAULT_TRIAL_LIMITS`.
 
+### One Restaurant Per Owner (DB-enforced)
+- **`restaurants_owner_id_unique`** — partial unique index on `restaurants(owner_id) WHERE owner_id IS NOT NULL` (migration `00018_one_restaurant_per_owner.sql`, applied Aug 2026). No owner can ever have a second restaurant row; the DB rejects it with `unique_violation`.
+- **Never use `.maybeSingle()` / `.single()` for owner-restaurant lookups.** PostgREST returns error `PGRST116` ("multiple rows") with `data = null` when an owner has >1 row, and a **zero-row** query also errors on `.single()`. Any code that only inspects `data` misreads these as "no restaurant" → wrongly redirects owners to `/signup/restaurant`. Use `fetchOwnerRestaurant(supabase, ownerId)` from `lib/owner-restaurant.ts` instead — it fetches `.limit(2)`, resolves multiple rows to the first (oldest), and returns `{ restaurant, error }` so callers can distinguish "genuinely no restaurant" from "query failed" (RLS/network). Never redirect to signup on a query error.
+- Aug 2026 production incident: owner `mazmakki@gmail.com` had 6 restaurants (`lahore-grill` + test slugs `999`/`111112`/`11111`/`6666`/`aliii`); the dedupe kept `lahore-grill` (earliest `created_at` — never sort UUIDs by `id`; byte order ≠ creation order) and the unique index now prevents recurrence.
+
 ### Custom Restaurant Slug (One-Time URL)
 Restaurant owners choose their URL once — permanent, can't be changed later.
 

@@ -12,6 +12,7 @@ import {
   type SubscriptionStatus,
 } from "@/lib/subscription"
 import { getOrderCountQuery } from "@/lib/subscription-usage"
+import { fetchOwnerRestaurant } from "@/lib/owner-restaurant"
 import type { Restaurant } from "@/types"
 
 export interface UseSubscriptionReturn {
@@ -84,13 +85,16 @@ export function useSubscription(): UseSubscriptionReturn {
         return
       }
 
-      const { data: restaurantData, error: rErr } = await supabase
-        .from("restaurants")
-        .select("*")
-        .eq("owner_id", user.id)
-        .single()
+      const { restaurant: restaurantData, error: rErr } =
+        await fetchOwnerRestaurant(supabase, user.id)
 
-      if (rErr || !restaurantData) {
+      if (rErr) {
+        // Query failed (multi-row / RLS / network) — never silently treat it
+        // as "no restaurant". The dashboard renders its error state instead.
+        setLoading(false)
+        return
+      }
+      if (!restaurantData) {
         setLoading(false)
         return
       }

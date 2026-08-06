@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
+import { fetchOwnerRestaurant } from "@/lib/owner-restaurant"
 
 // In-memory cache for restaurant lookups in middleware.
 // Short TTL (5s) keeps things fresh while reducing repeated DB queries
@@ -49,6 +50,31 @@ function setCachedUser(request: NextRequest, user: any): void {
   const key = getAuthCacheKey(request)
   if (!key) return
   userCache.set(key, { user, expiresAt: Date.now() + USER_CACHE_TTL_MS })
+}
+
+// Resolve the restaurant id for an owner from cache, falling back to a
+// duplicate-safe DB query (see fetchOwnerRestaurant). Returns { id } or null.
+// Distinguishes "owner has no restaurant" (clean, null) from "query failed"
+// ({ error: true, id: null }) so callers never redirect a user to restaurant
+// creation merely because a lookup errored.
+async function getOwnerRestaurantId(
+  supabase: ReturnType<typeof createServerClient>,
+  request: NextRequest,
+  user: any
+): Promise<{ id: string | null; error: boolean }> {
+  const cachedId = getCachedRestaurant(user.id)
+  if (cachedId) return { id: cachedId, error: false }
+  try {
+    const { restaurant } = await fetchOwnerRestaurant(supabase, user.id)
+    if (restaurant?.id) {
+      setCachedRestaurant(user.id, restaurant.id)
+      return { id: restaurant.id, error: false }
+    }
+    return { id: null, error: false }
+  } catch (err) {
+    console.error("[middleware] restaurant check failed:", err)
+    return { id: null, error: true }
+  }
 }
 
 export async function updateSession(request: NextRequest) {
@@ -108,26 +134,15 @@ export async function updateSession(request: NextRequest) {
     if (!user) {
       return NextResponse.redirect(new URL("/login?redirect=/dashboard", request.url))
     }
-    // Inline cache: only query DB if we haven't done so recently
-    let cachedId = getCachedRestaurant(user.id)
-    if (!cachedId) {
-      try {
-        const { data: restaurant } = await supabase
-          .from("restaurants")
-          .select("id")
-          .eq("owner_id", user.id)
-          .maybeSingle()
-        if (restaurant) {
-          cachedId = restaurant.id
-          setCachedRestaurant(user.id, restaurant.id)
-        }
-      } catch (err) {
-        console.error("[middleware] restaurant check failed:", err)
-        // Pass through — let the client-side handle it
-      }
+    const { id: ownerRestaurantId, error: restaurantLookupFailed } = await getOwnerRestaurantId(supabase, request, user)
+    if (restaurantLookupFailed) {
+      // Query failed (RLS/network/transient) — never redirect a valid owner to
+      // restaurant creation. Allow the request to proceed; the client-side
+      // dashboard will surface the actual error.
+      return supabaseResponse
     }
-    if (!cachedId) {
-      // User is logged in but doesn't own a restaurant — redirect to signup
+    if (!ownerRestaurantId) {
+      // User is logged in but genuinely owns no restaurant — redirect to signup
       return NextResponse.redirect(new URL("/signup/restaurant", request.url))
     }
   }
@@ -138,23 +153,11 @@ export async function updateSession(request: NextRequest) {
     if (!user) {
       return NextResponse.redirect(new URL("/login", request.url))
     }
-    let cachedId = getCachedRestaurant(user.id)
-    if (!cachedId) {
-      try {
-        const { data: restaurant } = await supabase
-          .from("restaurants")
-          .select("id")
-          .eq("owner_id", user.id)
-          .maybeSingle()
-        if (restaurant) {
-          cachedId = restaurant.id
-          setCachedRestaurant(user.id, restaurant.id)
-        }
-      } catch (err) {
-        console.error("[middleware] onboarding restaurant check failed:", err)
-      }
+    const { id: ownerRestaurantId, error: restaurantLookupFailed } = await getOwnerRestaurantId(supabase, request, user)
+    if (restaurantLookupFailed) {
+      return supabaseResponse
     }
-    if (!cachedId) {
+    if (!ownerRestaurantId) {
       return NextResponse.redirect(new URL("/signup/restaurant", request.url))
     }
   }
@@ -165,11 +168,17 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  // A user who already has a customer account cannot become a restaurant owner.
-  // Send them away from the restaurant signup form early (RLS blocks the insert
-  // too — this is a clean UX guard).
+  // A user who already has a customer account cannot become a restaurant owner,
+  // and an existing restaurant owner must never see the signup form again
+  // (RLS would allow a duplicate restaurant). Both are clean UX guards.
   if (pathname.startsWith("/signup/restaurant")) {
     if (user) {
+      const { id: ownerRestaurantId, error: restaurantLookupFailed } = await getOwnerRestaurantId(supabase, request, user)
+      // If the lookup failed, fall through and let the client-side signup page
+      // surface the error — never assume "no restaurant" from a failed query.
+      if (!restaurantLookupFailed && ownerRestaurantId) {
+        return NextResponse.redirect(new URL("/dashboard", request.url))
+      }
       try {
         const { data: existingCustomer } = await supabase
           .from("customers")
@@ -196,31 +205,18 @@ export async function updateSession(request: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
-    let cachedId = getCachedRestaurant(user.id)
-    if (!cachedId) {
-      try {
-        const { data: restaurant } = await supabase
-          .from("restaurants")
-          .select("id")
-          .eq("owner_id", user.id)
-          .maybeSingle()
-        if (restaurant) {
-          cachedId = restaurant.id
-          setCachedRestaurant(user.id, restaurant.id)
-        }
-      } catch (err) {
-        console.error("[middleware] api/owner restaurant fetch failed:", err)
-        return NextResponse.json({ error: "Internal server error" }, { status: 500 })
-      }
+    const { id: ownerRestaurantId, error: restaurantLookupFailed } = await getOwnerRestaurantId(supabase, request, user)
+    if (restaurantLookupFailed) {
+      return NextResponse.json({ error: "Internal server error" }, { status: 500 })
     }
-    if (!cachedId) {
+    if (!ownerRestaurantId) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
     // Set headers directly on request AND rebuild supabaseResponse so
     // downstream route handlers receive the custom headers even if setAll
     // recreated the response after getUser().
     request.headers.set("x-owner-id", user.id)
-    request.headers.set("x-restaurant-id", cachedId)
+    request.headers.set("x-restaurant-id", ownerRestaurantId)
     supabaseResponse = NextResponse.next({ request: { ...request, headers: request.headers } })
     return supabaseResponse
   }

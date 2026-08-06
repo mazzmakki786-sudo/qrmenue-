@@ -39,6 +39,7 @@ opencode.json
 
 # vercel
 .vercel
+.env.vercel.tmp
 
 # typescript
 *.tsbuildinfo
