@@ -261,10 +261,10 @@ export default function CheckoutPage() {
           setErrorMessage("This table is already occupied. Please select a different table.")
           setIsNetworkError(false)
         } else {
-          // Generic error — show internet check message as fallback
+          // Show actual server error message instead of generic internet error
           setErrorTitle("Order Failed")
-          setErrorMessage("Your order could not be placed. Your internet connection seems weak — please check your internet and try again.")
-          setIsNetworkError(true)
+          setErrorMessage(errorMsg || "Your order could not be placed. Please try again.")
+          setIsNetworkError(false)
         }
         setErrorDialogOpen(true)
         setLocalLoading(false)

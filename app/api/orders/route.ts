@@ -15,6 +15,7 @@ import { normalizePhone } from "@/lib/auth-validation"
 import { buildWhatsAppURL } from "@/lib/whatsapp"
 import { isRestaurantOpen } from "@/lib/restaurant-hours"
 import { logCustomerAction, getIpSimple } from "@/lib/owner-audit"
+import { sendOrderEmail } from "@/lib/resend"
 import { restaurantCache, dishPriceCache } from "@/lib/cache"
 import { getOrderCountFromDB, invalidateOrderCount } from "@/lib/subscription-usage"
 import { createLogger } from "@/lib/logger"
@@ -423,13 +424,56 @@ export const POST = safeRoute(async (request) => {
     // Plain fire-and-forget promises can be killed on Vercel as soon as the
     // response is sent, which made owner "New Order" pushes unreliable.
     after(async () => {
+      // Fetch restaurant owner email for email notification
+      const { data: restaurantForEmail } = await adminSupabase
+        .from("restaurants")
+        .select("name, owner_id")
+        .eq("id", restaurantId)
+        .single()
+
+      const { data: ownerProfile } = restaurantForEmail?.owner_id
+        ? await adminSupabase.auth.admin.getUserById(restaurantForEmail.owner_id)
+        : { data: null }
+
+      const ownerEmail = ownerProfile?.user?.email
+
       const jobs: Promise<unknown>[] = [
-        Promise.resolve(adminSupabase.from("notification_logs").insert({
-          restaurant_id: restaurantId,
-          order_id: data.id,
-          type: "order_email",
-          status: "sent",
-        })).catch((err: any) => log.error("Notification log insert failed", { message: err?.message })),
+        // Send actual order email to restaurant owner
+        (async () => {
+          try {
+            if (!ownerEmail) {
+              await adminSupabase.from("notification_logs").insert({
+                restaurant_id: restaurantId,
+                order_id: data.id,
+                type: "order_email",
+                status: "failed",
+              })
+              return
+            }
+            await sendOrderEmail(
+              { ...data, order_number: data.order_number },
+              { name: restaurantForEmail?.name || "Restaurant", owner_email: ownerEmail }
+            )
+            await adminSupabase.from("notification_logs").insert({
+              restaurant_id: restaurantId,
+              order_id: data.id,
+              type: "order_email",
+              recipient_email: ownerEmail,
+              status: "sent",
+            })
+          } catch (err: any) {
+            log.error("Order email send failed", { message: err?.message })
+            try {
+              await adminSupabase.from("notification_logs").insert({
+                restaurant_id: restaurantId,
+                order_id: data.id,
+                type: "order_email",
+                recipient_email: ownerEmail || "",
+                status: "failed",
+              })
+            } catch {}
+          }
+        })(),
 
         checkAndSendOrderLimitAlert(restaurantId).catch((err: any) => log.warn("Order limit alert failed", { message: err?.message })),
 

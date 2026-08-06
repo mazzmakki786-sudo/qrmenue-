@@ -31,6 +31,19 @@ function CustomerLoginForm() {
       setPhone(saved)
       setRememberMe(true)
     }
+
+    // Redirect if already logged in
+    const checkAuth = async () => {
+      try {
+        const { createClient } = await import("@/lib/supabase/client")
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          window.location.replace(redirectTo)
+        }
+      } catch {}
+    }
+    checkAuth()
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -218,6 +231,9 @@ function CustomerLoginForm() {
             Already have an account? <span className="text-[#25D366] font-semibold">Sign in</span>
           </button>
         )}
+        <Link href="/login" className="text-sm text-[#555] hover:text-black transition-colors">
+          Restaurant owner? <span className="text-[#25D366] font-semibold">Login here</span>
+        </Link>
         <Link href="/restaurants" className="text-xs text-[#999] hover:text-black transition-colors">
           Back to restaurants
         </Link>
