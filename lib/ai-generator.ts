@@ -16,17 +16,13 @@ export const AI_IMAGE_MODEL =
 const CLOUDFLARE_AI_BASE_URL =
   "https://api.cloudflare.com/client/v4/accounts"
 
-/** Supported poster aspect ratios (width:height). */
-export const AI_ASPECT_RATIOS = ["1:1", "4:3", "3:4", "16:9", "9:16"] as const
+/** Supported poster aspect ratios (width:height). Only 1:1 is offered. */
+export const AI_ASPECT_RATIOS = ["1:1"] as const
 export type AIAspectRatio = (typeof AI_ASPECT_RATIOS)[number]
 
 /** Actual output pixel sizes per ratio (multiples of 16 — FLUX constraint). */
 export const AI_IMAGE_SIZES: Record<AIAspectRatio, { width: number; height: number }> = {
   "1:1": { width: 1024, height: 1024 },
-  "4:3": { width: 1024, height: 768 },
-  "3:4": { width: 768, height: 1024 },
-  "16:9": { width: 1280, height: 720 },
-  "9:16": { width: 720, height: 1280 },
 }
 
 export interface AIPosterOptions {

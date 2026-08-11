@@ -9,10 +9,6 @@ import type { AIAspectRatio, AIColorSchemeKey } from "@/lib/ai-generator"
 export function ratioToAspect(ratio: AIAspectRatio): string {
   const map: Record<AIAspectRatio, string> = {
     "1:1": "1 / 1",
-    "4:3": "4 / 3",
-    "3:4": "3 / 4",
-    "16:9": "16 / 9",
-    "9:16": "9 / 16",
   }
   return map[ratio] || "1 / 1"
 }

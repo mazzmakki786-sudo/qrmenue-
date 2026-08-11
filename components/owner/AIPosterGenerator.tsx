@@ -9,10 +9,8 @@ import { PosterComposition } from "./PosterComposition"
 import {
   AI_TEMPLATES,
   AI_COLOR_SCHEMES,
-  AI_ASPECT_RATIOS,
   type AITemplateKey,
   type AIColorSchemeKey,
-  type AIAspectRatio,
 } from "@/lib/ai-generator"
 
 interface DishOption {
@@ -40,7 +38,6 @@ export function AIPosterGenerator({
   const [selectedDishIds, setSelectedDishIds] = useState<Set<string>>(new Set())
   const [templateKey, setTemplateKey] = useState<AITemplateKey>("classic")
   const [colorScheme, setColorScheme] = useState<AIColorSchemeKey>("appetizing")
-  const [ratio, setRatio] = useState<AIAspectRatio>("1:1")
   const [orderPhone, setOrderPhone] = useState("")
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [customPrompt, setCustomPrompt] = useState("")
@@ -105,7 +102,6 @@ export function AIPosterGenerator({
           dishes: selectedDishes.map((d) => ({ name: d.name_en, price: d.price })),
           templateKey,
           colorScheme,
-          ratio,
           orderPhone,
           customPrompt: showAdvanced ? customPrompt.trim() : undefined,
         }),
@@ -135,7 +131,7 @@ export function AIPosterGenerator({
           <PosterComposition
             artworkUrl={null}
             restaurantName={restaurant?.name || "Your Restaurant"}
-            ratio={ratio}
+            ratio="1:1"
             dishes={selectedDishes.map((d) => ({ name: d.name_en, price: d.price }))}
             orderPhone={orderPhone || null}
             qrUrl={previewQr}
@@ -257,30 +253,6 @@ export function AIPosterGenerator({
                 </button>
               ))}
             </div>
-          </div>
-
-          {/* ── Ratio ── */}
-          <div className="mb-5">
-            <label className="text-sm font-semibold text-[#333] mb-2 block">Format</label>
-            <div className="flex flex-wrap gap-2">
-              {AI_ASPECT_RATIOS.map((r) => (
-                <button
-                  key={r}
-                  type="button"
-                  onClick={() => setRatio(r)}
-                  className={`px-3 py-1.5 rounded-lg border text-sm transition-colors min-h-[36px] ${
-                    ratio === r
-                      ? "bg-black text-white border-black"
-                      : "bg-white text-[#555] border-[#E5E5E5] hover:border-black"
-                  }`}
-                >
-                  {r}
-                </button>
-              ))}
-            </div>
-            <p className="text-xs text-[#999] mt-1.5">
-              The poster is generated directly in this format.
-            </p>
           </div>
 
           {/* ── Advanced prompt (optional) ── */}
