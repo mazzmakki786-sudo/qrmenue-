@@ -3,18 +3,18 @@ import { createLogger } from "@/lib/logger"
 const log = createLogger("ai-generator")
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Gemini Image Generation (Imagen via Gemini API)
-// https://ai.google.dev/gemini-api/docs/image-generation
-// POST {GEMINI_API_BASE_URL}/v1beta/models/{model}:generateContent
-//   - model "imagen-4.0" (or "imagen-3.0") produces a single 1024x1024 image
-//   - model "gemini-2.5-flash-image" accepts multiple candidates + aspect ratios
+// Cloudflare Workers AI Image Generation (FLUX.1 [schnell])
+// https://developers.cloudflare.com/workers-ai/
+// POST https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/run/{model}
+//   - model "@cf/black-forest-labs/flux-1-schnell" produces a 1024x1024 JPEG
+//   - accepts { prompt, steps } only; returns base64 in { result.image }
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const AI_IMAGE_MODEL =
-  process.env.GEMINI_IMAGE_MODEL || "imagen-3.0-generate-001"
+  process.env.CLOUDFLARE_AI_MODEL || "@cf/black-forest-labs/flux-1-schnell"
 
-const GEMINI_BASE_URL =
-  process.env.GEMINI_API_BASE_URL || "https://generativelanguage.googleapis.com"
+const CLOUDFLARE_AI_BASE_URL =
+  "https://api.cloudflare.com/client/v4/accounts"
 
 /** Supported poster aspect ratios (width:height). */
 export const AI_ASPECT_RATIOS = ["1:1", "4:3", "3:4", "16:9", "9:16"] as const
@@ -29,17 +29,9 @@ export interface AIPosterOptions {
 }
 
 export interface AIPosterResult {
-  /** Base64-encoded PNG of the generated image (no data: prefix). */
+  /** Base64-encoded image of the generated image (no data: prefix). */
   b64: string
   mimeType: string
-}
-
-const RATIO_TO_SIZE: Record<AIAspectRatio, [number, number]> = {
-  "1:1": [1024, 1024],
-  "4:3": [1216, 912],
-  "3:4": [912, 1216],
-  "16:9": [1344, 768],
-  "9:16": [768, 1344],
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -129,39 +121,33 @@ ${POSTER_DESIGN_RULES}`
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Gemini API call
+// Cloudflare Workers AI call
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Generate a poster artwork image via the Gemini (Imagen) API.
+ * Generate a poster artwork image via Cloudflare Workers AI (FLUX.1 [schnell]).
  * Returns base64 image data; throws on failure with a readable message.
  */
 export async function generatePosterArtwork(
   options: AIPosterOptions
 ): Promise<AIPosterResult> {
-  const apiKey = process.env.GEMINI_API_KEY
-  if (!apiKey) {
+  const apiToken = process.env.CLOUDFLARE_API_TOKEN
+  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID
+
+  if (!apiToken || !accountId) {
     throw new Error(
-      "GEMINI_API_KEY is not configured. Contact support to enable AI posters."
+      "CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID is not configured. Contact support to enable AI posters."
     )
   }
 
-  const url = `${GEMINI_BASE_URL}/v1beta/models/${AI_IMAGE_MODEL}:generateContent`
-  const [width, height] = RATIO_TO_SIZE[options.ratio]
+  // FLUX.1 [schnell] outputs a fixed 1024x1024 canvas; the requested aspect
+  // ratio is enforced by the frontend via object-fit + CSS aspect ratio.
 
-  const payload: Record<string, unknown> = {
-    contents: [
-      {
-        parts: [{ text: options.prompt }],
-      },
-    ],
-    generationConfig: {
-      imageConfig: {
-        aspectRatio: options.ratio,
-        imageSize: `${width}x${height}`,
-      },
-      candidateCount: 1,
-    },
+  const url = `${CLOUDFLARE_AI_BASE_URL}/${accountId}/ai/run/${AI_IMAGE_MODEL}`
+  const payload = {
+    prompt: options.prompt,
+    steps: 4,
+    seed: Math.floor(Math.random() * 10),
   }
 
   const start = Date.now()
@@ -171,21 +157,21 @@ export async function generatePosterArtwork(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-goog-api-key": apiKey,
+        Authorization: `Bearer ${apiToken}`,
       },
       body: JSON.stringify(payload),
       // Image generation takes 10-60s
       signal: AbortSignal.timeout(90_000),
     })
   } catch (err) {
-    log.error("Gemini request failed", { error: String(err) })
+    log.error("Cloudflare request failed", { error: String(err) })
     throw new Error("Could not reach the AI image service. Please try again.")
   }
 
   const elapsed = Date.now() - start
   if (!res.ok) {
     const text = await res.text().catch(() => "")
-    log.error("Gemini error response", { status: res.status, body: text.slice(0, 500) })
+    log.error("Cloudflare error response", { status: res.status, body: text.slice(0, 500) })
     if (res.status === 429) {
       throw new Error("AI service is busy — please wait a minute and try again.")
     }
@@ -195,23 +181,23 @@ export async function generatePosterArtwork(
   }
 
   const json = (await res.json()) as {
-    candidates?: { content?: { parts?: { inlineData?: { data?: string; mimeType?: string } }[] } }[]
-    error?: { message?: string }
+    success?: boolean
+    result?: { image?: string }
+    errors?: { message?: string }[]
   }
 
-  if (json.error) {
-    log.error("Gemini API error", { message: json.error.message })
+  if (json.errors?.length) {
+    log.error("Cloudflare API error", { message: json.errors[0]?.message })
     throw new Error("AI image generation was rejected. Please try again.")
   }
 
-  const inlineData =
-    json.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data)?.inlineData
+  const imageB64: string | undefined = json.result?.image
 
-  if (!inlineData?.data) {
-    log.error("Gemini returned no image data", { elapsed })
+  if (!imageB64) {
+    log.error("Cloudflare returned no image data", { elapsed })
     throw new Error("The AI returned no image. Please try again.")
   }
 
-  log.info("Gemini image generated", { model: AI_IMAGE_MODEL, ms: elapsed })
-  return { b64: inlineData.data, mimeType: inlineData.mimeType || "image/png" }
+  log.info("Cloudflare image generated", { model: AI_IMAGE_MODEL, ms: elapsed })
+  return { b64: imageB64, mimeType: "image/jpeg" }
 }

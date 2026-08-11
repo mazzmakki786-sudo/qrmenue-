@@ -181,12 +181,12 @@ export const POST = safeRoute(async (request) => {
     })
 
     // Store in Supabase storage (public bucket ai-posters)
-    const path = `${restaurant.id}/${gen.id}.png`
+    const path = `${restaurant.id}/${gen.id}.jpg`
     const buffer = Buffer.from(result.b64, "base64")
     const { error: uploadError } = await admin.storage
       .from("ai-posters")
       .upload(path, buffer, {
-        contentType: result.mimeType || "image/png",
+        contentType: result.mimeType || "image/jpeg",
         upsert: true,
       })
     if (uploadError) {

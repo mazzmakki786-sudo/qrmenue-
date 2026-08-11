@@ -68,6 +68,16 @@ export default function AIPostersPage() {
           loadUsage()
         }
       )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "restaurants",
+          filter: `id=eq.${restaurant.id}`,
+        },
+        () => loadUsage()
+      )
       .subscribe()
     return () => {
       supabase.removeChannel(channel)

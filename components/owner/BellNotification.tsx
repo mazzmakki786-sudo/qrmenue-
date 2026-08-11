@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback, useRef } from "react"
+import { createPortal } from "react-dom"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import { useRouter } from "next/navigation"
@@ -106,7 +107,7 @@ export function BellNotification({ restaurantId }: Props) {
 
     const fetchInitial = async () => {
       const startOfDay = getStartOfTodayPK()
-      const [ordersRes, announcementsRes] = await Promise.all([
+      const [ordersRes, announcementsRes, newestAnnRes] = await Promise.all([
         supabase
           .from("orders")
           .select("*")
@@ -120,8 +121,17 @@ export function BellNotification({ restaurantId }: Props) {
           .eq("restaurant_id", restaurantId)
           .eq("type", "announcement")
           .eq("is_read", false),
+        supabase
+          .from("owner_notifications")
+          .select("id")
+          .eq("restaurant_id", restaurantId)
+          .eq("type", "announcement")
+          .order("created_at", { ascending: false })
+          .limit(1),
       ])
 
+      const newest = (newestAnnRes.data as any[] | null)?.[0]
+      if (newest?.id) lastAnnouncementRef.current = newest.id
       setTodayOrders((ordersRes.data || []) as TodayOrder[])
       setUnreadAnnouncements(announcementsRes.count ?? 0)
     }
@@ -264,9 +274,10 @@ export function BellNotification({ restaurantId }: Props) {
       // events (e.g. RLS-filtered delivery) without a full page reload.
       supabase
         .from("owner_notifications")
-        .select("id, created_at", { count: "exact", head: false })
+        .select("id, title, body, created_at, play_sound", { count: "exact", head: false })
         .eq("restaurant_id", restaurantId)
         .eq("type", "announcement")
+        .eq("is_read", false)
         .order("created_at", { ascending: false })
         .limit(1)
         .then(({ data, count }) => {
@@ -496,8 +507,9 @@ export function BellNotification({ restaurantId }: Props) {
       </div> {/* end ref={dropdownRef} */}
 
       {/* Announcement Center Modal */}
-      {announcementModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      {announcementModal &&
+        createPortal(
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={dismissAnnouncement} />
           <div className="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 animate-scale-up" style={{ maxHeight: "calc(100vh - 32px)", overflowY: "auto" }}>
             <div className="flex items-center gap-3 mb-4">
@@ -558,8 +570,9 @@ export function BellNotification({ restaurantId }: Props) {
               </button>
             </div>
           </div>
-        </div>
-      )}
+        </div>,
+          document.body
+        )}
     </>
   )
 }

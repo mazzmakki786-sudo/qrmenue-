@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import { useParams, useRouter } from "next/navigation"
 import { PlanEditor } from "@/components/superadmin/PlanEditor"
+import { RestaurantLimitsPanel } from "@/components/superadmin/RestaurantLimitsPanel"
 import { Button } from "@/components/ui/button"
 import { formatPrice, timeAgo } from "@/lib/utils"
 import { ArrowLeft, Phone, MapPin, Mail, Calendar, ExternalLink, ShoppingBag, Utensils, BarChart3, Users, TrendingUp, XCircle, Clock, Image as ImageIcon, Crown, Loader2, RotateCcw, PauseCircle, ChevronLeft } from "lucide-react"
@@ -462,6 +463,12 @@ export default function RestaurantDetailPage() {
             {resetMsg && <p className={`text-xs mt-2 ${resetMsg.type === "ok" ? "text-[#16A34A]" : "text-[#DC2626]"}`}>{resetMsg.text}</p>}
           </div>
         </div>
+      </section>
+
+      {/* Credits & Limits */}
+      <section className="mb-6">
+        <h2 className="text-xl font-bold text-black mb-4">Credits &amp; Limits</h2>
+        <RestaurantLimitsPanel restaurantId={id} onUpdated={fetchData} />
       </section>
 
       {/* Bottom Lists */}

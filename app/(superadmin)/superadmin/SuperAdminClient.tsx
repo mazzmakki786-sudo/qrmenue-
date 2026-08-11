@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import dynamic from "next/dynamic"
-import { Eye, EyeOff, Users, BarChart3, Settings as SettingsIcon, Store, Megaphone, Clock, CreditCard, Loader2, Mail } from "lucide-react"
+import { Eye, EyeOff, Users, BarChart3, Settings as SettingsIcon, Store, Megaphone, Clock, CreditCard, Loader2, Mail, Coins } from "lucide-react"
 import { LogoIcon } from "@/components/shared/LogoIcon"
 import { RestaurantTable } from "@/components/superadmin/RestaurantTable"
 import { CustomerTable } from "@/components/superadmin/CustomerTable"
@@ -15,6 +15,7 @@ import { AnnouncementsPanel } from "@/components/superadmin/AnnouncementsPanel"
 import { ActivityLogView } from "@/components/superadmin/ActivityLogView"
 import { PlanManager } from "@/components/superadmin/PlanManager"
 import { ContactInquiriesPanel } from "@/components/superadmin/ContactInquiriesPanel"
+import { LimitsCredits } from "@/components/superadmin/LimitsCredits"
 import { AddUserModal } from "./AddUserModal"
 
 // Dynamic import for heavy analytics view with recharts
@@ -23,7 +24,7 @@ const AnalyticsView = dynamic(
   { ssr: false, loading: () => <div className="h-96 bg-gray-50 rounded-2xl animate-pulse flex items-center justify-center"><span className="text-xs text-gray-400">Loading analytics...</span></div> }
 )
 
-type Tab = "restaurants" | "customers" | "analytics" | "announcements" | "plans" | "settings" | "inquiries"
+type Tab = "restaurants" | "customers" | "analytics" | "announcements" | "plans" | "settings" | "inquiries" | "credits"
 
 const SESSION_TIMEOUT_MS = 15 * 60 * 1000
 
@@ -189,6 +190,7 @@ const TABS: { id: Tab; label: string; icon: any }[] = [
   { id: "restaurants", label: "Restaurants", icon: Store },
   { id: "customers", label: "Customers", icon: Users },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
+  { id: "credits", label: "Credits & Limits", icon: Coins },
   { id: "announcements", label: "Announcements", icon: Megaphone },
   { id: "plans", label: "Plans", icon: CreditCard },
   { id: "inquiries", label: "Inquiries", icon: Mail },
@@ -423,6 +425,7 @@ export default function SuperAdminClient({ currentUserEmail }: { currentUserEmai
             {activeTab === "restaurants" && <RestaurantTable restaurants={restaurants} users={users} setRestaurants={setRestaurants} />}
             {activeTab === "customers" && <CustomerTable />}
             {activeTab === "analytics" && <AnalyticsView />}
+            {activeTab === "credits" && <LimitsCredits users={users} />}
             {activeTab === "inquiries" && <ContactInquiriesPanel />}
             {activeTab === "announcements" && <AnnouncementsPanel />}
             {activeTab === "plans" && <PlanManager />}
