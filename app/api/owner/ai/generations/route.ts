@@ -28,7 +28,7 @@ const dishItemSchema = z.object({
 })
 
 const generateSchema = z.object({
-  dishes: z.array(dishItemSchema).max(12).optional().default([]),
+  dishes: z.array(dishItemSchema).max(2).optional().default([]),
   templateKey: z.enum(Object.keys(AI_TEMPLATES) as [AITemplateKey, ...AITemplateKey[]]).default("classic"),
   colorScheme: z.enum(Object.keys(AI_COLOR_SCHEMES) as [AIColorSchemeKey, ...AIColorSchemeKey[]]).default("appetizing"),
   ratio: z.enum(AI_ASPECT_RATIOS as unknown as [AIAspectRatio, ...AIAspectRatio[]]).default("1:1"),
@@ -185,7 +185,7 @@ export const POST = safeRoute(async (request) => {
     dishes: dishNames.length,
   }, getIpSimple(request)).catch(console.error)
 
-  // ── Call Gemini ──
+  // ── Call Cloudflare FLUX ──
   try {
     const result = await generatePosterArtwork({
       prompt,
