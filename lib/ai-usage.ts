@@ -1,16 +1,15 @@
 import { Cache } from "@/lib/cache"
 
 /**
- * Monthly AI poster generation usage counting for plan limits.
+ * Monthly AI poster generation usage for plan limits.
  *
- * Mirrors `lib/subscription-usage.ts` (order counting) but resets on a
- * calendar-month boundary instead of plan period: usage = number of
- * `ai_poster_generations` rows for the restaurant created this month with
- * status != 'failed'. Failed attempts don't consume credits — the owner can
- * delete or retry them without penalty.
+ * Usage is a MONOTONIC counter stored on the restaurant
+ * (`restaurants.ai_credits_used`), incremented once when a generation
+ * SUCCEEDS. Deleting a poster does NOT decrement it, so the owner cannot
+ * delete old posters to get credits back.
  *
- * Counts are cached in-memory (10s TTL) and invalidated on every create /
- * delete / retry so the dashboard usage bar stays fresh.
+ * Counter is cached in-memory (10s TTL) and invalidated on create / delete /
+ * retry so the dashboard usage bar stays fresh.
  */
 
 export const aiUsageCache = new Cache<number>("ai-usage")
@@ -23,14 +22,8 @@ export function aiUsageKey(restaurantId: string): string {
   return `usage:${restaurantId}:${monthKey()}`
 }
 
-/** ISO timestamp of the first moment of the current month. */
-export function getMonthStartISO(): string {
-  const now = new Date()
-  return new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
-}
-
 type AIClient = {
-  from: (table: "ai_poster_generations") => any
+  from: (table: "restaurants") => any
 }
 
 export async function getAiGenerationCount(
@@ -41,15 +34,38 @@ export async function getAiGenerationCount(
   const cached = aiUsageCache.get(key)
   if (cached !== undefined) return cached
 
-  const { count } = await client
-    .from("ai_poster_generations")
-    .select("id", { count: "exact", head: true })
-    .eq("restaurant_id", restaurantId)
-    .neq("status", "failed")
-    .gte("created_at", getMonthStartISO())
+  const { data } = await client
+    .from("restaurants")
+    .select("ai_credits_used")
+    .eq("id", restaurantId)
+    .maybeSingle()
 
-  aiUsageCache.set(key, count ?? 0, 10_000)
-  return count ?? 0
+  const value = data?.ai_credits_used ?? 0
+  aiUsageCache.set(key, value, 10_000)
+  return value
+}
+
+/**
+ * Atomically increment the restaurant's credit counter and return the new
+ * value. Runs on the admin (service-role) client so it works regardless of
+ * the caller's RLS.
+ */
+export async function incrementAiUsage(
+  restaurantId: string,
+  adminClient: AIClient
+): Promise<number> {
+  const { data } = await adminClient
+    .from("restaurants")
+    .select("ai_credits_used")
+    .eq("id", restaurantId)
+    .single()
+  const next = (data?.ai_credits_used ?? 0) + 1
+  await adminClient
+    .from("restaurants")
+    .update({ ai_credits_used: next })
+    .eq("id", restaurantId)
+  invalidateAiUsage(restaurantId)
+  return next
 }
 
 /** Call after creating, deleting, or retrying a generation. */

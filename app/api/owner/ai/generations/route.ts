@@ -7,7 +7,7 @@ import { csrfGuard } from "@/lib/csrf"
 import { safeRoute } from "@/lib/api-error"
 import { logOwnerAction, getIpSimple } from "@/lib/owner-audit"
 import { getEffectiveLimits } from "@/lib/subscription"
-import { getAiGenerationCount, invalidateAiUsage } from "@/lib/ai-usage"
+import { getAiGenerationCount, incrementAiUsage, invalidateAiUsage } from "@/lib/ai-usage"
 import {
   generatePosterArtwork,
   buildArtworkPrompt,
@@ -22,12 +22,18 @@ import { createLogger } from "@/lib/logger"
 
 const log = createLogger("owner-ai")
 
+const dishItemSchema = z.object({
+  name: z.string().trim().min(1).max(100),
+  price: z.number().nonnegative().max(1000000).optional().nullable(),
+})
+
 const generateSchema = z.object({
-  dishNames: z.array(z.string().trim().min(1)).max(12).optional().default([]),
+  dishes: z.array(dishItemSchema).max(12).optional().default([]),
   templateKey: z.enum(Object.keys(AI_TEMPLATES) as [AITemplateKey, ...AITemplateKey[]]).default("classic"),
   colorScheme: z.enum(Object.keys(AI_COLOR_SCHEMES) as [AIColorSchemeKey, ...AIColorSchemeKey[]]).default("appetizing"),
   ratio: z.enum(AI_ASPECT_RATIOS as unknown as [AIAspectRatio, ...AIAspectRatio[]]).default("1:1"),
   customPrompt: z.string().max(2000).optional(),
+  orderPhone: z.string().trim().max(30).optional().default(""),
 })
 
 export const GET = safeRoute(async (request) => {
@@ -93,7 +99,7 @@ export const POST = safeRoute(async (request) => {
 
   const { data: restaurant } = await supabase
     .from("restaurants")
-    .select("id, name, plan, plan_limits_override, is_active, is_suspended")
+    .select("id, name, slug, phone, plan, plan_limits_override, is_active, is_suspended")
     .eq("owner_id", user.id)
     .maybeSingle()
   if (!restaurant) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
@@ -134,13 +140,20 @@ export const POST = safeRoute(async (request) => {
   const admin = createAdminClient()
 
   // ── Insert generation record (status pending) ──
+  const dishNames = parsed.data.dishes.map((d) => d.name)
+  const dishPrices = parsed.data.dishes.map((d) => d.price ?? null)
   const prompt = buildArtworkPrompt({
     templateKey: parsed.data.templateKey,
     colorScheme: parsed.data.colorScheme,
-    dishNames: parsed.data.dishNames,
+    dishNames,
     customPrompt: parsed.data.customPrompt,
-    restaurantName: restaurant.name,
   })
+
+  const APP_URL =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "https://digitalmenue.com"
+  const qrUrl = `${APP_URL}/${restaurant.slug}`
 
   const { data: gen, error: insertError } = await admin
     .from("ai_poster_generations")
@@ -151,7 +164,10 @@ export const POST = safeRoute(async (request) => {
       template_key: parsed.data.templateKey,
       color_scheme: parsed.data.colorScheme,
       ratio: parsed.data.ratio,
-      dish_names: parsed.data.dishNames,
+      dish_names: dishNames,
+      dish_prices: dishPrices,
+      order_phone: parsed.data.orderPhone || restaurant.phone || null,
+      qr_url: qrUrl,
       status: "pending",
     })
     .select()
@@ -162,12 +178,11 @@ export const POST = safeRoute(async (request) => {
     return NextResponse.json({ error: "Failed to start generation" }, { status: 400 })
   }
 
-  invalidateAiUsage(restaurant.id)
   logOwnerAction(restaurant.id, user.id, "ai_poster_generate", {
     generation_id: gen.id,
     template: parsed.data.templateKey,
     ratio: parsed.data.ratio,
-    dishes: parsed.data.dishNames.length,
+    dishes: dishNames.length,
   }, getIpSimple(request)).catch(console.error)
 
   // ── Call Gemini ──
@@ -177,7 +192,7 @@ export const POST = safeRoute(async (request) => {
       templateKey: parsed.data.templateKey,
       colorScheme: parsed.data.colorScheme,
       ratio: parsed.data.ratio,
-      dishNames: parsed.data.dishNames,
+      dishNames,
     })
 
     // Store in Supabase storage (public bucket ai-posters)
@@ -209,6 +224,9 @@ export const POST = safeRoute(async (request) => {
       log.error("Failed to finalize generation", { error: updateError.message })
     }
 
+    // Consume ONE credit — monotonic, never refunded on delete.
+    const newUsage = await incrementAiUsage(restaurant.id, admin)
+
     return NextResponse.json({
       generation: {
         ...gen,
@@ -216,9 +234,9 @@ export const POST = safeRoute(async (request) => {
         image_path: path,
         image_url: urlData.publicUrl,
       },
-      usage: used + 1,
+      usage: newUsage,
       limit,
-      remaining: Math.max(0, limit - used - 1),
+      remaining: Math.max(0, limit - newUsage),
     })
   } catch (err) {
     const message = err instanceof Error ? err.message : "Generation failed"

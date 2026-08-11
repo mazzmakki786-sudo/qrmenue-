@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Download, Loader2, Trash2, ImageOff } from "lucide-react"
 import type { Database } from "@/types/supabase"
 import { AI_TEMPLATES, AI_COLOR_SCHEMES } from "@/lib/ai-generator"
+import { PosterComposition } from "./PosterComposition"
 
 type Generation = Database["public"]["Tables"]["ai_poster_generations"]["Row"]
 
@@ -16,16 +17,22 @@ interface PosterCardProps {
   deleting: boolean
 }
 
-/** Restaurant poster text overlay — rendered on top of the AI artwork.
- *  Includes the restaurant's call-to-action and layout rules (headline top,
- *  dish list + prices, CTA footer) so every generated poster is on-brand. */
+/** A generated poster in history — renders the composed design (artwork +
+ *  restaurant name, dish price tags, order phone, QR "Scan to Order"). */
 export function PosterCard({ gen, restaurantName, onDelete, deleting }: PosterCardProps) {
   const overlayRef = useRef<HTMLDivElement>(null)
   const [downloading, setDownloading] = useState(false)
-  const [imgError, setImgError] = useState(false)
 
-  const templateLabel = AI_TEMPLATES[gen.template_key as keyof typeof AI_TEMPLATES]?.label ?? gen.template_key
-  const schemeLabel = AI_COLOR_SCHEMES[gen.color_scheme as keyof typeof AI_COLOR_SCHEMES]?.label ?? gen.color_scheme
+  const templateLabel =
+    AI_TEMPLATES[gen.template_key as keyof typeof AI_TEMPLATES]?.label ?? gen.template_key
+  const schemeLabel =
+    AI_COLOR_SCHEMES[gen.color_scheme as keyof typeof AI_COLOR_SCHEMES]?.label ?? gen.color_scheme
+
+  const prices = (gen.dish_prices as (number | null)[] | null) ?? []
+  const dishes = (gen.dish_names || []).map((name, i) => ({
+    name,
+    price: prices[i] ?? null,
+  }))
 
   const handleDownload = async () => {
     if (!overlayRef.current || !gen.image_url) return
@@ -79,50 +86,16 @@ export function PosterCard({ gen, restaurantName, onDelete, deleting }: PosterCa
 
   return (
     <div className="rounded-2xl border border-[#EDEDED] p-4 bg-white flex flex-col">
-      <div className="relative rounded-xl overflow-hidden border border-[#EEE]" ref={overlayRef}>
-        {/* AI artwork background */}
-        {imgError ? (
-          <div className="w-full aspect-square bg-[#F5F5F5] flex items-center justify-center text-[#999]">
-            <ImageOff className="w-8 h-8" />
-          </div>
-        ) : (
-          <img
-            src={gen.image_url}
-            alt="AI generated poster artwork"
-            className="w-full h-auto block"
-            onError={() => setImgError(true)}
-            crossOrigin="anonymous"
-          />
-        )}
-
-        {/* HTML text overlay — dish names + prices + restaurant CTA */}
-        <div className="absolute inset-0 flex flex-col items-center justify-between text-center pointer-events-none p-4">
-          <div>
-            <p className="text-white font-bold text-sm md:text-base uppercase tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-              {restaurantName}
-            </p>
-          </div>
-
-          <div className="bg-black/55 backdrop-blur-[2px] rounded-xl px-4 py-2.5 max-w-full">
-            {gen.dish_names && gen.dish_names.length > 0 ? (
-              <ul className="text-white text-xs md:text-sm font-medium space-y-0.5">
-                {gen.dish_names.slice(0, 6).map((name) => (
-                  <li key={name} className="truncate max-w-[200px] md:max-w-[260px]">
-                    {name}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-white text-xs md:text-sm">Our delicious menu</p>
-            )}
-          </div>
-
-          <div>
-            <p className="text-white text-[10px] md:text-xs uppercase tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-              Scan the QR — Order Now
-            </p>
-          </div>
-        </div>
+      <div className="rounded-xl overflow-hidden border border-[#EEE]" ref={overlayRef}>
+        <PosterComposition
+          artworkUrl={gen.image_url}
+          restaurantName={restaurantName}
+          ratio={(gen.ratio as any) || "1:1"}
+          dishes={dishes}
+          orderPhone={gen.order_phone}
+          qrUrl={gen.qr_url}
+          colorScheme={(gen.color_scheme as any) || "appetizing"}
+        />
       </div>
 
       <div className="flex items-center justify-between mt-3">

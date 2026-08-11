@@ -20,6 +20,15 @@ const CLOUDFLARE_AI_BASE_URL =
 export const AI_ASPECT_RATIOS = ["1:1", "4:3", "3:4", "16:9", "9:16"] as const
 export type AIAspectRatio = (typeof AI_ASPECT_RATIOS)[number]
 
+/** Actual output pixel sizes per ratio (multiples of 16 — FLUX constraint). */
+export const AI_IMAGE_SIZES: Record<AIAspectRatio, { width: number; height: number }> = {
+  "1:1": { width: 1024, height: 1024 },
+  "4:3": { width: 1024, height: 768 },
+  "3:4": { width: 768, height: 1024 },
+  "16:9": { width: 1280, height: 720 },
+  "9:16": { width: 720, height: 1280 },
+}
+
 export interface AIPosterOptions {
   prompt: string
   templateKey: string
@@ -39,7 +48,7 @@ export interface AIPosterResult {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const POSTER_DESIGN_RULES = `Design rules for a professional restaurant promotional poster (ALWAYS follow):
-- Do NOT render any text, letters, numbers, words, logos, or watermarks inside the image — the dish names, prices, and restaurant name are added as clean HTML text on top afterward, so the artwork must be pure imagery with empty (clean) space reserved in the areas where text will go.
+- STRICTLY NO TEXT: Do NOT render any letters, numbers, words, slogans, logos, watermarks, restaurant names, or signs anywhere in the image — no text of any kind.
 - Center-weighted composition: keep the main food/plate centered and visually dominant.
 - Leave clean negative space at the top for a headline, and at the bottom for a footer.
 - Mouth-watering, appetizing food photography: realistic, freshly plated, steam/smoke where suitable, vibrant natural colors.
@@ -98,7 +107,6 @@ export function buildArtworkPrompt(opts: {
   colorScheme: AIColorSchemeKey
   dishNames: string[]
   customPrompt?: string
-  restaurantName: string
 }): string {
   const template = AI_TEMPLATES[opts.templateKey]
   const scheme = AI_COLOR_SCHEMES[opts.colorScheme]
@@ -113,7 +121,7 @@ export function buildArtworkPrompt(opts: {
     return `${opts.customPrompt.trim()} ${POSTER_DESIGN_RULES}`
   }
 
-  return `Promotional poster artwork for "${opts.restaurantName}", a restaurant.
+  return `Professional restaurant promotional poster artwork.
 Show these dishes (photorealistic food): ${dishList}.
 Layout: ${template.label} — ${template.desc}.
 Color palette: ${scheme.palette}.
@@ -144,10 +152,13 @@ export async function generatePosterArtwork(
   // ratio is enforced by the frontend via object-fit + CSS aspect ratio.
 
   const url = `${CLOUDFLARE_AI_BASE_URL}/${accountId}/ai/run/${AI_IMAGE_MODEL}`
+  const size = AI_IMAGE_SIZES[options.ratio]
   const payload = {
     prompt: options.prompt,
     steps: 4,
     seed: Math.floor(Math.random() * 10),
+    width: size.width,
+    height: size.height,
   }
 
   const start = Date.now()

@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useSubscription } from "@/lib/hooks/useSubscription"
 import { Button } from "@/components/ui/button"
-import { Loader2, Sparkles, Wand2, Check } from "lucide-react"
+import { Loader2, Sparkles, Wand2, Check, Phone } from "lucide-react"
+import { PosterComposition } from "./PosterComposition"
 import {
   AI_TEMPLATES,
   AI_COLOR_SCHEMES,
@@ -40,6 +41,7 @@ export function AIPosterGenerator({
   const [templateKey, setTemplateKey] = useState<AITemplateKey>("classic")
   const [colorScheme, setColorScheme] = useState<AIColorSchemeKey>("appetizing")
   const [ratio, setRatio] = useState<AIAspectRatio>("1:1")
+  const [orderPhone, setOrderPhone] = useState("")
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [customPrompt, setCustomPrompt] = useState("")
   const [generating, setGenerating] = useState(false)
@@ -63,6 +65,11 @@ export function AIPosterGenerator({
     loadDishes()
   }, [loadDishes])
 
+  // Default the order phone box from the restaurant profile (editable).
+  useEffect(() => {
+    if (restaurant?.phone) setOrderPhone(restaurant.phone)
+  }, [restaurant?.phone])
+
   const toggleDish = (id: string) => {
     setSelectedDishIds((prev) => {
       const next = new Set(prev)
@@ -73,6 +80,11 @@ export function AIPosterGenerator({
   }
 
   const selectedDishes = dishes.filter((d) => selectedDishIds.has(d.id))
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "https://digitalmenue.com"
+  const previewQr = restaurant?.slug ? `${appUrl}/${restaurant.slug}` : null
 
   const handleGenerate = async () => {
     setError(null)
@@ -90,10 +102,11 @@ export function AIPosterGenerator({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          dishNames: selectedDishes.map((d) => d.name_en),
+          dishes: selectedDishes.map((d) => ({ name: d.name_en, price: d.price })),
           templateKey,
           colorScheme,
           ratio,
+          orderPhone,
           customPrompt: showAdvanced ? customPrompt.trim() : undefined,
         }),
       })
@@ -114,160 +127,205 @@ export function AIPosterGenerator({
   const canGenerate = remaining > 0 && !generating
 
   return (
-    <div className="bg-white rounded-2xl border border-[#EDEDED] p-5 md:p-6">
-      <div className="flex items-center gap-2 mb-1">
-        <Sparkles className="w-5 h-5 text-black" />
-        <h2 className="text-lg font-bold text-[#111]">Generate a Poster</h2>
-      </div>
-      <p className="text-sm text-[#666] mb-5">
-        Pick dishes from your menu — the AI creates restaurant-quality poster artwork.
-      </p>
-
-      {error && (
-        <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-sm text-red-700">
-          {error}
-        </div>
-      )}
-
-      {/* ── Dish selection (auto-picked, editable) ── */}
-      <div className="mb-5">
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-sm font-semibold text-[#333]">
-            Dishes on the poster{" "}
-            <span className="text-[#999] font-normal">({selectedDishes.length} selected)</span>
-          </label>
-          <span className="text-xs text-[#999]">Auto-picked from your menu — edit freely</span>
-        </div>
-        <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
-          {dishes.map((d) => (
-            <button
-              key={d.id}
-              type="button"
-              onClick={() => toggleDish(d.id)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm border transition-colors min-h-[36px] ${
-                selectedDishIds.has(d.id)
-                  ? "bg-black text-white border-black"
-                  : "bg-white text-[#555] border-[#E5E5E5] hover:border-black"
-              }`}
-            >
-              {selectedDishIds.has(d.id) && <Check className="w-3.5 h-3.5" />}
-              {d.name_en}
-            </button>
-          ))}
-          {dishes.length === 0 && (
-            <p className="text-sm text-[#999] w-full py-2">
-              No dishes yet — add dishes in the Menu tab first.
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* ── Design template (3 choices) ── */}
-      <div className="mb-5">
-        <label className="text-sm font-semibold text-[#333] mb-2 block">Design Template</label>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          {(Object.keys(AI_TEMPLATES) as AITemplateKey[]).map((key) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => setTemplateKey(key)}
-              className={`text-left p-3 rounded-xl border transition-colors ${
-                templateKey === key
-                  ? "border-black bg-[#FAFAFA]"
-                  : "border-[#E5E5E5] hover:border-black"
-              }`}
-            >
-              <span className="block text-sm font-semibold text-[#111]">{AI_TEMPLATES[key].label}</span>
-              <span className="block text-xs text-[#666] mt-0.5">{AI_TEMPLATES[key].desc}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Color scheme (3 choices) ── */}
-      <div className="mb-5">
-        <label className="text-sm font-semibold text-[#333] mb-2 block">Color Scheme</label>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          {(Object.keys(AI_COLOR_SCHEMES) as AIColorSchemeKey[]).map((key) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => setColorScheme(key)}
-              className={`text-left p-3 rounded-xl border transition-colors ${
-                colorScheme === key
-                  ? "border-black bg-[#FAFAFA]"
-                  : "border-[#E5E5E5] hover:border-black"
-              }`}
-            >
-              <span className="block text-sm font-semibold text-[#111]">{AI_COLOR_SCHEMES[key].label}</span>
-              <span className="block text-xs text-[#666] mt-0.5">{AI_COLOR_SCHEMES[key].desc}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Ratio ── */}
-      <div className="mb-5">
-        <label className="text-sm font-semibold text-[#333] mb-2 block">Format</label>
-        <div className="flex flex-wrap gap-2">
-          {AI_ASPECT_RATIOS.map((r) => (
-            <button
-              key={r}
-              type="button"
-              onClick={() => setRatio(r)}
-              className={`px-3 py-1.5 rounded-lg border text-sm transition-colors min-h-[36px] ${
-                ratio === r
-                  ? "bg-black text-white border-black"
-                  : "bg-white text-[#555] border-[#E5E5E5] hover:border-black"
-              }`}
-            >
-              {r}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Advanced prompt (optional) ── */}
-      <div className="mb-5">
-        <button
-          type="button"
-          onClick={() => setShowAdvanced((v) => !v)}
-          className="text-sm font-semibold text-[#333] hover:text-black flex items-center gap-1.5"
-        >
-          <Wand2 className="w-4 h-4" />
-          Advanced prompt {showAdvanced ? "▲" : "▼"}
-        </button>
-        {showAdvanced && (
-          <textarea
-            value={customPrompt}
-            onChange={(e) => setCustomPrompt(e.target.value)}
-            placeholder="Describe the poster you want — e.g. 'A Biryani festival poster with marinated chicken, kachumber salad, and mint chutney on a rustic wooden table, warm candlelight...'"
-            className="mt-2 w-full rounded-xl border border-[#E5E5E5] p-3 text-sm focus:border-black focus:outline-none min-h-[100px]"
+    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      {/* ── Live design preview ── */}
+      <div className="lg:col-span-2">
+        <div className="bg-white rounded-2xl border border-[#EDEDED] p-4 lg:sticky lg:top-4">
+          <p className="text-sm font-semibold text-[#333] mb-2">Live poster preview</p>
+          <PosterComposition
+            artworkUrl={null}
+            restaurantName={restaurant?.name || "Your Restaurant"}
+            ratio={ratio}
+            dishes={selectedDishes.map((d) => ({ name: d.name_en, price: d.price }))}
+            orderPhone={orderPhone || null}
+            qrUrl={previewQr}
+            colorScheme={colorScheme}
           />
-        )}
+          <p className="text-[11px] text-[#999] mt-2">
+            This is exactly how your poster will look — text, price tags, phone and QR are
+            overlaid on the AI artwork.
+          </p>
+        </div>
       </div>
 
-      {/* ── Generate CTA ── */}
-      <Button
-        onClick={handleGenerate}
-        disabled={!canGenerate}
-        className="w-full sm:w-auto"
-      >
-        {generating ? (
-          <>
-            <Loader2 className="w-4 h-4 animate-spin mr-2" />
-            Generating artwork… (10–60s)
-          </>
-        ) : (
-          <>
-            <Sparkles className="w-4 h-4 mr-2" />
-            Generate Poster
-          </>
-        )}
-      </Button>
-      <p className="text-xs text-[#999] mt-2">
-        {remaining} of {limit} generations left this month. Failed attempts don&apos;t count.
-      </p>
+      {/* ── Controls ── */}
+      <div className="lg:col-span-3">
+        <div className="bg-white rounded-2xl border border-[#EDEDED] p-5 md:p-6">
+          <div className="flex items-center gap-2 mb-1">
+            <Sparkles className="w-5 h-5 text-black" />
+            <h2 className="text-lg font-bold text-[#111]">Generate a Poster</h2>
+          </div>
+          <p className="text-sm text-[#666] mb-5">
+            Pick dishes from your menu — the AI creates restaurant-quality poster artwork.
+          </p>
+
+          {error && (
+            <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-sm text-red-700">
+              {error}
+            </div>
+          )}
+
+          {/* ── Dish selection (auto-picked, editable) ── */}
+          <div className="mb-5">
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-semibold text-[#333]">
+                Dishes on the poster{" "}
+                <span className="text-[#999] font-normal">({selectedDishes.length} selected)</span>
+              </label>
+              <span className="text-xs text-[#999]">Auto-picked from your menu — edit freely</span>
+            </div>
+            <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+              {dishes.map((d) => (
+                <button
+                  key={d.id}
+                  type="button"
+                  onClick={() => toggleDish(d.id)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm border transition-colors min-h-[36px] ${
+                    selectedDishIds.has(d.id)
+                      ? "bg-black text-white border-black"
+                      : "bg-white text-[#555] border-[#E5E5E5] hover:border-black"
+                  }`}
+                >
+                  {selectedDishIds.has(d.id) && <Check className="w-3.5 h-3.5" />}
+                  {d.name_en}
+                </button>
+              ))}
+              {dishes.length === 0 && (
+                <p className="text-sm text-[#999] w-full py-2">
+                  No dishes yet — add dishes in the Menu tab first.
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* ── Order phone box ── */}
+          <div className="mb-5">
+            <label className="text-sm font-semibold text-[#333] mb-2 flex items-center gap-1.5">
+              <Phone className="w-4 h-4" /> Order phone number
+            </label>
+            <input
+              type="tel"
+              value={orderPhone}
+              onChange={(e) => setOrderPhone(e.target.value)}
+              placeholder="e.g. 0300 1234567"
+              className="w-full rounded-xl border border-[#E5E5E5] p-3 text-sm focus:border-black focus:outline-none"
+            />
+            <p className="text-xs text-[#999] mt-1">
+              Shown in a call box on the poster so customers can order by phone.
+            </p>
+          </div>
+
+          {/* ── Design template (3 choices) ── */}
+          <div className="mb-5">
+            <label className="text-sm font-semibold text-[#333] mb-2 block">Design Template</label>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {(Object.keys(AI_TEMPLATES) as AITemplateKey[]).map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setTemplateKey(key)}
+                  className={`text-left p-3 rounded-xl border transition-colors ${
+                    templateKey === key
+                      ? "border-black bg-[#FAFAFA]"
+                      : "border-[#E5E5E5] hover:border-black"
+                  }`}
+                >
+                  <span className="block text-sm font-semibold text-[#111]">{AI_TEMPLATES[key].label}</span>
+                  <span className="block text-xs text-[#666] mt-0.5">{AI_TEMPLATES[key].desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Color scheme (3 choices) ── */}
+          <div className="mb-5">
+            <label className="text-sm font-semibold text-[#333] mb-2 block">Color Scheme</label>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {(Object.keys(AI_COLOR_SCHEMES) as AIColorSchemeKey[]).map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setColorScheme(key)}
+                  className={`text-left p-3 rounded-xl border transition-colors ${
+                    colorScheme === key
+                      ? "border-black bg-[#FAFAFA]"
+                      : "border-[#E5E5E5] hover:border-black"
+                  }`}
+                >
+                  <span className="block text-sm font-semibold text-[#111]">{AI_COLOR_SCHEMES[key].label}</span>
+                  <span className="block text-xs text-[#666] mt-0.5">{AI_COLOR_SCHEMES[key].desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Ratio ── */}
+          <div className="mb-5">
+            <label className="text-sm font-semibold text-[#333] mb-2 block">Format</label>
+            <div className="flex flex-wrap gap-2">
+              {AI_ASPECT_RATIOS.map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => setRatio(r)}
+                  className={`px-3 py-1.5 rounded-lg border text-sm transition-colors min-h-[36px] ${
+                    ratio === r
+                      ? "bg-black text-white border-black"
+                      : "bg-white text-[#555] border-[#E5E5E5] hover:border-black"
+                  }`}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-[#999] mt-1.5">
+              The poster is generated directly in this format.
+            </p>
+          </div>
+
+          {/* ── Advanced prompt (optional) ── */}
+          <div className="mb-5">
+            <button
+              type="button"
+              onClick={() => setShowAdvanced((v) => !v)}
+              className="text-sm font-semibold text-[#333] hover:text-black flex items-center gap-1.5"
+            >
+              <Wand2 className="w-4 h-4" />
+              Advanced prompt {showAdvanced ? "▲" : "▼"}
+            </button>
+            {showAdvanced && (
+              <textarea
+                value={customPrompt}
+                onChange={(e) => setCustomPrompt(e.target.value)}
+                placeholder="Describe the poster you want — e.g. 'A Biryani festival poster with marinated chicken, kachumber salad, and mint chutney on a rustic wooden table, warm candlelight...'"
+                className="mt-2 w-full rounded-xl border border-[#E5E5E5] p-3 text-sm focus:border-black focus:outline-none min-h-[100px]"
+              />
+            )}
+          </div>
+
+          {/* ── Generate CTA ── */}
+          <Button
+            onClick={handleGenerate}
+            disabled={!canGenerate}
+            className="w-full sm:w-auto"
+          >
+            {generating ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                Generating artwork… (10–60s)
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-4 h-4 mr-2" />
+                Generate Poster
+              </>
+            )}
+          </Button>
+          <p className="text-xs text-[#999] mt-2">
+            {remaining} of {limit} generations left this month. Failed attempts don&apos;t count.
+          </p>
+        </div>
+      </div>
     </div>
   )
 }

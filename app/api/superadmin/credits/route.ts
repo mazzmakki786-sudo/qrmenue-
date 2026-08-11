@@ -3,7 +3,6 @@ import { safeRoute } from "@/lib/api-error"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { isSuperAdmin, logAudit } from "@/lib/superadmin-security"
 import { csrfGuard } from "@/lib/csrf"
-import { getMonthStartISO } from "@/lib/ai-usage"
 
 const LIMIT_KEYS = [
   "maxDishes",
@@ -29,34 +28,22 @@ export const GET = safeRoute(async (request) => {
   }
 
   const admin = createAdminClient()
-  const monthStart = getMonthStartISO()
 
   const [
     restaurantsRes,
-    aiRows,
     dishesRes,
     ordersRes,
   ] = await Promise.all([
     admin
       .from("restaurants")
-      .select("id, name, slug, owner_id, city, plan, plan_limits_override")
+      .select("id, name, slug, owner_id, city, plan, plan_limits_override, ai_credits_used")
       .order("created_at", { ascending: false }),
-    admin
-      .from("ai_poster_generations")
-      .select("restaurant_id")
-      .neq("status", "failed")
-      .gte("created_at", monthStart),
     admin.from("dishes").select("restaurant_id, image_url"),
     admin
       .from("orders")
       .select("restaurant_id")
       .neq("order_status", "cancelled"),
   ])
-
-  const ai_usage: Record<string, number> = {}
-  for (const row of aiRows?.data || []) {
-    ai_usage[row.restaurant_id] = (ai_usage[row.restaurant_id] ?? 0) + 1
-  }
 
   const dish_count: Record<string, number> = {}
   const image_count: Record<string, number> = {}
@@ -78,7 +65,7 @@ export const GET = safeRoute(async (request) => {
     city: r.city,
     plan: r.plan,
     plan_limits_override: r.plan_limits_override,
-    ai_usage: ai_usage[r.id] ?? 0,
+    ai_usage: r.ai_credits_used ?? 0,
     dish_count: dish_count[r.id] ?? 0,
     image_count: image_count[r.id] ?? 0,
     order_count: order_count[r.id] ?? 0,

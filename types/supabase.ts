@@ -19,12 +19,15 @@ export type Database = {
           color_scheme: string
           created_at: string
           dish_names: string[]
+          dish_prices: Json | null
           error_message: string | null
           id: string
           image_path: string | null
           image_url: string | null
+          order_phone: string | null
           owner_id: string
           prompt: string
+          qr_url: string | null
           ratio: string
           restaurant_id: string
           status: string
@@ -34,12 +37,15 @@ export type Database = {
           color_scheme?: string
           created_at?: string
           dish_names?: string[]
+          dish_prices?: Json | null
           error_message?: string | null
           id?: string
           image_path?: string | null
           image_url?: string | null
+          order_phone?: string | null
           owner_id: string
           prompt: string
+          qr_url?: string | null
           ratio?: string
           restaurant_id: string
           status?: string
@@ -49,12 +55,15 @@ export type Database = {
           color_scheme?: string
           created_at?: string
           dish_names?: string[]
+          dish_prices?: Json | null
           error_message?: string | null
           id?: string
           image_path?: string | null
           image_url?: string | null
+          order_phone?: string | null
           owner_id?: string
           prompt?: string
+          qr_url?: string | null
           ratio?: string
           restaurant_id?: string
           status?: string
@@ -960,6 +969,7 @@ export type Database = {
       restaurants: {
         Row: {
           address: string | null
+          ai_credits_used: number | null
           banner_enabled: boolean | null
           banner_image_url: string | null
           banner_link_url: string | null
@@ -1002,6 +1012,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          ai_credits_used?: number | null
           banner_enabled?: boolean | null
           banner_image_url?: string | null
           banner_link_url?: string | null
@@ -1044,6 +1055,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          ai_credits_used?: number | null
           banner_enabled?: boolean | null
           banner_image_url?: string | null
           banner_link_url?: string | null
