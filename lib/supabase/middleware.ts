@@ -28,10 +28,22 @@ const USER_CACHE_TTL_MS = 10_000
 const userCache = new Map<string, { user: any; expiresAt: number }>()
 
 function getAuthCacheKey(request: NextRequest): string | null {
+  // @supabase/ssr stores the session in `sb-<ref>-auth-token` (storage key is
+  // derived from the project ref; verified empirically for this app). Sessions
+  // whose base64url value exceeds 3180 chars are chunked into
+  // `sb-<ref>-auth-token.0`, `.1`, ... (MAX_CHUNK_SIZE in @supabase/ssr) —
+  // Google OAuth sessions commonly exceed this because of user_metadata +
+  // identities. Strip any chunk suffix before matching so chunked sessions are
+  // detected; the PKCE `-code-verifier` cookie is still excluded (its base
+  // name ends in `-code-verifier`, not `-auth-token`).
   const cookie = request.cookies
     .getAll()
-    .find((c) => c.name.startsWith("sb-") && c.name.endsWith("-auth-token"))
-  if (!cookie || !cookie.value) return null
+    .find((c) => {
+      if (!c.value || !c.name.startsWith("sb-")) return false
+      const baseName = c.name.replace(/\.\d+$/, "")
+      return baseName.endsWith("-auth-token")
+    })
+  if (!cookie) return null
   return `${cookie.name}:${cookie.value.slice(0, 48)}`
 }
 
