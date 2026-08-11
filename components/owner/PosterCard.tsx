@@ -91,6 +91,7 @@ export function PosterCard({ gen, restaurantName, onDelete, deleting }: PosterCa
           artworkUrl={gen.image_url}
           restaurantName={restaurantName}
           ratio={(gen.ratio as any) || "1:1"}
+          template={(gen.template_key as any) || "classic"}
           dishes={dishes}
           orderPhone={gen.order_phone}
           qrUrl={gen.qr_url}

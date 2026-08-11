@@ -45,6 +45,7 @@ export interface AIPosterResult {
 export const POSTER_DESIGN_RULES = `Design rules for professional restaurant food photography (ALWAYS follow):
 - STRICTLY NO TEXT: Do NOT render any letters, numbers, words, slogans, logos, watermarks, restaurant names, menus, prices, or signs anywhere in the image — no text of any kind.
 - The dishes listed in the prompt MUST be the only subjects, shown exactly as described, centered in the frame and never cropped out.
+- If two dishes are featured, place them side by side in the center of the frame, both fully visible and equally prominent.
 - Mouth-watering, appetizing food photography: realistic, freshly plated, steam/smoke where suitable, vibrant natural colors.
 - Restaurant-quality presentation: garnishes, props, warm ambient lighting, shallow depth of field.
 - No people, no hands, no faces, no brand logos, no props with printed text (no newspapers, no labels on bottles).
@@ -96,15 +97,11 @@ const DISH_DESCRIPTORS: Record<string, string> = {
 export const AI_TEMPLATES = {
   classic: {
     label: "Classic Feast",
-    desc: "Hero dish in the center with a clean, balanced spread of all selected dishes around it",
+    desc: "Hero dishes in the center with a clean, balanced spread around them",
   },
   modern: {
     label: "Modern Minimalist",
-    desc: "One large hero dish centered on a clean studio background, lots of empty space, premium look",
-  },
-  festive: {
-    label: "Festive Celebration",
-    desc: "Energetic celebratory layout with vibrant decorations, bunting accents, and a lively table spread",
+    desc: "Dishes centered on a clean studio background, lots of empty space, premium look",
   },
 } as const
 
