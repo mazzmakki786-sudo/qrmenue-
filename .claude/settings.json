@@ -9,6 +9,38 @@
       "name": "ceo",
       "description": "Chief Executive Orchestrator — analyzes tasks, selects optimal subagents from 155+ specialists, delegates work, and synthesizes results. Use: /ceo <task>",
       "agentType": "ceo"
+    },
+    {
+      "name": "build",
+      "description": "Implement tasks incrementally — build, test, verify, commit. Add \"auto\" to run the whole plan in one approved pass."
+    },
+    {
+      "name": "code-simplify",
+      "description": "Simplify code for clarity and maintainability — reduce complexity without changing behavior"
+    },
+    {
+      "name": "plan",
+      "description": "Break work into small verifiable tasks with acceptance criteria and dependency ordering"
+    },
+    {
+      "name": "review",
+      "description": "Conduct a five-axis code review — correctness, readability, architecture, security, performance"
+    },
+    {
+      "name": "ship",
+      "description": "Run the pre-launch checklist via parallel fan-out to specialist personas, then synthesize a go/no-go decision"
+    },
+    {
+      "name": "spec",
+      "description": "Start spec-driven development — write a structured specification before writing code"
+    },
+    {
+      "name": "test",
+      "description": "Run TDD workflow — write failing tests, implement, verify. For bugs, use the Prove-It pattern."
+    },
+    {
+      "name": "webperf",
+      "description": "Run a web performance audit via the web-performance-auditor persona"
     }
   ]
 }

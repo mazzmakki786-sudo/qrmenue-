@@ -1,0 +1,26 @@
+- generic [active] [ref=f2e1]:
+  - main [ref=f2e2]:
+    - generic [ref=f2e5]:
+      - generic [ref=f2e6]:
+        - heading "Welcome back" [level=1] [ref=f2e16]
+        - paragraph [ref=f2e17]: Sign in to your account
+      - generic [ref=f2e18]:
+        - generic [ref=f2e19]:
+          - generic [ref=f2e20]: Email*
+          - textbox "Email*" [ref=f2e21]:
+            - /placeholder: owner@restaurant.com
+        - generic [ref=f2e22]:
+          - generic [ref=f2e23]: Password
+          - generic [ref=f2e24]:
+            - textbox "Password" [ref=f2e25]:
+              - /placeholder: Your password
+            - button [ref=f2e26] [cursor=pointer]
+        - button "Sign in" [ref=f2e30] [cursor=pointer]
+      - generic [ref=f2e31]: or
+      - button "Continue with Google" [ref=f2e35] [cursor=pointer]
+      - generic [ref=f2e41]:
+        - link "Don't have an account? Sign up" [ref=f2e42] [cursor=pointer]:
+          - /url: /signup/restaurant
+        - link "Back to home" [ref=f2e43] [cursor=pointer]:
+          - /url: /
+  - alert [ref=f2e44]

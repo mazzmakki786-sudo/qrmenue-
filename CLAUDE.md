@@ -29,6 +29,32 @@ npx playwright test e2e/customer-flow.spec.ts  # Single test file
 # generate_typescript_types — regenerate types/supabase.ts after schema changes
 ```
 
+## Agent Skills (from addyosmani/agent-skills, installed Aug 2026)
+
+24 engineering skills live in `.claude/skills/` (with shared checklists in
+`.claude/skills/references/`), 8 slash commands in `.claude/commands/` and
+`.claude/settings.json`, and 4 agents in `.claude/agents/`
+(`code-reviewer`, `security-auditor`, `test-engineer`, `web-performance-auditor`).
+Skills auto-trigger by task; slash commands are the manual entry points.
+
+| Command | Purpose |
+|---|---|
+| `/spec` | Spec-driven development — structured spec before code |
+| `/plan` | Break work into small verifiable tasks (acceptance criteria + dependencies) |
+| `/build` | Incremental implementation — build, test, verify, commit (`/build auto` = whole plan, one approval) |
+| `/test` | TDD workflow — failing test first; Prove-It pattern for bugs |
+| `/review` | Five-axis code review — correctness, readability, architecture, security, performance |
+| `/webperf` | Web performance audit via the web-performance-auditor persona |
+| `/code-simplify` | Simplify code for clarity without changing behavior |
+| `/ship` | Pre-launch checklist with parallel fan-out + go/no-go synthesis |
+
+Key auto-triggering skills: `spec-driven-development`, `planning-and-task-breakdown`,
+`incremental-implementation`, `test-driven-development` (tests are proof — this project has
+Playwright E2E in `e2e/`), `code-review-and-quality`, `debugging-and-error-recovery`,
+`security-and-hardening`, `performance-optimization`, `shipping-and-launch`,
+`using-agent-skills` (the meta-skill — see it for the discovery map).
+Before adding a new skill, follow `.claude/rules/skills-contributing.md` (anti-duplication).
+
 ## Project Stack
 
 - **Framework**: Next.js 15 (App Router), React 19, TypeScript (strict mode)
