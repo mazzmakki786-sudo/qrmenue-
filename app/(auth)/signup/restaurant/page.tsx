@@ -6,9 +6,10 @@ import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { PasswordInput, validatePassword } from "@/components/ui/password-input"
 import CityAutocomplete from "@/components/shared/CityAutocomplete"
 import { fetchOwnerRestaurant } from "@/lib/owner-restaurant"
-import { Sparkles, Check, X, Loader2, AlertTriangle, ShieldCheck, Timer, Wallet, LogOut } from "lucide-react"
+import { Sparkles, Check, X, Loader2, AlertTriangle, ShieldCheck, Timer, Wallet, LogOut, Mail, KeyRound } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 
 function getGoogleAvatar(user: User): string | undefined {
@@ -25,6 +26,8 @@ function getGoogleName(user: User): string | undefined {
   return typeof metaName === "string" && metaName ? metaName : undefined
 }
 
+const CODE_LENGTH = 6
+
 export default function RestaurantSignupPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -35,12 +38,20 @@ export default function RestaurantSignupPage() {
   const [checkingAuth, setCheckingAuth] = useState(true)
   const [isCustomer, setIsCustomer] = useState(false)
   const [form, setForm] = useState({
-    name: "", city: "", phone: "",
+    name: "", city: "", phone: "", email: "", password: "",
   })
   const [error, setError] = useState<string | null>(errorParam === "setup_failed" ? "Something went wrong creating your restaurant. Please try again." : null)
   const [loading, setLoading] = useState(false)
 
-  // ── Custom slug state ──
+  // ── Email signup → code verification state ──
+  const [awaitingCode, setAwaitingCode] = useState(false)
+  const [verifying, setVerifying] = useState(false)
+  const [resending, setResending] = useState(false)
+  const [code, setCode] = useState<string[]>(Array(CODE_LENGTH).fill(""))
+  const codeInputsRef = useRef<(HTMLInputElement | null)[]>([])
+  const [resendCooldown, setResendCooldown] = useState(0)
+
+  // ── Custom slug state (Google flow) ──
   const [customSlug, setCustomSlug] = useState("")
   const [slugStatus, setSlugStatus] = useState<"idle" | "checking" | "available" | "unavailable">("idle")
   const [slugError, setSlugError] = useState<string | null>(null)
@@ -166,6 +177,20 @@ export default function RestaurantSignupPage() {
     }
   }, [])
 
+  // Auto-focus the first code input when the verification step opens.
+  useEffect(() => {
+    if (awaitingCode) {
+      codeInputsRef.current[0]?.focus()
+    }
+  }, [awaitingCode])
+
+  // Resend cooldown countdown.
+  useEffect(() => {
+    if (resendCooldown <= 0) return
+    const t = setTimeout(() => setResendCooldown((c) => c - 1), 1000)
+    return () => clearTimeout(t)
+  }, [resendCooldown])
+
   const handleGoogleSignup = async () => {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || location.origin
     await supabase.auth.signInWithOAuth({
@@ -187,6 +212,109 @@ export default function RestaurantSignupPage() {
   const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }))
 
+  // ── Code input handlers ──
+  const handleCodeChange = (index: number, value: string) => {
+    // Digits only, single char per box
+    const digit = value.replace(/\D/g, "").slice(-1)
+    const next = [...code]
+    next[index] = digit
+    setCode(next)
+    if (digit && index < CODE_LENGTH - 1) {
+      codeInputsRef.current[index + 1]?.focus()
+    }
+  }
+
+  const handleCodeKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !code[index] && index > 0) {
+      codeInputsRef.current[index - 1]?.focus()
+    }
+  }
+
+  const handleCodePaste = (e: React.ClipboardEvent) => {
+    const text = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, CODE_LENGTH)
+    if (!text) return
+    e.preventDefault()
+    const next = Array(CODE_LENGTH).fill("")
+    text.split("").forEach((d, i) => { next[i] = d })
+    setCode(next)
+    codeInputsRef.current[Math.min(text.length, CODE_LENGTH - 1)]?.focus()
+  }
+
+  const handleVerifyCode = async () => {
+    const entered = code.join("")
+    if (entered.length !== CODE_LENGTH) {
+      setError("Please enter the 6-digit code")
+      return
+    }
+    setVerifying(true)
+    setError(null)
+    try {
+      const hasPaidPlan = preselectedPlan && ["starter", "growth", "premium"].includes(preselectedPlan)
+      const res = await fetch("/api/auth/verify-email-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email,
+          code: entered,
+          // Restaurant details are created server-side once the code checks out.
+          name: form.name,
+          city: form.city,
+          phone: form.phone,
+          plan: hasPaidPlan ? preselectedPlan : undefined,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || "Invalid code. Please try again.")
+        setVerifying(false)
+        return
+      }
+
+      // Email confirmed + restaurant created — sign in and go to onboarding.
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: form.email,
+        password: form.password,
+      })
+      if (signInError) {
+        console.error("[Signup] Post-verify signin failed:", signInError)
+        await new Promise((resolve) => setTimeout(resolve, 1500))
+        await supabase.auth.signInWithPassword({
+          email: form.email,
+          password: form.password,
+        })
+      }
+
+      setVerifying(false)
+      // Hard navigation for reliable cookie delivery.
+      window.location.href = "/dashboard/onboarding"
+    } catch {
+      setError("Something went wrong. Please try again.")
+      setVerifying(false)
+    }
+  }
+
+  const handleResendCode = async () => {
+    if (resendCooldown > 0) return
+    setResending(true)
+    setError(null)
+    try {
+      const res = await fetch("/api/auth/resend-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: form.email }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || "Could not resend the code. Please try again.")
+      } else {
+        setResendCooldown(30)
+      }
+    } catch {
+      setError("Something went wrong. Please try again.")
+    }
+    setResending(false)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -197,70 +325,113 @@ export default function RestaurantSignupPage() {
     }
 
     if (!user) {
-      setError("Please sign in with Google to continue")
+      const pwError = validatePassword(form.password)
+      if (pwError) {
+        setError(pwError)
+        return
+      }
+      if (!form.email.trim()) {
+        setError("Please enter your email address")
+        return
+      }
+    }
+
+    // Google-authenticated signup — create restaurant directly
+    if (user) {
+      if (!customSlug || slugStatus !== "available") {
+        setError("Please choose an available URL for your restaurant")
+        return
+      }
+
+      setLoading(true)
+      setError(null)
+
+      const hasPaidPlan = preselectedPlan && ["starter", "growth", "premium"].includes(preselectedPlan)
+
+      // ALWAYS create as trial — paid plans require superadmin activation
+      const slug = customSlug
+      const insertData: Record<string, unknown> = {
+        owner_id: user.id,
+        name: form.name,
+        slug,
+        phone: form.phone,
+        city: form.city,
+        plan: "trial",
+        requested_plan: hasPaidPlan ? preselectedPlan : null,
+        trial_start: new Date().toISOString(),
+        trial_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        image_upload_allowed: true,
+        is_active: true,
+        is_suspended: false,
+      }
+
+      const { error: dbError } = await (supabase.from("restaurants") as any).insert(insertData)
+
+      if (dbError) {
+        if (dbError.message?.includes("slug")) {
+          setError("This URL is already taken. Please choose another.")
+        } else {
+          setError("Something went wrong. Please try again.")
+        }
+        setLoading(false)
+        return
+      }
+
       setLoading(false)
+
+      // Fire-and-forget welcome email (owned by this new restaurant)
+      fetch("/api/auth/welcome", { method: "POST" }).catch(() => {})
+
+      // Notify superadmin if a paid plan was requested
+      if (hasPaidPlan) {
+        fetch("/api/notifications/plan-request", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ restaurant_slug: customSlug }),
+        }).catch(() => {})
+      }
+
+      router.replace("/onboarding")
       return
     }
 
-    // Validate custom slug (required for all authenticated signups)
-    if (!customSlug || slugStatus !== "available") {
-      setError("Please choose an available URL for your restaurant")
-      setLoading(false)
-      return
-    }
-
+    // ── Email/password signup via API ──
     setLoading(true)
     setError(null)
 
     const hasPaidPlan = preselectedPlan && ["starter", "growth", "premium"].includes(preselectedPlan)
 
-    // User is signed in via Google — create restaurant directly
-    // ALWAYS create as trial — paid plans require superadmin activation
-    const slug = customSlug
-    const insertData: Record<string, unknown> = {
-      owner_id: user.id,
-      name: form.name,
-      slug,
-      phone: form.phone,
-      city: form.city,
-      plan: "trial",
-      requested_plan: hasPaidPlan ? preselectedPlan : null,
-      trial_start: new Date().toISOString(),
-      trial_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-      image_upload_allowed: true,
-      is_active: true,
-      is_suspended: false,
-    }
-
-    const { error: dbError } = await (supabase.from("restaurants") as any).insert(insertData)
-
-    if (dbError) {
-      if (dbError.message?.includes("slug")) {
-        setError("This URL is already taken. Please choose another.")
-      } else {
-        setError("Something went wrong. Please try again.")
-      }
-      setLoading(false)
-      return
-    }
-
-    setLoading(false)
-
-    // Fire-and-forget welcome email (owned by this new restaurant)
-    fetch("/api/auth/welcome", { method: "POST" }).catch(() => {})
-
-    // Notify superadmin if a paid plan was requested
-    if (hasPaidPlan) {
-      // We don't have the restaurant_id from this direct insert, so call via slug
-      fetch("/api/notifications/plan-request", {
+    try {
+      const res = await fetch("/api/auth/signup/restaurant", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ restaurant_slug: customSlug }),
-      }).catch(() => {})
-    }
+        body: JSON.stringify({
+          name: form.name,
+          city: form.city,
+          phone: form.phone,
+          email: form.email,
+          password: form.password,
+          plan: hasPaidPlan ? preselectedPlan : undefined,
+        }),
+      })
 
-    // Always go to onboarding (paid plans need superadmin activation)
-    router.replace("/onboarding")
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || "Something went wrong. Please try again.")
+        setLoading(false)
+        return
+      }
+
+      // Account created — move to the 6-digit code verification step.
+      setLoading(false)
+      setCode(Array(CODE_LENGTH).fill(""))
+      setAwaitingCode(true)
+      setResendCooldown(30)
+    } catch {
+      setError("Something went wrong. Please try again.")
+      setLoading(false)
+    }
   }
 
   const googleAvatar = user ? getGoogleAvatar(user) : undefined
@@ -306,11 +477,11 @@ export default function RestaurantSignupPage() {
             </div>
             <h2 className="text-xl font-bold text-black mb-2">Customer account detected</h2>
             <p className="text-sm text-[#555] max-w-sm mb-6">
-              This Google account is already registered as a customer. A customer
+              This account is already registered as a customer. A customer
               account cannot be used to create a restaurant.
             </p>
             <p className="text-xs text-[#888] max-w-xs mb-4">
-              Please sign in with a different Google account to create a restaurant.
+              Please sign in with a different account to create a restaurant.
             </p>
             <Button variant="google" onClick={handleGoogleSignup} className="w-full min-h-[48px] mb-4">
               <svg className="w-[18px] h-[18px] mr-3 shrink-0" viewBox="0 0 24 24">
@@ -323,15 +494,141 @@ export default function RestaurantSignupPage() {
             </Button>
             <p className="text-xs text-[#999]">This won&apos;t switch you away from the customer account already in use.</p>
           </div>
+        ) : !user && awaitingCode ? (
+          /* ── Email verification step — 6-digit code ── */
+          <div className="flex flex-col items-center py-2">
+            <div className="w-14 h-14 rounded-full bg-[#25D366]/15 flex items-center justify-center mb-5">
+              <Mail className="w-7 h-7 text-[#1ba94a]" />
+            </div>
+            <h1 className="text-xl font-bold text-black mb-1">Verify your email</h1>
+            <p className="text-sm text-[#555] text-center mb-6 max-w-[300px]">
+              We sent a 6-digit code to <span className="font-semibold text-black">{form.email}</span>.
+              Enter it below to activate your restaurant.
+            </p>
+
+            <div className="flex gap-2.5 justify-center mb-2" onPaste={handleCodePaste}>
+              {code.map((digit, i) => (
+                <input
+                  key={i}
+                  ref={(el) => { codeInputsRef.current[i] = el }}
+                  value={digit}
+                  onChange={(e) => handleCodeChange(i, e.target.value)}
+                  onKeyDown={(e) => handleCodeKeyDown(i, e)}
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  maxLength={1}
+                  aria-label={`Digit ${i + 1}`}
+                  className="w-11 h-[52px] text-center text-xl font-bold rounded-[10px] border border-border bg-[#F9FAFB] text-text-primary outline-none focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/20 transition-colors"
+                />
+              ))}
+            </div>
+
+            <p className="text-[11px] text-[#999] mb-4">Code expires in 15 minutes</p>
+
+            {error && (
+              <div className="w-full bg-red-50 border border-red-100 rounded-xl px-4 py-3 mb-4">
+                <p className="text-xs text-[#DC2626]">{error}</p>
+              </div>
+            )}
+
+            <Button type="button" variant="primary" fullWidth loading={verifying} onClick={handleVerifyCode} size="lg">
+              {verifying ? "Verifying..." : "Verify & Create Restaurant"}
+            </Button>
+
+            <button
+              type="button"
+              onClick={handleResendCode}
+              disabled={resending || resendCooldown > 0}
+              className="mt-4 text-sm text-[#555] hover:text-black transition-colors disabled:text-[#bbb] flex items-center gap-1.5"
+            >
+              <KeyRound className="w-3.5 h-3.5" />
+              {resending
+                ? "Resending..."
+                : resendCooldown > 0
+                ? `Resend code in ${resendCooldown}s`
+                : "Didn't receive it? Resend code"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setAwaitingCode(false)}
+              className="mt-2 text-xs text-[#999] hover:text-black transition-colors"
+            >
+              Use a different email
+            </button>
+          </div>
         ) : !user ? (
-          /* ── Not signed in — Google OAuth is the only way in ── */
+          /* ── Not signed in — email/password form + Google ── */
           <div className="flex flex-col items-center py-2">
             <div className="flex flex-col items-center text-center mb-6">
               <h1 className="text-2xl font-bold text-black mb-1">Register Your Restaurant</h1>
               <p className="text-sm text-[#555]">{preselectedPlan ? "Set up your account to continue" : "Start your 30-day free trial today"}</p>
             </div>
 
-            <Button variant="google" onClick={handleGoogleSignup} className="w-full min-h-[48px] mb-4">
+            <form onSubmit={handleSubmit} className="w-full space-y-4">
+              {restaurantFields.map((f) =>
+                f.id === "city" ? (
+                  <CityAutocomplete
+                    key={f.id}
+                    label={f.label}
+                    id={f.id}
+                    value={form.city}
+                    onChange={(val) => setForm((prev) => ({ ...prev, city: val }))}
+                    placeholder={f.placeholder}
+                    required
+                  />
+                ) : (
+                  <Input
+                    key={f.id}
+                    label={f.label}
+                    id={f.id}
+                    type={f.type}
+                    value={(form as any)[f.id]}
+                    onChange={handleChange(f.id)}
+                    placeholder={f.placeholder}
+                    required
+                  />
+                )
+              )}
+
+              <Input
+                label="Email *"
+                id="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange("email")}
+                placeholder="owner@restaurant.com"
+                required
+              />
+              <PasswordInput
+                label="Password *"
+                id="password"
+                value={form.password}
+                onChange={handleChange("password")}
+                placeholder="Create a strong password"
+                required
+                showRequirements
+              />
+
+              {error && (
+                <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3">
+                  <p className="text-xs text-[#DC2626]">{error}</p>
+                </div>
+              )}
+
+              <Button type="submit" variant="primary" fullWidth loading={loading} size="lg">
+                {loading ? "Creating..." : "Create Restaurant & Start Trial"}
+              </Button>
+            </form>
+
+            <div className="relative w-full flex items-center justify-center my-5">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-[#F0F0F0]" />
+              </div>
+              <span className="relative px-4 bg-white text-xs text-[#999] uppercase tracking-wider">or</span>
+            </div>
+
+            <Button variant="google" onClick={handleGoogleSignup} className="w-full min-h-[48px]">
               <svg className="w-[18px] h-[18px] mr-3 shrink-0" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -341,15 +638,9 @@ export default function RestaurantSignupPage() {
               Continue with Google
             </Button>
 
-            <p className="text-xs text-[#555] text-center mt-2 mb-4 max-w-[260px]">
-              You&apos;ll sign in with your Google account, then set up your restaurant.
+            <p className="text-xs text-[#555] text-center mt-4 max-w-[260px]">
+              Your restaurant URL will be generated automatically from your restaurant name.
             </p>
-
-            {error && (
-              <div className="w-full bg-red-50 border border-red-100 rounded-xl px-4 py-3">
-                <p className="text-xs text-[#DC2626]">{error}</p>
-              </div>
-            )}
           </div>
         ) : (
           <>

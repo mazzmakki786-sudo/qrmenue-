@@ -56,24 +56,24 @@ test.describe("Production QA E2E & Responsiveness Audit", () => {
     await page.goto(`${BASE_URL}/pricing`, { waitUntil: "networkidle" })
     await expect(page.locator("body")).toContainText("PKR")
 
-    // 2. Authentication: Google-Only Login Check
+    // 2. Authentication: Email + Google Login Check
     await page.goto(`${BASE_URL}/login`, { waitUntil: "networkidle" })
-    // Owner login is Google OAuth only — no email/password form should exist
+    // Owners can sign in with email/password OR Google OAuth
     const googleBtn = page.locator('button:has-text("Continue with Google")').first()
     await expect(googleBtn).toBeVisible()
-    await expect(page.locator('input[type="email"]')).toHaveCount(0)
-    await expect(page.locator('input[type="password"]')).toHaveCount(0)
-    console.log("✅ /login is Google OAuth only (no email/password form)")
+    await expect(page.locator('input[type="email"]')).toHaveCount(1)
+    await expect(page.locator('input[type="password"]')).toHaveCount(1)
+    console.log("✅ /login has both email/password and Google OAuth")
 
-    // 3. Signup Flow — Google-first gate
+    // 3. Signup Flow — email form + Google option
     await page.goto(`${BASE_URL}/signup/restaurant`, { waitUntil: "networkidle" })
 
-    // Signed-out users only see the Google button (no email/password form)
+    // Signed-out users see the email/password signup form + the Google button
     const signupGoogleBtn = page.locator('button:has-text("Continue with Google")').first()
     await expect(signupGoogleBtn).toBeVisible()
-    await expect(page.locator('input[id="email"]')).toHaveCount(0)
-    await expect(page.locator('input[id="password"]')).toHaveCount(0)
-    console.log("✅ /signup/restaurant gates on Google OAuth")
+    await expect(page.locator('input[id="email"]')).toHaveCount(1)
+    await expect(page.locator('input[id="password"]')).toHaveCount(1)
+    console.log("✅ /signup/restaurant has email/password signup + Google OAuth")
 
     // Complete the merchant workflow is only possible with real Google auth.
     // Fall back to a pre-provisioned restaurant slug for the dashboard CRUD flow.
@@ -152,12 +152,12 @@ test.describe("Production QA E2E & Responsiveness Audit", () => {
       await page.locator('button[aria-label="Close navigation menu"]').first().click() // Close drawer
     }
 
-    // 2. Mobile Google-Only Login Check
+    // 2. Mobile Login Check — email/password + Google OAuth
     await page.goto(`${BASE_URL}/login`, { waitUntil: "networkidle" })
     const googleBtnMobile = page.locator('button:has-text("Continue with Google")').first()
     await expect(googleBtnMobile).toBeVisible()
-    await expect(page.locator('input[type="password"]')).toHaveCount(0)
-    console.log("✅ Mobile /login is Google OAuth only")
+    await expect(page.locator('input[type="password"]')).toHaveCount(1)
+    console.log("✅ Mobile /login has email/password + Google OAuth")
 
     // 3. Mobile Customer Menu
     await page.goto(`${BASE_URL}/${restaurantSlug}`, { waitUntil: "networkidle" })

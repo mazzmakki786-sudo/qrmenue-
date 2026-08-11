@@ -82,6 +82,14 @@ export const superadminAddOwnerSchema = z.object({
   city: citySchema.optional().or(z.literal("")),
 })
 
+export const restaurantSignupSchema = z.object({
+  name: nameSchema,
+  city: citySchema,
+  phone: phoneSchema,
+  email: emailSchema,
+  password: passwordSchema,
+})
+
 export const customerSignupSchema = z.object({
   name: nameSchema,
   phone: phoneSchema,

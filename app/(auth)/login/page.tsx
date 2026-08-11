@@ -3,6 +3,8 @@
 import { Suspense, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import Link from "next/link"
 
 function LoginForm() {
@@ -11,6 +13,7 @@ function LoginForm() {
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [form, setForm] = useState({ email: "", password: "" })
 
   const handleGoogleLogin = async () => {
     setLoading(true)
@@ -31,6 +34,39 @@ function LoginForm() {
     }
   }
 
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!form.email.trim() || !form.password) {
+      setError("Please enter your email and password")
+      return
+    }
+    setLoading(true)
+    setError(null)
+
+    try {
+      const supabase = (await import("@/lib/supabase/client")).createClient()
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: form.email.trim(),
+        password: form.password,
+      })
+      if (signInError) {
+        console.warn("[Owner Login] failure", signInError.code)
+        setError("Incorrect email or password")
+        setLoading(false)
+        return
+      }
+
+      const dest = redirectParam?.startsWith("/dashboard") ? redirectParam : "/dashboard"
+      window.location.href = dest
+    } catch {
+      setError("Something went wrong. Please try again.")
+      setLoading(false)
+    }
+  }
+
+  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm((prev) => ({ ...prev, [field]: e.target.value }))
+
   return (
     <div className="w-full flex flex-col items-center">
       <div className="flex flex-col items-center text-center mb-6">
@@ -48,6 +84,45 @@ function LoginForm() {
         <p className="text-sm text-[#555]">Sign in to your account</p>
       </div>
 
+      <form onSubmit={handleEmailLogin} className="w-full space-y-4">
+        <Input
+          label="Email"
+          id="email"
+          type="email"
+          value={form.email}
+          onChange={handleChange("email")}
+          placeholder="owner@restaurant.com"
+          required
+          autoComplete="email"
+        />
+        <PasswordInput
+          label="Password"
+          id="password"
+          value={form.password}
+          onChange={handleChange("password")}
+          placeholder="Your password"
+          required
+          autoComplete="current-password"
+        />
+
+        {error && (
+          <div className="w-full bg-red-50 border border-red-100 rounded-xl px-4 py-3">
+            <p className="text-xs text-[#DC2626]">{error}</p>
+          </div>
+        )}
+
+        <Button type="submit" variant="primary" fullWidth loading={loading} size="lg">
+          {loading ? "Signing in..." : "Sign in"}
+        </Button>
+      </form>
+
+      <div className="relative w-full flex items-center justify-center my-5">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-[#F0F0F0]" />
+        </div>
+        <span className="relative px-4 bg-white text-xs text-[#999] uppercase tracking-wider">or</span>
+      </div>
+
       <Button variant="google" onClick={handleGoogleLogin} className="w-full mb-5 min-h-[48px]">
         <svg className="w-[18px] h-[18px] mr-3 shrink-0" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
@@ -58,13 +133,7 @@ function LoginForm() {
         Continue with Google
       </Button>
 
-      {error && (
-        <div className="w-full bg-red-50 border border-red-100 rounded-xl px-4 py-3">
-          <p className="text-xs text-[#DC2626]">{error}</p>
-        </div>
-      )}
-
-      <div className="flex flex-col items-center gap-3 mt-6 w-full">
+      <div className="flex flex-col items-center gap-3 mt-2 w-full">
         <Link href="/signup/restaurant" className="text-sm text-[#555] hover:text-black transition-colors">
           Don&apos;t have an account? <span className="text-[#25D366] font-semibold">Sign up</span>
         </Link>
