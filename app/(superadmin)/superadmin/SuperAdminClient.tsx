@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import { uid } from "@/lib/realtime"
 import dynamic from "next/dynamic"
 import { Eye, EyeOff, Users, BarChart3, Settings as SettingsIcon, Store, Megaphone, Clock, CreditCard, Loader2, Mail, Coins } from "lucide-react"
-import { LogoIcon } from "@/components/shared/LogoIcon"
+import { LogoIcon, ICON_LOGO } from "@/components/shared/LogoIcon"
 import { RestaurantTable } from "@/components/superadmin/RestaurantTable"
 import { CustomerTable } from "@/components/superadmin/CustomerTable"
 import { CompanySettingsForm } from "@/components/superadmin/CompanySettingsForm"
@@ -71,7 +71,7 @@ function LoginForm({ onLogin, locked }: { onLogin: () => void; locked: boolean }
       return (
         <div className="fixed inset-0 z-[60] bg-white flex items-center justify-center px-4">
           <div className="text-center max-w-sm">
-            <LogoIcon className="w-12 h-12 mx-auto mb-4" />
+            <LogoIcon className="w-12 h-12 mx-auto mb-4" src={ICON_LOGO} />
             <h1 className="text-xl font-bold mb-2">Lockout Cleared</h1>
             <p className="text-sm text-[#555] mb-6">
               Your lockout has been cleared. Try signing in again.
@@ -85,7 +85,7 @@ function LoginForm({ onLogin, locked }: { onLogin: () => void; locked: boolean }
     return (
       <div className="fixed inset-0 z-[60] bg-white flex items-center justify-center px-4">
         <div className="text-center max-w-sm">
-          <LogoIcon className="w-12 h-12 mb-4 mx-auto" />
+          <LogoIcon className="w-12 h-12 mb-4 mx-auto" src={ICON_LOGO} />
           <h1 className="text-xl font-bold mb-2">Access Denied</h1>
           <p className="text-sm text-[#555] mb-6">
             Account locked due to multiple failed attempts.
@@ -108,7 +108,7 @@ function LoginForm({ onLogin, locked }: { onLogin: () => void; locked: boolean }
     <div className="fixed inset-0 z-[60] bg-white flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <LogoIcon className="w-14 h-14 mx-auto mb-4" />
+          <LogoIcon className="w-14 h-14 mx-auto mb-4" src={ICON_LOGO} />
           <h1 className="text-2xl font-bold">Super Admin</h1>
           <p className="text-sm text-[#555] mt-1">Company access only</p>
         </div>

@@ -9,6 +9,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { timeAgo } from "@/lib/utils"
 import type { Order } from "@/types"
+import { ORDER_STATUS_META, ORDER_STATUS_TABS, type OrderStatus } from "@/lib/orderStatus"
 import { useSubscription } from "@/lib/hooks/useSubscription"
 import { Lock, Sparkles, ArrowRight, Receipt, ChevronRight, Clock, ClipboardList, RefreshCw, Wifi, WifiOff } from "lucide-react"
 import { DashboardFooter } from "@/components/shared/DashboardFooter"
@@ -40,6 +41,8 @@ export default function OrdersPage() {
   const [restaurantId, setRestaurantId] = useState<string | null>(null)
   const [lastUpdated, setLastUpdated] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
+  const [statusFilter, setStatusFilter] = useState<"all" | OrderStatus>("all")
+  const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set())
   const [realtimeConnected, setRealtimeConnected] = useState(true)
   const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null)
   const lastRealtimeRef = useRef<number>(Date.now())
@@ -124,7 +127,19 @@ export default function OrdersPage() {
         (payload) => {
           lastRealtimeRef.current = Date.now()
           setRealtimeConnected(true)
-          setOrders((prev) => [payload.new as Order, ...prev.slice(0, 499)])
+          const newOrder = payload.new as Order
+          setOrders((prev) => [newOrder, ...prev.slice(0, 499)])
+          // Visually highlight freshly arrived orders for ~6s
+          if (newOrder.order_status === "received") {
+            setNewOrderIds((prev) => new Set(prev).add(newOrder.id))
+            setTimeout(() => {
+              setNewOrderIds((prev) => {
+                const next = new Set(prev)
+                next.delete(newOrder.id)
+                return next
+              })
+            }, 6000)
+          }
         }
       )
       .on(
@@ -174,10 +189,16 @@ export default function OrdersPage() {
 
   const blur = (text: string) => "█".repeat(Math.max(4, Math.min(text?.length || 0, 14)))
 
+  // Status filter (client-side) applied on top of the server-side date filter
+  const statusFiltered =
+    statusFilter === "all"
+      ? orders
+      : orders.filter((o) => o.order_status === statusFilter)
+
   // Client-side search by order number
   const searchedOrders = searchQuery.trim()
-    ? orders.filter((o) => String(o.order_number).includes(searchQuery.trim()))
-    : orders
+    ? statusFiltered.filter((o) => String(o.order_number).includes(searchQuery.trim()))
+    : statusFiltered
 
   const totalPages = Math.ceil(searchedOrders.length / PAGE_SIZE)
   const paginatedOrders = searchedOrders.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
@@ -185,7 +206,7 @@ export default function OrdersPage() {
   useEffect(() => {
     setCurrentPage(1)
     setSearchQuery("")
-  }, [filter])
+  }, [filter, statusFilter])
 
   return (
     <div className="max-w-4xl mx-auto flex flex-col gap-6">
@@ -285,6 +306,37 @@ export default function OrdersPage() {
 
 
 
+      {/* Status filter tabs with live counts */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+        {ORDER_STATUS_TABS.map((tab) => {
+          const count =
+            tab.key === "all"
+              ? orders.length
+              : orders.filter((o) => o.order_status === tab.key).length
+          const active = statusFilter === tab.key
+          return (
+            <button
+              key={tab.key}
+              onClick={() => setStatusFilter(tab.key)}
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition-colors shrink-0 ${
+                active
+                  ? "bg-black text-white"
+                  : "bg-[#F0F0F0] text-[#555] hover:bg-[#E2E2E2]"
+              }`}
+            >
+              {tab.label}
+              <span
+                className={`min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center ${
+                  active ? "bg-white/20 text-white" : "bg-white text-[#999]"
+                }`}
+              >
+                {count}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3">
           <p className="text-sm text-red-700">{error}</p>
@@ -312,11 +364,15 @@ export default function OrdersPage() {
           <div className="flex flex-col gap-2">
             {paginatedOrders.map((order) => {
               const isLocked = shouldBlurOrderDetails
+              const meta = ORDER_STATUS_META[order.order_status as OrderStatus]
+              const isNew = newOrderIds.has(order.id)
               return (
                 <Link
                   key={order.id}
                   href={isLocked ? "#" : `/dashboard/orders/${order.id}`}
-                  className={`bg-white border border-[#F0F0F0] rounded-xl p-4 hover:shadow-[0px_4px_20px_rgba(0,0,0,0.05)] transition-all active:scale-[0.995] block ${isLocked ? "cursor-not-allowed" : ""}`}
+                  className={`bg-white border rounded-xl p-4 hover:shadow-[0px_4px_20px_rgba(0,0,0,0.05)] transition-all active:scale-[0.995] block ${
+                    isNew ? "border-[#25D366] ring-2 ring-[#25D366]/30" : "border-[#F0F0F0]"
+                  } ${isLocked ? "cursor-not-allowed" : ""}`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -324,7 +380,7 @@ export default function OrdersPage() {
                         {isLocked ? <Lock className="w-4 h-4 opacity-50" /> : <Receipt className="w-4 h-4" />}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-bold text-sm text-black truncate">
                             {isLocked ? (
                               <span className="blur-sm select-none">{order.order_number}</span>
@@ -332,6 +388,12 @@ export default function OrdersPage() {
                               `#${order.order_number}`
                             )}
                           </span>
+                          {!isLocked && meta && (
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${meta.badge}`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${meta.dot} ${order.order_status === "received" ? "animate-pulse" : ""}`} />
+                              {meta.label}
+                            </span>
+                          )}
                           <span className="text-[10px] text-[#999] flex items-center gap-1 shrink-0">
                             <Clock className="w-3 h-3" />
                             {timeAgo(order.created_at)}

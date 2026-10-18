@@ -13,7 +13,7 @@ import { useCartStore } from "@/stores/cartStore"
 import { CartBar } from "@/components/customer/CartBar"
 import { DealBanner } from "@/components/customer/DealBanner"
 import { DishBadges } from "@/components/customer/DishBadges"
-import { LogoIcon } from "@/components/shared/LogoIcon"
+import { LogoIcon, ICON_LOGO } from "@/components/shared/LogoIcon"
 import type { Category, Deal, Dish } from "@/types"
 import type { BrandingConfig } from "@/lib/branding"
 
@@ -466,7 +466,7 @@ export function RestaurantDetailClient({ restaurant, categories, branding }: Pro
             </Link>
             {/* Logo + Name */}
             <Link href="/restaurants" className="flex items-center gap-2 shrink-0">
-              <LogoIcon className="w-5 h-5 shrink-0" />
+              <LogoIcon className="w-5 h-5 shrink-0" src={ICON_LOGO} />
               <span className="hidden sm:inline text-xs font-semibold text-text-primary">{restaurant.name}</span>
               <span className="text-[10px] text-text-muted hidden sm:inline">— Digital QR Menue</span>
             </Link>

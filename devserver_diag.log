@@ -1,0 +1,27 @@
+
+> qrmenu@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.5.18
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.8:3000
+   - Environments: .env.local
+   - Experiments (use with caution):
+     ⨯ webpackBuildWorker
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Ready in 27.3s
+ ○ Compiling / ...
+ ✓ Compiled / in 31.9s (944 modules)
+ GET / 200 in 2270ms
+ ○ Compiling /api/plans ...
+ ✓ Compiled /api/plans in 3.6s (953 modules)
+ GET /api/plans 200 in 5927ms
+ GET / 200 in 2222ms
+ GET /api/plans 200 in 428ms
+ ✓ Compiled in 2.3s (953 modules)
+ GET / 200 in 3827ms
+ GET /api/plans 200 in 524ms
+ GET /api/plans 200 in 388ms
+[?25h

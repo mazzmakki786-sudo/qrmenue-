@@ -19,11 +19,6 @@ const CLOUDFLARE_AI_BASE_URL =
 export const AI_ASPECT_RATIOS = ["1:1"] as const
 export type AIAspectRatio = (typeof AI_ASPECT_RATIOS)[number]
 
-/** Actual output pixel sizes per ratio (multiples of 16 — FLUX constraint). */
-export const AI_IMAGE_SIZES: Record<AIAspectRatio, { width: number; height: number }> = {
-  "1:1": { width: 1024, height: 1024 },
-}
-
 export interface AIPosterOptions {
   prompt: string
   templateKey: string
@@ -39,69 +34,25 @@ export interface AIPosterResult {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Poster design rules — always applied to the AI prompt
-// ─────────────────────────────────────────────────────────────────────────────
-
-export const POSTER_DESIGN_RULES = `Design rules for professional restaurant food photography (ALWAYS follow):
-- STRICTLY NO TEXT: Do NOT render any letters, numbers, words, slogans, logos, watermarks, restaurant names, menus, prices, or signs anywhere in the image — no text of any kind.
-- The dishes listed in the prompt MUST be the only subjects, shown exactly as described, centered in the frame and never cropped out.
-- If two dishes are featured, place them side by side in the center of the frame, both fully visible and equally prominent.
-- Mouth-watering, appetizing food photography: realistic, freshly plated, steam/smoke where suitable, vibrant natural colors.
-- Restaurant-quality presentation: garnishes, props, warm ambient lighting, shallow depth of field.
-- No people, no hands, no faces, no brand logos, no props with printed text (no newspapers, no labels on bottles).
-- Professional advertising photography style, high resolution, sharp focus on the food.`
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Dish descriptors — curated so FLUX renders the EXACT dish the owner selected
-// (falls back to the dish name itself).
-// ─────────────────────────────────────────────────────────────────────────────
-
-const DISH_DESCRIPTORS: Record<string, string> = {
-  "chicken biryani": "chicken biryani — long-grain basmati rice layered with spiced chicken, saffron, crispy fried onions and fresh mint",
-  "beef biryani": "beef biryani — spiced basmati rice layered with tender beef, saffron and fried onions",
-  biryani: "a hearty biryani — saffron basmati rice layered with spiced meat, crispy fried onions and mint",
-  pulao: "vegetable pulao — fragrant basmati rice with carrots, green peas, whole spices and a drizzle of ghee",
-  "mutton pulao": "mutton pulao — tender mutton pieces in fragrant spiced basmati rice with fried onions",
-  nihari: "beef nihari — a slow-cooked shank stew in a thick spiced gravy, garnished with ginger, green chilies, coriander and lemon",
-  "chicken karahi": "chicken karahi — a tomato-based wok-fried curry with ginger, garlic and green chilies",
-  karahi: "a karahi curry — a wok-fried tomato-based meat curry with ginger, garlic and green chilies",
-  "seekh kebab": "seekh kebabs — charred minced-meat skewers served with grilled onions and mint chutney",
-  kebab: "grilled kebabs — charred skewers of spiced minced meat served with chutney",
-  "chicken tikka": "charcoal chicken tikka — smoky, bright-orange grilled chicken pieces with char marks",
-  tikka: "smoky marinated grilled meat tikka skewers with charred edges",
-  haleem: "haleem — a slow-cooked lentil and meat porridge topped with fried onions, ginger, lemon and coriander",
-  korma: "a rich, creamy chicken korma with a silky cashew gravy and a swirl of cream",
-  daal: "daal — a comforting lentil curry with a tempering of fried garlic, cumin and chilies",
-  "daal makhani": "daal makhani — black lentils slow-cooked with butter and cream",
-  naan: "freshly baked naan bread brushed with butter",
-  "garlic naan": "freshly baked garlic naan brushed with butter and herbs",
-  roti: "freshly baked roti flatbread",
-  chai: "a glass of masala chai — spiced milky tea with cardamom",
-  tea: "a cup of masala chai with cardamom and cinnamon",
-  zinger: "a crispy fried chicken burger with lettuce and spicy mayo",
-  burger: "a gourmet beef burger with melted cheese, fresh lettuce and a brioche bun",
-  fries: "a serving of golden crispy french fries",
-  "french fries": "a serving of golden crispy french fries",
-  pizza: "a wood-fired pizza with bubbling melted cheese and fresh basil",
-  "ice cream": "a scoop of creamy ice cream",
-  "chocolate shake": "a tall glass of thick chocolate milkshake topped with whipped cream",
-  lassi: "a tall glass of creamy sweet lassi topped with pistachios",
-  "cold coffee": "a tall glass of iced cold coffee with cream",
-  salad: "a fresh garden salad with crisp vegetables",
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Design templates (3) — how the artwork is composed
+// Design templates — how the poster is composed
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const AI_TEMPLATES = {
   classic: {
     label: "Classic Feast",
-    desc: "Hero dishes in the center with a clean, balanced spread around them",
+    desc: "Warm traditional restaurant scene, soft candle glow, rich wooden table, centred hero presentation",
   },
   modern: {
     label: "Modern Minimalist",
-    desc: "Dishes centered on a clean studio background, lots of empty space, premium look",
+    desc: "Bright clean studio backdrop, soft even light, pale neutral surface, lots of empty space",
+  },
+  bold: {
+    label: "Street Bold",
+    desc: "Energetic street-food scene, punchy high-contrast lighting, dark stall backdrop, vivid colour",
+  },
+  elegant: {
+    label: "Fine Dining Luxe",
+    desc: "Exclusive fine-dining ambience, black marble table, gold candlelight, deep shadows, discreet and premium",
   },
 } as const
 
@@ -131,36 +82,31 @@ export const AI_COLOR_SCHEMES = {
 
 export type AIColorSchemeKey = keyof typeof AI_COLOR_SCHEMES
 
-/** Build the final artwork prompt from template + palette + exact dish context. */
-export function buildArtworkPrompt(opts: {
+/**
+ * Build the AI backdrop prompt.
+ *
+ * The dish photos themselves come from the restaurant's real menu images (see
+ * lib/poster-artwork.ts), because a text-to-image model can only ever guess what
+ * a dish looks like. AI is used solely for the atmospheric backdrop that sits
+ * behind those photos — so it must contain NO food and NO text.
+ */
+export function buildBackdropPrompt(opts: {
   templateKey: AITemplateKey
   colorScheme: AIColorSchemeKey
-  dishNames: string[]
   customPrompt?: string
 }): string {
+  if (opts.customPrompt && opts.customPrompt.trim()) {
+    return `${opts.customPrompt.trim()} No text, no food, no people.`
+  }
   const template = AI_TEMPLATES[opts.templateKey]
   const scheme = AI_COLOR_SCHEMES[opts.colorScheme]
-
-  if (opts.customPrompt && opts.customPrompt.trim()) {
-    // Advanced mode — owner writes their own vision; still enforce the rules
-    return `${opts.customPrompt.trim()} ${POSTER_DESIGN_RULES}`
-  }
-
-  const dishList =
-    opts.dishNames.length > 0
-      ? opts.dishNames
-          .map((name) => {
-            const key = name.trim().toLowerCase()
-            return DISH_DESCRIPTORS[key] || `the exact dish "${name}", prepared authentically and beautifully plated`
-          })
-          .join("; ")
-      : "a delicious spread of food"
-
-  return `Premium restaurant food photography — one frame that shows ONLY these exact dishes: ${dishList}.
-The dishes above MUST be the only subjects, each clearly identifiable, mouth-watering, and centered in the frame.
-Style: ${template.label} — ${template.desc}.
+  return `Restaurant table ambience backdrop — an empty, clean surface ready for food to be placed on top.
+Scene: ${template.label} — ${template.desc}.
 Color palette: ${scheme.palette}.
-${POSTER_DESIGN_RULES}`
+Mood: warm, inviting, softly lit, shallow depth of field, gentle bokeh, dark edges so white text stays readable.
+Absolutely NO food, NO plates, NO cutlery, NO people, NO hands.
+STRICTLY NO TEXT: no letters, numbers, words, logos, watermarks, menus, prices or signs anywhere.
+Professional commercial photography, high resolution.`
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -170,6 +116,10 @@ ${POSTER_DESIGN_RULES}`
 /**
  * Generate a poster artwork image via Cloudflare Workers AI (FLUX.1 [schnell]).
  * Returns base64 image data; throws on failure with a readable message.
+ *
+ * NOTE: the flux-1-schnell input schema accepts ONLY { prompt, steps }.
+ * Sending seed / width / height returns HTTP 400 "unevaluated properties".
+ * The model natively outputs 1024x1024, which matches the 1:1 poster ratio.
  */
 export async function generatePosterArtwork(
   options: AIPosterOptions
@@ -183,17 +133,12 @@ export async function generatePosterArtwork(
     )
   }
 
-  // FLUX.1 [schnell] accepts explicit width/height (multiples of 16) per the
-  // AI_IMAGE_SIZES map; the poster overlay enforces the visual ratio.
-
   const url = `${CLOUDFLARE_AI_BASE_URL}/${accountId}/ai/run/${AI_IMAGE_MODEL}`
-  const size = AI_IMAGE_SIZES[options.ratio]
   const payload = {
     prompt: options.prompt,
-    steps: 4,
-    seed: Math.floor(Math.random() * 10),
-    width: size.width,
-    height: size.height,
+    // 8 is the documented maximum for flux-1-schnell and roughly doubles detail
+    // over the default 4, for ~2x the neurons. Still ~$0.001 per image.
+    steps: 8,
   }
 
   const start = Date.now()

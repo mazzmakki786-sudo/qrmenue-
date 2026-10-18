@@ -1,0 +1,58 @@
+[
+  {
+    "file": "/preview/1-classic.jpg",
+    "templateKey": "classic",
+    "dishes": [
+      {
+        "name": "Mutton Reshmi Karahi",
+        "price": 1800
+      },
+      {
+        "name": "Chicken Tikka Karahi",
+        "price": 1200
+      }
+    ]
+  },
+  {
+    "file": "/preview/2-modern.jpg",
+    "templateKey": "modern",
+    "dishes": [
+      {
+        "name": "Chicken Pop Burger",
+        "price": 849
+      },
+      {
+        "name": "Ceasar Salad",
+        "price": 800
+      }
+    ]
+  },
+  {
+    "file": "/preview/3-bold.jpg",
+    "templateKey": "bold",
+    "dishes": [
+      {
+        "name": "Mutton Biryani",
+        "price": 650
+      },
+      {
+        "name": "Chicken Biryani",
+        "price": 450
+      }
+    ]
+  },
+  {
+    "file": "/preview/4-elegant.jpg",
+    "templateKey": "elegant",
+    "dishes": [
+      {
+        "name": "Pulao",
+        "price": 500
+      },
+      {
+        "name": "Zarda Rice",
+        "price": 350
+      }
+    ]
+  }
+]

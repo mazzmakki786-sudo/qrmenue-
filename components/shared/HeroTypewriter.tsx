@@ -22,9 +22,27 @@ export function HeroTypewriter() {
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches
-    if (prefersReducedMotion) return // static first phrase for reduced-motion users
 
     let cancelled = false
+
+    // Reduced motion: swap whole phrases (no per-character typing) so the
+    // rotating benefit message still works without triggering motion sickness.
+    if (prefersReducedMotion) {
+      let phraseIndex = 0
+      let timeout: ReturnType<typeof setTimeout>
+      const swap = () => {
+        if (cancelled) return
+        phraseIndex = (phraseIndex + 1) % PHRASES.length
+        setText(PHRASES[phraseIndex])
+        timeout = setTimeout(swap, 2800)
+      }
+      timeout = setTimeout(swap, 2800)
+      return () => {
+        cancelled = true
+        clearTimeout(timeout)
+      }
+    }
+
     let phraseIndex = 0
     let charIndex = PHRASES[0].length
     let deleting = false

@@ -1,0 +1,43 @@
+   ▲ Next.js 15.5.18
+   - Local:        http://localhost:3111
+   - Network:      http://192.168.0.110:3111
+   - Environments: .env.local
+   - Experiments (use with caution):
+     ⨯ webpackBuildWorker
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Ready in 6s
+ ○ Compiling /poster-preview ...
+ ✓ Compiled /poster-preview in 13.4s (798 modules)
+ GET /poster-preview 200 in 9973ms
+ GET /poster-preview 200 in 1414ms
+ ○ Compiling /[slug] ...
+ ✓ Compiled /[slug] in 7.1s (1006 modules)
+ GET /poster-preview 200 in 821ms
+ GET /favicon.ico 200 in 10538ms
+ GET /poster-preview 200 in 883ms
+ GET /favicon.ico 200 in 1376ms
+ GET /poster-preview 200 in 943ms
+ GET /favicon.ico 200 in 1013ms
+ ✓ Compiled in 2.1s (843 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /poster-preview 200 in 1560ms
+ GET /poster-preview 200 in 1571ms
+ ○ Compiling /[slug] ...
+ ✓ Compiled /[slug] in 767ms (619 modules)
+ GET /favicon.ico 200 in 2835ms
+ GET /poster-preview 200 in 1114ms
+ GET /favicon.ico 200 in 1178ms
+ ✓ Compiled in 2.2s (1006 modules)
+ GET /poster-preview 200 in 757ms
+ GET /poster-preview 200 in 1547ms
+ GET /favicon.ico 200 in 1295ms
+ ✓ Compiled in 2.7s (1006 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /poster-preview 200 in 2354ms
+ GET /poster-preview 200 in 2714ms
+ GET /favicon.ico 200 in 1864ms
+ GET /poster-preview 200 in 1065ms
+ GET /favicon.ico 200 in 1068ms
+ GET /poster-preview 200 in 1344ms

@@ -5,9 +5,10 @@ export const dynamic = "force-dynamic"
 import { useEffect, useState, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { formatPrice, timeAgo, formatTo12Hour } from "@/lib/utils"
-import { ChevronRight, ClipboardList, QrCode, UtensilsCrossed, User, Check, TrendingUp, TrendingDown, AlertCircle, RefreshCw, Power, Clock, Sparkles, Store, ImageIcon, MapPin, Phone, Globe, Camera, ChevronLeft, ChevronDown, ChevronUp, Loader2 } from "lucide-react"
+import { ChevronRight, ClipboardList, QrCode, UtensilsCrossed, User, Check, TrendingUp, TrendingDown, AlertCircle, RefreshCw, Power, Clock, Sparkles, Store, ImageIcon, MapPin, Phone, Globe, Camera, ChevronLeft, ChevronDown, ChevronUp, Loader2, ChefHat } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { uid } from "@/lib/realtime"
 import type { Order } from "@/types"
 import { useSubscription } from "@/lib/hooks/useSubscription"
 import { Badge } from "@/components/ui/badge"
@@ -68,6 +69,7 @@ export default function DashboardPage() {
   const [categoryCount, setCategoryCount] = useState(0)
   const [dishCount, setDishCount] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  const [preparingCount, setPreparingCount] = useState(0)
 
   const fetchData = useCallback(async () => {
     if (!restaurant?.id) {
@@ -209,6 +211,30 @@ export default function DashboardPage() {
     }
   }, [restaurant])
 
+  // Live "preparing" order count for the dashboard quick button
+  useEffect(() => {
+    if (!restaurant?.id) return
+    const supabase = createClient()
+    const loadPreparing = async () => {
+      const { count } = await supabase
+        .from("orders")
+        .select("id", { count: "exact", head: true })
+        .eq("restaurant_id", restaurant.id)
+        .eq("order_status", "preparing")
+      setPreparingCount(count ?? 0)
+    }
+    loadPreparing()
+    const channel = supabase
+      .channel(uid(`dash-preparing-${restaurant.id}`))
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "orders", filter: `restaurant_id=eq.${restaurant.id}` },
+        () => loadPreparing()
+      )
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [restaurant?.id])
+
   useEffect(() => {
     if (!restaurant?.id) return
     if (restaurant.plan === "trial") {
@@ -329,6 +355,18 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-black">Dashboard</h1>
         <div className="flex items-center gap-2">
+          <Link
+            href="/dashboard/orders/preparing"
+            className="relative bg-white border border-[#E0E0E0] text-black px-4 py-2 rounded-full flex items-center gap-2 text-sm font-semibold hover:bg-[#F5F5F5] transition-all active:scale-95"
+          >
+            <ChefHat className="w-4 h-4" />
+            <span className="hidden sm:inline">Preparing</span>
+            {preparingCount > 0 && (
+              <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-[#EA580C] text-white text-[10px] font-bold flex items-center justify-center">
+                {preparingCount}
+              </span>
+            )}
+          </Link>
           <Link
             href="/dashboard/qr"
             className="bg-white border border-[#E0E0E0] text-black px-4 py-2 rounded-full flex items-center gap-2 text-sm font-semibold hover:bg-[#F5F5F5] transition-all active:scale-95"

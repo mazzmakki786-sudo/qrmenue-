@@ -10,7 +10,7 @@ import { getEffectiveLimits } from "@/lib/subscription"
 import { getAiGenerationCount, incrementAiUsage, invalidateAiUsage } from "@/lib/ai-usage"
 import {
   generatePosterArtwork,
-  buildArtworkPrompt,
+  buildBackdropPrompt,
   AI_ASPECT_RATIOS,
   AI_TEMPLATES,
   AI_COLOR_SCHEMES,
@@ -18,6 +18,7 @@ import {
   type AIColorSchemeKey,
   type AIAspectRatio,
 } from "@/lib/ai-generator"
+import { buildPosterArtwork } from "@/lib/poster-artwork"
 import { createLogger } from "@/lib/logger"
 
 const log = createLogger("owner-ai")
@@ -142,10 +143,9 @@ export const POST = safeRoute(async (request) => {
   // ── Insert generation record (status pending) ──
   const dishNames = parsed.data.dishes.map((d) => d.name)
   const dishPrices = parsed.data.dishes.map((d) => d.price ?? null)
-  const prompt = buildArtworkPrompt({
+  const prompt = buildBackdropPrompt({
     templateKey: parsed.data.templateKey,
     colorScheme: parsed.data.colorScheme,
-    dishNames,
     customPrompt: parsed.data.customPrompt,
   })
 
@@ -185,23 +185,69 @@ export const POST = safeRoute(async (request) => {
     dishes: dishNames.length,
   }, getIpSimple(request)).catch(console.error)
 
-  // ── Call Cloudflare FLUX ──
+  // ── Resolve the restaurant's REAL dish photos ──
+  // These are the source of truth for the poster: a text-to-image model can only
+  // guess what a dish looks like, the restaurant's own photo cannot be wrong.
+  const { data: menuDishes } = await admin
+    .from("dishes")
+    .select("name_en, image_url")
+    .eq("restaurant_id", restaurant.id)
+
+  const photoByName = new Map<string, string | null>()
+  for (const d of menuDishes || []) {
+    photoByName.set((d.name_en || "").trim().toLowerCase(), d.image_url)
+  }
+  const artworkDishes = parsed.data.dishes.map((d) => ({
+    name: d.name,
+    imageUrl: photoByName.get(d.name.trim().toLowerCase()) ?? null,
+  }))
+
+  // ── Call Cloudflare FLUX for the ambience backdrop ──
+  // Optional: if this fails we still produce a poster from the dish photos alone,
+  // which is free and instant. Never let the backdrop take the whole poster down.
+  let backdrop: Buffer | null = null
   try {
-    const result = await generatePosterArtwork({
+    const ai = await generatePosterArtwork({
       prompt,
       templateKey: parsed.data.templateKey,
       colorScheme: parsed.data.colorScheme,
       ratio: parsed.data.ratio,
-      dishNames,
+      dishNames: [],
+    })
+    backdrop = Buffer.from(ai.b64, "base64")
+  } catch (err) {
+    log.warn("AI backdrop unavailable — falling back to dish-photo backdrop", {
+      error: String(err),
+    })
+  }
+
+  // ── Compose the final artwork from the real dish photos ──
+  try {
+    const artwork = await buildPosterArtwork({
+      dishes: artworkDishes,
+      colorScheme: parsed.data.colorScheme,
+      templateKey: parsed.data.templateKey,
+      backdropImage: backdrop,
+    })
+
+    // Text overlay MUST list exactly the dishes that appear in the artwork,
+    // otherwise the poster advertises a dish it never shows.
+    const shownNames = new Set(artwork.usedDishNames.map((n) => n.trim()))
+    const finalNames: string[] = []
+    const finalPrices: (number | null)[] = []
+    parsed.data.dishes.forEach((d, i) => {
+      if (shownNames.has(d.name.trim())) {
+        finalNames.push(dishNames[i])
+        finalPrices.push(dishPrices[i])
+      }
     })
 
     // Store in Supabase storage (public bucket ai-posters)
     const path = `${restaurant.id}/${gen.id}.jpg`
-    const buffer = Buffer.from(result.b64, "base64")
     const { error: uploadError } = await admin.storage
       .from("ai-posters")
-      .upload(path, buffer, {
-        contentType: result.mimeType || "image/jpeg",
+      .upload(path, artwork.buffer, {
+        contentType: artwork.mimeType,
         upsert: true,
       })
     if (uploadError) {
@@ -217,6 +263,8 @@ export const POST = safeRoute(async (request) => {
         status: "success",
         image_path: path,
         image_url: urlData.publicUrl,
+        dish_names: finalNames,
+        dish_prices: finalPrices,
       })
       .eq("id", gen.id)
 
@@ -233,6 +281,8 @@ export const POST = safeRoute(async (request) => {
         status: "success",
         image_path: path,
         image_url: urlData.publicUrl,
+        dish_names: finalNames,
+        dish_prices: finalPrices,
       },
       usage: newUsage,
       limit,
